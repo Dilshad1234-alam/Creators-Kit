@@ -4,12 +4,18 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import Script from 'next/script';
 
 export default function CheckoutPage() {
   const { cart, cartTotal, clearCart } = useCart();
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalLoading, setModalLoading] = useState(false);
+  const [modalPaymentOption, setModalPaymentOption] = useState('upi');
+  const [paymentMethod, setPaymentMethod] = useState('online');
   const [formData, setFormData] = useState({
     email: '',
     firstName: '',
@@ -17,10 +23,7 @@ export default function CheckoutPage() {
     address: '',
     city: '',
     zip: '',
-    country: 'US',
-    cardNumber: '',
-    expiryDate: '',
-    cvc: '',
+    country: 'IN',
   });
 
   const handleChange = (e) => {
@@ -35,7 +38,17 @@ export default function CheckoutPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/checkout', {
+      if (paymentMethod === 'cod') {
+        // Mock successful COD checkout
+        setTimeout(() => {
+          clearCart();
+          router.push('/order-success');
+        }, 1000);
+        return;
+      }
+
+      // 1. Create Razorpay order via our API route
+      const res = await fetch('/api/create-order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -47,23 +60,68 @@ export default function CheckoutPage() {
       });
 
       if (!res.ok) {
-        throw new Error('Payment processing failed');
+        throw new Error('Failed to create order');
       }
 
-      // Mock successful checkout
-      clearCart();
-      alert('Order placed successfully! Check your email for confirmation.');
-      router.push('/');
+      const order = await res.json();
+
+      // 2. If it's a mock order (because of placeholder keys), open custom modal
+      if (order.id.startsWith('order_mock_')) {
+        setShowModal(true);
+        setLoading(false);
+        return;
+      }
+
+      // 3. Initialize Razorpay Checkout
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_placeholder',
+        amount: order.amount,
+        currency: order.currency,
+        name: 'Creators Kit',
+        description: 'Complete Creators Kit Bundle',
+        order_id: order.id,
+        prefill: {
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email,
+        },
+        theme: {
+          color: '#FC1D00',
+        },
+        handler: function (response) {
+          // Payment Successful
+          console.log(response);
+          clearCart();
+          router.push('/order-success');
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      
+      rzp.on('payment.failed', function (response) {
+        alert('Payment Failed: ' + response.error.description);
+      });
+      
+      rzp.open();
+
     } catch (error) {
       alert('Checkout error: ' + error.message);
-    } finally {
       setLoading(false);
     }
   };
 
+  const handleMockPaymentConfirm = () => {
+    setModalLoading(true);
+    setTimeout(() => {
+      setModalLoading(false);
+      setShowModal(false);
+      clearCart();
+      router.push('/order-success');
+    }, 2000);
+  };
+
   if (!cart || cart.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-zinc-100">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">No items in checkout.</h1>
           <Link href="/product" className="text-[#FC1D00] hover:underline font-medium">Return to store</Link>
@@ -73,185 +131,292 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 text-foreground flex flex-col md:flex-row">
-      
-      {/* Left side: Checkout Form */}
-      <div className="flex-1 p-4 sm:p-8 md:p-12 lg:p-24 bg-white border-r border-neutral-200">
-        <div className="max-w-xl mx-auto">
-          <Link href="/" className="text-2xl font-black tracking-tighter text-[#FC1D00] mb-12 block">
-            Creators Kit
-          </Link>
+    <>
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" />
+      <div className="min-h-screen bg-black py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        {/* Background Glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-[#FC1D00]/10 blur-[120px] rounded-full pointer-events-none"></div>
+
+        <div className="max-w-6xl mx-auto relative z-10 pt-4">
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
           
-          <form onSubmit={handleSubmit} className="space-y-10">
-            {/* Contact */}
-            <section>
-              <h2 className="text-xl font-bold mb-4">Contact Information</h2>
-              <div>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  placeholder="Email address"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-[#FC1D00] focus:border-transparent transition-shadow"
-                />
-              </div>
-            </section>
-
-            {/* Shipping */}
-            <section>
-              <h2 className="text-xl font-bold mb-4">Shipping Address</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  name="firstName"
-                  required
-                  placeholder="First name"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-[#FC1D00]"
-                />
-                <input
-                  type="text"
-                  name="lastName"
-                  required
-                  placeholder="Last name"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-[#FC1D00]"
-                />
-                <input
-                  type="text"
-                  name="address"
-                  required
-                  placeholder="Street address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  className="col-span-2 w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-[#FC1D00]"
-                />
-                <input
-                  type="text"
-                  name="city"
-                  required
-                  placeholder="City"
-                  value={formData.city}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-[#FC1D00]"
-                />
-                <input
-                  type="text"
-                  name="zip"
-                  required
-                  placeholder="ZIP code"
-                  value={formData.zip}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-[#FC1D00]"
-                />
-              </div>
-            </section>
-
-            {/* Payment */}
-            <section>
-              <h2 className="text-xl font-bold mb-4">Payment Details</h2>
-              <p className="text-sm text-neutral-500 mb-4">This is a mock checkout. Do not enter real credit card details.</p>
-              <div className="bg-neutral-50 p-4 rounded-xl border border-neutral-200 space-y-4">
-                <input
-                  type="text"
-                  name="cardNumber"
-                  required
-                  placeholder="Card number"
-                  value={formData.cardNumber}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-[#FC1D00]"
-                />
-                <div className="grid grid-cols-2 gap-4">
+          {/* Left side: Checkout Form */}
+          <div className="w-full lg:flex-1 bg-zinc-900/80 backdrop-blur-xl border border-zinc-800/80 rounded-3xl p-6 shadow-2xl">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Contact */}
+              <section>
+                <h2 className="text-lg font-bold mb-3 text-zinc-100">Contact Information</h2>
+                <div>
                   <input
-                    type="text"
-                    name="expiryDate"
+                    type="email"
+                    name="email"
                     required
-                    placeholder="MM/YY"
-                    value={formData.expiryDate}
+                    placeholder="Email address"
+                    value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-[#FC1D00]"
-                  />
-                  <input
-                    type="text"
-                    name="cvc"
-                    required
-                    placeholder="CVC"
-                    value={formData.cvc}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-[#FC1D00]"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-[#FC1D00] focus:ring-1 focus:ring-[#FC1D00] transition-colors shadow-inner"
                   />
                 </div>
+              </section>
+
+              {/* Shipping */}
+              <section>
+                <h2 className="text-lg font-bold mb-3 text-zinc-100">Shipping Address</h2>
+                <div className="grid grid-cols-2 gap-3">
+                  <input
+                    type="text"
+                    name="firstName"
+                    required
+                    placeholder="First name"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-[#FC1D00] focus:ring-1 focus:ring-[#FC1D00] transition-colors shadow-inner"
+                  />
+                  <input
+                    type="text"
+                    name="lastName"
+                    required
+                    placeholder="Last name"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-[#FC1D00] focus:ring-1 focus:ring-[#FC1D00] transition-colors shadow-inner"
+                  />
+                  <input
+                    type="text"
+                    name="address"
+                    required
+                    placeholder="Street address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    className="col-span-2 w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-[#FC1D00] focus:ring-1 focus:ring-[#FC1D00] transition-colors shadow-inner"
+                  />
+                  <input
+                    type="text"
+                    name="city"
+                    required
+                    placeholder="City"
+                    value={formData.city}
+                    onChange={handleChange}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-[#FC1D00] focus:ring-1 focus:ring-[#FC1D00] transition-colors shadow-inner"
+                  />
+                  <input
+                    type="text"
+                    name="zip"
+                    required
+                    placeholder="ZIP code"
+                    value={formData.zip}
+                    onChange={handleChange}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-[#FC1D00] focus:ring-1 focus:ring-[#FC1D00] transition-colors shadow-inner"
+                  />
+                </div>
+              </section>
+
+              {/* Payment */}
+              <section>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-bold text-zinc-100">Payment Method</h2>
+                  <div className="flex items-center text-[10px] text-green-400 font-medium bg-green-400/10 px-2 py-1 rounded-full border border-green-400/20">
+                    <svg className="w-2.5 h-2.5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 2a5 5 0 00-5 5v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2H9V7a1 1 0 012 0v2h2V7a3 3 0 00-3-3z" clipRule="evenodd"></path>
+                    </svg>
+                    Secure Checkout
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  {/* Online Payment Option */}
+                  <label className={`block p-4 rounded-2xl border cursor-pointer transition-all duration-300 ${paymentMethod === 'online' ? 'bg-[#FC1D00]/10 border-[#FC1D00] shadow-[0_0_15px_rgba(252,29,0,0.1)]' : 'bg-zinc-950/50 border-zinc-800 hover:border-zinc-700'}`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'online' ? 'border-[#FC1D00]' : 'border-zinc-600'}`}>
+                        {paymentMethod === 'online' && <div className="w-2.5 h-2.5 rounded-full bg-[#FC1D00]" />}
+                      </div>
+                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center p-1 shrink-0">
+                        <svg viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full text-[#3395FF]">
+                          <path d="M250 500c138.071 0 250-111.929 250-250S388.071 0 250 0 0 111.929 0 250s111.929 250 250 250z" fill="currentColor"/>
+                          <path d="M150.313 189.688L297.813 135c10.312-3.75 20 4.688 15 14.688L270 235c-2.188 4.688-2.188 10 0 14.688l42.813 85.312c5 10-4.688 18.438-15 14.688L150.313 295c-10.313-3.75-10.313-18.438 0-22.188l55.937-20c4.375-1.562 7.188-5.937 6.875-10.625l-6-63.75c-.625-5.312-5.312-9.062-10.625-8.437l-46.187 6c-11.25 1.562-17.5-12.813-9.375-20.312l49.062-42.5c4-3.438 4.375-9.688.938-13.75-2.813-3.125-7.5-4.062-11.25-2.188l-29.375 14.062c-9.688 4.688-19.376-3.437-14.063-12.5z" fill="#fff"/>
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className={`font-bold text-sm ${paymentMethod === 'online' ? 'text-white' : 'text-zinc-300'}`}>Pay Online (Razorpay)</h3>
+                        <p className="text-zinc-500 text-xs mt-0.5">Credit/Debit, UPI & Netbanking</p>
+                      </div>
+                    </div>
+                    <input type="radio" name="paymentMethod" value="online" checked={paymentMethod === 'online'} onChange={() => setPaymentMethod('online')} className="hidden" />
+                  </label>
+
+                  {/* Cash on Delivery Option */}
+                  <label className={`block p-4 rounded-2xl border cursor-pointer transition-all duration-300 ${paymentMethod === 'cod' ? 'bg-[#FC1D00]/10 border-[#FC1D00] shadow-[0_0_15px_rgba(252,29,0,0.1)]' : 'bg-zinc-950/50 border-zinc-800 hover:border-zinc-700'}`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'cod' ? 'border-[#FC1D00]' : 'border-zinc-600'}`}>
+                        {paymentMethod === 'cod' && <div className="w-2.5 h-2.5 rounded-full bg-[#FC1D00]" />}
+                      </div>
+                      <div className="w-10 h-10 bg-zinc-800 rounded-lg flex items-center justify-center p-2 shrink-0">
+                        <span className="text-xl">🚚</span>
+                      </div>
+                      <div>
+                        <h3 className={`font-bold text-sm ${paymentMethod === 'cod' ? 'text-white' : 'text-zinc-300'}`}>Cash on Delivery (COD)</h3>
+                        <p className="text-zinc-500 text-xs mt-0.5">Pay when you receive your order</p>
+                      </div>
+                    </div>
+                    <input type="radio" name="paymentMethod" value="cod" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} className="hidden" />
+                  </label>
+                </div>
+              </section>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 bg-[#FC1D00] text-white rounded-xl font-bold text-lg hover:bg-[#E01900] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl hover:shadow-[#FC1D00]/40 hover:-translate-y-1 flex justify-center items-center mt-2"
+              >
+                {loading ? (
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : paymentMethod === 'online' ? (
+                  `Pay ₹${cartTotal.toLocaleString()} with Razorpay`
+                ) : (
+                  `Place Order (COD)`
+                )}
+              </button>
+            </form>
+          </div>
+
+          {/* Right side: Order Summary */}
+          <div className="w-full lg:w-[420px] lg:sticky lg:top-24">
+            <div className="bg-zinc-900/80 backdrop-blur-xl border border-zinc-800/80 rounded-3xl p-6 sm:p-8 shadow-2xl">
+              <h2 className="text-xl font-bold mb-6 text-zinc-100">Order Summary</h2>
+              
+              <div className="space-y-4 mb-8">
+                {cart.map((item) => (
+                  <div key={item.id} className="flex gap-4 items-center mb-6">
+                    <div className="relative shrink-0">
+                      <div className="grid grid-cols-3 gap-1.5 w-[140px]">
+                        {item.images && item.images.length > 0 ? (
+                          item.images.map((img, idx) => (
+                            <div key={idx} className="relative w-10 h-10 bg-zinc-950 rounded-lg flex items-center justify-center border border-zinc-800 overflow-hidden shadow-inner">
+                              <Image src={img.src} alt={`${item.name} part ${idx + 1}`} fill className="object-contain p-1" />
+                            </div>
+                          ))
+                        ) : (
+                          <div className="w-16 h-16 bg-zinc-950 border border-zinc-800 rounded-xl flex items-center justify-center text-3xl shadow-inner col-span-3">
+                            📦
+                          </div>
+                        )}
+                      </div>
+                      <span className="absolute -top-2 -right-2 bg-[#FC1D00] text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-lg shadow-[#FC1D00]/50 z-10 ring-2 ring-zinc-900">
+                        {item.quantity}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-sm text-zinc-100 truncate">{item.name}</h4>
+                      <p className="text-xs text-zinc-400 mt-0.5">Complete bundle</p>
+                    </div>
+                    <div className="font-semibold text-sm text-zinc-100">
+                      ₹{(item.price * item.quantity).toLocaleString()}
+                    </div>
+                  </div>
+                ))}
               </div>
-            </section>
+
+              <div className="border-t border-zinc-800/80 pt-6 space-y-3 text-sm text-zinc-400 mb-6">
+                <div className="flex justify-between">
+                  <span>Subtotal</span>
+                  <span className="font-medium text-zinc-100">₹{cartTotal.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Shipping</span>
+                  <span className="font-medium text-green-400">Free</span>
+                </div>
+              </div>
+              
+              <div className="border-t border-zinc-800/80 pt-6 flex justify-between items-center">
+                <span className="text-lg font-bold text-zinc-100">Total</span>
+                <div className="text-right">
+                  <span className="text-xs text-zinc-500 mr-2 font-medium">INR</span>
+                  <span className="text-2xl font-black text-zinc-100 tracking-tight">₹{cartTotal.toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    {/* Custom Mock Payment Modal */}
+    {showModal && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 w-full max-w-md shadow-2xl relative overflow-hidden">
+          {/* Modal Glow */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-[#FC1D00]/10 blur-[50px] rounded-full pointer-events-none"></div>
+          
+          <div className="relative z-10">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-white">Select Payment Method</h3>
+              <button onClick={() => setShowModal(false)} className="text-zinc-500 hover:text-white transition-colors" disabled={modalLoading}>
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-3 mb-8">
+              {/* UPI */}
+              <label className={`block p-4 rounded-xl border cursor-pointer transition-all duration-200 ${modalPaymentOption === 'upi' ? 'bg-zinc-800 border-zinc-600' : 'bg-zinc-950/50 border-zinc-800 hover:border-zinc-700'}`}>
+                <div className="flex items-center gap-3">
+                  <input type="radio" name="modalPayment" value="upi" checked={modalPaymentOption === 'upi'} onChange={() => setModalPaymentOption('upi')} className="accent-[#FC1D00]" disabled={modalLoading} />
+                  <div>
+                    <h4 className="text-white font-medium text-sm">UPI</h4>
+                    <p className="text-zinc-500 text-xs">Google Pay, PhonePe, Paytm</p>
+                  </div>
+                </div>
+              </label>
+
+              {/* Cards */}
+              <label className={`block p-4 rounded-xl border cursor-pointer transition-all duration-200 ${modalPaymentOption === 'cards' ? 'bg-zinc-800 border-zinc-600' : 'bg-zinc-950/50 border-zinc-800 hover:border-zinc-700'}`}>
+                <div className="flex items-center gap-3">
+                  <input type="radio" name="modalPayment" value="cards" checked={modalPaymentOption === 'cards'} onChange={() => setModalPaymentOption('cards')} className="accent-[#FC1D00]" disabled={modalLoading} />
+                  <div>
+                    <h4 className="text-white font-medium text-sm">Credit / Debit Card</h4>
+                    <p className="text-zinc-500 text-xs">Visa, Mastercard, RuPay</p>
+                  </div>
+                </div>
+              </label>
+
+              {/* Netbanking */}
+              <label className={`block p-4 rounded-xl border cursor-pointer transition-all duration-200 ${modalPaymentOption === 'netbanking' ? 'bg-zinc-800 border-zinc-600' : 'bg-zinc-950/50 border-zinc-800 hover:border-zinc-700'}`}>
+                <div className="flex items-center gap-3">
+                  <input type="radio" name="modalPayment" value="netbanking" checked={modalPaymentOption === 'netbanking'} onChange={() => setModalPaymentOption('netbanking')} className="accent-[#FC1D00]" disabled={modalLoading} />
+                  <div>
+                    <h4 className="text-white font-medium text-sm">Netbanking</h4>
+                    <p className="text-zinc-500 text-xs">All major Indian banks</p>
+                  </div>
+                </div>
+              </label>
+            </div>
 
             <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-4 bg-[#FC1D00] text-white rounded-xl font-bold text-lg hover:bg-[#E01900] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md flex justify-center items-center"
+              onClick={handleMockPaymentConfirm}
+              disabled={modalLoading}
+              className="w-full py-4 px-4 bg-[#FC1D00] hover:bg-[#E01A00] text-white font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(252,29,0,0.2)] disabled:opacity-70 flex justify-center items-center"
             >
-              {loading ? (
-                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
+              {modalLoading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing secure payment...
+                </>
               ) : (
-                `Pay $${cartTotal.toFixed(2)}`
+                `Proceed to Pay ₹${cartTotal.toLocaleString()}`
               )}
             </button>
-          </form>
-        </div>
-      </div>
-
-      {/* Right side: Order Summary */}
-      <div className="w-full md:w-96 lg:w-[450px] p-4 sm:p-8 md:p-12 bg-neutral-50">
-        <div className="max-w-md mx-auto sticky top-12">
-          <h2 className="text-xl font-bold mb-6 hidden md:block">Order Summary</h2>
-          
-          <div className="space-y-4 mb-8">
-            {cart.map((item) => (
-              <div key={item.id} className="flex gap-4 items-center">
-                <div className="relative w-16 h-16 bg-white border border-neutral-200 rounded-lg flex items-center justify-center text-3xl shrink-0">
-                  📦
-                  <span className="absolute -top-2 -right-2 bg-neutral-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
-                    {item.quantity}
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-bold text-sm text-neutral-900">{item.name}</h4>
-                  <p className="text-xs text-neutral-500">Complete bundle</p>
-                </div>
-                <div className="font-medium text-sm">
-                  ${(item.price * item.quantity).toFixed(2)}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="border-t border-neutral-200 pt-6 space-y-3 text-sm text-neutral-600 mb-6">
-            <div className="flex justify-between">
-              <span>Subtotal</span>
-              <span className="font-medium text-neutral-900">${cartTotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Shipping</span>
-              <span className="font-medium text-neutral-900">Free</span>
-            </div>
-          </div>
-          
-          <div className="border-t border-neutral-200 pt-6 flex justify-between items-center">
-            <span className="text-lg font-bold text-neutral-900">Total</span>
-            <div className="text-right">
-              <span className="text-xs text-neutral-500 mr-2">USD</span>
-              <span className="text-2xl font-extrabold text-neutral-900">${cartTotal.toFixed(2)}</span>
-            </div>
           </div>
         </div>
       </div>
-
-    </div>
+    )}
+    </>
   );
 }

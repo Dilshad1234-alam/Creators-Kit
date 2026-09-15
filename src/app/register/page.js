@@ -50,24 +50,20 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 tracking-tight">
-          Create your account
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Or{' '}
-          <Link
-            href="/login"
-            className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
-          >
-            sign in to your existing account
-          </Link>
-        </p>
-      </div>
+    <div className="min-h-screen bg-black flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Background Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#FC1D00]/10 rounded-full blur-[120px] pointer-events-none"></div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-xl sm:rounded-xl sm:px-10 border border-gray-100">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
+        <div className="bg-zinc-900/90 border border-zinc-800/80 rounded-2xl shadow-2xl p-8 max-w-md w-full mx-auto backdrop-blur-md">
+          <div className="text-center mb-8">
+            <Link href="/" className="inline-block text-3xl font-black tracking-tighter text-[#FC1D00] mb-2 hover:scale-105 transition-transform">
+              Creators Kit.
+            </Link>
+            <h2 className="text-2xl font-extrabold text-zinc-100 tracking-tight mt-4">
+              Create your account
+            </h2>
+          </div>
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
               <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
@@ -95,7 +91,7 @@ export default function RegisterPage() {
             <div>
               <label
                 htmlFor="name"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-zinc-300"
               >
                 Full Name
               </label>
@@ -108,7 +104,7 @@ export default function RegisterPage() {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
+                  className="appearance-none block w-full px-3 py-2.5 bg-zinc-950 border border-zinc-700 rounded-lg shadow-sm placeholder-zinc-500 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[#FC1D00] focus:border-[#FC1D00] sm:text-sm transition-colors"
                   placeholder="John Doe"
                 />
               </div>
@@ -117,7 +113,7 @@ export default function RegisterPage() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-zinc-300"
               >
                 Email address
               </label>
@@ -130,7 +126,7 @@ export default function RegisterPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
+                  className="appearance-none block w-full px-3 py-2.5 bg-zinc-950 border border-zinc-700 rounded-lg shadow-sm placeholder-zinc-500 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[#FC1D00] focus:border-[#FC1D00] sm:text-sm transition-colors"
                   placeholder="you@example.com"
                 />
               </div>
@@ -139,7 +135,7 @@ export default function RegisterPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-zinc-300"
               >
                 Password
               </label>
@@ -152,7 +148,7 @@ export default function RegisterPage() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
+                  className="appearance-none block w-full px-3 py-2.5 bg-zinc-950 border border-zinc-700 rounded-lg shadow-sm placeholder-zinc-500 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[#FC1D00] focus:border-[#FC1D00] sm:text-sm transition-colors"
                   placeholder="••••••••"
                 />
               </div>
@@ -162,7 +158,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#FC1D00] hover:bg-[#E01900] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FC1D00] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 {loading ? (
                   <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -175,6 +171,16 @@ export default function RegisterPage() {
               </button>
             </div>
           </form>
+
+          <p className="mt-6 text-center text-sm text-zinc-400">
+            Already have an account?{' '}
+            <Link
+              href="/login"
+              className="font-bold text-[#FC1D00] hover:text-red-500 transition-colors"
+            >
+              Sign in
+            </Link>
+          </p>
         </div>
       </div>
     </div>
