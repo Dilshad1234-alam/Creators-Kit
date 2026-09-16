@@ -13,7 +13,7 @@ export default function CartPage() {
 
   if (cart.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-950 px-4 text-zinc-100">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#0d0d0d] px-4 text-zinc-100">
         <div className="text-6xl mb-6">🛒</div>
         <h2 className="text-3xl font-bold mb-4">Your cart is empty</h2>
         <p className="text-zinc-400 mb-8 text-center max-w-md">
@@ -21,7 +21,7 @@ export default function CartPage() {
         </p>
         <Link
           href="/product"
-          className="px-8 py-3 bg-[#FC1D00] text-white rounded-full font-bold hover:bg-[#E01900] transition-colors shadow-sm"
+          className="px-8 py-3 bg-[#FF3B14] text-white rounded-full font-bold hover:bg-[#E01900] transition-colors shadow-sm"
         >
           View Creators Kit
         </Link>
@@ -30,9 +30,9 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden text-zinc-100">
+    <div className="min-h-screen bg-[#0d0d0d] relative overflow-hidden text-zinc-100">
       {/* Background Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-[#FC1D00]/10 blur-[120px] rounded-full pointer-events-none"></div>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-[#FF3B14]/10 blur-[120px] rounded-full pointer-events-none"></div>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
         <h1 className="text-4xl font-extrabold mb-10 text-white">Review Your Cart</h1>
@@ -45,12 +45,12 @@ export default function CartPage() {
                 <div className="grid grid-cols-3 gap-2 shrink-0 w-[184px]">
                   {item.images && item.images.length > 0 ? (
                     item.images.map((img, idx) => (
-                      <div key={idx} className="relative w-14 h-14 bg-zinc-950 rounded-xl flex items-center justify-center border border-zinc-800 overflow-hidden shadow-inner hover:scale-110 transition-transform">
+                      <div key={idx} className="relative w-14 h-14 bg-[#0d0d0d] rounded-xl flex items-center justify-center border border-zinc-800 overflow-hidden shadow-inner hover:scale-110 transition-transform">
                         <Image src={img.src} alt={`${item.name} part ${idx + 1}`} fill className="object-contain p-1.5" />
                       </div>
                     ))
                   ) : (
-                    <div className="relative w-full h-28 col-span-3 bg-zinc-950 rounded-2xl flex items-center justify-center border border-zinc-800 overflow-hidden shadow-inner">
+                    <div className="relative w-full h-28 col-span-3 bg-[#0d0d0d] rounded-2xl flex items-center justify-center border border-zinc-800 overflow-hidden shadow-inner">
                       <span className="text-4xl">📦</span>
                     </div>
                   )}
@@ -60,7 +60,7 @@ export default function CartPage() {
                   <p className="text-zinc-400 text-sm mb-4 truncate">Complete setup with hardware & courses.</p>
                   
                   <div className="flex items-center justify-between mt-auto">
-                    <div className="flex items-center gap-4 bg-zinc-950 rounded-lg p-1 border border-zinc-800">
+                    <div className="flex items-center gap-4 bg-[#0d0d0d] rounded-lg p-1 border border-zinc-800">
                       <button 
                         onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
                         className="w-8 h-8 flex items-center justify-center rounded bg-zinc-900 border border-zinc-700 text-zinc-400 hover:bg-zinc-800 transition-colors"
@@ -78,7 +78,7 @@ export default function CartPage() {
                     
                     <button 
                       onClick={() => removeFromCart(item.id)}
-                      className="text-sm font-medium text-red-500 hover:text-red-700 transition-colors"
+                      className="text-sm font-medium text-#FF6B4A hover:text-red-700 transition-colors"
                     >
                       Remove
                     </button>
@@ -118,7 +118,7 @@ export default function CartPage() {
               
               <button 
                 onClick={() => router.push('/checkout')}
-                className="w-full py-4 bg-[#FC1D00] text-white rounded-2xl font-bold text-lg hover:bg-[#E01900] transition-all duration-300 shadow-xl hover:shadow-[#FC1D00]/40 hover:-translate-y-1"
+                className="w-full py-4 bg-[#FF3B14] text-white rounded-2xl font-bold text-lg hover:bg-[#E01900] transition-all duration-300 shadow-xl hover:shadow-[#FF3B14]/40 hover:-translate-y-1"
               >
                 Proceed to Checkout
               </button>

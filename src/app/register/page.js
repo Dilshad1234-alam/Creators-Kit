@@ -50,14 +50,14 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen bg-[#0d0d0d] flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#FC1D00]/10 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#FF3B14]/10 rounded-full blur-[120px] pointer-events-none"></div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
         <div className="bg-zinc-900/90 border border-zinc-800/80 rounded-2xl shadow-2xl p-8 max-w-md w-full mx-auto backdrop-blur-md">
           <div className="text-center mb-8">
-            <Link href="/" className="inline-block text-3xl font-black tracking-tighter text-[#FC1D00] mb-2 hover:scale-105 transition-transform">
+            <Link href="/" className="inline-block text-3xl font-black tracking-tighter text-[#FF3B14] mb-2 hover:scale-105 transition-transform">
               Creators Kit.
             </Link>
             <h2 className="text-2xl font-extrabold text-zinc-100 tracking-tight mt-4">
@@ -104,7 +104,7 @@ export default function RegisterPage() {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2.5 bg-zinc-950 border border-zinc-700 rounded-lg shadow-sm placeholder-zinc-500 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[#FC1D00] focus:border-[#FC1D00] sm:text-sm transition-colors"
+                  className="appearance-none block w-full px-3 py-2.5 bg-[#0d0d0d] border border-zinc-700 rounded-lg shadow-sm placeholder-zinc-500 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[#FF3B14] focus:border-[#FF3B14] sm:text-sm transition-colors"
                   placeholder="John Doe"
                 />
               </div>
@@ -126,7 +126,7 @@ export default function RegisterPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2.5 bg-zinc-950 border border-zinc-700 rounded-lg shadow-sm placeholder-zinc-500 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[#FC1D00] focus:border-[#FC1D00] sm:text-sm transition-colors"
+                  className="appearance-none block w-full px-3 py-2.5 bg-[#0d0d0d] border border-zinc-700 rounded-lg shadow-sm placeholder-zinc-500 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[#FF3B14] focus:border-[#FF3B14] sm:text-sm transition-colors"
                   placeholder="you@example.com"
                 />
               </div>
@@ -148,7 +148,7 @@ export default function RegisterPage() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2.5 bg-zinc-950 border border-zinc-700 rounded-lg shadow-sm placeholder-zinc-500 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[#FC1D00] focus:border-[#FC1D00] sm:text-sm transition-colors"
+                  className="appearance-none block w-full px-3 py-2.5 bg-[#0d0d0d] border border-zinc-700 rounded-lg shadow-sm placeholder-zinc-500 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[#FF3B14] focus:border-[#FF3B14] sm:text-sm transition-colors"
                   placeholder="••••••••"
                 />
               </div>
@@ -158,7 +158,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#FC1D00] hover:bg-[#E01900] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FC1D00] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#FF3B14] hover:bg-[#E01900] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF3B14] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 {loading ? (
                   <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -176,7 +176,7 @@ export default function RegisterPage() {
             Already have an account?{' '}
             <Link
               href="/login"
-              className="font-bold text-[#FC1D00] hover:text-red-500 transition-colors"
+              className="font-bold text-[#FF3B14] hover:text-#FF6B4A transition-colors"
             >
               Sign in
             </Link>

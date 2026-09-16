@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function OrderSuccessPage() {
   return (
-    <div className="min-h-screen bg-black py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden flex items-center justify-center">
+    <div className="min-h-screen bg-[#0d0d0d] py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden flex items-center justify-center">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-green-500/10 blur-[120px] rounded-full pointer-events-none"></div>
 
@@ -19,7 +19,7 @@ export default function OrderSuccessPage() {
             Thank you for your purchase. Your Creators Kit is ready for download and shipment.
           </p>
 
-          <div className="bg-zinc-950/50 rounded-2xl p-5 mb-8 border border-zinc-800/50 text-left">
+          <div className="bg-[#0d0d0d]/50 rounded-2xl p-5 mb-8 border border-zinc-800/50 text-left">
             <div className="flex justify-between items-center mb-3">
               <span className="text-zinc-500 text-sm">Order Number</span>
               <span className="text-zinc-200 font-mono text-sm">#CK-{Math.floor(100000 + Math.random() * 900000)}</span>
@@ -39,7 +39,7 @@ export default function OrderSuccessPage() {
 
           <Link
             href="/"
-            className="block w-full py-3.5 px-4 bg-[#FC1D00] hover:bg-[#E01A00] text-white font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(252,29,0,0.3)] hover:shadow-[0_0_30px_rgba(252,29,0,0.5)] active:scale-[0.98]"
+            className="block w-full py-3.5 px-4 bg-[#FF3B14] hover:bg-[#E01A00] text-white font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(252,29,0,0.3)] hover:shadow-[0_0_30px_rgba(252,29,0,0.5)] active:scale-[0.98]"
           >
             Return to Dashboard
           </Link>

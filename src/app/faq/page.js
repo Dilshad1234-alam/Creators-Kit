@@ -29,7 +29,7 @@ export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 py-16 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#0d0d0d] text-zinc-100 py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-16">
           <h1 className="text-5xl font-extrabold tracking-tight mb-4 text-zinc-100">Frequently Asked Questions</h1>
@@ -48,7 +48,7 @@ export default function FAQPage() {
               >
                 <span className="font-bold text-lg text-zinc-100">{faq.question}</span>
                 <svg 
-                  className={`w-6 h-6 text-[#FC1D00] transform transition-transform duration-200 ${openIndex === index ? 'rotate-180' : ''}`} 
+                  className={`w-6 h-6 text-[#FF3B14] transform transition-transform duration-200 ${openIndex === index ? 'rotate-180' : ''}`} 
                   fill="none" 
                   viewBox="0 0 24 24" 
                   stroke="currentColor"
@@ -71,7 +71,7 @@ export default function FAQPage() {
         <div className="mt-16 text-center bg-zinc-900 p-8 rounded-3xl border border-zinc-800">
           <h3 className="text-xl font-bold mb-2 text-zinc-100">Still have questions?</h3>
           <p className="text-zinc-400 mb-6">Our support team is ready to help you out.</p>
-          <a href="/contact" className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-[#FC1D00] hover:bg-[#E01900] transition-colors">
+          <a href="/contact" className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-[#FF3B14] hover:bg-[#E01900] transition-colors">
             Contact Support
           </a>
         </div>

@@ -1,8 +1,8 @@
 export default function ReturnsPolicyPage() {
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 py-16 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#0d0d0d] text-zinc-100 py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto prose prose-invert">
-        <h1 className="text-4xl font-extrabold mb-8 text-[#FC1D00]">Return & Refund Policy</h1>
+        <h1 className="text-4xl font-extrabold mb-8 text-[#FF3B14]">Return & Refund Policy</h1>
         
         <div className="space-y-6 text-zinc-400 leading-relaxed">
           <p>We want you to be completely satisfied with your Creators Kit. If for any reason you are not, we offer a generous 30-day money-back guarantee.</p>

@@ -1,8 +1,8 @@
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 py-16 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#0d0d0d] text-zinc-100 py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto prose prose-invert">
-        <h1 className="text-4xl font-extrabold mb-8 text-[#FC1D00]">Privacy Policy</h1>
+        <h1 className="text-4xl font-extrabold mb-8 text-[#FF3B14]">Privacy Policy</h1>
         <p className="text-zinc-500 mb-8">Last updated: {new Date().toLocaleDateString()}</p>
         
         <div className="space-y-6 text-zinc-400 leading-relaxed">
