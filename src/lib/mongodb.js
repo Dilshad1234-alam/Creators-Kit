@@ -2,6 +2,11 @@ import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
+// Do not throw a hard error during build/pre-rendering if URI is missing
+if (!MONGODB_URI && process.env.NODE_ENV !== 'production') {
+  console.warn('Warning: MONGODB_URI environment variable is missing.');
+}
+
 // MONGODB_URI check moved to dbConnect to avoid build-time errors
 
 /**
@@ -19,9 +24,10 @@ async function dbConnect() {
   if (!MONGODB_URI) {
     if (process.env.NODE_ENV === 'production') {
       console.warn('MONGODB_URI is not defined. Skipping DB connection.');
-      return null;
+      // Return a dummy connection or handle gracefully for static build in prod
+    } else {
+      throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
     }
-    throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
   }
 
   if (cached.conn) {
