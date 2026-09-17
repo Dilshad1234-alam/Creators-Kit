@@ -24,7 +24,7 @@ async function dbConnect() {
   if (!MONGODB_URI) {
     if (process.env.NODE_ENV === 'production') {
       console.warn('MONGODB_URI is not defined. Skipping DB connection.');
-      // Return a dummy connection or handle gracefully for static build in prod
+      return null;
     } else {
       throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
     }
