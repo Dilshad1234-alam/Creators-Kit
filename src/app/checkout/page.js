@@ -121,7 +121,7 @@ export default function CheckoutPage() {
 
   if (!cart || cart.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0d0d0d] text-zinc-100">
+      <div className="min-h-screen flex items-center justify-center bg-[#0B0D0E] text-zinc-100">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">No items in checkout.</h1>
           <Link href="/product" className="text-[#FF3B14] hover:underline font-medium">Return to store</Link>
@@ -133,7 +133,7 @@ export default function CheckoutPage() {
   return (
     <>
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
-      <div className="min-h-screen bg-[#0d0d0d] py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="min-h-screen bg-[#0B0D0E] py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         {/* Background Glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-[#FF3B14]/10 blur-[120px] rounded-full pointer-events-none"></div>
 
@@ -154,7 +154,7 @@ export default function CheckoutPage() {
                     placeholder="Email address"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#0d0d0d] border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14] transition-colors shadow-inner"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0D0E] border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14] transition-colors shadow-inner"
                   />
                 </div>
               </section>
@@ -170,7 +170,7 @@ export default function CheckoutPage() {
                     placeholder="First name"
                     value={formData.firstName}
                     onChange={handleChange}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#0d0d0d] border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14] transition-colors shadow-inner"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0D0E] border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14] transition-colors shadow-inner"
                   />
                   <input
                     type="text"
@@ -179,7 +179,7 @@ export default function CheckoutPage() {
                     placeholder="Last name"
                     value={formData.lastName}
                     onChange={handleChange}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#0d0d0d] border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14] transition-colors shadow-inner"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0D0E] border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14] transition-colors shadow-inner"
                   />
                   <input
                     type="text"
@@ -188,7 +188,7 @@ export default function CheckoutPage() {
                     placeholder="Street address"
                     value={formData.address}
                     onChange={handleChange}
-                    className="col-span-2 w-full px-3.5 py-2.5 rounded-xl bg-[#0d0d0d] border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14] transition-colors shadow-inner"
+                    className="col-span-2 w-full px-3.5 py-2.5 rounded-xl bg-[#0B0D0E] border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14] transition-colors shadow-inner"
                   />
                   <input
                     type="text"
@@ -197,7 +197,7 @@ export default function CheckoutPage() {
                     placeholder="City"
                     value={formData.city}
                     onChange={handleChange}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#0d0d0d] border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14] transition-colors shadow-inner"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0D0E] border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14] transition-colors shadow-inner"
                   />
                   <input
                     type="text"
@@ -206,7 +206,7 @@ export default function CheckoutPage() {
                     placeholder="ZIP code"
                     value={formData.zip}
                     onChange={handleChange}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#0d0d0d] border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14] transition-colors shadow-inner"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0D0E] border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14] transition-colors shadow-inner"
                   />
                 </div>
               </section>
@@ -225,7 +225,7 @@ export default function CheckoutPage() {
                 
                 <div className="space-y-3">
                   {/* Online Payment Option */}
-                  <label className={`block p-4 rounded-2xl border cursor-pointer transition-all duration-300 ${paymentMethod === 'online' ? 'bg-[#FF3B14]/10 border-[#FF3B14] shadow-[0_0_15px_rgba(252,29,0,0.1)]' : 'bg-[#0d0d0d]/50 border-zinc-800 hover:border-zinc-700'}`}>
+                  <label className={`block p-4 rounded-2xl border cursor-pointer transition-all duration-300 ${paymentMethod === 'online' ? 'bg-[#FF3B14]/10 border-[#FF3B14] shadow-[0_0_15px_rgba(252,29,0,0.1)]' : 'bg-[#0B0D0E]/50 border-zinc-800 hover:border-zinc-700'}`}>
                     <div className="flex items-center gap-3">
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'online' ? 'border-[#FF3B14]' : 'border-zinc-600'}`}>
                         {paymentMethod === 'online' && <div className="w-2.5 h-2.5 rounded-full bg-[#FF3B14]" />}
@@ -245,7 +245,7 @@ export default function CheckoutPage() {
                   </label>
 
                   {/* Cash on Delivery Option */}
-                  <label className={`block p-4 rounded-2xl border cursor-pointer transition-all duration-300 ${paymentMethod === 'cod' ? 'bg-[#FF3B14]/10 border-[#FF3B14] shadow-[0_0_15px_rgba(252,29,0,0.1)]' : 'bg-[#0d0d0d]/50 border-zinc-800 hover:border-zinc-700'}`}>
+                  <label className={`block p-4 rounded-2xl border cursor-pointer transition-all duration-300 ${paymentMethod === 'cod' ? 'bg-[#FF3B14]/10 border-[#FF3B14] shadow-[0_0_15px_rgba(252,29,0,0.1)]' : 'bg-[#0B0D0E]/50 border-zinc-800 hover:border-zinc-700'}`}>
                     <div className="flex items-center gap-3">
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'cod' ? 'border-[#FF3B14]' : 'border-zinc-600'}`}>
                         {paymentMethod === 'cod' && <div className="w-2.5 h-2.5 rounded-full bg-[#FF3B14]" />}
@@ -294,12 +294,12 @@ export default function CheckoutPage() {
                       <div className="grid grid-cols-3 gap-1.5 w-[140px]">
                         {item.images && item.images.length > 0 ? (
                           item.images.map((img, idx) => (
-                            <div key={idx} className="relative w-10 h-10 bg-[#0d0d0d] rounded-lg flex items-center justify-center border border-zinc-800 overflow-hidden shadow-inner">
+                            <div key={idx} className="relative w-10 h-10 bg-[#0B0D0E] rounded-lg flex items-center justify-center border border-zinc-800 overflow-hidden shadow-inner">
                               <Image src={img.src} alt={`${item.name} part ${idx + 1}`} fill className="object-contain p-1" />
                             </div>
                           ))
                         ) : (
-                          <div className="w-16 h-16 bg-[#0d0d0d] border border-zinc-800 rounded-xl flex items-center justify-center text-3xl shadow-inner col-span-3">
+                          <div className="w-16 h-16 bg-[#0B0D0E] border border-zinc-800 rounded-xl flex items-center justify-center text-3xl shadow-inner col-span-3">
                             📦
                           </div>
                         )}
@@ -346,7 +346,7 @@ export default function CheckoutPage() {
 
     {/* Custom Mock Payment Modal */}
     {showModal && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0d0d0d]/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0B0D0E]/60 backdrop-blur-sm animate-in fade-in duration-200">
         <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 w-full max-w-md shadow-2xl relative overflow-hidden">
           {/* Modal Glow */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-[#FF3B14]/10 blur-[50px] rounded-full pointer-events-none"></div>
@@ -363,7 +363,7 @@ export default function CheckoutPage() {
 
             <div className="space-y-3 mb-8">
               {/* UPI */}
-              <label className={`block p-4 rounded-xl border cursor-pointer transition-all duration-200 ${modalPaymentOption === 'upi' ? 'bg-zinc-800 border-zinc-600' : 'bg-[#0d0d0d]/50 border-zinc-800 hover:border-zinc-700'}`}>
+              <label className={`block p-4 rounded-xl border cursor-pointer transition-all duration-200 ${modalPaymentOption === 'upi' ? 'bg-zinc-800 border-zinc-600' : 'bg-[#0B0D0E]/50 border-zinc-800 hover:border-zinc-700'}`}>
                 <div className="flex items-center gap-3">
                   <input type="radio" name="modalPayment" value="upi" checked={modalPaymentOption === 'upi'} onChange={() => setModalPaymentOption('upi')} className="accent-[#FF3B14]" disabled={modalLoading} />
                   <div>
@@ -374,7 +374,7 @@ export default function CheckoutPage() {
               </label>
 
               {/* Cards */}
-              <label className={`block p-4 rounded-xl border cursor-pointer transition-all duration-200 ${modalPaymentOption === 'cards' ? 'bg-zinc-800 border-zinc-600' : 'bg-[#0d0d0d]/50 border-zinc-800 hover:border-zinc-700'}`}>
+              <label className={`block p-4 rounded-xl border cursor-pointer transition-all duration-200 ${modalPaymentOption === 'cards' ? 'bg-zinc-800 border-zinc-600' : 'bg-[#0B0D0E]/50 border-zinc-800 hover:border-zinc-700'}`}>
                 <div className="flex items-center gap-3">
                   <input type="radio" name="modalPayment" value="cards" checked={modalPaymentOption === 'cards'} onChange={() => setModalPaymentOption('cards')} className="accent-[#FF3B14]" disabled={modalLoading} />
                   <div>
@@ -385,7 +385,7 @@ export default function CheckoutPage() {
               </label>
 
               {/* Netbanking */}
-              <label className={`block p-4 rounded-xl border cursor-pointer transition-all duration-200 ${modalPaymentOption === 'netbanking' ? 'bg-zinc-800 border-zinc-600' : 'bg-[#0d0d0d]/50 border-zinc-800 hover:border-zinc-700'}`}>
+              <label className={`block p-4 rounded-xl border cursor-pointer transition-all duration-200 ${modalPaymentOption === 'netbanking' ? 'bg-zinc-800 border-zinc-600' : 'bg-[#0B0D0E]/50 border-zinc-800 hover:border-zinc-700'}`}>
                 <div className="flex items-center gap-3">
                   <input type="radio" name="modalPayment" value="netbanking" checked={modalPaymentOption === 'netbanking'} onChange={() => setModalPaymentOption('netbanking')} className="accent-[#FF3B14]" disabled={modalLoading} />
                   <div>

@@ -31,6 +31,7 @@ export async function POST(req) {
       name,
       email,
       password,
+      role: 'user', // Default role for all new signups
     });
 
     if (user) {
@@ -39,6 +40,7 @@ export async function POST(req) {
           _id: user._id,
           name: user.name,
           email: user.email,
+          role: user.role,
         },
         { status: 201 }
       );

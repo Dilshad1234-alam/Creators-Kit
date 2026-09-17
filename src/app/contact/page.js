@@ -12,7 +12,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0d0d0d] text-zinc-100 py-16 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#0B0D0E] text-zinc-100 py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h1 className="text-5xl font-extrabold tracking-tight mb-4 text-zinc-100">Contact Us</h1>
@@ -22,7 +22,7 @@ export default function ContactPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 max-w-5xl mx-auto bg-zinc-900 rounded-3xl shadow-sm border border-zinc-800 overflow-hidden">
           
           {/* Contact Info */}
-          <div className="bg-[#0d0d0d] text-zinc-100 p-10 md:p-16 flex flex-col justify-between border-r border-zinc-800">
+          <div className="bg-[#0B0D0E] text-zinc-100 p-10 md:p-16 flex flex-col justify-between border-r border-zinc-800">
             <div>
               <h2 className="text-3xl font-bold mb-6">Get in touch</h2>
               <p className="text-zinc-400 mb-10 leading-relaxed">
@@ -65,7 +65,7 @@ export default function ContactPage() {
                   type="text"
                   id="name"
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-[#0d0d0d] border border-zinc-700 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#FF3B14]"
+                  className="w-full px-4 py-3 rounded-xl bg-[#0B0D0E] border border-zinc-700 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#FF3B14]"
                   placeholder="John Doe"
                 />
               </div>
@@ -75,7 +75,7 @@ export default function ContactPage() {
                   type="email"
                   id="email"
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-[#0d0d0d] border border-zinc-700 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#FF3B14]"
+                  className="w-full px-4 py-3 rounded-xl bg-[#0B0D0E] border border-zinc-700 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#FF3B14]"
                   placeholder="john@example.com"
                 />
               </div>
@@ -85,7 +85,7 @@ export default function ContactPage() {
                   id="message"
                   required
                   rows="4"
-                  className="w-full px-4 py-3 rounded-xl bg-[#0d0d0d] border border-zinc-700 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#FF3B14] resize-none"
+                  className="w-full px-4 py-3 rounded-xl bg-[#0B0D0E] border border-zinc-700 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#FF3B14] resize-none"
                   placeholder="How can we help you?"
                 ></textarea>
               </div>

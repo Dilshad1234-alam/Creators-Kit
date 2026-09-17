@@ -1,11 +1,32 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function Home() {
   const [openFaqIndex, setOpenFaqIndex] = useState(-1);
+  const [isHeroHovered, setIsHeroHovered] = useState(false);
+  const [currentFrame, setCurrentFrame] = useState(0);
+
+  const ringLightFrames = [
+    '/kits 17.jpg - Edited.png',
+    '/kits 18.jpg - Edited.png',
+    '/kits 14.jpg - Edited.png',
+    '/kits 16.jpg - Edited.png',
+  ];
+
+  useEffect(() => {
+    let interval;
+    if (isHeroHovered) {
+      interval = setInterval(() => {
+        setCurrentFrame((prev) => (prev + 1) % ringLightFrames.length);
+      }, 300);
+    } else {
+      setCurrentFrame(0);
+    }
+    return () => clearInterval(interval);
+  }, [isHeroHovered]);
 
   const kitComponents = [
     {
@@ -16,7 +37,7 @@ export default function Home() {
       useCase: 'Perfect for well-lit vlogs, beauty tutorials, and streaming.',
       benefit: 'Instantly elevates your video quality with flattering, even lighting.',
       icon: '💡',
-      image: '/kits 7.jpg - Edited.png',
+      image: '/kits 25.jpg - Edited.png',
     },
     {
       id: 'mic',
@@ -26,7 +47,7 @@ export default function Home() {
       useCase: 'Ideal for interviews, podcasts, and on-the-go vlogging.',
       benefit: 'Ensures your audience hears every word clearly, without background static.',
       icon: '🎙️',
-      image: '/kits 2 - Edited.png',
+      image: '/kits 27.jpg - Edited.png',
     },
     {
       id: 'tripod',
@@ -36,7 +57,7 @@ export default function Home() {
       useCase: 'Achieve stable shots and smooth panning for professional videos.',
       benefit: 'No more shaky footage; get the perfect angle every time.',
       icon: '📸',
-      image: '/kits 11.jpg - Edited.png',
+      image: '/kits 24.jpg - Edited.png',
     },
     {
       id: 'green-screen',
@@ -46,7 +67,7 @@ export default function Home() {
       useCase: 'Easily drop in custom backgrounds for gaming, streaming, or effects.',
       benefit: 'Transform your messy bedroom into a professional studio instantly.',
       icon: '🟩',
-      image: '/kits 5.jpg - Edited.png',
+      image: '/kits 26.jpg - Edited.png',
     },
     {
       id: 'pen-drive',
@@ -56,7 +77,7 @@ export default function Home() {
       useCase: 'Access premium educational content offline, anywhere you go.',
       benefit: 'No internet required to learn the exact secrets of going viral.',
       icon: '💾',
-      image: '/kits 4.jpg - Edited.png',
+      image: '/kits 28.jpg - Edited.png',
     },
   ];
 
@@ -109,14 +130,14 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0d0d0d] text-white font-sans overflow-x-hidden w-full">
+    <div className="min-h-screen flex flex-col bg-[#0B0D0E] text-white font-sans overflow-x-hidden w-full">
       <main className="flex-grow w-full">
         {/* 1. Hero Section (7.1) */}
-        <section className="relative w-full pt-8 md:pt-12 pb-4 overflow-hidden bg-[#0d0d0d]">
+        <section className="relative w-full pt-8 md:pt-12 pb-4 overflow-hidden bg-[#0B0D0E]">
           <div className="w-full grid grid-cols-1 lg:grid-cols-12 items-center gap-12 px-6 lg:px-12 relative z-10">
             
-            {/* Left Column (Text & CTAs) - Pushed to Left Corner */}
-            <div className="lg:col-span-7 flex flex-col items-start text-left transition-all">
+            {/* Left Column (Text & CTAs) - Pushed slightly right for balance */}
+            <div className="lg:col-span-6 lg:col-start-2 flex flex-col items-start text-left transition-all">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FF6B4A]/10 text-[#FF6B4A] text-sm font-bold mb-8 border border-[#FF6B4A]/20 shadow-sm animate-fade-in-up">
                 <span className="flex h-2 w-2 rounded-full bg-[#FF3B14] animate-pulse"></span>
                 🔥 All-in-One Creator Bundle
@@ -151,17 +172,25 @@ export default function Home() {
 
             {/* Right Column (Visual) - Pushed to Right Corner */}
             <div className="lg:col-span-5 relative w-full mt-12 lg:mt-0 flex justify-end items-center pr-0 lg:pr-12">
-              <div className="relative w-full max-w-[800px] h-[500px] lg:h-[600px] flex justify-center items-center">
-                
-                {/* Clean, Static Default Image */}
-                <Image 
-                  src="/kits 1 - Edited.png" 
-                  alt="Creators Kit Bundle" 
-                  fill
-                  className="object-contain relative z-10 animate-fade-in drop-shadow-[0_20px_50px_rgba(252,29,0,0.15)]" 
-                  style={{ filter: 'brightness(1) contrast(1.1)' }}
-                  priority
-                />
+              <div 
+                className="relative w-full max-w-[800px] h-[500px] lg:h-[600px] flex justify-center items-center bg-[#0B0D0E] cursor-pointer"
+                onMouseEnter={() => setIsHeroHovered(true)}
+                onMouseLeave={() => setIsHeroHovered(false)}
+              >
+                <div className="relative w-full h-full drop-shadow-[0_20px_50px_rgba(252,29,0,0.15)] will-change-transform transform-gpu">
+                  {ringLightFrames.map((src, i) => (
+                    <Image 
+                      key={i}
+                      src={src} 
+                      alt={`Creators Kit Bundle Variant ${i}`} 
+                      fill
+                      className={`object-contain transition-opacity duration-500 ease-in-out absolute inset-0 will-change-opacity transform-gpu ${
+                        currentFrame === i ? 'opacity-100' : 'opacity-0'
+                      }`} 
+                      priority={i === 0}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -172,7 +201,7 @@ export default function Home() {
         </section>        
 
         {/* 2. What's Inside (7.2) */}
-        <section id="whats-inside" className="w-full pt-12 pb-16 bg-[#0d0d0d] border-t border-zinc-900/50">
+        <section id="whats-inside" className="w-full pt-12 pb-16 bg-[#0B0D0E] border-t border-zinc-900/50">
           <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12">
             <div className="text-center mb-24">
               <h2 className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight text-white drop-shadow-md">Unbox your potential</h2>
@@ -183,17 +212,25 @@ export default function Home() {
             
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 lg:gap-8 w-full">
               {kitComponents.map((item) => (
-                <a href={`#${item.id}`} key={item.id} className="relative bg-[#0d0d0d]/50 hover:bg-zinc-900/80 p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] border border-zinc-800/60 hover:border-zinc-700/80 shadow-lg hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-500 text-center group cursor-pointer flex flex-col items-center justify-between w-full h-full overflow-hidden">
+                <a href={`#${item.id}`} key={item.id} className={`relative hover:bg-zinc-900/80 p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] border border-zinc-800/60 hover:border-zinc-700/80 shadow-lg hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-500 text-center group cursor-pointer flex flex-col items-center justify-between w-full h-full ${
+                  item.id === 'ring-light' || item.id === 'tripod' || item.id === 'mic'
+                    ? 'bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-zinc-800/40 via-[#0B0D0E]/80 to-[#0B0D0E]/50'
+                    : 'bg-[#0B0D0E]/50'
+                }`}>
                   
                   {/* Subtle Red Hover Glow */}
-                  <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-[#FF3B14]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+                  <div className="absolute top-0 inset-x-0 h-32 rounded-t-[2rem] md:rounded-t-[3rem] bg-gradient-to-b from-[#FF3B14]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
 
-                  <div className="relative w-full aspect-square mb-6 flex items-center justify-center">
+                  <div className="relative w-full aspect-square mb-4 flex items-center justify-center">
                     <Image 
                       src={item.image} 
                       alt={item.name} 
                       fill 
-                      className="object-contain p-2 md:p-4 filter drop-shadow-2xl transform group-hover:scale-110 group-hover:-translate-y-2 transition-transform duration-700 ease-out z-10" 
+                      className={`object-contain filter transform transition-transform duration-700 ease-out z-10 scale-[1.25] group-hover:scale-[1.5] group-hover:-translate-y-4 ${
+                        item.id === 'ring-light' || item.id === 'tripod' || item.id === 'mic'
+                          ? 'drop-shadow-[0_15px_30px_rgba(255,255,255,0.15)]'
+                          : 'drop-shadow-2xl'
+                      }`} 
                     />
                   </div>
                   
@@ -207,19 +244,19 @@ export default function Home() {
         </section>
 
         {/* 3. Component Details (7.3) - Edge to Edge Grid Cards */}
-        <section className="w-full pt-8 pb-12 bg-[#0d0d0d] relative">
+        <section className="w-full pt-8 pb-12 bg-[#0B0D0E] relative">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-900/20 via-black to-black opacity-50 pointer-events-none"></div>
           <div className="w-full px-4 space-y-8 relative z-10">
             
             {kitComponents.map((item, idx) => (
-              <div id={item.id} key={item.id} className={`flex flex-col lg:flex-row items-center gap-0 bg-[#0d0d0d] rounded-[3rem] border border-zinc-900 overflow-hidden shadow-2xl group hover:border-zinc-800 transition-colors duration-500 ${idx % 2 !== 0 ? 'lg:flex-row-reverse' : ''}`}>
-                <div className="w-full lg:w-1/2 aspect-square lg:aspect-[4/3] bg-[#0d0d0d] flex items-center justify-center text-9xl relative overflow-hidden p-12">
-                  <div className="absolute inset-0 bg-gradient-to-br from-black to-zinc-950 z-0"></div>
+              <div id={item.id} key={item.id} className={`flex flex-col lg:flex-row items-center gap-0 bg-[#0B0D0E] rounded-[3rem] border border-zinc-900 overflow-hidden shadow-2xl group hover:border-zinc-800 transition-colors duration-500 ${idx % 2 !== 0 ? 'lg:flex-row-reverse' : ''}`}>
+                <div className="w-full lg:w-1/2 aspect-square lg:aspect-[4/3] bg-[#0B0D0E] flex items-center justify-center text-9xl relative overflow-hidden p-12">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-zinc-800/30 via-[#0B0D0E] to-[#0B0D0E] z-0"></div>
                   {/* Glowing backdrop for image */}
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-[#FF3B14]/5 rounded-full blur-[80px] group-hover:bg-[#FF3B14]/20 transition-colors duration-700"></div>
                   
                   <div className="z-10 w-full h-full relative transform group-hover:scale-110 transition-transform duration-700 ease-out">
-                    <Image src={item.image} alt={item.name} fill className="object-contain p-4 drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]" />
+                    <Image src={item.image} alt={item.name} fill className="object-contain p-4 drop-shadow-[0_20px_50px_rgba(255,255,255,0.15)]" />
                   </div>
                 </div>
                 
@@ -266,7 +303,7 @@ export default function Home() {
         </section>
 
         {/* 4. Benefits Section (7.4) */}
-        <section className="w-full pt-16 pb-12 bg-[#0d0d0d] text-white relative overflow-hidden border-t border-zinc-900/50">
+        <section className="w-full pt-16 pb-12 bg-[#0B0D0E] text-white relative overflow-hidden border-t border-zinc-900/50">
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
           
           <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12 relative z-10">
@@ -282,7 +319,7 @@ export default function Home() {
                   {/* Subtle Accent Glow on Hover */}
                   <div className="absolute -top-10 -right-10 w-64 h-64 bg-gradient-to-br from-[#FF3B14]/10 to-transparent rounded-full blur-[80px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
                   
-                  <div className="w-20 h-20 bg-black/80 backdrop-blur-md rounded-[2rem] flex items-center justify-center text-4xl mb-8 border border-zinc-800/80 group-hover:border-[#FF3B14]/50 group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-500 shadow-inner relative z-10">
+                  <div className="w-20 h-20 bg-[#0B0D0E]/80 backdrop-blur-md rounded-[2rem] flex items-center justify-center text-4xl mb-8 border border-zinc-800/80 group-hover:border-[#FF3B14]/50 group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-500 shadow-inner relative z-10">
                     {b.icon}
                   </div>
                   <h3 className="text-3xl md:text-4xl font-black mb-4 text-zinc-200 group-hover:text-white transition-colors duration-300 relative z-10">{b.title}</h3>
@@ -294,7 +331,7 @@ export default function Home() {
         </section>
 
         {/* 5. Free Courses Section (7.5) */}
-        <section className="w-full pt-16 pb-12 bg-[#0d0d0d] border-t border-zinc-900/50">
+        <section className="w-full pt-16 pb-12 bg-[#0B0D0E] border-t border-zinc-900/50">
           <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12">
             <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-24 gap-8">
               <div className="w-full text-center lg:text-left">
@@ -331,7 +368,7 @@ export default function Home() {
         </section>
 
         {/* 7. Creator Workflow Timeline (7.7) */}
-        <section className="w-full pt-12 pb-12 bg-[#0d0d0d] overflow-hidden border-t border-zinc-900/50">
+        <section className="w-full pt-12 pb-12 bg-[#0B0D0E] overflow-hidden border-t border-zinc-900/50">
           <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12">
             <div className="text-center mb-8 md:mb-12">
               <h2 className="text-5xl md:text-7xl font-black mb-8 tracking-tight text-white drop-shadow-md">Your streamlined workflow</h2>
@@ -367,7 +404,7 @@ export default function Home() {
         </section>
 
         {/* 10. FAQ Section */}
-        <section className="w-full pt-16 pb-12 bg-[#0d0d0d] border-t border-zinc-900/50">
+        <section className="w-full pt-16 pb-12 bg-[#0B0D0E] border-t border-zinc-900/50">
           <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12">
             <div className="text-center mb-24 max-w-4xl mx-auto">
               <h2 className="text-5xl md:text-7xl font-black mb-8 tracking-tight text-white drop-shadow-md">Frequently Asked Questions</h2>
@@ -382,7 +419,7 @@ export default function Home() {
                     onClick={() => setOpenFaqIndex(openFaqIndex === index ? -1 : index)}
                   >
                     <span className="font-black text-2xl md:text-3xl text-zinc-100 group-hover:text-white transition-colors pr-8">{faq.question}</span>
-                    <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 shadow-inner ${openFaqIndex === index ? 'bg-[#FF3B14] text-white shadow-[0_0_20px_rgba(255,59,20,0.4)] rotate-180' : 'bg-black/80 text-zinc-400 group-hover:text-white border border-zinc-800/80 group-hover:border-[#FF3B14]/50'}`}>
+                    <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 shadow-inner ${openFaqIndex === index ? 'bg-[#FF3B14] text-white shadow-[0_0_20px_rgba(255,59,20,0.4)] rotate-180' : 'bg-[#0B0D0E]/80 text-zinc-400 group-hover:text-white border border-zinc-800/80 group-hover:border-[#FF3B14]/50'}`}>
                       <svg className="w-6 h-6 transform transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
                       </svg>
@@ -398,9 +435,9 @@ export default function Home() {
         </section>
 
         {/* 9. Complete Bundle CTA - Full Width Final Banner */}
-        <section className="w-full pt-16 pb-24 md:pt-16 md:pb-32 bg-[#0d0d0d] relative overflow-hidden border-t border-zinc-900/50">
+        <section className="w-full pt-16 pb-24 md:pt-16 md:pb-32 bg-[#0B0D0E] relative overflow-hidden border-t border-zinc-900/50">
           {/* Animated Background Elements - Subdued for dark theme */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#FF3B14]/10 via-[#0d0d0d] to-[#0d0d0d] opacity-80 mix-blend-screen"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#FF3B14]/10 via-[#0B0D0E] to-[#0B0D0E] opacity-80 mix-blend-screen"></div>
           
           <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12 relative z-10 text-white">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">

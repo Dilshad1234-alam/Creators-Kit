@@ -7,7 +7,7 @@ export default function Footer() {
   const pathname = usePathname();
   if (pathname === '/login' || pathname === '/register') return null;
   return (
-    <footer className="w-full bg-[#0d0d0d] text-zinc-400 py-20 border-t border-zinc-800 font-sans">
+    <footer className="w-full bg-[#0B0D0E] text-zinc-400 py-20 border-t border-zinc-800 font-sans">
       <div className="w-full px-6 md:px-12 lg:px-24 mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 lg:gap-8">
         
         {/* Brand Summary */}

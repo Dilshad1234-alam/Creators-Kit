@@ -13,7 +13,7 @@ export default function CartPage() {
 
   if (cart.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#0d0d0d] px-4 text-zinc-100">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#0B0D0E] px-4 text-zinc-100">
         <div className="text-6xl mb-6">🛒</div>
         <h2 className="text-3xl font-bold mb-4">Your cart is empty</h2>
         <p className="text-zinc-400 mb-8 text-center max-w-md">
@@ -30,7 +30,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0d0d0d] relative overflow-hidden text-zinc-100">
+    <div className="min-h-screen bg-[#0B0D0E] relative overflow-hidden text-zinc-100">
       {/* Background Glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-[#FF3B14]/10 blur-[120px] rounded-full pointer-events-none"></div>
 
@@ -43,14 +43,18 @@ export default function CartPage() {
             {cart.map((item) => (
               <div key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center p-6 bg-zinc-900/80 backdrop-blur-xl border border-zinc-800/80 rounded-3xl shadow-2xl gap-6 w-full overflow-hidden">
                 <div className="grid grid-cols-3 gap-2 shrink-0 w-[184px]">
-                  {item.images && item.images.length > 0 ? (
+                  {item.img ? (
+                    <div className="relative w-full h-28 col-span-3 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-700/40 via-zinc-900/80 to-[#0B0D0E] rounded-2xl flex items-center justify-center border border-zinc-800 overflow-hidden shadow-inner">
+                      <Image src={item.img} alt={item.name} fill className="object-contain p-4 drop-shadow-[0_0_15px_rgba(255,255,255,0.15)]" />
+                    </div>
+                  ) : item.images && item.images.length > 0 ? (
                     item.images.map((img, idx) => (
-                      <div key={idx} className="relative w-14 h-14 bg-[#0d0d0d] rounded-xl flex items-center justify-center border border-zinc-800 overflow-hidden shadow-inner hover:scale-110 transition-transform">
+                      <div key={idx} className="relative w-14 h-14 bg-[#0B0D0E] rounded-xl flex items-center justify-center border border-zinc-800 overflow-hidden shadow-inner hover:scale-110 transition-transform">
                         <Image src={img.src} alt={`${item.name} part ${idx + 1}`} fill className="object-contain p-1.5" />
                       </div>
                     ))
                   ) : (
-                    <div className="relative w-full h-28 col-span-3 bg-[#0d0d0d] rounded-2xl flex items-center justify-center border border-zinc-800 overflow-hidden shadow-inner">
+                    <div className="relative w-full h-28 col-span-3 bg-[#0B0D0E] rounded-2xl flex items-center justify-center border border-zinc-800 overflow-hidden shadow-inner">
                       <span className="text-4xl">📦</span>
                     </div>
                   )}
@@ -60,7 +64,7 @@ export default function CartPage() {
                   <p className="text-zinc-400 text-sm mb-4 truncate">Complete setup with hardware & courses.</p>
                   
                   <div className="flex items-center justify-between mt-auto">
-                    <div className="flex items-center gap-4 bg-[#0d0d0d] rounded-lg p-1 border border-zinc-800">
+                    <div className="flex items-center gap-4 bg-[#0B0D0E] rounded-lg p-1 border border-zinc-800">
                       <button 
                         onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
                         className="w-8 h-8 flex items-center justify-center rounded bg-zinc-900 border border-zinc-700 text-zinc-400 hover:bg-zinc-800 transition-colors"
