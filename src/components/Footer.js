@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 
 export default function Footer() {
   const pathname = usePathname();
-  if (pathname === '/login' || pathname === '/register') return null;
+  if (pathname === '/login' || pathname === '/register' || pathname.startsWith('/admin')) return null;
   return (
     <footer className="w-full bg-[#0B0D0E] text-zinc-400 py-20 border-t border-zinc-800 font-sans">
       <div className="w-full px-6 md:px-12 lg:px-24 mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 lg:gap-8">
@@ -33,7 +33,6 @@ export default function Footer() {
             <li><Link href="/product" className="hover:text-[#FF3B14] transition-colors">Product Bundle</Link></li>
             <li><Link href="/about" className="hover:text-[#FF3B14] transition-colors">About Us</Link></li>
             <li><Link href="/contact" className="hover:text-[#FF3B14] transition-colors">Contact Support</Link></li>
-            <li><Link href="/faq" className="hover:text-[#FF3B14] transition-colors">FAQ</Link></li>
           </ul>
         </div>
 

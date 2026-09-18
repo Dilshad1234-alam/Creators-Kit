@@ -6,6 +6,14 @@ if (process.env.NODE_ENV === 'development') {
 const nextConfig = {
   /* config options here */
   reactCompiler: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'ik.imagekit.io',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

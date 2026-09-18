@@ -29,13 +29,12 @@ export default function Navbar() {
     router.push('/login');
   };
 
-  if (pathname === '/login' || pathname === '/register') return null;
+  if (pathname === '/login' || pathname === '/register' || pathname.startsWith('/admin')) return null;
 
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Product', href: '/product' },
     { name: 'About', href: '/about' },
-    { name: 'FAQ', href: '/faq' },
     { name: 'Contact', href: '/contact' },
   ];
 

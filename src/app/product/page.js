@@ -11,81 +11,106 @@ export default function ProductPage() {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [activeTab, setActiveTab] = useState('description');
   const { addToCart, cart } = useCart();
-  const [productData, setProductData] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [whatsInsideItems, setWhatsInsideItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [contentMap, setContentMap] = useState({});
 
   const [currentImage, setCurrentImage] = useState(0);
   const [openFaqIndex, setOpenFaqIndex] = useState(-1);
 
   useEffect(() => {
-    async function fetchProduct() {
+    async function fetchContent() {
       try {
-        const res = await fetch('/api/products');
+        const res = await fetch('/api/content');
         const data = await res.json();
-        if (data.success && data.data.length > 0) {
-          // Find the bundle or just use the first item as the main product
-          const bundle = data.data.find(p => p.id === 'bundle-01') || data.data[0];
-          setProductData(bundle);
+        if (data.success) {
+          const map = {};
+          data.data.forEach(item => {
+            map[item.key] = item.value;
+          });
+          setContentMap(map);
         }
       } catch (e) {
-        console.error('Error fetching product:', e);
+        console.error('Error fetching content:', e);
+      }
+    }
+    fetchContent();
+  }, []);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [prodRes, whatsInsideRes] = await Promise.all([
+          fetch('/api/products'),
+          fetch('/api/whats-inside')
+        ]);
+        const prodData = await prodRes.json();
+        const whatsInsideData = await whatsInsideRes.json();
+        
+        if (prodData.success && prodData.data.length > 0) {
+          setProducts(prodData.data);
+        }
+        if (whatsInsideData.success && whatsInsideData.data) {
+          setWhatsInsideItems(whatsInsideData.data);
+        }
+      } catch (e) {
+        console.error('Error fetching data:', e);
       } finally {
         setLoading(false);
       }
     }
-    fetchProduct();
+    fetchData();
   }, []);
 
-  // Use dynamic data if available, else fallback to hardcoded
-  const displayPrice = productData?.price || 3999;
-  const displayOriginalPrice = productData?.originalPrice || 4999;
+  // Separate products by category
+  const bundleProducts = products.filter(p => !p.category || p.category === 'bundle' || p.category === 'both');
+  const individualProducts = products.filter(p => !p.category || p.category === 'individual' || p.category === 'both');
+
+  // Use the first bundle product for the Hero Section
+  const mainBundle = bundleProducts[0] || {};
+  
+  let dynamicImages = [
+    { src: '/kits 25 (1).jpg', bg: 'bg-zinc-900/50', title: 'Loading...', description: 'Loading...' }
+  ];
+
+  if (mainBundle.images && mainBundle.images.length > 0) {
+    dynamicImages = mainBundle.images.map(img => ({
+      src: img.src || '/placeholder.png',
+      bg: 'bg-zinc-900/50',
+      title: mainBundle.name || 'CREATOR BUNDLE',
+      description: mainBundle.description
+    }));
+  } else if (mainBundle.image) {
+    dynamicImages = [{
+      src: mainBundle.image,
+      bg: 'bg-zinc-900/50',
+      title: mainBundle.name || 'CREATOR BUNDLE',
+      description: mainBundle.description
+    }];
+  }
 
   const product = {
-    id: 'creators-kit-v1',
-    name: 'CREATOR BUNDLE',
-    price: displayPrice,
-    originalPrice: displayOriginalPrice,
-    description: 'An elite, all-in-one studio setup designed for serious creators. From the 10-inch precision LED ring light and noise-canceling wireless audio, to the chroma key green screen and comprehensive mastery courses—everything you need to dominate your niche is right here in one ultimate box.',
-    images: [
-      { type: 'light', src: '/kits 25.jpg - Edited.png', bg: 'bg-zinc-900/50', title: 'Professional LED Ring Light', description: 'Precision 10-inch LED ring light with adjustable color temperatures and brightness levels for flawless illumination.' },
-      { type: 'mic', src: '/kits 27.jpg - Edited.png', bg: 'bg-zinc-900/50', title: 'Wireless Noise-Canceling Mic', description: 'Crisp, clear audio capture with advanced noise reduction and a reliable long-range wireless transmitter.' },
-      { type: 'tripod', src: '/kits 24.jpg - Edited.png', bg: 'bg-zinc-900/50', title: 'Versatile Creator Tripod', description: 'Sturdy, adjustable mounting solution for smartphones and DSLRs with 360° rotation and smooth positioning.' },
-      { type: 'screen', src: '/kits 26.jpg - Edited.png', bg: 'bg-zinc-900/50', title: 'Chroma Key Green Curtain', description: 'High-quality wrinkle-resistant green screen backdrop for seamless background replacement and streaming.' },
-      { type: 'pendrive', src: '/kits 28.jpg - Edited.png', bg: 'bg-zinc-900/50', title: 'Exclusive Mastery Pen Drive', description: 'Physical high-speed USB drive pre-loaded with all our exclusive social media and video editing masterclasses.' },
-    ],
+    id: mainBundle._id || 'creators-kit-v1',
+    name: mainBundle.name || contentMap['product_hero_heading'] || 'CREATOR BUNDLE',
+    subheading: mainBundle.subheading || 'CREATOR BUNDLE - COMPLETE SETUP',
+    price: mainBundle.price || 3999,
+    originalPrice: mainBundle.originalPrice || 4999,
+    description: mainBundle.description || contentMap['product_hero_desc'] || 'An elite, all-in-one studio setup designed for serious creators. From the 10-inch precision LED ring light and noise-canceling wireless audio, to the chroma key green screen and comprehensive mastery courses—everything you need to dominate your niche is right here in one ultimate box.',
+    images: dynamicImages,
   };
 
-  const includedItems = [
-    { name: '10-inch Professional LED Ring Light', icon: '💡' },
-    { name: 'Adjustable Aluminum Ring Light Stand', icon: '🗼' },
-    { name: 'Wireless Noise-Canceling Microphone', icon: '🎙️' },
-    { name: 'Flexible Tripod for Camera/Phone', icon: '📸' },
-    { name: 'Chroma Key Green Curtain with Clamps', icon: '🟩' },
-    { name: 'Instagram, YouTube, and Filmora Mastery Courses', icon: '🎓' },
-    { name: 'Physical USB Pendrive (Courses Offline)', icon: '💾' },
-    { name: 'Printed Masterclass Workbooks & Shot Lists', icon: '📑' },
-  ];
+  const discountPercent = product.originalPrice > product.price 
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) 
+    : 0;
 
-  const partDetails = [
-    { title: 'Perfect Lighting', desc: '10-inch ring light with 3 color modes and 10 brightness levels.', img: '/kits 25.jpg - Edited.png' },
-    { title: 'Stable Shots', desc: 'Durable floor stand and flexible desk tripod included.', img: '/kits 24.jpg - Edited.png' },
-    { title: 'Clear Audio', desc: 'Wireless plug-and-play mic with active noise cancellation.', img: '/kits 27.jpg - Edited.png' },
-    { title: 'Clean Backgrounds', desc: 'Wrinkle-resistant green screen for easy chroma keying.', img: '/kits 26.jpg - Edited.png' },
-  ];
+  // Note: includedItems and partDetails have been removed to use dynamic mapping over products
 
   const faqs = [
     { question: 'Do I need to buy these parts separately?', answer: 'No! The Creators Kit is a single, complete bundle. You get all the hardware, courses, and physical resources in one box for one price.' },
     { question: 'Does the microphone work with my smartphone?', answer: 'Yes, our wireless microphone includes adapters for both USB-C and Lightning ports, making it plug-and-play compatible.' },
     { question: 'How do I access the Mastery Courses?', answer: 'The courses are pre-loaded onto a high-speed USB Pendrive included in the box. Simply plug it into your computer to watch them entirely offline, forever.' },
     { question: 'What is your return policy?', answer: 'We offer a 30-day money-back guarantee. If you are not completely satisfied, you can return the complete kit within 30 days for a full refund.' },
-  ];
-
-  const individualGear = [
-    { id: 'ring-light', name: '10-inch Pro Ring Light', img: '/kits 25.jpg - Edited.png', price: 1499 },
-    { id: 'wireless-mic', name: 'Wireless Microphone', img: '/kits 27.jpg - Edited.png', price: 2499 },
-    { id: 'tripod', name: 'Flexible Desk Tripod', img: '/kits 24.jpg - Edited.png', price: 999 },
-    { id: 'green-screen', name: 'Chroma Key Green Screen', img: '/kits 26.jpg - Edited.png', price: 1299 },
-    { id: 'mastery-pendrive', name: 'Mastery Courses Pendrive', img: '/kits 28.jpg - Edited.png', price: 2999 },
   ];
 
   const handleAddToCart = () => {
@@ -110,7 +135,7 @@ export default function ProductPage() {
       router.push('/login?redirect=/product');
       return;
     }
-    addToCart({ id: item.id, name: item.name, price: item.price, quantity: 1, img: item.img });
+    addToCart({ id: item._id || item.id, name: item.name, price: item.price, quantity: 1, img: item.image });
   };
 
   return (
@@ -171,7 +196,7 @@ export default function ProductPage() {
                 {product.images[currentImage].title}
               </h1>
               <h2 className="text-md md:text-lg text-zinc-500 tracking-[0.3em] uppercase mb-4">
-                CREATOR BUNDLE - COMPLETE SETUP
+                {product.subheading}
               </h2>
               
               <p className="text-lg text-zinc-400 mb-6 leading-relaxed font-medium">
@@ -180,7 +205,11 @@ export default function ProductPage() {
 
               {/* Pricing & Offer Area */}
               <div className="bg-zinc-900 p-8 rounded-3xl border border-zinc-800 mb-6 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 right-0 bg-[#FF3B14] text-white text-xs font-bold px-4 py-1 rounded-bl-xl tracking-wider">SAVE 55%</div>
+                {discountPercent > 0 && (
+                  <div className="absolute top-0 right-0 bg-[#FF3B14] text-white text-xs font-bold px-4 py-1 rounded-bl-xl tracking-wider">
+                    SAVE {discountPercent}%
+                  </div>
+                )}
                 <div className="flex items-end gap-4 mb-2">
                   <span className="text-5xl md:text-6xl font-black text-zinc-100">₹{product.price.toLocaleString()}</span>
                   <span className="text-2xl font-bold text-zinc-600 line-through mb-1">₹{product.originalPrice.toLocaleString()}</span>
@@ -232,10 +261,10 @@ export default function ProductPage() {
           </div>
           
           <div className="w-full px-6 md:px-12 lg:px-24 mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {individualGear.map((item) => (
-              <div key={item.id} className="bg-zinc-900/60 backdrop-blur-md p-6 rounded-3xl border border-zinc-800 hover:border-[#FF3B14]/50 transition-colors group flex flex-col items-center text-center shadow-lg hover:shadow-[0_8px_30px_rgba(255,59,20,0.1)]">
+            {individualProducts.map((item) => (
+              <div key={item._id || item.id} className="bg-zinc-900/60 backdrop-blur-md p-6 rounded-3xl border border-zinc-800 hover:border-[#FF3B14]/50 transition-colors group flex flex-col items-center text-center shadow-lg hover:shadow-[0_8px_30px_rgba(255,59,20,0.1)]">
                 <div className="relative w-full aspect-square mb-4 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-700/40 via-zinc-900/80 to-[#0B0D0E] rounded-2xl p-4 overflow-hidden group-hover:border-[#FF3B14]/30 border border-zinc-800 transition-colors">
-                  <Image src={item.img} alt={item.name} fill className="object-contain p-2 drop-shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:scale-110 transition-transform duration-300" />
+                  <Image src={item.image || '/placeholder.png'} alt={item.name} fill className="object-contain p-2 drop-shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:scale-110 transition-transform duration-300" />
                 </div>
                 <h3 className="font-bold text-zinc-100 mb-2 leading-tight flex-grow">{item.name}</h3>
                 <div className="text-[#FF3B14] font-extrabold text-xl mb-4">₹{item.price}</div>
@@ -254,97 +283,48 @@ export default function ProductPage() {
         <section className="w-full py-24 bg-[#0B0D0E] border-t border-zinc-900 relative overflow-hidden">
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:24px_24px]"></div>
           
-          <div className="w-full px-6 md:px-12 lg:px-24 mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-20">
-            {/* The Bundle List */}
-            <div>
-              <h2 className="text-4xl md:text-5xl font-extrabold mb-4 tracking-tight text-zinc-100">The Complete Bundle</h2>
-              <p className="text-xl text-zinc-400 mb-10 font-medium">Sold exclusively as one complete package. We don't nickel-and-dime you for individual parts.</p>
-              
-              <div className="bg-zinc-900/50 backdrop-blur-md rounded-[2.5rem] p-8 md:p-10 border border-zinc-800 shadow-2xl">
-                <ul className="space-y-4">
-                  {includedItems.map((item, idx) => (
-                    <li key={idx} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-zinc-800 transition-colors border border-transparent hover:border-zinc-700">
-                      <div className="flex-shrink-0 w-12 h-12 bg-[#0B0D0E] rounded-xl flex items-center justify-center text-xl border border-zinc-800">
-                        {item.icon}
-                      </div>
-                      <span className="font-bold text-lg text-zinc-200">{item.name}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+          <div className="w-full px-6 md:px-12 lg:px-24 mx-auto relative z-10 flex flex-col items-center">
+            
+            {/* Top/Header Area */}
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <h2 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight text-zinc-100">The Complete Bundle</h2>
+              <p className="text-xl text-zinc-400 font-medium">Everything you need to shoot, record, and light your content perfectly. Sold exclusively as one complete package.</p>
+            </div>
+            
+            {/* What's Included - Top Overview Banner */}
+            <div className="w-full bg-zinc-900/40 backdrop-blur-md rounded-[2.5rem] p-6 md:p-8 border border-zinc-800/80 shadow-2xl mb-16 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-[#FF3B14]/5 rounded-full blur-3xl -mr-24 -mt-24 pointer-events-none"></div>
+              <ul className="flex flex-wrap items-center justify-center gap-4 md:gap-8 relative z-10">
+                {whatsInsideItems.map((item, idx) => (
+                  <li key={item._id || item.id || idx} className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#0B0D0E]/50 border border-zinc-800/50 shadow-inner">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center text-xs text-green-400 border border-green-500/20">
+                      ✓
+                    </div>
+                    <span className="font-bold text-sm md:text-base text-zinc-200">{item.name}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            {/* Hardware Deep Dive */}
-            <div>
-              <h2 className="text-4xl md:text-5xl font-extrabold mb-4 tracking-tight text-zinc-100">Pro Hardware Included</h2>
-              <p className="text-xl text-zinc-400 mb-10 font-medium">Everything you need to shoot, record, and light your content perfectly.</p>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {partDetails.map((part, idx) => (
-                  <div key={idx} className="bg-zinc-900/50 backdrop-blur-md p-8 rounded-3xl border border-zinc-800 hover:border-[#FF3B14]/50 transition-colors group overflow-hidden">
-                    <div className="relative w-full aspect-square mb-6 rounded-2xl overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-700/40 via-zinc-900/80 to-[#0B0D0E] border border-zinc-800 p-4 shadow-2xl hover:border-[#FF3B14] transition duration-300 transform hover:scale-[1.02]">
-                      <Image src={part.img} alt={part.title} fill className="object-contain p-4 drop-shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:scale-110 transition-transform duration-500" />
+            {/* Deep Dive into All Items (3-column grid) */}
+            <div className="w-full">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                {whatsInsideItems.map((part, idx) => (
+                  <div key={part._id || part.id || idx} className="bg-zinc-900/40 backdrop-blur-md p-8 rounded-[2rem] border border-zinc-800 hover:border-zinc-700 transition-all group overflow-hidden shadow-xl flex flex-col">
+                    <div className="relative w-full aspect-[4/3] mb-6 rounded-2xl overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-800/30 via-zinc-900/60 to-[#0B0D0E] border border-zinc-800/50 p-4 shadow-inner">
+                      <Image src={part.image || '/placeholder.png'} alt={part.name} fill className="object-contain p-4 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] group-hover:scale-105 transition-transform duration-500" />
                     </div>
-                    <h3 className="text-xl font-bold mb-3 text-zinc-100">{part.title}</h3>
-                    <p className="text-zinc-400 font-medium leading-relaxed">{part.desc}</p>
+                    <h3 className="text-xl font-bold mb-3 text-zinc-100 group-hover:text-[#FF3B14] transition-colors">{part.name}</h3>
+                    <p className="text-zinc-400 font-medium leading-relaxed text-sm flex-grow">{part.description}</p>
                   </div>
                 ))}
               </div>
             </div>
+
           </div>
         </section>
 
-        {/* 3. Education & Resources */}
-        <section className="w-full py-24 bg-zinc-900">
-          <div className="w-full px-6 md:px-12 lg:px-24 mx-auto text-center">
-            {/* <div className="inline-block px-6 py-2 rounded-full bg-[#FF3B14]/20 border border-[#FF3B14]/50 text-[#FF3B14] font-bold text-sm md:text-base tracking-widest uppercase mb-6 shadow-lg shadow-[#FF3B14]/10">
-               🎁 In tools ke saath ye videos bilkul FREE milengi!
-            </div> */}
-            <h2 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight text-zinc-100">The Secret Sauce: Education</h2>
-            <p className="text-xl text-zinc-400 max-w-3xl mx-auto mb-16 font-medium">
-              We don't just send you gear and wish you luck. The Creators Kit includes complete mastery courses and physical resources to guarantee your success.
-            </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-              <div className="bg-zinc-900/60 border border-zinc-800 rounded-[2.5rem] p-8 backdrop-blur-xl shadow-xl flex flex-col items-center group hover:-translate-y-2 transition-transform">
-                <div className="relative h-40 w-40 mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Image src="/video 2.webp - Edited.png" alt="Instagram Mastery" fill className="object-contain" />
-                </div>
-                <h3 className="text-2xl font-bold mb-4 text-zinc-100">Instagram Mastery</h3>
-                <p className="text-zinc-400 font-medium">Algorithm secrets, viral reel formulas, and audience building strategies.</p>
-              </div>
-              <div className="bg-zinc-900/60 border border-zinc-800 rounded-[2.5rem] p-8 backdrop-blur-xl shadow-xl flex flex-col items-center group hover:-translate-y-2 transition-transform">
-                <div className="relative h-40 w-40 mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Image src="/video 1.webp - Edited.png" alt="YouTube Mastery" fill className="object-contain" />
-                </div>
-                <h3 className="text-2xl font-bold mb-4 text-zinc-100">YouTube Mastery</h3>
-                <p className="text-zinc-400 font-medium">SEO optimization, thumbnail psychology, and monetization blueprints.</p>
-              </div>
-              <div className="bg-zinc-900/60 border border-zinc-800 rounded-[2.5rem] p-8 backdrop-blur-xl shadow-xl flex flex-col items-center group hover:-translate-y-2 transition-transform">
-                <div className="relative h-40 w-40 mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Image src="/video.webp - Edited.png" alt="Filmora Mastery" fill className="object-contain" />
-                </div>
-                <h3 className="text-2xl font-bold mb-4 text-zinc-100">Filmora Mastery</h3>
-                <p className="text-zinc-400 font-medium">Zero-to-hero video editing course. Learn cuts, transitions, and color grading.</p>
-              </div>
-            </div>
-
-            <div className="bg-[#0B0D0E] rounded-[3rem] p-10 md:p-16 border border-zinc-800 grid grid-cols-1 md:grid-cols-2 gap-12 items-center text-left relative overflow-hidden shadow-2xl">
-               <div className="absolute top-1/2 right-0 w-96 h-96 bg-[#FF3B14]/20 rounded-full blur-[100px] -translate-y-1/2"></div>
-               <div className="relative z-10">
-                 <h3 className="text-3xl md:text-4xl font-extrabold mb-6 text-zinc-100">Pre-loaded on a physical Pendrive.</h3>
-                 <p className="text-xl text-zinc-400 font-medium mb-8">Access all courses offline instantly. Plus, receive high-quality printed project workbooks in the box for tactile, hands-on learning.</p>
-                 <ul className="space-y-4 font-bold">
-                   <li className="flex items-center gap-3"><span className="text-[#FF3B14] text-2xl">💾</span> <span className="text-zinc-300">High-Speed USB Drive</span></li>
-                   <li className="flex items-center gap-3"><span className="text-[#FF3B14] text-2xl">📑</span> <span className="text-zinc-300">Printed Project Guides</span></li>
-                 </ul>
-               </div>
-               <div className="relative z-10 w-full aspect-square rounded-3xl overflow-hidden shadow-2xl border border-zinc-800 bg-zinc-900/90 p-4 hover:border-[#FF3B14] transition duration-300 transform hover:scale-[1.02]">
-                 <Image src="/kit 5.webp" alt="The Creators Kit Box and Pendrive" fill className="object-contain p-4" />
-               </div>
-            </div>
-          </div>
-        </section>
 
         {/* 4. Details Tabs (Shipping/Policies) & FAQ */}
         <section className="w-full py-24 bg-[#0B0D0E] border-t border-zinc-900">

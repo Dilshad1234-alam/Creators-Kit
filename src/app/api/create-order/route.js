@@ -3,18 +3,17 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req) {
   try {
-    const { items, customer } = await req.json();
+    const { items, customer, discountAmount = 0 } = await req.json();
 
-    // Verify razorpay keys are present
-    if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-      return NextResponse.json({ error: 'Razorpay keys not configured' }, { status: 500 });
-    }
 
     // Calculate total amount in paise (1 INR = 100 paise)
-    const amount = items.reduce((total, item) => total + item.price * item.quantity, 0) * 100;
+    const cartTotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
+    const amount = Math.max(0, cartTotal - discountAmount) * 100;
 
-    // If using placeholder keys, return a mock order instead of crashing
-    if (process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID === 'rzp_test_placeholder') {
+
+
+    // Gracefully handle missing keys by returning a mock order
+    if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
       return NextResponse.json({
         id: `order_mock_${Date.now()}`,
         amount: amount.toString(),

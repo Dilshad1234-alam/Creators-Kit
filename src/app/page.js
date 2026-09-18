@@ -5,9 +5,58 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export default function Home() {
-  const [openFaqIndex, setOpenFaqIndex] = useState(-1);
-  const [isHeroHovered, setIsHeroHovered] = useState(false);
   const [currentFrame, setCurrentFrame] = useState(0);
+  const [isHeroHovered, setIsHeroHovered] = useState(false);
+  const [contentMap, setContentMap] = useState({});
+  const [kitComponents, setKitComponents] = useState([]);
+  const [masteryCourses, setMasteryCourses] = useState([]);
+  const [openFaqIndex, setOpenFaqIndex] = useState(-1);
+
+  useEffect(() => {
+    async function fetchContent() {
+      try {
+        const res = await fetch('/api/content');
+        const data = await res.json();
+        if (data.success) {
+          const map = {};
+          data.data.forEach(item => {
+            map[item.key] = item.value;
+          });
+          setContentMap(map);
+        }
+      } catch (e) {
+        console.error('Failed to fetch content:', e);
+      }
+    }
+    
+    async function fetchFeatures() {
+      try {
+        const res = await fetch('/api/homepage-features');
+        const data = await res.json();
+        if (data.success) {
+          setKitComponents(data.data);
+        }
+      } catch (e) {
+        console.error('Failed to fetch features:', e);
+      }
+    }
+
+    async function fetchCourses() {
+      try {
+        const res = await fetch('/api/homepage-masterclasses');
+        const data = await res.json();
+        if (data.success) {
+          setMasteryCourses(data.data);
+        }
+      } catch (e) {
+        console.error('Failed to fetch masterclasses:', e);
+      }
+    }
+
+    fetchContent();
+    fetchFeatures();
+    fetchCourses();
+  }, []);
 
   const ringLightFrames = [
     '/kits 17.jpg - Edited.png',
@@ -28,58 +77,7 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [isHeroHovered]);
 
-  const kitComponents = [
-    {
-      id: 'ring-light',
-      name: ' Ring Light',
-      description: 'Professional LED ring light with adjustable color temperatures.',
-      features: ['3 Color Modes', '10 Brightness Levels', 'USB Powered'],
-      useCase: 'Perfect for well-lit vlogs, beauty tutorials, and streaming.',
-      benefit: 'Instantly elevates your video quality with flattering, even lighting.',
-      icon: '💡',
-      image: '/kits 25.jpg - Edited.png',
-    },
-    {
-      id: 'mic',
-      name: 'Wireless Microphone',
-      description: 'Crisp, clear audio capture without the hassle of cables.',
-      features: ['Noise Reduction', 'Plug-and-Play', '65ft Range'],
-      useCase: 'Ideal for interviews, podcasts, and on-the-go vlogging.',
-      benefit: 'Ensures your audience hears every word clearly, without background static.',
-      icon: '🎙️',
-      image: '/kits 27.jpg - Edited.png',
-    },
-    {
-      id: 'tripod',
-      name: 'Camera/Phone Tripod',
-      description: 'Versatile mounting solution for your smartphone or DSLR.',
-      features: ['360° Rotation', 'Bluetooth Remote', 'Universal Mount'],
-      useCase: 'Achieve stable shots and smooth panning for professional videos.',
-      benefit: 'No more shaky footage; get the perfect angle every time.',
-      icon: '📸',
-      image: '/kits 24.jpg - Edited.png',
-    },
-    {
-      id: 'green-screen',
-      name: 'Chroma Key Curtain',
-      description: 'High-quality green screen backdrop for seamless background replacement.',
-      features: ['Wrinkle-resistant', 'Washable', 'Includes Clamps'],
-      useCase: 'Easily drop in custom backgrounds for gaming, streaming, or effects.',
-      benefit: 'Transform your messy bedroom into a professional studio instantly.',
-      icon: '🟩',
-      image: '/kits 26.jpg - Edited.png',
-    },
-    {
-      id: 'pen-drive',
-      name: 'Mastery Pen Drive',
-      description: 'Physical USB pendrive packed with all our exclusive Mastery Courses and digital resources.',
-      features: ['Plug-and-Play', 'High-Speed USB', 'Pre-loaded Courses'],
-      useCase: 'Access premium educational content offline, anywhere you go.',
-      benefit: 'No internet required to learn the exact secrets of going viral.',
-      icon: '💾',
-      image: '/kits 28.jpg - Edited.png',
-    },
-  ];
+
 
   const benefits = [
     { title: 'Perfect Lighting', desc: 'Flattering illumination in any environment.', icon: '✨' },
@@ -90,29 +88,6 @@ export default function Home() {
     { title: 'Included Education', desc: 'Step-by-step mastery courses.', icon: '📚' },
   ];
 
-  const masteryCourses = [
-    {
-      title: 'Instagram Mastery',
-      description: 'Learn the algorithm secrets, how to go viral with Reels, and build a dedicated following fast.',
-      icon: '📱',
-      color: 'border-zinc-800/60',
-      iconBg: 'bg-gradient-to-br from-pink-400 to-fuchsia-500 shadow-pink-500/30',
-    },
-    {
-      title: 'YouTube Mastery',
-      description: 'Master SEO, thumbnail creation, and viewer retention to monetize your channel efficiently.',
-      icon: '▶️',
-      color: 'border-zinc-800/60',
-      iconBg: 'bg-gradient-to-br from-[#FF6B4A] to-orange-500 shadow-[#FF6B4A]/30',
-    },
-    {
-      title: 'Filmora Mastery',
-      description: 'Professional video editing made simple. Learn cuts, transitions, effects, and color grading.',
-      icon: '🎬',
-      color: 'border-zinc-800/60',
-      iconBg: 'bg-gradient-to-br from-blue-500 to-cyan-500 shadow-blue-500/30',
-    },
-  ];
 
   const workflowSteps = [
     { title: 'Setup', description: 'Unbox your gear and build your studio in just 10 minutes.' },
@@ -143,15 +118,15 @@ export default function Home() {
                 🔥 All-in-One Creator Bundle
               </div>
               
-              <h1 className="text-6xl md:text-7xl lg:text-[5.5rem] font-extrabold tracking-tight mb-8 leading-[1.1] w-full text-zinc-100 drop-shadow-sm">
-                Start creating with <br className="hidden md:block" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF3B14] via-[#FF6B4A] to-orange-500">
-                  one complete kit.
+              <h1 className="text-5xl md:text-7xl font-extrabold mb-6 leading-tight tracking-tight drop-shadow-lg">
+                {contentMap['hero_heading'] || 'Unbox your potential'} <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF3B14] to-[#FF7354]">
+                  {contentMap['hero_subheading'] || 'The Complete Creator Bundle'}
                 </span>
               </h1>
               
               <p className="w-full max-w-2xl text-lg md:text-xl text-zinc-400 mb-10 leading-relaxed font-medium">
-                Stop guessing what gear you need. We provide the professional equipment, expert courses, and tactile resources so you can focus on what matters: making great content.
+                {contentMap['hero_description'] || 'Stop guessing what gear you need. We provide the professional equipment, expert courses, and tactile resources so you can focus on what matters: making great content.'}
               </p>
               
               <div className="flex flex-col sm:flex-row items-center justify-start gap-5 w-full">
@@ -210,35 +185,41 @@ export default function Home() {
               </p>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 lg:gap-8 w-full">
-              {kitComponents.map((item) => (
-                <a href={`#${item.id}`} key={item.id} className={`relative hover:bg-zinc-900/80 p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] border border-zinc-800/60 hover:border-zinc-700/80 shadow-lg hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-500 text-center group cursor-pointer flex flex-col items-center justify-between w-full h-full ${
-                  item.id === 'ring-light' || item.id === 'tripod' || item.id === 'mic'
-                    ? 'bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-zinc-800/40 via-[#0B0D0E]/80 to-[#0B0D0E]/50'
-                    : 'bg-[#0B0D0E]/50'
-                }`}>
-                  
-                  {/* Subtle Red Hover Glow */}
-                  <div className="absolute top-0 inset-x-0 h-32 rounded-t-[2rem] md:rounded-t-[3rem] bg-gradient-to-b from-[#FF3B14]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+            <div className="w-full overflow-hidden pause-marquee -mx-6 lg:-mx-12 px-6 lg:px-12 relative pb-8">
+              <div className="absolute left-0 top-0 w-24 md:w-48 h-full bg-gradient-to-r from-[#0B0D0E] via-[#0B0D0E]/80 to-transparent z-10 pointer-events-none"></div>
+              <div className="absolute right-0 top-0 w-24 md:w-48 h-full bg-gradient-to-l from-[#0B0D0E] via-[#0B0D0E]/80 to-transparent z-10 pointer-events-none"></div>
+              
+              <div className="flex w-max gap-4 md:gap-6 lg:gap-8 animate-marquee">
+                {[...kitComponents, ...kitComponents].map((item, index) => (
+                  <a href={`#${item._id}`} key={`${item._id}-${index}`} className={`w-[260px] md:w-[320px] lg:w-[360px] relative overflow-hidden hover:bg-zinc-900/80 p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] border border-zinc-800/60 hover:border-zinc-700/80 shadow-lg hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-500 text-center group cursor-pointer flex flex-col items-center justify-between h-[340px] md:h-[400px] ${
+                    index % 2 === 0
+                      ? 'bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-zinc-800/40 via-[#0B0D0E]/80 to-[#0B0D0E]/50'
+                      : 'bg-[#0B0D0E]/50'
+                  }`}>
+                    
+                    {/* Subtle Red Hover Glow */}
+                    <div className="absolute top-0 inset-x-0 h-32 rounded-t-[2rem] md:rounded-t-[3rem] bg-gradient-to-b from-[#FF3B14]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
 
-                  <div className="relative w-full aspect-square mb-4 flex items-center justify-center">
-                    <Image 
-                      src={item.image} 
-                      alt={item.name} 
-                      fill 
-                      className={`object-contain filter transform transition-transform duration-700 ease-out z-10 scale-[1.25] group-hover:scale-[1.5] group-hover:-translate-y-4 ${
-                        item.id === 'ring-light' || item.id === 'tripod' || item.id === 'mic'
-                          ? 'drop-shadow-[0_15px_30px_rgba(255,255,255,0.15)]'
-                          : 'drop-shadow-2xl'
-                      }`} 
-                    />
-                  </div>
-                  
-                  <h3 className="font-bold text-lg md:text-xl text-zinc-300 group-hover:text-white transition-colors duration-300 leading-tight z-10">
-                    {item.name}
-                  </h3>
-                </a>
-              ))}
+                    <div className="relative w-full h-[180px] md:h-[220px] mb-6 flex items-center justify-center">
+                      <Image 
+                        src={item.image} 
+                        alt={item.name} 
+                        fill 
+                        sizes="(max-width: 768px) 260px, (max-width: 1024px) 320px, 360px"
+                        className={`object-contain filter transform transition-transform duration-700 ease-out z-10 scale-100 group-hover:scale-110 group-hover:-translate-y-2 ${
+                          index % 2 === 0
+                            ? 'drop-shadow-[0_15px_30px_rgba(255,255,255,0.15)]'
+                            : 'drop-shadow-2xl'
+                        }`} 
+                      />
+                    </div>
+                    
+                    <h3 className="font-bold text-lg md:text-xl text-zinc-300 group-hover:text-white transition-colors duration-300 leading-tight z-10 w-full mt-auto">
+                      {item.name}
+                    </h3>
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -249,7 +230,7 @@ export default function Home() {
           <div className="w-full px-4 space-y-8 relative z-10">
             
             {kitComponents.map((item, idx) => (
-              <div id={item.id} key={item.id} className={`flex flex-col lg:flex-row items-center gap-0 bg-[#0B0D0E] rounded-[3rem] border border-zinc-900 overflow-hidden shadow-2xl group hover:border-zinc-800 transition-colors duration-500 ${idx % 2 !== 0 ? 'lg:flex-row-reverse' : ''}`}>
+              <div id={item._id} key={item._id} className={`flex flex-col lg:flex-row items-center gap-0 bg-[#0B0D0E] rounded-[3rem] border border-zinc-900 overflow-hidden shadow-2xl group hover:border-zinc-800 transition-colors duration-500 ${idx % 2 !== 0 ? 'lg:flex-row-reverse' : ''}`}>
                 <div className="w-full lg:w-1/2 aspect-square lg:aspect-[4/3] bg-[#0B0D0E] flex items-center justify-center text-9xl relative overflow-hidden p-12">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-zinc-800/30 via-[#0B0D0E] to-[#0B0D0E] z-0"></div>
                   {/* Glowing backdrop for image */}
@@ -345,24 +326,39 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 w-full">
-              {masteryCourses.map((course, index) => (
-                <div key={index} className={`p-10 md:p-12 rounded-[2.5rem] md:rounded-[3rem] border ${course.color} bg-zinc-950/40 hover:bg-zinc-900/60 backdrop-blur-xl hover:-translate-y-4 transition-all duration-500 shadow-xl hover:shadow-[0_30px_60px_rgba(0,0,0,0.5)] relative overflow-hidden group`}>
-                  
-                  {/* Included Free Ribbon */}
-                  <div className="absolute top-8 right-8 bg-green-500/20 text-green-400 border border-green-500/30 font-bold px-4 py-1.5 rounded-full text-sm z-20 shadow-[0_0_15px_rgba(34,197,94,0.2)] backdrop-blur-md">
-                    100% Free
-                  </div>
+              {masteryCourses.map((course, index) => {
+                const iconBgs = [
+                  'bg-gradient-to-br from-pink-400 to-fuchsia-500 shadow-pink-500/30',
+                  'bg-gradient-to-br from-[#FF6B4A] to-orange-500 shadow-[#FF6B4A]/30',
+                  'bg-gradient-to-br from-blue-500 to-cyan-500 shadow-blue-500/30'
+                ];
+                const bgClass = iconBgs[index % iconBgs.length];
+                
+                return (
+                  <div key={course._id || index} className={`p-10 md:p-12 rounded-[2.5rem] md:rounded-[3rem] border border-zinc-800/60 bg-zinc-950/40 hover:bg-zinc-900/60 backdrop-blur-xl hover:-translate-y-4 transition-all duration-500 shadow-xl hover:shadow-[0_30px_60px_rgba(0,0,0,0.5)] relative overflow-hidden group`}>
+                    
+                    {/* Included Free Ribbon */}
+                    {course.badge && (
+                      <div className="absolute top-8 right-8 bg-green-500/20 text-green-400 border border-green-500/30 font-bold px-4 py-1.5 rounded-full text-sm z-20 shadow-[0_0_15px_rgba(34,197,94,0.2)] backdrop-blur-md">
+                        {course.badge}
+                      </div>
+                    )}
 
-                  {/* Decorative corner blur */}
-                  <div className="absolute -top-20 -right-20 w-80 h-80 bg-gradient-to-br from-zinc-800/40 to-transparent rounded-full blur-[80px] group-hover:scale-150 group-hover:from-zinc-700/50 transition-all duration-1000 opacity-50"></div>
+                    {/* Decorative corner blur */}
+                    <div className="absolute -top-20 -right-20 w-80 h-80 bg-gradient-to-br from-zinc-800/40 to-transparent rounded-full blur-[80px] group-hover:scale-150 group-hover:from-zinc-700/50 transition-all duration-1000 opacity-50"></div>
 
-                  <div className={`relative z-10 w-24 h-24 rounded-[2rem] flex items-center justify-center text-5xl mb-10 text-white shadow-2xl ${course.iconBg} transform group-hover:rotate-12 transition-transform duration-500`}>
-                    {course.icon}
+                    <div className={`relative z-10 w-24 h-24 rounded-[2rem] flex items-center justify-center text-5xl mb-10 text-white shadow-2xl ${bgClass} transform group-hover:rotate-12 transition-transform duration-500 overflow-hidden border border-white/10`}>
+                      {course.image ? (
+                        <img src={course.image} alt={course.title} className="w-full h-full object-cover" />
+                      ) : (
+                        "🎓"
+                      )}
+                    </div>
+                    <h3 className="relative z-10 text-3xl md:text-4xl font-black mb-5 text-zinc-100 group-hover:text-white transition-colors">{course.title}</h3>
+                    <p className="relative z-10 text-lg md:text-xl text-zinc-400 font-medium leading-relaxed">{course.description}</p>
                   </div>
-                  <h3 className="relative z-10 text-3xl md:text-4xl font-black mb-5 text-zinc-100 group-hover:text-white transition-colors">{course.title}</h3>
-                  <p className="relative z-10 text-lg md:text-xl text-zinc-400 font-medium leading-relaxed">{course.description}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>

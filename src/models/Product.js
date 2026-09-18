@@ -20,6 +20,9 @@ const ProductSchema = new mongoose.Schema({
   originalPrice: {
     type: Number,
   },
+  subheading: {
+    type: String,
+  },
   stock: {
     type: Number,
     default: 0,
@@ -34,6 +37,11 @@ const ProductSchema = new mongoose.Schema({
   useCase: String,
   benefit: String,
   icon: String,
+  category: {
+    type: String,
+    enum: ['bundle', 'individual', 'both'],
+    default: 'both',
+  },
 }, { timestamps: true });
 
 export default mongoose.models.Product || mongoose.model('Product', ProductSchema);
