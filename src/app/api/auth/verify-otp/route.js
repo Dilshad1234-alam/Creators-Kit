@@ -12,10 +12,11 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Please provide email and OTP' }, { status: 400 });
     }
 
+    const normalizedEmail = decodeURIComponent(email).toLowerCase();
     const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
 
     const user = await User.findOne({
-      email,
+      email: normalizedEmail,
       otpCode: hashedOtp,
       otpExpire: { $gt: Date.now() },
     });

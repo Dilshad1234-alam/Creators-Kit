@@ -42,9 +42,6 @@ export default function RegisterPage() {
         throw new Error(data.error || 'Something went wrong');
       }
 
-      // Store user name from form data
-      sessionStorage.setItem('userName', formData.name);
-
       router.push(`/verify-otp?email=${encodeURIComponent(formData.email)}`);
     } catch (err) {
       setError(err.message);

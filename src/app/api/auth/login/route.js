@@ -26,6 +26,14 @@ export async function POST(req) {
       );
     }
 
+    // Block login if user has not verified their OTP
+    if (!user.isVerified) {
+      return NextResponse.json(
+        { error: 'Please verify your email address before logging in.', email: user.email },
+        { status: 403 }
+      );
+    }
+
     // Check if password matches
     const isMatch = await user.matchPassword(password);
 
