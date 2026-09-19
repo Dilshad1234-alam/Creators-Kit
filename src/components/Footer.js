@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 export default function Footer() {
@@ -12,7 +13,14 @@ export default function Footer() {
         
         {/* Brand Summary */}
         <div className="col-span-1 md:col-span-2">
-          <span className="text-4xl font-black tracking-tighter text-white mb-6 block">Creators Kit<span className="text-[#FF3B14]">.</span></span>
+          <Link href="/" className="relative block w-[220px] h-[70px] mb-6">
+            <Image
+              src="/logo kits.png - Edited.png"
+              alt="Creators Kit Logo"
+              fill
+              className="object-contain object-left mix-blend-lighten contrast-125"
+            />
+          </Link>
           <p className="text-lg max-w-md font-medium leading-relaxed text-zinc-400 mb-8">
             The complete toolkit for modern creators. Professional equipment, elite education, and tactile physical resources bundled into one seamless experience.
           </p>

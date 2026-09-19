@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import HomepageFeaturesManager from './HomepageFeaturesManager';
 import MasterclassesManager from './MasterclassesManager';
 
 export default function ContentManager({ tab }) {
+  const router = useRouter();
   const [contentMap, setContentMap] = useState({});
   const [isSaving, setIsSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -18,7 +20,7 @@ export default function ContentManager({ tab }) {
     setLoading(true);
     try {
       const endpoint = tab === 'legal' ? '/api/policies' : '/api/content';
-      const res = await fetch(endpoint);
+      const res = await fetch(endpoint, { cache: 'no-store' });
       const data = await res.json();
       if (data.success) {
         if (tab === 'legal') {
@@ -51,6 +53,7 @@ export default function ContentManager({ tab }) {
         });
       }
       alert('Content saved successfully!');
+      router.refresh();
       fetchData();
     } catch (err) {
       console.error('Failed to save content', err);

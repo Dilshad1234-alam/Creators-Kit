@@ -2,8 +2,39 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
+
+function SidebarNav({ navItems }) {
+  const searchParams = useSearchParams();
+  const currentTab = searchParams.get('tab');
+
+  return (
+    <nav className="px-4 pb-8 space-y-2">
+      {navItems.map((item, index) => {
+        const isDashboard = item.path === '/admin';
+        const isActive = isDashboard
+          ? !currentTab
+          : currentTab && item.path.includes(`tab=${currentTab}`);
+
+        return (
+          <Link
+            key={index}
+            href={item.path}
+            className={`flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all group ${
+              isActive
+                ? 'bg-[#FF3B14] text-white shadow-lg shadow-[#FF3B14]/20'
+                : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'
+            }`}
+          >
+            <span className="text-xl group-hover:scale-110 transition-transform">{item.icon}</span>
+            {item.name}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
@@ -37,36 +68,20 @@ export default function AdminLayout({ children }) {
       {/* Sidebar Navigation */}
       <aside className="w-full md:w-64 lg:w-72 bg-zinc-950 border-b md:border-r border-zinc-900 shrink-0 sticky top-0 md:h-screen overflow-y-auto z-20 shadow-2xl">
         <div className="p-6 md:p-8 pb-4 flex flex-col items-start gap-1">
-          <Link href="/" className="relative block w-[160px] h-[50px] group mb-2">
+          <Link href="/" className="relative block w-[200px] h-[65px] group mb-6">
             <Image
-              src="/logo kit.jpg - Edited.png"
+              src="/logo kits.png - Edited.png"
               alt="Creators Kit Logo"
               fill
-              className="object-contain object-left transform transition-transform duration-300 group-hover:scale-105 mix-blend-lighten contrast-125"
+              className="object-contain object-left transform transition-transform duration-300 group-hover:scale-105 drop-shadow-md"
               priority
             />
           </Link>
-          <div className="flex items-center gap-2 px-1">
-            <div className="w-2 h-2 rounded-full bg-[#FF3B14]"></div>
-            <span className="font-bold text-sm tracking-widest uppercase text-zinc-400">Admin Panel</span>
-          </div>
         </div>
         
-        <nav className="px-4 pb-8 space-y-1">
-          {navItems.map((item, index) => {
-            // Simplified active state handling for URL params
-            return (
-              <Link
-                key={index}
-                href={item.path}
-                className="flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-zinc-400 hover:bg-zinc-900 hover:text-white transition-all group"
-              >
-                <span className="text-xl group-hover:scale-110 transition-transform">{item.icon}</span>
-                {item.name}
-              </Link>
-            );
-          })}
-        </nav>
+        <Suspense fallback={<nav className="px-4 pb-8 space-y-1"></nav>}>
+          <SidebarNav navItems={navItems} />
+        </Suspense>
       </aside>
 
       {/* Main Content Area */}

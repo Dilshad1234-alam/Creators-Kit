@@ -38,15 +38,22 @@ export default function Navbar() {
     { name: 'Contact', href: '/contact' },
   ];
 
+  const handleNavClick = (e, href) => {
+    if (pathname === href) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <header className="w-full bg-[#0B0D0E]/80 backdrop-blur-md border-b border-zinc-800/80 sticky top-0 z-50">
       <div className="w-full px-6 lg:px-12">
-        <div className="flex items-center justify-between h-16 gap-8 relative">
+        <div className="flex items-center justify-between h-20 gap-8 relative">
           {/* Brand Logo */}
           <div className="flex-shrink-0 flex items-center">
-            <Link href="/" className="relative flex items-center w-[160px] h-[50px] group">
+            <Link href="/" className="relative flex items-center w-[200px] h-[65px] group">
               <Image
-                src="/logo kit.jpg - Edited.png"
+                src="/logo kits.png - Edited.png"
                 alt="Creators Kit Logo"
                 fill
                 className="object-contain object-left transform transition-transform duration-300 group-hover:scale-105 mix-blend-lighten contrast-125"
@@ -62,6 +69,7 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
+                onClick={(e) => handleNavClick(e, link.href)}
                 className={`relative text-base font-bold transition-colors duration-300 py-2 ${
                   pathname === link.href ? 'text-[#FF3B14]' : 'text-zinc-400 hover:text-[#FF3B14]'
                 }`}
@@ -169,7 +177,10 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                onClick={() => setIsMobileMenuOpen(false)}
+                onClick={(e) => {
+                  setIsMobileMenuOpen(false);
+                  handleNavClick(e, link.href);
+                }}
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
                   pathname === link.href ? 'text-[#FF3B14] bg-zinc-900' : 'text-zinc-300 hover:text-[#FF3B14] hover:bg-zinc-900'
                 }`}
