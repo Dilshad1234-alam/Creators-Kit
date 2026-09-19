@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import connectDB from '@/lib/db';
+import connectDB from '@/lib/mongodb';
 import Order from '@/models/Order';
 
 export async function POST(req) {
