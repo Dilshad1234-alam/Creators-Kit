@@ -41,6 +41,19 @@ const OrderSchema = new mongoose.Schema({
     enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
     default: 'Pending',
   },
+  paymentStatus: {
+    type: String,
+    enum: ['Pending', 'Paid', 'Failed', 'COD'],
+    default: 'Pending',
+  },
+  paymentMode: {
+    type: String,
+    enum: ['Online', 'Cash on Delivery'],
+    default: 'Online',
+  },
+  deliveryOtp: {
+    type: String,
+  }
 }, { timestamps: true });
 
 // Clear Mongoose cache for HMR

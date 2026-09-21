@@ -2,21 +2,31 @@
 
 @theme inline {
   /* Brand Colors */
-  --color-primary: #FC1D00;
-  --color-primary-hover: #E01900;
-  --color-primary-light: #FF4D33;
+  --color-primary: #F59E0B;
+  --color-primary-hover: #D97706;
+  --color-primary-light: #FCD34D;
+  
+  --color-secondary: #38BDF8;
+  --color-secondary-hover: #0EA5E9;
   
   /* Supporting Neutral Colors */
-  --color-background: #09090b; /* zinc-950 */
-  --color-foreground: #f4f4f5; /* zinc-100 */
-  --color-surface: #18181b; /* zinc-900 */
-  --color-surface-hover: #27272a; /* zinc-800 */
+  --color-background: #0B0F19; 
+  --color-foreground: #94A3B8; 
+  --color-surface: #131C2E; 
+  --color-surface-hover: #1E293B; 
   
-  --color-neutral-100: #f4f4f5;
-  --color-neutral-200: #e4e4e7;
-  --color-neutral-700: #3f3f46;
-  --color-neutral-800: #27272a;
-  --color-neutral-900: #18181b;
+  /* Restoring standard neutral polarity for Dark Mode */
+  --color-neutral-50: #F8FAFC; 
+  --color-neutral-100: #F1F5F9;
+  --color-neutral-200: #E2E8F0;
+  --color-neutral-300: #CBD5E1;
+  --color-neutral-400: #94A3B8;
+  --color-neutral-500: #64748B;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155; 
+  --color-neutral-800: #1E293B; /* Border color */
+  --color-neutral-900: #131C2E; /* Surface color */
+  --color-neutral-950: #0B0F19; /* Background color */
 
   /* Typography */
   --font-sans: 'Inter', var(--font-geist-sans), system-ui, sans-serif;
@@ -29,14 +39,14 @@
 }
 
 :root {
-  --background: #09090b;
-  --foreground: #f4f4f5;
+  --background: #0B0F19;
+  --foreground: #94A3B8;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #09090b;
-    --foreground: #f4f4f5;
+    --background: #0B0F19;
+    --foreground: #94A3B8;
   }
 }
 
@@ -68,4 +78,57 @@ body {
 @keyframes marquee {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
+}
+
+@layer components {
+  .premium-glow-card {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    transition: all 0.4s ease-out;
+    border: none !important;
+  }
+
+  .premium-glow-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 0 60px 15px rgba(245, 158, 11, 0.5);
+  }
+
+  .premium-glow-card::before {
+    content: '';
+    position: absolute;
+    width: 250%;
+    height: 250%;
+    top: -75%;
+    left: -75%;
+    background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(245, 158, 11, 0.8) 60deg, transparent 120deg, transparent 180deg, rgba(56, 189, 248, 0.8) 240deg, transparent 300deg);
+    animation: spin-slow 4s linear infinite;
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: -2;
+    pointer-events: none;
+  }
+
+  .premium-glow-card::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border-radius: inherit;
+    background: #131C2E;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .premium-glow-card:hover::before {
+    opacity: 1;
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

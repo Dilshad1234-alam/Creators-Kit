@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
+import PendingUser from '@/models/PendingUser';
 import crypto from 'crypto';
 import { sendEmail } from '@/lib/mailer';
 export async function POST(req) {
@@ -17,25 +18,27 @@ export async function POST(req) {
       );
     }
 
-    let user = await User.findOne({ email });
+    // First check if a verified user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return NextResponse.json(
+        { error: 'User already exists' },
+        { status: 400 }
+      );
+    }
 
-    if (user) {
-      if (user.isVerified) {
-        return NextResponse.json(
-          { error: 'User already exists' },
-          { status: 400 }
-        );
-      }
+    // Now check if there is an unverified registration attempt
+    let pendingUser = await PendingUser.findOne({ email });
+
+    if (pendingUser) {
       // If unverified, update details for a fresh registration attempt
-      user.name = name;
-      user.password = password;
+      pendingUser.name = name;
+      pendingUser.password = password;
     } else {
-      user = new User({
+      pendingUser = new PendingUser({
         name,
         email,
         password,
-        role: 'user',
-        isVerified: false
       });
     }
 
@@ -43,10 +46,10 @@ export async function POST(req) {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
 
-    user.otpCode = hashedOtp;
-    user.otpExpire = Date.now() + 10 * 60 * 1000; // 10 mins
+    pendingUser.otpCode = hashedOtp;
+    pendingUser.otpExpire = Date.now() + 10 * 60 * 1000; // 10 mins
 
-    await user.save();
+    await pendingUser.save();
 
     // Send email with OTP
     try {
@@ -58,20 +61,20 @@ export async function POST(req) {
       `;
 
       await sendEmail({
-        to: user.email,
+        to: pendingUser.email,
         subject: 'Verify your account',
         html: message,
       });
 
       return NextResponse.json(
-        { message: 'Registration initiated. Please verify OTP.', email: user.email },
+        { message: 'Registration initiated. Please verify OTP.', email: pendingUser.email },
         { status: 201 }
       );
     } catch (emailErr) {
       console.error('Email error in register:', emailErr.message);
-      user.otpCode = undefined;
-      user.otpExpire = undefined;
-      await user.save({ validateBeforeSave: false });
+      pendingUser.otpCode = undefined;
+      pendingUser.otpExpire = undefined;
+      await pendingUser.save({ validateBeforeSave: false });
       return NextResponse.json(
         { error: 'Registration succeeded, but failed to send verification email. Please try again or request a new OTP.' },
         { status: 500 }

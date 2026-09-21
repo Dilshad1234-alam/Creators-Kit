@@ -71,20 +71,20 @@ export default function ProductPage() {
   const mainBundle = bundleProducts[0] || {};
   
   let dynamicImages = [
-    { src: '/kits 25 (1).jpg', bg: 'bg-zinc-900/50', title: 'Loading...', description: 'Loading...' }
+    { src: '/kits 25 (1).jpg', bg: 'bg-neutral-900/50', title: 'Loading...', description: 'Loading...' }
   ];
 
   if (mainBundle.images && mainBundle.images.length > 0) {
     dynamicImages = mainBundle.images.map(img => ({
       src: img.src || '/placeholder.png',
-      bg: 'bg-zinc-900/50',
+      bg: 'bg-neutral-900/50',
       title: mainBundle.name || 'CREATOR BUNDLE',
       description: mainBundle.description
     }));
   } else if (mainBundle.image) {
     dynamicImages = [{
       src: mainBundle.image,
-      bg: 'bg-zinc-900/50',
+      bg: 'bg-neutral-900/50',
       title: mainBundle.name || 'CREATOR BUNDLE',
       description: mainBundle.description
     }];
@@ -139,22 +139,22 @@ export default function ProductPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0B0D0E] text-zinc-100 font-sans w-full">
+    <div className="min-h-screen flex flex-col bg-background text-neutral-100 font-sans w-full">
       <main className="flex-grow w-full">
         
         {/* Sticky Action Bar for Mobile (Hidden on Desktop) */}
-        <div className="fixed bottom-0 left-0 w-full bg-[#0B0D0E] border-t border-zinc-800 p-4 z-50 md:hidden flex gap-3 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]">
+        <div className="fixed bottom-0 left-0 w-full bg-background border-t border-neutral-800 p-4 z-50 md:hidden flex gap-3 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]">
            <div className="flex-1">
-             <p className="text-xs text-zinc-400 font-bold uppercase tracking-wider">Total Price</p>
-             <p className="text-xl font-black text-zinc-100">₹{product.price.toLocaleString()}</p>
+             <p className="text-xs text-neutral-400 font-bold uppercase tracking-wider">Total Price</p>
+             <p className="text-xl font-black text-neutral-100">₹{product.price.toLocaleString()}</p>
            </div>
-           <button onClick={handleBuyNow} className="flex-1 bg-[#FF3B14] text-white rounded-full font-bold shadow-lg hover:bg-[#E01900] transition-colors">
+           <button onClick={handleBuyNow} className="flex-1 bg-primary text-neutral-950 rounded-full font-bold shadow-lg hover:bg-primary-hover transition-colors">
              Buy Now
            </button>
         </div>
 
         {/* 1. Main Product Overview Section */}
-        <section className="w-full bg-[#0B0D0E] py-4 min-h-[calc(100vh-5rem)] flex items-center justify-center border-b border-zinc-900 relative overflow-hidden">
+        <section className="w-full bg-background py-4 min-h-[calc(100vh-5rem)] flex items-center justify-center border-b border-neutral-900 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-#FF6B4A/10 via-transparent to-transparent opacity-70 pointer-events-none"></div>
 
           <div className="w-full px-6 md:px-12 lg:px-24 mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 relative z-10">
@@ -162,12 +162,12 @@ export default function ProductPage() {
             {/* Left: Product Gallery */}
             <div className="flex flex-col gap-4">
               {/* Main Image Viewport */}
-              <div className={`w-full h-[500px] lg:h-[600px] rounded-[3rem] flex items-center justify-center shadow-2xl shadow-zinc-950/50 border border-zinc-800 transition-all duration-700 relative overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-700/40 via-zinc-900/80 to-[#0B0D0E] p-6 hover:border-[#FF3B14] transform hover:scale-[1.02] ${product.images[currentImage].bg}`}>
+              <div className={`w-full h-[500px] lg:h-[600px] rounded-[3rem] flex items-center justify-center shadow-2xl shadow-neutral-950/50 border border-neutral-800 transition-all duration-700 ease-in-out relative overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-neutral-700/40 via-neutral-900/80 to-background p-6 hover:border-primary transform hover:scale-[1.02] will-change-transform hover:shadow-[0_0_40px_rgba(245,158,11,0.2)] ${product.images[currentImage].bg}`}>
                 <Image
                   src={product.images[currentImage].src}
                   alt="Product Image"
                   fill
-                  className="object-contain p-6 drop-shadow-[0_0_25px_rgba(255,255,255,0.15)] transform transition-transform hover:scale-110 duration-500 cursor-zoom-in"
+                  className="object-contain p-6 drop-shadow-[0_0_25px_rgba(255,255,255,0.15)] transform transition-all duration-500 ease-in-out hover:scale-110 will-change-transform cursor-zoom-in"
                 />
               </div>
               
@@ -177,10 +177,10 @@ export default function ProductPage() {
                   <button
                     key={idx}
                     onClick={() => setCurrentImage(idx)}
-                    className={`relative snap-center shrink-0 w-24 h-24 rounded-2xl flex items-center justify-center border-2 transition-all overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-700/40 via-zinc-900/80 to-[#0B0D0E] ${
+                    className={`relative snap-center shrink-0 w-24 h-24 rounded-2xl flex items-center justify-center border-2 transition-all overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-neutral-700/40 via-neutral-900/80 to-background ${
                       currentImage === idx 
-                        ? 'border-[#FF3B14] ring-4 ring-[#FF3B14]/20 scale-105 shadow-lg' 
-                        : 'border-zinc-800 opacity-60 hover:opacity-100 hover:scale-105 hover:border-[#FF3B14]'
+                        ? 'border-primary ring-4 ring-primary/20 scale-105 shadow-lg' 
+                        : 'border-neutral-800 opacity-60 hover:opacity-100 hover:scale-105 hover:border-primary'
                     }`}
                   >
                     <Image src={img.src} alt="Thumbnail" fill className="object-contain p-2 drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]" />
@@ -192,27 +192,27 @@ export default function ProductPage() {
             {/* Right: Product Info & Pricing */}
             <div className="flex flex-col justify-center">
               
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif tracking-tight mb-2 text-zinc-300 uppercase" style={{ fontFamily: 'Georgia, serif' }}>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif tracking-tight mb-2 text-neutral-300 uppercase" style={{ fontFamily: 'Georgia, serif' }}>
                 {product.images[currentImage].title}
               </h1>
-              <h2 className="text-md md:text-lg text-zinc-500 tracking-[0.3em] uppercase mb-4">
+              <h2 className="text-md md:text-lg text-neutral-500 tracking-[0.3em] uppercase mb-4">
                 {product.subheading}
               </h2>
               
-              <p className="text-lg text-zinc-400 mb-6 leading-relaxed font-medium">
+              <p className="text-lg text-neutral-400 mb-6 leading-relaxed font-medium">
                 {product.images[currentImage].description}
               </p>
 
               {/* Pricing & Offer Area */}
-              <div className="bg-zinc-900 p-8 rounded-3xl border border-zinc-800 mb-6 shadow-sm relative overflow-hidden">
+              <div className="bg-neutral-900 p-8 rounded-3xl border border-neutral-800 mb-6 shadow-sm relative overflow-hidden">
                 {discountPercent > 0 && (
-                  <div className="absolute top-0 right-0 bg-[#FF3B14] text-white text-xs font-bold px-4 py-1 rounded-bl-xl tracking-wider">
+                  <div className="absolute top-0 right-0 bg-primary text-neutral-950 text-xs font-bold px-4 py-1 rounded-bl-xl tracking-wider">
                     SAVE {discountPercent}%
                   </div>
                 )}
                 <div className="flex items-end gap-4 mb-2">
-                  <span className="text-5xl md:text-6xl font-black text-zinc-100">₹{product.price.toLocaleString()}</span>
-                  <span className="text-2xl font-bold text-zinc-600 line-through mb-1">₹{product.originalPrice.toLocaleString()}</span>
+                  <span className="text-5xl md:text-6xl font-black text-neutral-100">₹{product.price.toLocaleString()}</span>
+                  <span className="text-2xl font-bold text-neutral-600 line-through mb-1">₹{product.originalPrice.toLocaleString()}</span>
                 </div>
                 <p className="text-sm font-bold text-green-500 flex items-center gap-2">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" /><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H14a2.5 2.5 0 014.9 0H19a1 1 0 001-1v-5l-2.5-4H14V5a1 1 0 00-1-1H3zM14 7h2.1l1.875 3H14V7z" /></svg>
@@ -224,14 +224,14 @@ export default function ProductPage() {
               <div className="flex flex-col sm:flex-row gap-4 mb-4">
                 <button
                   onClick={handleAddToCart}
-                  className="hidden md:flex flex-1 py-5 px-8 bg-zinc-900 border border-zinc-700 text-zinc-100 rounded-full font-bold text-lg hover:border-[#FF3B14] hover:text-[#FF3B14] hover:bg-[#0B0D0E] transition-colors items-center justify-center gap-3 shadow-sm"
+                  className="hidden md:flex flex-1 py-5 px-8 bg-neutral-900 border border-neutral-700 text-neutral-100 rounded-full font-bold text-lg hover:border-primary hover:text-primary hover:bg-background transition-colors items-center justify-center gap-3 shadow-sm"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                   Add to Cart
                 </button>
                 <button
                   onClick={handleBuyNow}
-                  className="hidden md:flex flex-1 py-5 px-8 bg-[#FF3B14] text-white rounded-full font-extrabold text-xl hover:bg-[#E01900] transition-all hover:scale-105 shadow-xl shadow-#FF6B4A/30 items-center justify-center gap-2"
+                  className="hidden md:flex flex-1 py-5 px-8 bg-primary text-neutral-950 rounded-full font-extrabold text-xl hover:bg-primary-hover transition-all hover:scale-105 shadow-xl shadow-#FF6B4A/30 items-center justify-center gap-2"
                 >
                   Buy Now
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
@@ -239,13 +239,13 @@ export default function ProductPage() {
               </div>
 
               {/* Secure Checkout Badges */}
-              <div className="grid grid-cols-2 gap-4 text-sm font-medium text-zinc-500">
+              <div className="grid grid-cols-2 gap-4 text-sm font-medium text-neutral-500">
                 <div className="flex items-center gap-2">
-                   <svg className="w-5 h-5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                   <svg className="w-5 h-5 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                    Secure Encrypted Checkout
                 </div>
                 <div className="flex items-center gap-2">
-                   <svg className="w-5 h-5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                   <svg className="w-5 h-5 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                    30-Day Guarantee
                 </div>
               </div>
@@ -254,23 +254,23 @@ export default function ProductPage() {
         </section>
 
         {/* 1.5. Individual Gear Purchase Section */}
-        <section className="w-full py-16 bg-[#0B0D0E] relative z-10 border-t border-zinc-900">
+        <section className="w-full py-16 bg-background relative z-10 border-t border-neutral-900">
           <div className="w-full px-6 md:px-12 lg:px-24 mx-auto text-center mb-10">
-             <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-zinc-100 mb-4">Need Just One Piece?</h2>
-             <p className="text-zinc-400 font-medium">Build your own setup by purchasing our premium gear individually.</p>
+             <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-neutral-100 mb-4">Need Just One Piece?</h2>
+             <p className="text-neutral-400 font-medium">Build your own setup by purchasing our premium gear individually.</p>
           </div>
           
           <div className="w-full px-6 md:px-12 lg:px-24 mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {individualProducts.map((item) => (
-              <div key={item._id || item.id} className="bg-zinc-900/60 backdrop-blur-md p-6 rounded-3xl border border-zinc-800 hover:border-[#FF3B14]/50 transition-colors group flex flex-col items-center text-center shadow-lg hover:shadow-[0_8px_30px_rgba(255,59,20,0.1)]">
-                <div className="relative w-full aspect-square mb-4 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-700/40 via-zinc-900/80 to-[#0B0D0E] rounded-2xl p-4 overflow-hidden group-hover:border-[#FF3B14]/30 border border-zinc-800 transition-colors">
+              <div key={item._id || item.id} className="premium-glow-card p-6 rounded-3xl group flex flex-col items-center text-center">
+                <div className="relative w-full aspect-square mb-4 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-neutral-700/40 via-neutral-900/80 to-background rounded-2xl p-4 overflow-hidden group-hover:border-primary/30 border border-neutral-800 transition-colors">
                   <Image src={item.image || '/placeholder.png'} alt={item.name} fill className="object-contain p-2 drop-shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:scale-110 transition-transform duration-300" />
                 </div>
-                <h3 className="font-bold text-zinc-100 mb-2 leading-tight flex-grow">{item.name}</h3>
-                <div className="text-[#FF3B14] font-extrabold text-xl mb-4">₹{item.price}</div>
+                <h3 className="font-bold text-neutral-100 mb-2 leading-tight flex-grow">{item.name}</h3>
+                <div className="text-primary font-extrabold text-xl mb-4">₹{item.price}</div>
                 <button
                   onClick={() => handleAddIndividualToCart(item)}
-                  className="w-full py-3 bg-zinc-800 text-white rounded-xl font-bold hover:bg-[#FF3B14] transition-colors text-sm shadow-md"
+                  className="w-full py-3 bg-neutral-800 text-neutral-100 rounded-xl font-bold hover:bg-primary transition-colors text-sm shadow-md"
                 >
                   Add to Cart
                 </button>
@@ -280,27 +280,27 @@ export default function ProductPage() {
         </section>
 
         {/* 2. What's Included & Features */}
-        <section className="w-full py-24 bg-[#0B0D0E] border-t border-zinc-900 relative overflow-hidden">
+        <section className="w-full py-24 bg-background border-t border-neutral-900 relative overflow-hidden">
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:24px_24px]"></div>
           
           <div className="w-full px-6 md:px-12 lg:px-24 mx-auto relative z-10 flex flex-col items-center">
             
             {/* Top/Header Area */}
             <div className="text-center max-w-3xl mx-auto mb-16">
-              <h2 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight text-zinc-100">The Complete Bundle</h2>
-              <p className="text-xl text-zinc-400 font-medium">Everything you need to shoot, record, and light your content perfectly. Sold exclusively as one complete package.</p>
+              <h2 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight text-neutral-100">The Complete Bundle</h2>
+              <p className="text-xl text-neutral-400 font-medium">Everything you need to shoot, record, and light your content perfectly. Sold exclusively as one complete package.</p>
             </div>
             
             {/* What's Included - Top Overview Banner */}
-            <div className="w-full bg-zinc-900/40 backdrop-blur-md rounded-[2.5rem] p-6 md:p-8 border border-zinc-800/80 shadow-2xl mb-16 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-[#FF3B14]/5 rounded-full blur-3xl -mr-24 -mt-24 pointer-events-none"></div>
+            <div className="w-full premium-glow-card rounded-[2.5rem] p-6 md:p-8 mb-16 relative">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full blur-3xl -mr-24 -mt-24 pointer-events-none"></div>
               <ul className="flex flex-wrap items-center justify-center gap-4 md:gap-8 relative z-10">
                 {whatsInsideItems.map((item, idx) => (
-                  <li key={item._id || item.id || idx} className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#0B0D0E]/50 border border-zinc-800/50 shadow-inner">
+                  <li key={item._id || item.id || idx} className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-background/50 border border-neutral-800/50 shadow-inner">
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center text-xs text-green-400 border border-green-500/20">
                       ✓
                     </div>
-                    <span className="font-bold text-sm md:text-base text-zinc-200">{item.name}</span>
+                    <span className="font-bold text-sm md:text-base text-neutral-200">{item.name}</span>
                   </li>
                 ))}
               </ul>
@@ -310,12 +310,12 @@ export default function ProductPage() {
             <div className="w-full">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                 {whatsInsideItems.map((part, idx) => (
-                  <div key={part._id || part.id || idx} className="bg-zinc-900/40 backdrop-blur-md p-8 rounded-[2rem] border border-zinc-800 hover:border-zinc-700 transition-all group overflow-hidden shadow-xl flex flex-col">
-                    <div className="relative w-full aspect-[4/3] mb-6 rounded-2xl overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-800/30 via-zinc-900/60 to-[#0B0D0E] border border-zinc-800/50 p-4 shadow-inner">
+                  <div key={part._id || part.id || idx} className="premium-glow-card p-8 rounded-[2rem] flex flex-col">
+                    <div className="relative w-full aspect-[4/3] mb-6 rounded-2xl overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-neutral-800/30 via-neutral-900/60 to-background border border-neutral-800/50 p-4 shadow-inner">
                       <Image src={part.image || '/placeholder.png'} alt={part.name} fill className="object-contain p-4 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] group-hover:scale-105 transition-transform duration-500" />
                     </div>
-                    <h3 className="text-xl font-bold mb-3 text-zinc-100 group-hover:text-[#FF3B14] transition-colors">{part.name}</h3>
-                    <p className="text-zinc-400 font-medium leading-relaxed text-sm flex-grow">{part.description}</p>
+                    <h3 className="text-xl font-bold mb-3 text-neutral-100 group-hover:text-primary transition-colors">{part.name}</h3>
+                    <p className="text-neutral-400 font-medium leading-relaxed text-sm flex-grow">{part.description}</p>
                   </div>
                 ))}
               </div>
@@ -327,55 +327,55 @@ export default function ProductPage() {
 
 
         {/* 4. Details Tabs (Shipping/Policies) & FAQ */}
-        <section className="w-full py-24 bg-[#0B0D0E] border-t border-zinc-900">
+        <section className="w-full py-24 bg-background border-t border-neutral-900">
           <div className="w-full px-6 md:px-12 lg:px-24 mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
             
             {/* Policies */}
             <div>
-              <h2 className="text-4xl font-extrabold mb-8 tracking-tight text-zinc-100">Policies & Guarantees</h2>
+              <h2 className="text-4xl font-extrabold mb-8 tracking-tight text-neutral-100">Policies & Guarantees</h2>
               
               <div className="space-y-8">
-                <div className="bg-zinc-900 p-8 rounded-3xl border border-zinc-800 shadow-sm">
+                <div className="bg-neutral-900 p-8 rounded-3xl border border-neutral-800 shadow-sm">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center text-green-500">
                       <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" /><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H14a2.5 2.5 0 014.9 0H19a1 1 0 001-1v-5l-2.5-4H14V5a1 1 0 00-1-1H3zM14 7h2.1l1.875 3H14V7z" /></svg>
                     </div>
-                    <h3 className="text-xl font-bold text-zinc-100">Fast & Free Shipping</h3>
+                    <h3 className="text-xl font-bold text-neutral-100">Fast & Free Shipping</h3>
                   </div>
-                  <p className="text-zinc-400 font-medium leading-relaxed">We process all orders within 24 hours. Standard delivery takes 3-5 business days nationwide absolutely free.</p>
+                  <p className="text-neutral-400 font-medium leading-relaxed">We process all orders within 24 hours. Standard delivery takes 3-5 business days nationwide absolutely free.</p>
                 </div>
                 
-                <div className="bg-zinc-900 p-8 rounded-3xl border border-zinc-800 shadow-sm">
+                <div className="bg-neutral-900 p-8 rounded-3xl border border-neutral-800 shadow-sm">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500">
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
-                    <h3 className="text-xl font-bold text-zinc-100">30-Day Guarantee</h3>
+                    <h3 className="text-xl font-bold text-neutral-100">30-Day Guarantee</h3>
                   </div>
-                  <p className="text-zinc-400 font-medium leading-relaxed">If you're not completely satisfied with the kit, simply return it within 30 days for a full, no-questions-asked refund.</p>
+                  <p className="text-neutral-400 font-medium leading-relaxed">If you're not completely satisfied with the kit, simply return it within 30 days for a full, no-questions-asked refund.</p>
                 </div>
               </div>
             </div>
 
             {/* FAQ Accordion */}
             <div>
-              <h2 className="text-4xl font-extrabold mb-8 tracking-tight text-zinc-100">Product FAQ</h2>
+              <h2 className="text-4xl font-extrabold mb-8 tracking-tight text-neutral-100">Product FAQ</h2>
               <div className="space-y-4">
                 {faqs.map((faq, index) => (
-                  <div key={index} className={`border ${openFaqIndex === index ? 'border-[#FF3B14]' : 'border-zinc-800'} rounded-[1.5rem] overflow-hidden bg-zinc-900 shadow-sm transition-colors duration-300`}>
+                  <div key={index} className={`border ${openFaqIndex === index ? 'border-primary' : 'border-neutral-800'} rounded-[1.5rem] overflow-hidden bg-neutral-900 shadow-sm transition-colors duration-300`}>
                     <button
-                      className="w-full px-8 py-6 text-left flex justify-between items-center hover:bg-zinc-800/50 transition-colors"
+                      className="w-full px-8 py-6 text-left flex justify-between items-center hover:bg-neutral-800/50 transition-colors"
                       onClick={() => setOpenFaqIndex(openFaqIndex === index ? -1 : index)}
                     >
-                      <span className="font-bold text-lg text-zinc-100 pr-4">{faq.question}</span>
-                      <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-300 ${openFaqIndex === index ? 'bg-[#FF3B14]/20 text-[#FF3B14]' : 'bg-zinc-800 text-zinc-400'}`}>
+                      <span className="font-bold text-lg text-neutral-100 pr-4">{faq.question}</span>
+                      <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-300 ${openFaqIndex === index ? 'bg-primary/20 text-primary' : 'bg-neutral-800 text-neutral-400'}`}>
                         <svg className={`w-5 h-5 transform transition-transform duration-300 ${openFaqIndex === index ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
                       </div>
                     </button>
                     <div className={`px-8 overflow-hidden transition-all duration-300 ease-in-out ${openFaqIndex === index ? 'max-h-96 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}>
-                      <p className="text-zinc-400 font-medium leading-relaxed">{faq.answer}</p>
+                      <p className="text-neutral-400 font-medium leading-relaxed">{faq.answer}</p>
                     </div>
                   </div>
                 ))}

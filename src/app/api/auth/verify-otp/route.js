@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
+import PendingUser from '@/models/PendingUser';
 import crypto from 'crypto';
 
 export async function POST(req) {
@@ -15,21 +16,29 @@ export async function POST(req) {
     const normalizedEmail = decodeURIComponent(email).toLowerCase();
     const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
 
-    const user = await User.findOne({
+    const pendingUser = await PendingUser.findOne({
       email: normalizedEmail,
       otpCode: hashedOtp,
       otpExpire: { $gt: Date.now() },
     });
 
-    if (!user) {
+    if (!pendingUser) {
       return NextResponse.json({ error: 'Invalid or expired OTP' }, { status: 400 });
     }
 
-    user.isVerified = true;
-    user.otpCode = undefined;
-    user.otpExpire = undefined;
-    
+    // Move user to main User collection
+    const user = new User({
+      name: pendingUser.name,
+      email: pendingUser.email,
+      password: pendingUser.password, // This will be automatically hashed by User pre-save hook
+      isVerified: true,
+      role: 'user', // Default role
+    });
+
     await user.save();
+    
+    // Delete the pending registration
+    await PendingUser.deleteOne({ _id: pendingUser._id });
 
     return NextResponse.json({ message: 'Account verified successfully' }, { status: 200 });
   } catch (error) {

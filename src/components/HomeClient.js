@@ -4,41 +4,42 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ringLightFrames, benefits, workflowSteps, faqs } from '@/lib/constants';
+import MasterclassCard from './MasterclassCard';
+import InteractiveLightCard from './InteractiveLightCard';
 
 export default function HomeClient({ contentMap, kitComponents, masteryCourses }) {
-  const [currentFrame, setCurrentFrame] = useState(0);
-  const [isHeroHovered, setIsHeroHovered] = useState(false);
+  const [lightMode, setLightMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('heroLightMode') || 'white';
+    }
+    return 'white';
+  });
   const [openFaqIndex, setOpenFaqIndex] = useState(-1);
 
-  useEffect(() => {
-    let interval;
-    if (isHeroHovered) {
-      interval = setInterval(() => {
-        setCurrentFrame((prev) => (prev + 1) % ringLightFrames.length);
-      }, 300);
-    } else {
-      setCurrentFrame(0);
-    }
-    return () => clearInterval(interval);
-  }, [isHeroHovered]);
+  const handleLightModeChange = (mode) => {
+    setLightMode(mode);
+    if (typeof window !== 'undefined') {
+    localStorage.setItem('heroLightMode', mode);
+  }
+  };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0B0D0E] text-white font-sans overflow-x-hidden w-full">
+    <div className="min-h-screen flex flex-col bg-background text-white font-sans overflow-x-hidden w-full">
       <main className="flex-grow w-full">
         {/* 1. Hero Section (7.1) */}
-        <section className="relative w-full pt-8 md:pt-12 pb-4 overflow-hidden bg-[#0B0D0E]">
+        <section className="relative w-full pt-8 md:pt-12 pb-4 overflow-hidden bg-background">
           <div className="w-full grid grid-cols-1 lg:grid-cols-12 items-center gap-12 px-6 lg:px-12 relative z-10">
             
             {/* Left Column (Text & CTAs) */}
             <div className="lg:col-span-6 lg:col-start-2 flex flex-col items-start text-left transition-all">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FF6B4A]/10 text-[#FF6B4A] text-sm font-bold mb-8 border border-[#FF6B4A]/20 shadow-sm animate-fade-in-up">
-                <span className="flex h-2 w-2 rounded-full bg-[#FF3B14] animate-pulse"></span>
-                🔥 All-in-One Creator Bundle
+                <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+                {contentMap['hero_badge'] || '🔥 All-in-One Creator Bundle'}
               </div>
               
               <h1 className="text-5xl md:text-7xl font-extrabold mb-6 leading-tight tracking-tight drop-shadow-lg">
                 {contentMap['hero_heading'] || 'Unbox your potential'} <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF3B14] to-[#FF7354]">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-light">
                   {contentMap['hero_subheading'] || 'The Complete Creator Bundle'}
                 </span>
               </h1>
@@ -50,51 +51,99 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
               <div className="flex flex-col sm:flex-row items-center justify-start gap-5 w-full">
                 <Link
                   href="/product"
-                  className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#FF3B14] to-[#FF512F] text-white rounded-full font-extrabold text-lg hover:shadow-[0_0_40px_rgba(252,29,0,0.5)] transition-all hover:-translate-y-1 text-center"
+                  className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-primary to-primary-hover text-white rounded-full font-extrabold text-lg hover:shadow-[0_0_40px_rgba(255,110,64,0.5)] transition-all hover:-translate-y-1 text-center"
                 >
-                  Get Your Creator Kit
+                  {contentMap['hero_btn1_text'] || 'Get Your Creator Kit'}
                 </Link>
                 <a
                   href="#whats-inside"
-                  className="w-full sm:w-auto px-8 py-4 bg-zinc-900 text-zinc-300 border-2 border-zinc-800 rounded-full font-bold text-lg hover:border-[#FF3B14] hover:text-[#FF3B14] transition-colors shadow-sm text-center"
+                  className="w-full sm:w-auto px-8 py-4 bg-zinc-900 text-zinc-300 border-2 border-zinc-800 rounded-full font-bold text-lg hover:border-secondary hover:text-secondary transition-colors shadow-sm text-center"
                 >
-                  Explore What's Inside
+                  {contentMap['hero_btn2_text'] || 'Explore What\'s Inside'}
                 </a>
               </div>
             </div>
 
             {/* Right Column (Visual) */}
-            <div className="lg:col-span-5 relative w-full mt-12 lg:mt-0 flex justify-end items-center pr-0 lg:pr-12">
-              <div 
-                className="relative w-full max-w-[800px] h-[500px] lg:h-[600px] flex justify-center items-center bg-[#0B0D0E] cursor-pointer"
-                onMouseEnter={() => setIsHeroHovered(true)}
-                onMouseLeave={() => setIsHeroHovered(false)}
-              >
-                <div className="relative w-full h-full drop-shadow-[0_20px_50px_rgba(252,29,0,0.15)] will-change-transform transform-gpu">
-                  {ringLightFrames.map((src, i) => (
-                    <Image 
-                      key={i}
-                      src={src} 
-                      alt={`Creators Kit Bundle Variant ${i}`} 
-                      fill
-                      className={`object-contain transition-opacity duration-500 ease-in-out absolute inset-0 will-change-opacity transform-gpu ${
-                        currentFrame === i ? 'opacity-100' : 'opacity-0'
-                      }`} 
-                      priority={i === 0}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
+<div className="lg:col-span-5 relative w-full mt-12 lg:mt-0 flex justify-end items-center pr-0 lg:pr-12">
+  <div className="relative w-full max-w-[800px] flex flex-col items-center">
+    
+    {/* Ring Light Image */}
+    <div className={`pointer-events-none relative w-full h-[500px] lg:h-[600px] flex justify-center items-center transition-all duration-700 ease-in-out will-change-transform transform-gpu ${
+      lightMode === 'white' 
+        ? 'drop-shadow-[0_0_60px_rgba(255,255,255,0.3)] brightness-110'
+        : lightMode === 'warm'
+        ? 'drop-shadow-[0_0_60px_rgba(245,158,11,0.4)] sepia-[0.3] hue-rotate-[-10deg]'
+        : 'brightness-50 grayscale-[0.5] drop-shadow-none'
+    }`}>
+      {/* Base Fixed Asset */}
+      <Image 
+        src="/kits 17.jpg - Edited.png" 
+        alt="Creators Kit Bundle"
+        fill
+        className="object-contain z-10"
+        priority
+      />
+    </div>
+
+    {/* Interactive Controls */}
+    <div className="pointer-events-auto flex items-center gap-4 mt-8 bg-neutral-900/80 p-3 rounded-full border border-neutral-800/80 shadow-[0_10px_30px_rgba(0,0,0,0.5)] backdrop-blur-md relative z-50">
+      
+      {/* White Light Button */}
+      <button 
+        onClick={() => handleLightModeChange('white')}
+        className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 border ${
+          lightMode === 'white' 
+            ? 'bg-neutral-800 text-white shadow-[0_0_15px_rgba(255,255,255,0.2)] border-neutral-600' 
+            : 'bg-transparent text-neutral-400 hover:text-white hover:bg-neutral-800/50 border-transparent'
+        }`}
+      >
+        <div className={`w-3 h-3 rounded-full transition-all duration-300 ${lightMode === 'white' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'bg-neutral-500'}`}></div>
+        White Light
+      </button>
+      
+      {/* Warm Light Button */}
+      <button 
+        onClick={() => handleLightModeChange('warm')}
+        className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 border ${
+          lightMode === 'warm' 
+            ? 'bg-neutral-800 text-primary shadow-[0_0_15px_rgba(245,158,11,0.2)] border-primary/50' 
+            : 'bg-transparent text-neutral-400 hover:text-primary hover:bg-neutral-800/50 border-transparent'
+        }`}
+      >
+        <div className={`w-3 h-3 rounded-full transition-all duration-300 ${lightMode === 'warm' ? 'bg-primary shadow-[0_0_8px_rgba(245,158,11,0.8)]' : 'bg-neutral-500'}`}></div>
+        Warm Light
+      </button>
+      
+      <div className="w-[1px] h-8 bg-neutral-800 mx-2"></div>
+      
+      {/* Power / Off Button */}
+      <button 
+        onClick={() => handleLightModeChange('off')}
+        className={`flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 border ${
+          lightMode === 'off'
+            ? 'bg-red-500/20 text-red-500 border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.3)]'
+            : 'bg-transparent text-neutral-400 border-transparent hover:text-white hover:bg-neutral-800/50'
+        }`}
+        title="Turn Off"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      </button>
+
+    </div>
+  </div>
+</div>
 
           </div>
           
           {/* Main Background Blur */}
-          <div className="absolute top-1/4 right-0 w-1/2 h-[800px] bg-gradient-to-l from-[#FF3B14]/10 to-transparent rounded-full blur-[150px] -z-10 pointer-events-none"></div>
+          <div className="absolute top-1/4 right-0 w-1/2 h-[800px] bg-gradient-to-l from-primary/10 to-transparent rounded-full blur-[150px] -z-10 pointer-events-none"></div>
         </section>        
 
         {/* 2. What's Inside (7.2) */}
-        <section id="whats-inside" className="w-full pt-12 pb-16 bg-[#0B0D0E] border-t border-zinc-900/50">
+        <section id="whats-inside" className="w-full pt-12 pb-16 bg-background border-t border-zinc-900/50">
           <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12">
             <div className="text-center mb-24">
               <h2 className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight text-white drop-shadow-md">Unbox your potential</h2>
@@ -104,19 +153,15 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
             </div>
             
             <div className="w-full overflow-hidden pause-marquee -mx-6 lg:-mx-12 px-6 lg:px-12 relative pb-8">
-              <div className="absolute left-0 top-0 w-24 md:w-48 h-full bg-gradient-to-r from-[#0B0D0E] via-[#0B0D0E]/80 to-transparent z-10 pointer-events-none"></div>
-              <div className="absolute right-0 top-0 w-24 md:w-48 h-full bg-gradient-to-l from-[#0B0D0E] via-[#0B0D0E]/80 to-transparent z-10 pointer-events-none"></div>
+              <div className="absolute left-0 top-0 w-24 md:w-48 h-full bg-gradient-to-r from-background via-background/80 to-transparent z-10 pointer-events-none"></div>
+              <div className="absolute right-0 top-0 w-24 md:w-48 h-full bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none"></div>
               
               <div className="flex w-max gap-4 md:gap-6 lg:gap-8 animate-marquee">
                 {[...kitComponents, ...kitComponents].map((item, index) => (
-                  <a href={`#${item._id}`} key={`${item._id}-${index}`} className={`w-[260px] md:w-[320px] lg:w-[360px] relative overflow-hidden hover:bg-zinc-900/80 p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] border border-zinc-800/60 hover:border-zinc-700/80 shadow-lg hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-500 text-center group cursor-pointer flex flex-col items-center justify-between h-[340px] md:h-[400px] ${
-                    index % 2 === 0
-                      ? 'bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-zinc-800/40 via-[#0B0D0E]/80 to-[#0B0D0E]/50'
-                      : 'bg-[#0B0D0E]/50'
-                  }`}>
+                  <a href={`#${item._id}`} key={`${item._id}-${index}`} className={`w-[260px] md:w-[320px] lg:w-[360px] premium-glow-card p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] text-center flex flex-col items-center justify-between h-[340px] md:h-[400px] cursor-pointer`}>
                     
                     {/* Subtle Red Hover Glow */}
-                    <div className="absolute top-0 inset-x-0 h-32 rounded-t-[2rem] md:rounded-t-[3rem] bg-gradient-to-b from-[#FF3B14]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+                    <div className="absolute top-0 inset-x-0 h-32 rounded-t-[2rem] md:rounded-t-[3rem] bg-gradient-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
 
                     <div className="relative w-full h-[180px] md:h-[220px] mb-6 flex items-center justify-center">
                       <Image 
@@ -143,16 +188,16 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
         </section>
 
         {/* 3. Component Details (7.3) */}
-        <section className="w-full pt-8 pb-12 bg-[#0B0D0E] relative">
+        <section className="w-full pt-8 pb-12 bg-background relative">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-900/20 via-black to-black opacity-50 pointer-events-none"></div>
           <div className="w-full px-4 space-y-8 relative z-10">
             
             {kitComponents.map((item, idx) => (
-              <div id={item._id} key={item._id} className={`flex flex-col lg:flex-row items-center gap-0 bg-[#0B0D0E] rounded-[3rem] border border-zinc-900 overflow-hidden shadow-2xl group hover:border-zinc-800 transition-colors duration-500 ${idx % 2 !== 0 ? 'lg:flex-row-reverse' : ''}`}>
-                <div className="w-full lg:w-1/2 aspect-square lg:aspect-[4/3] bg-[#0B0D0E] flex items-center justify-center text-9xl relative overflow-hidden p-12">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-zinc-800/30 via-[#0B0D0E] to-[#0B0D0E] z-0"></div>
+              <div id={item._id} key={item._id} className={`flex flex-col lg:flex-row items-center gap-0 bg-background rounded-[3rem] border border-zinc-900 overflow-hidden shadow-2xl group hover:border-zinc-800 transition-colors duration-500 ${idx % 2 !== 0 ? 'lg:flex-row-reverse' : ''}`}>
+                <div className="w-full lg:w-1/2 aspect-square lg:aspect-[4/3] bg-background flex items-center justify-center text-9xl relative overflow-hidden p-12">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-zinc-800/30 via-background to-background z-0"></div>
                   {/* Glowing backdrop for image */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-[#FF3B14]/5 rounded-full blur-[80px] group-hover:bg-[#FF3B14]/20 transition-colors duration-700"></div>
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-primary/5 rounded-full blur-[80px] group-hover:bg-primary/20 transition-colors duration-700"></div>
                   
                   <div className="z-10 w-full h-full relative transform group-hover:scale-110 transition-transform duration-700 ease-out">
                     <Image src={item.image} alt={item.name} fill className="object-contain p-4 drop-shadow-[0_20px_50px_rgba(255,255,255,0.15)]" />
@@ -161,7 +206,7 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
                 
                 <div className="w-full lg:w-1/2 p-12 lg:p-24 flex flex-col justify-center space-y-10">
                   <div>
-                    <h3 className="text-5xl md:text-6xl font-black tracking-tight mb-6 text-white group-hover:text-[#FF3B14] transition-colors duration-500">{item.name}</h3>
+                    <h3 className="text-5xl md:text-6xl font-black tracking-tight mb-6 text-white group-hover:text-primary transition-colors duration-500">{item.name}</h3>
                     <p className="text-2xl text-zinc-400 leading-relaxed font-medium">{item.description}</p>
                   </div>
                   
@@ -170,7 +215,7 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
                     <ul className="space-y-6">
                       {item.features.map((f, i) => (
                         <li key={i} className="flex items-center gap-6 font-bold text-xl text-zinc-200">
-                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#FF3B14]/10 flex items-center justify-center text-[#FF3B14] shadow-[0_0_15px_rgba(252,29,0,0.2)]">
+                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-[0_0_15px_rgba(255,110,64,0.2)]">
                             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                           </div>
                           {f}
@@ -190,7 +235,7 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
                     <div className="flex items-start gap-6">
                       <div className="text-4xl pt-1 drop-shadow-lg">✨</div>
                       <div>
-                        <p className="text-xl font-black text-[#FF3B14] mb-1">The Benefit</p>
+                        <p className="text-xl font-black text-primary mb-1">The Benefit</p>
                         <p className="text-xl font-medium text-zinc-300">{item.benefit}</p>
                       </div>
                     </div>
@@ -202,7 +247,7 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
         </section>
 
         {/* 4. Benefits Section (7.4) */}
-        <section className="w-full pt-16 pb-12 bg-[#0B0D0E] text-white relative overflow-hidden border-t border-zinc-900/50">
+        <section className="w-full pt-16 pb-12 bg-background text-white relative overflow-hidden border-t border-zinc-900/50">
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
           
           <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12 relative z-10">
@@ -213,16 +258,13 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 w-full">
               {benefits.map((b, i) => (
-                <div key={i} className="relative p-10 md:p-12 rounded-[2.5rem] md:rounded-[3rem] border border-zinc-800/60 bg-zinc-950/40 hover:bg-zinc-900/60 hover:border-zinc-700/80 backdrop-blur-xl transition-all duration-500 group shadow-xl hover:shadow-[0_30px_60px_rgba(0,0,0,0.5)] overflow-hidden">
+                <div key={i} className="premium-glow-card p-10 md:p-12 rounded-[2.5rem] md:rounded-[3rem] group flex flex-col h-full">
                   
-                  {/* Subtle Accent Glow on Hover */}
-                  <div className="absolute -top-10 -right-10 w-64 h-64 bg-gradient-to-br from-[#FF3B14]/10 to-transparent rounded-full blur-[80px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
-                  
-                  <div className="w-20 h-20 bg-[#0B0D0E]/80 backdrop-blur-md rounded-[2rem] flex items-center justify-center text-4xl mb-8 border border-zinc-800/80 group-hover:border-[#FF3B14]/50 group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-500 shadow-inner relative z-10">
+                  <div className="w-20 h-20 bg-background/80 backdrop-blur-md rounded-[2rem] flex items-center justify-center text-4xl mb-8 border border-zinc-800/80 group-hover:border-secondary/50 group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-500 shadow-inner relative z-10">
                     {b.icon}
                   </div>
                   <h3 className="text-3xl md:text-4xl font-black mb-4 text-zinc-200 group-hover:text-white transition-colors duration-300 relative z-10">{b.title}</h3>
-                  <p className="text-lg md:text-xl text-zinc-400 font-medium leading-relaxed relative z-10">{b.desc}</p>
+                  <p className="text-lg md:text-xl text-zinc-400 font-medium leading-relaxed relative z-10 flex-grow">{b.desc}</p>
                 </div>
               ))}
             </div>
@@ -230,7 +272,7 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
         </section>
 
         {/* 5. Free Courses Section (7.5) */}
-        <section className="w-full pt-16 pb-12 bg-[#0B0D0E] border-t border-zinc-900/50">
+        <section className="w-full pt-16 pb-12 bg-background border-t border-zinc-900/50">
           <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12">
             <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-24 gap-8">
               <div className="w-full text-center lg:text-left">
@@ -253,7 +295,7 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
                 const bgClass = iconBgs[index % iconBgs.length];
                 
                 return (
-                  <div key={course._id || index} className={`p-10 md:p-12 rounded-[2.5rem] md:rounded-[3rem] border border-zinc-800/60 bg-zinc-950/40 hover:bg-zinc-900/60 backdrop-blur-xl hover:-translate-y-4 transition-all duration-500 shadow-xl hover:shadow-[0_30px_60px_rgba(0,0,0,0.5)] relative overflow-hidden group`}>
+                  <div key={course._id || index} className={`premium-glow-card p-10 md:p-12 rounded-[2.5rem] md:rounded-[3rem] group`}>
                     
                     {/* Included Free Ribbon */}
                     {course.badge && (
@@ -282,7 +324,7 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
         </section>
 
         {/* 7. Creator Workflow Timeline (7.7) */}
-        <section className="w-full pt-12 pb-12 bg-[#0B0D0E] overflow-hidden border-t border-zinc-900/50">
+        <section className="w-full pt-12 pb-12 bg-background overflow-hidden border-t border-zinc-900/50">
           <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12">
             <div className="text-center mb-8 md:mb-12">
               <h2 className="text-5xl md:text-7xl font-black mb-8 tracking-tight text-white drop-shadow-md">Your streamlined workflow</h2>
@@ -292,23 +334,27 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
             <div className="relative w-full max-w-7xl mx-auto">
               {/* Connecting Line - Timeline style */}
               <div className="hidden lg:block absolute top-24 left-0 w-full h-1.5 bg-zinc-800/60 -translate-y-1/2 rounded-full overflow-hidden">
-                 <div className="w-full h-full bg-gradient-to-r from-[#FF3B14] to-orange-500 transform origin-left"></div>
+                 <div className="w-full h-full bg-gradient-to-r from-primary to-orange-500 transform origin-left"></div>
               </div>
               
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-10 relative z-10">
                 {workflowSteps.map((step, index) => (
-                  <div key={index} className="relative pt-12 lg:pt-0 group">
+                  <div key={index} className="relative pt-12 lg:pt-0 group h-full flex flex-col">
                     {/* Timeline Node */}
-                    <div className="hidden lg:flex absolute top-24 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-zinc-950 border-4 border-[#FF3B14] items-center justify-center shadow-[0_0_20px_rgba(252,29,0,0.5)] z-20 group-hover:scale-150 transition-transform duration-500">
+                    <div className="hidden lg:flex absolute top-24 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-zinc-950 border-4 border-primary items-center justify-center shadow-[0_0_20px_rgba(255,110,64,0.5)] z-20 group-hover:scale-150 transition-transform duration-500">
                       <div className="w-2.5 h-2.5 bg-white rounded-full"></div>
                     </div>
 
-                    <div className="bg-zinc-950/40 backdrop-blur-xl p-10 md:p-12 rounded-[2.5rem] md:rounded-[3rem] shadow-xl border border-zinc-800/60 relative text-center flex flex-col items-center hover:border-zinc-700/80 hover:bg-zinc-900/60 hover:-translate-y-4 transition-all duration-500 h-full mt-0 lg:mt-32 hover:shadow-[0_30px_60px_rgba(0,0,0,0.5)]">
-                      <div className="w-24 h-24 bg-gradient-to-br from-[#FF3B14] to-[#FF512F] text-white rounded-full flex items-center justify-center font-black text-4xl mb-8 shadow-[0_0_30px_rgba(252,29,0,0.3)] ring-8 ring-black/50 transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 -mt-24">
+                    <div className="relative w-full h-full mt-0 lg:mt-32 pt-12">
+                      {/* Number Circle positioned outside the overflow-hidden card */}
+                      <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 w-24 h-24 bg-gradient-to-br from-primary to-primary-hover text-white rounded-full flex items-center justify-center font-black text-4xl shadow-[0_0_30px_rgba(255,110,64,0.3)] ring-8 ring-black/50 transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                         {index + 1}
                       </div>
-                      <h3 className="text-3xl md:text-4xl font-black mb-5 text-zinc-100 group-hover:text-white transition-colors">{step.title}</h3>
-                      <p className="text-lg md:text-xl text-zinc-400 font-medium leading-relaxed">{step.description}</p>
+
+                      <div className="premium-glow-card p-10 md:p-12 pt-16 md:pt-20 rounded-[2.5rem] md:rounded-[3rem] text-center flex flex-col items-center h-full">
+                        <h3 className="text-3xl md:text-4xl font-black mb-5 text-zinc-100 group-hover:text-white transition-colors">{step.title}</h3>
+                        <p className="text-lg md:text-xl text-zinc-400 font-medium leading-relaxed flex-grow">{step.description}</p>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -318,7 +364,7 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
         </section>
 
         {/* 10. FAQ Section */}
-        <section className="w-full pt-16 pb-12 bg-[#0B0D0E] border-t border-zinc-900/50">
+        <section className="w-full pt-16 pb-12 bg-background border-t border-zinc-900/50">
           <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12">
             <div className="text-center mb-24 max-w-4xl mx-auto">
               <h2 className="text-5xl md:text-7xl font-black mb-8 tracking-tight text-white drop-shadow-md">Frequently Asked Questions</h2>
@@ -327,13 +373,13 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
 
             <div className="space-y-6 w-full max-w-5xl mx-auto">
               {faqs.map((faq, index) => (
-                <div key={index} className={`border ${openFaqIndex === index ? 'border-[#FF3B14]/50 bg-zinc-900/60 shadow-[0_10px_30px_rgba(255,59,20,0.1)]' : 'border-zinc-800/60 bg-zinc-950/40 hover:bg-zinc-900/60'} backdrop-blur-xl rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-xl transition-all duration-500`}>
+                <div key={index} className={`border ${openFaqIndex === index ? 'border-primary/50 bg-zinc-900/60 shadow-[0_10px_30px_rgba(255,110,64,0.1)]' : 'border-zinc-800/60 bg-zinc-950/40 hover:bg-zinc-900/60'} backdrop-blur-xl rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-xl transition-all duration-500`}>
                   <button
                     className="w-full px-8 md:px-12 py-8 md:py-10 text-left flex justify-between items-center group"
                     onClick={() => setOpenFaqIndex(openFaqIndex === index ? -1 : index)}
                   >
                     <span className="font-black text-2xl md:text-3xl text-zinc-100 group-hover:text-white transition-colors pr-8">{faq.question}</span>
-                    <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 shadow-inner ${openFaqIndex === index ? 'bg-[#FF3B14] text-white shadow-[0_0_20px_rgba(255,59,20,0.4)] rotate-180' : 'bg-[#0B0D0E]/80 text-zinc-400 group-hover:text-white border border-zinc-800/80 group-hover:border-[#FF3B14]/50'}`}>
+                    <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 shadow-inner ${openFaqIndex === index ? 'bg-primary text-white shadow-[0_0_20px_rgba(255,110,64,0.4)] rotate-180' : 'bg-background/80 text-zinc-400 group-hover:text-white border border-zinc-800/80 group-hover:border-secondary/50'}`}>
                       <svg className="w-6 h-6 transform transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
                       </svg>
@@ -349,9 +395,9 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
         </section>
 
         {/* 9. Complete Bundle CTA - Full Width Final Banner */}
-        <section className="w-full pt-16 pb-24 md:pt-16 md:pb-32 bg-[#0B0D0E] relative overflow-hidden border-t border-zinc-900/50">
+        <section className="w-full pt-16 pb-24 md:pt-16 md:pb-32 bg-background relative overflow-hidden border-t border-zinc-900/50">
           {/* Animated Background Elements - Subdued for dark theme */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#FF3B14]/10 via-[#0B0D0E] to-[#0B0D0E] opacity-80 mix-blend-screen"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-background to-background opacity-80 mix-blend-screen"></div>
           
           <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12 relative z-10 text-white">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
@@ -375,8 +421,8 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
               
               {/* Right Column: Pricing Card & CTA */}
               <div className="flex flex-col items-center w-full">
-                <div className="w-full max-w-2xl bg-zinc-950/40 backdrop-blur-xl border border-zinc-800/60 rounded-[3rem] p-10 md:p-16 shadow-2xl relative group hover:border-zinc-700/80 transition-all duration-500 text-center">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#FF3B14]/5 to-transparent rounded-[3rem] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+                <div className="w-full max-w-2xl premium-glow-card rounded-[3rem] p-10 md:p-16 text-center group">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-[3rem] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
                   
                   <div className="relative z-10 w-full flex flex-col items-center">
                     <p className="text-lg md:text-xl font-bold text-zinc-500 line-through mb-4 tracking-wide decoration-[#FF3B14] decoration-2">Total Value: ₹4,999</p>
@@ -387,7 +433,7 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
                     
                     <Link
                       href="/product"
-                      className="inline-flex w-full justify-center items-center gap-4 px-10 py-5 md:py-6 bg-gradient-to-r from-[#FF3B14] to-[#FF6B4A] text-white rounded-full font-black text-xl md:text-2xl hover:shadow-[0_0_40px_rgba(255,59,20,0.4)] transition-all hover:-translate-y-2 group/btn"
+                      className="inline-flex w-full justify-center items-center gap-4 px-10 py-5 md:py-6 bg-gradient-to-r from-primary to-[#FF6B4A] text-white rounded-full font-black text-xl md:text-2xl hover:shadow-[0_0_40px_rgba(255,110,64,0.4)] transition-all hover:-translate-y-2 group/btn"
                     >
                       Order Your Kit Now
                       <svg className="w-8 h-8 text-white transform group-hover/btn:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
@@ -409,3 +455,4 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
     </div>
   );
 }
+

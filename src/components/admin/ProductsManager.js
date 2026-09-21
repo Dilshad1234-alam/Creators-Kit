@@ -69,7 +69,7 @@ export default function ProductsManager() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this product?')) return;
+    // Confirmation removed to delete directly
     
     try {
       const res = await fetch(`/api/products/${id}`, {
@@ -141,19 +141,19 @@ export default function ProductsManager() {
   if (loading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-10 bg-zinc-800/60 rounded w-1/4 mb-4"></div>
-        <div className="bg-zinc-900/40 border border-zinc-800/40 rounded-3xl p-8 h-96"></div>
+        <div className="h-10 bg-neutral-800/60 rounded w-1/4 mb-4"></div>
+        <div className="bg-neutral-900/40 border border-neutral-800/40 rounded-3xl p-8 h-96"></div>
       </div>
     );
   }
 
   const renderTable = (title, items, defaultCategory) => (
-    <div className="bg-zinc-900/60 border border-zinc-800/80 shadow-2xl rounded-3xl p-8 backdrop-blur-xl">
+    <div className="bg-neutral-900/60 border border-neutral-800/80 shadow-2xl rounded-3xl p-8 backdrop-blur-xl">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-bold text-white">{title}</h2>
+        <h2 className="text-2xl font-bold text-neutral-100">{title}</h2>
         <button 
           onClick={() => handleAddNewClick(defaultCategory)}
-          className="px-6 py-2 bg-[#FF3B14] hover:bg-[#FF3B14]/80 text-white font-bold rounded-full transition-all duration-300 text-sm shadow-[0_0_15px_rgba(255,59,20,0.4)]"
+          className="px-6 py-2 bg-primary hover:bg-primary/80 text-neutral-100 font-bold rounded-full transition-all duration-300 text-sm shadow-[0_0_15px_rgba(245,158,11,0.4)]"
         >
           + Add New Product
         </button>
@@ -162,7 +162,7 @@ export default function ProductsManager() {
       <div className="overflow-x-auto">
         <table className="w-full text-left">
           <thead>
-            <tr className="text-zinc-500 uppercase text-xs font-black tracking-wider border-b border-zinc-800/50">
+            <tr className="text-neutral-500 uppercase text-xs font-black tracking-wider border-b border-neutral-800/50">
               <th className="pb-4 pr-4">Product Name</th>
               <th className="pb-4 px-4 w-[25%]">Description</th>
               <th className="pb-4 px-4">Price (₹)</th>
@@ -173,33 +173,33 @@ export default function ProductsManager() {
           </thead>
           <tbody className="divide-y divide-zinc-800/30">
             {items.map((p) => (
-              <tr key={p._id} className="hover:bg-zinc-800/20 transition-colors">
+              <tr key={p._id} className="hover:bg-neutral-800/20 transition-colors">
                 <td className="py-5 pr-4">
                   <div className="flex items-center gap-4">
                     {p.image ? (
-                      <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-zinc-900 border border-zinc-800 flex-shrink-0">
+                      <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-neutral-900 border border-neutral-800 flex-shrink-0">
                         <Image src={p.image} alt={p.name} fill className="object-contain p-1" />
                       </div>
                     ) : (
-                      <div className="w-12 h-12 rounded-lg bg-zinc-900 border border-zinc-800 flex-shrink-0 flex items-center justify-center text-zinc-600">
+                      <div className="w-12 h-12 rounded-lg bg-neutral-900 border border-neutral-800 flex-shrink-0 flex items-center justify-center text-neutral-600">
                         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                       </div>
                     )}
                     <div>
-                      <div className="font-bold text-zinc-200">{p.name}</div>
-                      {p.image && <div className="text-xs text-zinc-500 mt-1 font-mono truncate max-w-[150px]">{p.image}</div>}
+                      <div className="font-bold text-neutral-200">{p.name}</div>
+                      {p.image && <div className="text-xs text-neutral-500 mt-1 font-mono truncate max-w-[150px]">{p.image}</div>}
                     </div>
                   </div>
                 </td>
-                <td className="py-5 px-4 text-sm text-zinc-400">
+                <td className="py-5 px-4 text-sm text-neutral-400">
                   {p.description ? (p.description.length > 50 ? p.description.substring(0, 50) + '...' : p.description) : '-'}
                 </td>
-                <td className="py-5 px-4 text-zinc-300 font-medium">
+                <td className="py-5 px-4 text-neutral-300 font-medium">
                   {p.price.toLocaleString()}
                 </td>
-                <td className="py-5 px-4 text-zinc-500 line-through text-sm">
+                <td className="py-5 px-4 text-neutral-500 line-through text-sm">
                   {p.originalPrice ? p.originalPrice.toLocaleString() : '-'}
                 </td>
                 <td className="py-5 px-4">
@@ -217,7 +217,7 @@ export default function ProductsManager() {
                   <div className="flex justify-end gap-2">
                     <button 
                       onClick={() => handleEditClick(p)}
-                      className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold rounded-lg transition-colors border border-zinc-700 hover:border-zinc-600"
+                      className="px-3 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-bold rounded-lg transition-colors border border-neutral-700 hover:border-neutral-600"
                     >
                       Edit
                     </button>
@@ -236,8 +236,8 @@ export default function ProductsManager() {
               <tr>
                 <td colSpan="6" className="py-16 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
-                    <p className="text-zinc-500 text-lg">No products found.</p>
-                    <p className="text-zinc-600 text-sm">Use <strong>+ Add New Product</strong> above to create one.</p>
+                    <p className="text-neutral-500 text-lg">No products found.</p>
+                    <p className="text-neutral-600 text-sm">Use <strong>+ Add New Product</strong> above to create one.</p>
                   </div>
                 </td>
               </tr>
@@ -258,10 +258,10 @@ export default function ProductsManager() {
 
       {/* Add/Edit Product Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-lg shadow-2xl relative flex flex-col max-h-[90vh]">
-            <div className="px-8 pt-8 pb-6 shrink-0 border-b border-zinc-800">
-              <h2 className="text-2xl font-bold text-white m-0">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-surface/60 backdrop-blur-sm">
+          <div className="bg-neutral-900 border border-neutral-800 rounded-3xl w-full max-w-lg shadow-2xl relative flex flex-col max-h-[90vh]">
+            <div className="px-8 pt-8 pb-6 shrink-0 border-b border-neutral-800">
+              <h2 className="text-2xl font-bold text-neutral-100 m-0">
                 {editingProduct ? 'Edit Product' : 'Add New Product'}
               </h2>
             </div>
@@ -270,42 +270,42 @@ export default function ProductsManager() {
               <div className="px-8 py-6 space-y-4 overflow-y-auto custom-scrollbar flex-1">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-zinc-500 mb-1 uppercase tracking-wider">Product Name</label>
+                  <label className="block text-xs font-bold text-neutral-500 mb-1 uppercase tracking-wider">Product Name</label>
                   <input 
                     required 
                     type="text" 
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14]/50 outline-none transition-all"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 focus:border-primary focus:ring-1 focus:ring-primary/50 outline-none transition-all"
                     placeholder="e.g. Creators Kit 25"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-zinc-500 mb-1 uppercase tracking-wider">Subheading (Optional)</label>
+                  <label className="block text-xs font-bold text-neutral-500 mb-1 uppercase tracking-wider">Subheading (Optional)</label>
                   <input 
                     type="text" 
                     value={formData.subheading}
                     onChange={(e) => setFormData({...formData, subheading: e.target.value})}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14]/50 outline-none transition-all"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 focus:border-primary focus:ring-1 focus:ring-primary/50 outline-none transition-all"
                     placeholder="e.g., CREATOR BUNDLE - COMPLETE SETUP"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-zinc-500 mb-2 uppercase tracking-wider">Placement Category</label>
+                <label className="block text-xs font-bold text-neutral-500 mb-2 uppercase tracking-wider">Placement Category</label>
                 <div className="grid grid-cols-3 gap-3">
-                  <label className={`cursor-pointer rounded-xl border p-3 flex flex-col items-center text-center transition-colors ${formData.category === 'bundle' ? 'bg-[#FF3B14]/10 border-[#FF3B14] text-white' : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'}`}>
+                  <label className={`cursor-pointer rounded-xl border p-3 flex flex-col items-center text-center transition-colors ${formData.category === 'bundle' ? 'bg-primary/10 border-primary text-neutral-100' : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:border-neutral-700'}`}>
                     <input type="radio" name="category" value="bundle" className="hidden" checked={formData.category === 'bundle'} onChange={(e) => setFormData({...formData, category: e.target.value})} />
                     <span className="font-bold text-sm">Bundle Only</span>
                     <span className="text-[10px] opacity-70 mt-1">Main Kit Items</span>
                   </label>
-                  <label className={`cursor-pointer rounded-xl border p-3 flex flex-col items-center text-center transition-colors ${formData.category === 'individual' ? 'bg-[#FF3B14]/10 border-[#FF3B14] text-white' : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'}`}>
+                  <label className={`cursor-pointer rounded-xl border p-3 flex flex-col items-center text-center transition-colors ${formData.category === 'individual' ? 'bg-primary/10 border-primary text-neutral-100' : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:border-neutral-700'}`}>
                     <input type="radio" name="category" value="individual" className="hidden" checked={formData.category === 'individual'} onChange={(e) => setFormData({...formData, category: e.target.value})} />
                     <span className="font-bold text-sm">Individual Only</span>
                     <span className="text-[10px] opacity-70 mt-1">Need Just One Piece</span>
                   </label>
-                  <label className={`cursor-pointer rounded-xl border p-3 flex flex-col items-center text-center transition-colors ${formData.category === 'both' ? 'bg-[#FF3B14]/10 border-[#FF3B14] text-white' : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'}`}>
+                  <label className={`cursor-pointer rounded-xl border p-3 flex flex-col items-center text-center transition-colors ${formData.category === 'both' ? 'bg-primary/10 border-primary text-neutral-100' : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:border-neutral-700'}`}>
                     <input type="radio" name="category" value="both" className="hidden" checked={formData.category === 'both'} onChange={(e) => setFormData({...formData, category: e.target.value})} />
                     <span className="font-bold text-sm">Both Sections</span>
                     <span className="text-[10px] opacity-70 mt-1">Shows everywhere</span>
@@ -314,12 +314,12 @@ export default function ProductsManager() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-zinc-500 mb-1 uppercase tracking-wider">Description</label>
+                <label className="block text-xs font-bold text-neutral-500 mb-1 uppercase tracking-wider">Description</label>
                 <textarea 
                   required 
                   value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14]/50 outline-none transition-all resize-y"
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 focus:border-primary focus:ring-1 focus:ring-primary/50 outline-none transition-all resize-y"
                   placeholder="Product description..."
                   rows={3}
                 />
@@ -327,22 +327,22 @@ export default function ProductsManager() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-zinc-500 mb-1 uppercase tracking-wider">Price (₹)</label>
+                  <label className="block text-xs font-bold text-neutral-500 mb-1 uppercase tracking-wider">Price (₹)</label>
                   <input 
                     required 
                     type="number" 
                     value={formData.price}
                     onChange={(e) => setFormData({...formData, price: e.target.value})}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14]/50 outline-none transition-all"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 focus:border-primary focus:ring-1 focus:ring-primary/50 outline-none transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-zinc-500 mb-1 uppercase tracking-wider">Original Price (₹)</label>
+                  <label className="block text-xs font-bold text-neutral-500 mb-1 uppercase tracking-wider">Original Price (₹)</label>
                   <input 
                     type="number" 
                     value={formData.originalPrice}
                     onChange={(e) => setFormData({...formData, originalPrice: e.target.value})}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14]/50 outline-none transition-all"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 focus:border-primary focus:ring-1 focus:ring-primary/50 outline-none transition-all"
                     placeholder="Optional"
                   />
                 </div>
@@ -350,20 +350,20 @@ export default function ProductsManager() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-zinc-500 mb-1 uppercase tracking-wider">Stock</label>
+                  <label className="block text-xs font-bold text-neutral-500 mb-1 uppercase tracking-wider">Stock</label>
                   <input 
                     required 
                     type="number" 
                     value={formData.stock}
                     onChange={(e) => setFormData({...formData, stock: e.target.value})}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14]/50 outline-none transition-all"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 focus:border-primary focus:ring-1 focus:ring-primary/50 outline-none transition-all"
                   />
                 </div>
               </div>
 
               {(formData.category === 'bundle' || formData.category === 'both') ? (
                 <div>
-                  <label className="block text-xs font-bold text-zinc-500 mb-1 uppercase tracking-wider">Product Gallery Images (Up to 5)</label>
+                  <label className="block text-xs font-bold text-neutral-500 mb-1 uppercase tracking-wider">Product Gallery Images (Up to 5)</label>
                   <div className="space-y-2">
                     {formData.images.map((url, index) => (
                       <input 
@@ -379,7 +379,7 @@ export default function ProductsManager() {
                             ...(index === 0 ? { image: e.target.value } : {})
                           }));
                         }}
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14]/50 outline-none transition-all"
+                        className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 focus:border-primary focus:ring-1 focus:ring-primary/50 outline-none transition-all"
                         placeholder={`Image URL ${index + 1}`}
                       />
                     ))}
@@ -387,31 +387,31 @@ export default function ProductsManager() {
                 </div>
               ) : (
                 <div>
-                  <label className="block text-xs font-bold text-zinc-500 mb-1 uppercase tracking-wider">Image URL</label>
+                  <label className="block text-xs font-bold text-neutral-500 mb-1 uppercase tracking-wider">Image URL</label>
                   <input 
                     required 
                     type="text" 
                     value={formData.image}
                     onChange={(e) => setFormData({...formData, image: e.target.value})}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14]/50 outline-none transition-all"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 focus:border-primary focus:ring-1 focus:ring-primary/50 outline-none transition-all"
                     placeholder="/kits 25.jpg"
                   />
                 </div>
               )}
             </div>
 
-              <div className="px-8 py-6 shrink-0 border-t border-zinc-800 flex justify-end gap-3 bg-zinc-950/30 rounded-b-3xl">
+              <div className="px-8 py-6 shrink-0 border-t border-neutral-800 flex justify-end gap-3 bg-neutral-950/30 rounded-b-3xl">
                 <button 
                   type="button"
                   onClick={() => { setIsModalOpen(false); setEditingProduct(null); }}
-                  className="px-6 py-3 bg-transparent text-zinc-400 hover:text-white font-bold rounded-xl transition-colors"
+                  className="px-6 py-3 bg-transparent text-neutral-400 hover:text-neutral-100 font-bold rounded-xl transition-colors"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit"
                   disabled={isSaving}
-                  className="px-8 py-3 bg-[#FF3B14] hover:bg-[#FF3B14]/80 text-white font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(255,59,20,0.4)] disabled:opacity-50"
+                  className="px-8 py-3 bg-primary hover:bg-primary/80 text-neutral-100 font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(245,158,11,0.4)] disabled:opacity-50"
                 >
                   {isSaving ? 'Saving...' : editingProduct ? 'Save Changes' : 'Add Product'}
                 </button>

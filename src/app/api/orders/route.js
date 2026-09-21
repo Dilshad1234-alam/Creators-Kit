@@ -40,6 +40,13 @@ export async function POST(req) {
       body.status = 'Pending';
     }
 
+    // Assign COD defaults and generate Delivery OTP if not already provided
+    if (!body.paymentMode) body.paymentMode = 'Cash on Delivery';
+    if (!body.paymentStatus) body.paymentStatus = 'COD';
+    if (!body.deliveryOtp) {
+      body.deliveryOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
     const order = await Order.create(body);
     return NextResponse.json({ success: true, data: order }, { status: 201 });
   } catch (error) {

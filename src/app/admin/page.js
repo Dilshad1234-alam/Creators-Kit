@@ -6,6 +6,7 @@ import ProductsManager from '@/components/admin/ProductsManager';
 import OrdersManager from '@/components/admin/OrdersManager';
 import ContentManager from '@/components/admin/ContentManager';
 import CouponsManager from '@/components/admin/CouponsManager';
+import BlogsManager from '@/components/admin/BlogsManager';
 
 export default function AdminPage() {
   const searchParams = useSearchParams();
@@ -14,10 +15,10 @@ export default function AdminPage() {
   return (
     <div className="w-full animate-fade-in">
       <header className="mb-10">
-        <h1 className="text-4xl md:text-5xl font-black tracking-tight drop-shadow-md text-white mb-2 capitalize">
+        <h1 className="text-4xl md:text-5xl font-black tracking-tight drop-shadow-md text-neutral-100 mb-2 capitalize">
           {tab.replace('-', ' ')}
         </h1>
-        <p className="text-zinc-400 text-lg">Manage your storefront data dynamically.</p>
+        <p className="text-neutral-400 text-lg">Manage your storefront data dynamically.</p>
       </header>
 
       <div className="w-full">
@@ -26,6 +27,7 @@ export default function AdminPage() {
         {tab === 'products' && <ProductsManager />}
         {tab === 'orders' && <OrdersManager />}
         {tab === 'coupons' && <CouponsManager />}
+        {tab === 'blogs' && <BlogsManager />}
         {tab === 'legal' && <ContentManager tab="legal" />}
       </div>
     </div>

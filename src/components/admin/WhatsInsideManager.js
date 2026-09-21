@@ -108,20 +108,20 @@ export default function WhatsInsideManager() {
   if (loading) {
     return (
       <div className="space-y-6 animate-pulse mt-12">
-        <div className="h-10 bg-zinc-800/60 rounded w-1/4 mb-4"></div>
-        <div className="bg-zinc-900/40 border border-zinc-800/40 rounded-3xl p-8 h-64"></div>
+        <div className="h-10 bg-neutral-800/60 rounded w-1/4 mb-4"></div>
+        <div className="bg-neutral-900/40 border border-neutral-800/40 rounded-3xl p-8 h-64"></div>
       </div>
     );
   }
 
   return (
     <>
-      <div className="bg-zinc-900/60 border border-zinc-800/80 shadow-2xl rounded-3xl p-8 backdrop-blur-xl mt-12">
+      <div className="bg-neutral-900/60 border border-neutral-800/80 shadow-2xl rounded-3xl p-8 backdrop-blur-xl mt-12">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-bold text-white">Manage What's Inside Grid</h2>
+        <h2 className="text-2xl font-bold text-neutral-100">Manage What's Inside Grid</h2>
         <button 
           onClick={handleAddNewClick}
-          className="px-6 py-2 bg-[#FF3B14] hover:bg-[#FF3B14]/80 text-white font-bold rounded-full transition-all duration-300 text-sm shadow-[0_0_15px_rgba(255,59,20,0.4)]"
+          className="px-6 py-2 bg-primary hover:bg-primary/80 text-neutral-100 font-bold rounded-full transition-all duration-300 text-sm shadow-[0_0_15px_rgba(245,158,11,0.4)]"
         >
           + Add New Item
         </button>
@@ -130,7 +130,7 @@ export default function WhatsInsideManager() {
       <div className="overflow-x-auto">
         <table className="w-full text-left">
           <thead>
-            <tr className="text-zinc-500 uppercase text-xs font-black tracking-wider border-b border-zinc-800/50">
+            <tr className="text-neutral-500 uppercase text-xs font-black tracking-wider border-b border-neutral-800/50">
               <th className="pb-4 pr-4">Item Name</th>
               <th className="pb-4 px-4 w-[40%]">Description</th>
               <th className="pb-4 pl-4 text-right">Actions</th>
@@ -138,34 +138,34 @@ export default function WhatsInsideManager() {
           </thead>
           <tbody className="divide-y divide-zinc-800/30">
             {items.map((p) => (
-              <tr key={p._id} className="hover:bg-zinc-800/20 transition-colors">
+              <tr key={p._id} className="hover:bg-neutral-800/20 transition-colors">
                 <td className="py-5 pr-4">
                   <div className="flex items-center gap-4">
                     {p.image ? (
-                      <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-zinc-900 border border-zinc-800 flex-shrink-0">
+                      <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-neutral-900 border border-neutral-800 flex-shrink-0">
                         <Image src={p.image} alt={p.name} fill className="object-contain p-1" />
                       </div>
                     ) : (
-                      <div className="w-12 h-12 rounded-lg bg-zinc-900 border border-zinc-800 flex-shrink-0 flex items-center justify-center text-zinc-600">
+                      <div className="w-12 h-12 rounded-lg bg-neutral-900 border border-neutral-800 flex-shrink-0 flex items-center justify-center text-neutral-600">
                         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                       </div>
                     )}
                     <div>
-                      <div className="font-bold text-zinc-200">{p.name}</div>
-                      {p.image && <div className="text-xs text-zinc-500 mt-1 font-mono truncate max-w-[150px]">{p.image}</div>}
+                      <div className="font-bold text-neutral-200">{p.name}</div>
+                      {p.image && <div className="text-xs text-neutral-500 mt-1 font-mono truncate max-w-[150px]">{p.image}</div>}
                     </div>
                   </div>
                 </td>
-                <td className="py-5 px-4 text-sm text-zinc-400">
+                <td className="py-5 px-4 text-sm text-neutral-400">
                   {p.description ? (p.description.length > 80 ? p.description.substring(0, 80) + '...' : p.description) : '-'}
                 </td>
                 <td className="py-5 pl-4 text-right align-middle">
                   <div className="flex justify-end gap-2">
                     <button 
                       onClick={() => handleEditClick(p)}
-                      className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold rounded-lg transition-colors border border-zinc-700 hover:border-zinc-600"
+                      className="px-3 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-bold rounded-lg transition-colors border border-neutral-700 hover:border-neutral-600"
                     >
                       Edit
                     </button>
@@ -184,8 +184,8 @@ export default function WhatsInsideManager() {
               <tr>
                 <td colSpan="3" className="py-16 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
-                    <p className="text-zinc-500 text-lg">No items found.</p>
-                    <p className="text-zinc-600 text-sm">Use <strong>+ Add New Item</strong> above to create one.</p>
+                    <p className="text-neutral-500 text-lg">No items found.</p>
+                    <p className="text-neutral-600 text-sm">Use <strong>+ Add New Item</strong> above to create one.</p>
                   </div>
                 </td>
               </tr>
@@ -197,13 +197,13 @@ export default function WhatsInsideManager() {
 
     {isModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
-          <div className="relative bg-[#0B0D0E] border border-zinc-800 w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh]">
-            <div className="px-8 py-6 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50 rounded-t-3xl">
-              <h3 className="text-xl font-bold text-white">
+          <div className="absolute inset-0 bg-surface/80 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
+          <div className="relative bg-background border border-neutral-800 w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="px-8 py-6 border-b border-neutral-800 flex justify-between items-center bg-neutral-900/50 rounded-t-3xl">
+              <h3 className="text-xl font-bold text-neutral-100">
                 {editingItem ? 'Edit Item' : 'Add New Item'}
               </h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-zinc-500 hover:text-white transition-colors">
+              <button onClick={() => setIsModalOpen(false)} className="text-neutral-500 hover:text-neutral-100 transition-colors">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
@@ -211,51 +211,51 @@ export default function WhatsInsideManager() {
             <form onSubmit={handleSubmitForm} className="flex flex-col flex-1 overflow-hidden">
               <div className="px-8 py-6 space-y-4 overflow-y-auto custom-scrollbar flex-1">
                 <div>
-                  <label className="block text-xs font-bold text-zinc-500 mb-1 uppercase tracking-wider">Item Name</label>
+                  <label className="block text-xs font-bold text-neutral-500 mb-1 uppercase tracking-wider">Item Name</label>
                   <input 
                     required 
                     type="text" 
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14]/50 outline-none transition-all"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 focus:border-primary focus:ring-1 focus:ring-primary/50 outline-none transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-zinc-500 mb-1 uppercase tracking-wider">Description</label>
+                  <label className="block text-xs font-bold text-neutral-500 mb-1 uppercase tracking-wider">Description</label>
                   <textarea 
                     required
                     value={formData.description}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                     rows="3"
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14]/50 outline-none transition-all resize-none"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 focus:border-primary focus:ring-1 focus:ring-primary/50 outline-none transition-all resize-none"
                   ></textarea>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-zinc-500 mb-1 uppercase tracking-wider">Image URL</label>
+                  <label className="block text-xs font-bold text-neutral-500 mb-1 uppercase tracking-wider">Image URL</label>
                   <input 
                     required 
                     type="text" 
                     value={formData.image}
                     onChange={(e) => setFormData({...formData, image: e.target.value})}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-[#FF3B14] focus:ring-1 focus:ring-[#FF3B14]/50 outline-none transition-all"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 focus:border-primary focus:ring-1 focus:ring-primary/50 outline-none transition-all"
                     placeholder="/image.jpg or https://..."
                   />
                 </div>
               </div>
-              <div className="px-8 py-6 border-t border-zinc-800 bg-zinc-900/50 rounded-b-3xl flex justify-end gap-4">
+              <div className="px-8 py-6 border-t border-neutral-800 bg-neutral-900/50 rounded-b-3xl flex justify-end gap-4">
                 <button 
                   type="button" 
                   onClick={() => setIsModalOpen(false)}
-                  className="px-6 py-3 font-bold text-zinc-400 hover:text-white transition-colors"
+                  className="px-6 py-3 font-bold text-neutral-400 hover:text-neutral-100 transition-colors"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit" 
                   disabled={isSaving}
-                  className="px-8 py-3 bg-[#FF3B14] hover:bg-[#FF3B14]/80 disabled:opacity-50 text-white font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(255,59,20,0.3)] flex items-center gap-2"
+                  className="px-8 py-3 bg-primary hover:bg-primary/80 disabled:opacity-50 text-neutral-100 font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(245,158,11,0.3)] flex items-center gap-2"
                 >
                   {isSaving ? 'Saving...' : 'Save Item'}
                 </button>

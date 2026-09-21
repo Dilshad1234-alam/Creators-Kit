@@ -61,17 +61,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0D0E] flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen bg-background flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#FF3B14]/10 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-        <div className="bg-zinc-900/90 border border-zinc-800/80 rounded-2xl shadow-2xl p-8 max-w-md w-full mx-auto backdrop-blur-md">
+        <div className="bg-neutral-900/90 border border-neutral-800/80 rounded-2xl shadow-2xl p-8 max-w-md w-full mx-auto backdrop-blur-md">
           <div className="text-center mb-8">
-            <Link href="/" className="inline-block text-3xl font-black tracking-tighter text-[#FF3B14] mb-2 hover:scale-105 transition-transform">
+            <Link href="/" className="inline-block text-3xl font-black tracking-tighter text-primary mb-2 hover:scale-105 transition-transform">
               Creators Kit.
             </Link>
-            <h2 className="text-2xl font-extrabold text-zinc-100 tracking-tight mt-4">
+            <h2 className="text-2xl font-extrabold text-neutral-100 tracking-tight mt-4">
               Welcome Back
             </h2>
           </div>
@@ -102,7 +102,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-zinc-300"
+                className="block text-sm font-medium text-neutral-300"
               >
                 Email address
               </label>
@@ -115,7 +115,7 @@ export default function LoginPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2.5 bg-[#0B0D0E] border border-zinc-700 rounded-lg shadow-sm placeholder-zinc-500 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[#FF3B14] focus:border-[#FF3B14] sm:text-sm transition-colors"
+                  className="appearance-none block w-full px-3 py-2.5 bg-background border border-neutral-700 rounded-lg shadow-sm placeholder-zinc-500 text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary sm:text-sm transition-colors"
                   placeholder="you@example.com"
                 />
               </div>
@@ -124,7 +124,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-zinc-300"
+                className="block text-sm font-medium text-neutral-300"
               >
                 Password
               </label>
@@ -137,13 +137,13 @@ export default function LoginPage() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2.5 pr-10 bg-[#0B0D0E] border border-zinc-700 rounded-lg shadow-sm placeholder-zinc-500 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[#FF3B14] focus:border-[#FF3B14] sm:text-sm transition-colors"
+                  className="appearance-none block w-full px-3 py-2.5 pr-10 bg-background border border-neutral-700 rounded-lg shadow-sm placeholder-zinc-500 text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary sm:text-sm transition-colors"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-zinc-400 hover:text-zinc-300 focus:outline-none"
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-neutral-400 hover:text-neutral-300 focus:outline-none"
                 >
                   {showPassword ? (
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -165,11 +165,11 @@ export default function LoginPage() {
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 text-[#FF3B14] focus:ring-[#FF3B14] border-zinc-700 bg-[#0B0D0E] rounded"
+                  className="h-4 w-4 text-primary focus:ring-primary border-neutral-700 bg-background rounded"
                 />
                 <label
                   htmlFor="remember-me"
-                  className="ml-2 block text-sm text-zinc-300"
+                  className="ml-2 block text-sm text-neutral-300"
                 >
                   Remember me
                 </label>
@@ -178,7 +178,7 @@ export default function LoginPage() {
               <div className="text-sm">
                 <Link
                   href="/forgot-password"
-                  className="font-medium text-[#FF3B14] hover:text-#FF6B4A transition-colors"
+                  className="font-medium text-primary hover:text-#FF6B4A transition-colors"
                 >
                   Forgot your password?
                 </Link>
@@ -189,10 +189,10 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#FF3B14] hover:bg-[#E01900] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF3B14] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-neutral-100 bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 {loading ? (
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-neutral-100" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
@@ -203,11 +203,11 @@ export default function LoginPage() {
             </div>
           </form>
 
-          <p className="mt-6 text-center text-sm text-zinc-400">
+          <p className="mt-6 text-center text-sm text-neutral-400">
             Don't have an account?{' '}
             <Link
               href="/register"
-              className="font-bold text-[#FF3B14] hover:text-#FF6B4A transition-colors"
+              className="font-bold text-primary hover:text-#FF6B4A transition-colors"
             >
               Create one now
             </Link>

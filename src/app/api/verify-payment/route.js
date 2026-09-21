@@ -30,11 +30,17 @@ export async function POST(req) {
     // Connect to database
     await connectDB();
 
+    // Generate 6-digit delivery OTP
+    const deliveryOtp = Math.floor(100000 + Math.random() * 900000).toString();
+
     // Securely save the order with 'Processing' status now that payment is verified
     const newOrder = await Order.create({
       ...orderData,
       orderId: razorpay_payment_id, // Store the payment ID for reference
       status: 'Processing',
+      paymentStatus: 'Paid',
+      paymentMode: 'Online',
+      deliveryOtp: deliveryOtp,
     });
 
     return NextResponse.json({ success: true, order: newOrder });

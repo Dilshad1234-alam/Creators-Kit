@@ -11,9 +11,12 @@ export default async function Home() {
   let content = await Content.find({}).lean();
   if (content.length === 0) {
     const seedData = [
+      { key: 'hero_badge', value: '🔥 All-in-One Creator Bundle' },
       { key: 'hero_heading', value: 'Unbox your potential' },
       { key: 'hero_subheading', value: 'The Complete Creator Bundle' },
       { key: 'hero_description', value: 'Stop guessing what gear you need. We provide the professional equipment, expert courses, and tactile resources so you can focus on what matters: making great content.' },
+      { key: 'hero_btn1_text', value: 'Get Your Creator Kit' },
+      { key: 'hero_btn2_text', value: 'Explore What\'s Inside' },
       { key: 'product_hero_heading', value: 'PROFESSIONAL LED RING LIGHT' },
       { key: 'product_badge_text', value: 'SAVE 55%' },
       { key: 'product_hero_desc', value: 'An elite, all-in-one studio setup designed for serious creators. From the 10-inch precision LED ring light and noise-canceling wireless audio, to the chroma key green screen and comprehensive mastery courses—everything you need to dominate your niche is right here in one ultimate box.' },

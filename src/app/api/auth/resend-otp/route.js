@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
+import PendingUser from '@/models/PendingUser';
 import crypto from 'crypto';
 import { sendEmail } from '@/lib/mailer';
 export async function POST(req) {
@@ -12,24 +13,25 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Please provide email' }, { status: 400 });
     }
 
-    const user = await User.findOne({ email });
+    const pendingUser = await PendingUser.findOne({ email });
 
-    if (!user) {
+    if (!pendingUser) {
+      // It's possible the user is already verified and in the main User collection.
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return NextResponse.json({ error: 'User is already verified' }, { status: 400 });
+      }
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    if (user.isVerified) {
-      return NextResponse.json({ error: 'User is already verified' }, { status: 400 });
     }
 
     // Generate new 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
 
-    user.otpCode = hashedOtp;
-    user.otpExpire = Date.now() + 10 * 60 * 1000; // 10 mins
+    pendingUser.otpCode = hashedOtp;
+    pendingUser.otpExpire = Date.now() + 10 * 60 * 1000; // 10 mins
 
-    await user.save();
+    await pendingUser.save();
 
     // Send email with new OTP
     try {
@@ -41,7 +43,7 @@ export async function POST(req) {
       `;
 
       await sendEmail({
-        to: user.email,
+        to: pendingUser.email,
         subject: 'Your new verification code',
         html: message,
       });
