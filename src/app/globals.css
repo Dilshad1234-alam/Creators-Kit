@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 @theme inline {
   /* Brand Colors */
   --color-primary: #F59E0B;
@@ -39,15 +41,21 @@
 }
 
 :root {
-  --background: #0B0F19;
-  --foreground: #94A3B8;
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  --surface: #FFFFFF;
+  --card-inset: 0px;
+  --card-border-color: #E2E8F0;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0B0F19;
-    --foreground: #94A3B8;
-  }
+.dark {
+  --background: #0B0F19;
+  --foreground: #94A3B8;
+  --surface: #131C2E;
+  --card-inset: 2px;
+  --card-border-color: transparent;
+  --card-shadow: none;
 }
 
 body {
@@ -86,10 +94,12 @@ body {
     overflow: hidden;
     z-index: 1;
     transition: all 0.4s ease-out;
-    border: none !important;
+    border: 1px solid var(--card-border-color) !important;
+    box-shadow: var(--card-shadow);
   }
 
-  .premium-glow-card:hover {
+  .premium-glow-card:hover,
+  .premium-glow-card:focus-within {
     transform: translateY(-6px);
     box-shadow: 0 0 60px 15px rgba(245, 158, 11, 0.5);
   }
@@ -112,14 +122,15 @@ body {
   .premium-glow-card::after {
     content: '';
     position: absolute;
-    inset: 2px;
+    inset: var(--card-inset);
     border-radius: inherit;
-    background: #131C2E;
+    background: var(--surface);
     z-index: -1;
     pointer-events: none;
   }
 
-  .premium-glow-card:hover::before {
+  .premium-glow-card:hover::before,
+  .premium-glow-card:focus-within::before {
     opacity: 1;
   }
 }

@@ -107,16 +107,16 @@ function VerifyOtpForm() {
 
   return (
     <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-      <div className="bg-neutral-900/90 border border-neutral-800/80 rounded-2xl shadow-2xl p-8 max-w-md w-full mx-auto backdrop-blur-md">
+      <div className="bg-white dark:bg-neutral-900/90 border border-neutral-200 dark:border-neutral-800/80 rounded-2xl shadow-2xl p-8 max-w-md w-full mx-auto backdrop-blur-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-block text-3xl font-black tracking-tighter text-primary mb-2 hover:scale-105 transition-transform">
             Creators Kit.
           </Link>
-          <h2 className="text-2xl font-extrabold text-neutral-100 tracking-tight mt-4">
+          <h2 className="text-2xl font-extrabold text-neutral-900 dark:text-neutral-100 tracking-tight mt-4">
             Verify Your Email
           </h2>
-          <p className="text-sm text-neutral-400 mt-2">
-            We've sent a 6-digit code to <span className="font-bold text-neutral-100">{email}</span>. Please enter it below.
+          <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2">
+            We've sent a 6-digit code to <span className="font-bold text-neutral-900 dark:text-neutral-100">{email}</span>. Please enter it below.
           </p>
         </div>
         <form className="space-y-6" onSubmit={handleSubmit}>
@@ -135,7 +135,7 @@ function VerifyOtpForm() {
           <div>
             <label
               htmlFor="otp"
-              className="block text-sm font-medium text-neutral-300 text-center"
+              className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 text-center"
             >
               6-Digit Code
             </label>
@@ -148,7 +148,7 @@ function VerifyOtpForm() {
                 required
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
-                className="appearance-none block w-1/2 text-center text-3xl tracking-widest px-3 py-3 bg-background border border-neutral-700 rounded-lg shadow-sm placeholder-zinc-700 text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                className="appearance-none block w-1/2 text-center text-3xl tracking-widest px-3 py-3 bg-white dark:bg-background border border-neutral-700 rounded-lg shadow-sm placeholder-zinc-700 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
                 placeholder="000000"
               />
             </div>
@@ -158,10 +158,10 @@ function VerifyOtpForm() {
             <button
               type="submit"
               disabled={loading || otp.length !== 6}
-              className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-neutral-100 bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-neutral-900 dark:text-neutral-100 bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {loading ? (
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-neutral-100" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-neutral-900 dark:text-neutral-100" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
@@ -173,7 +173,7 @@ function VerifyOtpForm() {
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-sm text-neutral-400">
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">
             Didn't receive the code?{' '}
             <button
               type="button"
@@ -192,11 +192,11 @@ function VerifyOtpForm() {
 
 export default function VerifyOtpPage() {
   return (
-    <div className="min-h-screen bg-background flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen bg-white dark:bg-background flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
 
-      <Suspense fallback={<div className="text-neutral-100 text-center z-10 relative">Loading...</div>}>
+      <Suspense fallback={<div className="text-neutral-900 dark:text-neutral-100 text-center z-10 relative">Loading...</div>}>
         <VerifyOtpForm />
       </Suspense>
     </div>

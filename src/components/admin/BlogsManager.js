@@ -105,12 +105,12 @@ export default function BlogsManager() {
     }
   };
 
-  if (isLoading) return <div className="text-white">Loading blogs...</div>;
+  if (isLoading) return <div className="text-neutral-900 dark:text-white">Loading blogs...</div>;
 
   return (
-    <div className="bg-neutral-900/50 rounded-3xl border border-neutral-800 p-8 shadow-xl">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-bold text-white">Manage Blogs</h2>
+    <div className="bg-white dark:bg-neutral-900/50 rounded-3xl border border-neutral-200 dark:border-neutral-800 p-8 shadow-xl">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
+        <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white">Manage Blogs</h2>
         <button 
           onClick={() => openModal()} 
           className="bg-primary text-black font-bold px-6 py-3 rounded-full hover:bg-primary-hover transition-colors"
@@ -120,8 +120,8 @@ export default function BlogsManager() {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-neutral-300">
-          <thead className="text-xs uppercase bg-neutral-800/50 text-neutral-400">
+        <table className="w-full text-left text-neutral-700 dark:text-neutral-300">
+          <thead className="text-xs uppercase bg-neutral-100 dark:bg-neutral-800/50 text-neutral-600 dark:text-neutral-400">
             <tr>
               <th className="px-6 py-4 rounded-tl-xl rounded-bl-xl">Image</th>
               <th className="px-6 py-4">Title</th>
@@ -132,9 +132,9 @@ export default function BlogsManager() {
           </thead>
           <tbody>
             {blogs.map((blog) => (
-              <tr key={blog._id} className="border-b border-neutral-800/50 hover:bg-neutral-800/20 transition-colors">
+              <tr key={blog._id} className="border-b border-neutral-200 dark:border-neutral-800/50 hover:bg-neutral-100 dark:bg-neutral-800/20 transition-colors">
                 <td className="px-6 py-4">
-                  <div className="w-16 h-12 relative rounded-md overflow-hidden bg-neutral-950 border border-neutral-800">
+                  <div className="w-16 h-12 relative rounded-md overflow-hidden bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800">
                     <img 
                       src={blog.image || '/placeholder.png'} 
                       alt="thumbnail" 
@@ -142,11 +142,11 @@ export default function BlogsManager() {
                     />
                   </div>
                 </td>
-                <td className="px-6 py-4 font-medium text-white max-w-xs truncate">{blog.title}</td>
+                <td className="px-6 py-4 font-medium text-neutral-900 dark:text-white max-w-xs truncate">{blog.title}</td>
                 <td className="px-6 py-4">{blog.author}</td>
                 <td className="px-6 py-4">{new Date(blog.createdAt).toLocaleDateString()}</td>
                 <td className="px-6 py-4 text-right">
-                  <button onClick={() => openModal(blog)} className="text-primary hover:text-white mr-4 transition-colors font-medium">Edit</button>
+                  <button onClick={() => openModal(blog)} className="text-primary hover:text-neutral-900 dark:text-white mr-4 transition-colors font-medium">Edit</button>
                   <button onClick={() => handleDelete(blog.slug)} className="text-red-500 hover:text-red-400 transition-colors font-medium">Delete</button>
                 </td>
               </tr>
@@ -164,83 +164,83 @@ export default function BlogsManager() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-neutral-950 border border-neutral-800 rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-            <h3 className="text-2xl font-bold text-white mb-6">
+          <div className="bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <h3 className="text-2xl font-bold text-neutral-900 dark:text-white mb-6">
               {editingBlog ? 'Edit Blog Post' : 'Add New Blog Post'}
             </h3>
             
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-neutral-400 mb-2">Title</label>
+                <label className="block text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-2">Title</label>
                 <input 
                   type="text" 
                   name="title" 
                   required
                   value={formData.title} 
                   onChange={handleChange} 
-                  className="w-full bg-neutral-900 border border-neutral-800 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                  className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                   placeholder="The Exact Lighting & Audio Setup..."
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-sm font-medium text-neutral-400 mb-2">Author</label>
+                  <label className="block text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-2">Author</label>
                   <input 
                     type="text" 
                     name="author" 
                     required
                     value={formData.author} 
                     onChange={handleChange} 
-                    className="w-full bg-neutral-900 border border-neutral-800 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                    className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                     placeholder="e.g. Sarah Jenkins"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-neutral-400 mb-2">Image URL</label>
+                  <label className="block text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-2">Image URL</label>
                   <input 
                     type="text" 
                     name="image" 
                     required
                     value={formData.image} 
                     onChange={handleChange} 
-                    className="w-full bg-neutral-900 border border-neutral-800 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                    className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                     placeholder="/kits 16.jpg - Edited.png"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-neutral-400 mb-2">Excerpt (Short Description)</label>
+                <label className="block text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-2">Excerpt (Short Description)</label>
                 <textarea 
                   name="excerpt" 
                   required
                   value={formData.excerpt} 
                   onChange={handleChange} 
                   rows="2"
-                  className="w-full bg-neutral-900 border border-neutral-800 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
+                  className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
                   placeholder="A short summary of the blog post..."
                 ></textarea>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-neutral-400 mb-2">Full Content</label>
+                <label className="block text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-2">Full Content</label>
                 <textarea 
                   name="content" 
                   required
                   value={formData.content} 
                   onChange={handleChange} 
                   rows="6"
-                  className="w-full bg-neutral-900 border border-neutral-800 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                  className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                   placeholder="Write your rich blog content here..."
                 ></textarea>
               </div>
 
-              <div className="flex justify-end gap-4 pt-4 border-t border-neutral-800">
+              <div className="flex justify-end gap-4 pt-4 border-t border-neutral-200 dark:border-neutral-800">
                 <button 
                   type="button" 
                   onClick={closeModal} 
-                  className="px-6 py-3 rounded-xl font-bold text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
+                  className="px-6 py-3 rounded-xl font-bold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:text-white hover:bg-neutral-100 dark:bg-neutral-800 transition-colors"
                 >
                   Cancel
                 </button>

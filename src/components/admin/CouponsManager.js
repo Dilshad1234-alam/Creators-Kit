@@ -96,15 +96,15 @@ export default function CouponsManager() {
     }
   };
 
-  if (loading) return <div className="text-neutral-400">Loading coupons...</div>;
+  if (loading) return <div className="text-neutral-600 dark:text-neutral-400">Loading coupons...</div>;
 
   return (
-    <div className="bg-neutral-900/60 border border-neutral-800 rounded-3xl p-8 backdrop-blur-xl">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-bold text-neutral-100">Coupons & Discounts</h2>
+    <div className="bg-white dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-8 backdrop-blur-xl">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
+        <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-neutral-100">Coupons & Discounts</h2>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-primary hover:bg-primary/90 text-neutral-100 px-4 py-2 rounded-xl font-bold transition-colors"
+          className="bg-primary hover:bg-primary/90 text-neutral-900 dark:text-neutral-100 px-4 py-2 rounded-xl font-bold transition-colors"
         >
           + Create Coupon
         </button>
@@ -113,7 +113,7 @@ export default function CouponsManager() {
       <div className="overflow-x-auto">
         <table className="w-full text-left">
           <thead>
-            <tr className="text-neutral-500 uppercase text-xs font-black tracking-wider border-b border-neutral-800">
+            <tr className="text-neutral-500 uppercase text-xs font-black tracking-wider border-b border-neutral-200 dark:border-neutral-800">
               <th className="pb-4 pr-4">Code</th>
               <th className="pb-4 px-4">Discount</th>
               <th className="pb-4 px-4">Applies To</th>
@@ -124,14 +124,14 @@ export default function CouponsManager() {
           </thead>
           <tbody className="divide-y divide-zinc-800/50">
             {coupons.map((c) => (
-              <tr key={c._id} className="hover:bg-neutral-800/30 transition-colors">
-                <td className="py-5 pr-4 font-mono font-bold text-neutral-100 align-top">{c.code}</td>
-                <td className="py-5 px-4 align-top text-neutral-300 font-medium">
+              <tr key={c._id} className="hover:bg-neutral-100 dark:bg-neutral-800/30 transition-colors">
+                <td className="py-5 pr-4 font-mono font-bold text-neutral-900 dark:text-neutral-100 align-top">{c.code}</td>
+                <td className="py-5 px-4 align-top text-neutral-700 dark:text-neutral-300 font-medium">
                   {c.discountType === 'percentage' ? `${c.discountAmount}%` : `₹${c.discountAmount}`}
                 </td>
                 <td className="py-5 px-4 align-top">
                   {c.applicableProduct === 'ALL' ? (
-                    <span className="text-neutral-400 text-sm">Site-wide</span>
+                    <span className="text-neutral-600 dark:text-neutral-400 text-sm">Site-wide</span>
                   ) : (
                     <span className="text-blue-400 text-sm bg-blue-400/10 px-2 py-1 rounded-md border border-blue-400/20">Specific Product</span>
                   )}
@@ -142,13 +142,13 @@ export default function CouponsManager() {
                     className={`px-3 py-1 rounded-full text-xs font-bold border transition-colors ${
                       c.isActive 
                         ? 'bg-green-500/10 text-green-500 border-green-500/20 hover:bg-green-500/20' 
-                        : 'bg-neutral-800/50 text-neutral-500 border-neutral-700 hover:bg-neutral-800'
+                        : 'bg-neutral-100 dark:bg-neutral-800/50 text-neutral-500 border-neutral-700 hover:bg-neutral-100 dark:bg-neutral-800'
                     }`}
                   >
                     {c.isActive ? 'Active' : 'Inactive'}
                   </button>
                 </td>
-                <td className="py-5 px-4 align-top text-neutral-400 text-sm">
+                <td className="py-5 px-4 align-top text-neutral-600 dark:text-neutral-400 text-sm">
                   {c.expiryDate ? new Date(c.expiryDate).toLocaleDateString() : 'Never'}
                 </td>
                 <td className="py-5 px-4 align-top text-right">
@@ -176,7 +176,7 @@ export default function CouponsManager() {
                         alert('Failed to seed: ' + data.error);
                       }
                     }}
-                    className="bg-neutral-800 hover:bg-neutral-700 text-neutral-100 px-6 py-2 rounded-xl font-bold transition-colors"
+                    className="bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100 px-6 py-2 rounded-xl font-bold transition-colors"
                   >
                     Instant Database Seeder
                   </button>
@@ -189,25 +189,25 @@ export default function CouponsManager() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface/60 backdrop-blur-sm">
-          <div className="bg-background border border-neutral-800 rounded-3xl p-8 w-full max-w-md shadow-2xl">
-            <h3 className="text-xl font-bold text-neutral-100 mb-6">Create New Coupon</h3>
+          <div className="bg-white dark:bg-background border border-neutral-200 dark:border-neutral-800 rounded-3xl p-8 w-full max-w-md shadow-2xl">
+            <h3 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-6">Create New Coupon</h3>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
-                <label className="block text-sm font-bold text-neutral-400 mb-1">Coupon Code</label>
+                <label className="block text-sm font-bold text-neutral-600 dark:text-neutral-400 mb-1">Coupon Code</label>
                 <input 
                   type="text" 
                   required
                   placeholder="e.g. CREATOR20"
-                  className="w-full bg-neutral-900/50 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 outline-none focus:border-primary font-mono uppercase"
+                  className="w-full bg-white dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-neutral-900 dark:text-neutral-100 outline-none focus:border-primary font-mono uppercase"
                   value={formData.code}
                   onChange={e => setFormData({...formData, code: e.target.value.toUpperCase()})}
                 />
               </div>
               <div className="flex gap-4">
                 <div className="w-1/3">
-                  <label className="block text-sm font-bold text-neutral-400 mb-1">Type</label>
+                  <label className="block text-sm font-bold text-neutral-600 dark:text-neutral-400 mb-1">Type</label>
                   <select 
-                    className="w-full bg-neutral-900/50 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 outline-none focus:border-primary"
+                    className="w-full bg-white dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-neutral-900 dark:text-neutral-100 outline-none focus:border-primary"
                     value={formData.discountType}
                     onChange={e => setFormData({...formData, discountType: e.target.value})}
                   >
@@ -216,21 +216,21 @@ export default function CouponsManager() {
                   </select>
                 </div>
                 <div className="w-2/3">
-                  <label className="block text-sm font-bold text-neutral-400 mb-1">Amount</label>
+                  <label className="block text-sm font-bold text-neutral-600 dark:text-neutral-400 mb-1">Amount</label>
                   <input 
                     type="number" 
                     required
                     min="1"
-                    className="w-full bg-neutral-900/50 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 outline-none focus:border-primary"
+                    className="w-full bg-white dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-neutral-900 dark:text-neutral-100 outline-none focus:border-primary"
                     value={formData.discountAmount}
                     onChange={e => setFormData({...formData, discountAmount: e.target.value})}
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-bold text-neutral-400 mb-1">Apply To</label>
+                <label className="block text-sm font-bold text-neutral-600 dark:text-neutral-400 mb-1">Apply To</label>
                 <select 
-                  className="w-full bg-neutral-900/50 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 outline-none focus:border-primary"
+                  className="w-full bg-white dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-neutral-900 dark:text-neutral-100 outline-none focus:border-primary"
                   value={formData.applicableProduct}
                   onChange={e => setFormData({...formData, applicableProduct: e.target.value})}
                 >
@@ -241,10 +241,10 @@ export default function CouponsManager() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-bold text-neutral-400 mb-1">Expiry Date (Optional)</label>
+                <label className="block text-sm font-bold text-neutral-600 dark:text-neutral-400 mb-1">Expiry Date (Optional)</label>
                 <input 
                   type="date" 
-                  className="w-full bg-neutral-900/50 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 outline-none focus:border-primary [color-scheme:dark]"
+                  className="w-full bg-white dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-neutral-900 dark:text-neutral-100 outline-none focus:border-primary [color-scheme:dark]"
                   value={formData.expiryDate}
                   onChange={e => setFormData({...formData, expiryDate: e.target.value})}
                 />
@@ -253,13 +253,13 @@ export default function CouponsManager() {
                 <button 
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="flex-1 px-4 py-3 rounded-xl font-bold text-neutral-300 bg-neutral-800 hover:bg-neutral-700 transition-colors"
+                  className="flex-1 px-4 py-3 rounded-xl font-bold text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-700 transition-colors"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit"
-                  className="flex-1 px-4 py-3 rounded-xl font-bold text-neutral-100 bg-primary hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
+                  className="flex-1 px-4 py-3 rounded-xl font-bold text-neutral-900 dark:text-neutral-100 bg-primary hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
                 >
                   Create
                 </button>

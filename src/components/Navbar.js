@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -47,7 +48,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="w-full bg-background/80 backdrop-blur-md border-b border-neutral-800/80 sticky top-0 z-50">
+    <header className="w-full bg-white/80 dark:bg-neutral-950/80 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-800/80 sticky top-0 z-50 transition-colors duration-300">
       <div className="w-full px-6 lg:px-12">
         <div className="flex items-center justify-between h-20 gap-8 relative">
           {/* Brand Logo */}
@@ -72,7 +73,7 @@ export default function Navbar() {
                 href={link.href}
                 onClick={(e) => handleNavClick(e, link.href)}
                 className={`relative text-base font-bold transition-colors duration-300 py-2 ${
-                  pathname === link.href ? 'text-primary' : 'text-neutral-400 hover:text-primary'
+                  pathname === link.href ? 'text-primary' : 'text-neutral-600 dark:text-neutral-400 hover:text-primary'
                 }`}
               >
                 {link.name}
@@ -88,16 +89,16 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-4">
             {!isMounted ? (
               <div className="flex items-center gap-4 w-[140px] justify-end">
-                <div className="w-8 h-8 rounded-full border-2 border-neutral-800/80 border-t-primary animate-spin"></div>
+                <div className="w-8 h-8 rounded-full border-2 border-neutral-200 dark:border-neutral-800/80 border-t-primary animate-spin"></div>
               </div>
             ) : userName ? (
               <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 text-sm font-semibold bg-neutral-900/80 border border-neutral-800 text-neutral-300 px-4 py-2 rounded-full">
+                <div className="flex items-center gap-2 text-sm font-semibold bg-white dark:bg-neutral-900/80 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 px-4 py-2 rounded-full">
                   {userName}
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="p-2 text-neutral-400 hover:text-red-500 transition-colors bg-neutral-900/50 hover:bg-neutral-900 border border-transparent hover:border-red-900/30 rounded-full"
+                  className="p-2 text-neutral-600 dark:text-neutral-400 hover:text-red-500 transition-colors bg-white dark:bg-neutral-900/50 hover:bg-white dark:bg-neutral-900 border border-transparent hover:border-red-900/30 rounded-full"
                   title="Log out"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -107,7 +108,7 @@ export default function Navbar() {
               </div>
             ) : (
               <>
-                <Link href="/login" className="text-sm font-semibold text-neutral-400 hover:text-primary transition-colors duration-300">
+                <Link href="/login" className="text-sm font-semibold text-neutral-600 dark:text-neutral-400 hover:text-primary transition-colors duration-300">
                   Log in
                 </Link>
                 <Link
@@ -119,9 +120,12 @@ export default function Navbar() {
               </>
             )}
             
+            {/* Theme Toggle Desktop */}
+            <ThemeToggle />
+            
             {/* Cart Icon */}
             {!pathname.startsWith('/admin') && (
-              <Link href="/cart" className="relative p-2 text-neutral-400 hover:text-secondary transition-all duration-300 hover:scale-110">
+              <Link href="/cart" className="relative p-2 text-neutral-600 dark:text-neutral-400 hover:text-secondary transition-all duration-300 hover:scale-110">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
@@ -136,9 +140,12 @@ export default function Navbar() {
 
           {/* Mobile menu button */}
           <div className="flex md:hidden items-center space-x-4 ml-auto">
+            {/* Theme Toggle Mobile */}
+            <ThemeToggle />
+
             {/* Mobile Cart Icon */}
             {!pathname.startsWith('/admin') && (
-              <Link href="/cart" className="relative p-2 text-neutral-400 hover:text-secondary transition-colors">
+              <Link href="/cart" className="relative p-2 text-neutral-600 dark:text-neutral-400 hover:text-secondary transition-colors">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
@@ -152,7 +159,7 @@ export default function Navbar() {
             
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-neutral-400 hover:text-secondary hover:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-secondary"
+              className="inline-flex items-center justify-center p-2 rounded-md text-neutral-600 dark:text-neutral-400 hover:text-secondary hover:bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-secondary"
             >
               <span className="sr-only">Open main menu</span>
               {!isMobileMenuOpen ? (
@@ -171,7 +178,7 @@ export default function Navbar() {
 
       {/* Mobile Navigation Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-neutral-800/80 bg-background/90 backdrop-blur-xl absolute w-full left-0 shadow-2xl">
+        <div className="md:hidden border-t border-neutral-200 dark:border-neutral-800/80 bg-white/95 dark:bg-neutral-950/95 backdrop-blur-xl absolute w-full left-0 shadow-2xl transition-colors duration-300">
           {!pathname.startsWith('/admin') && (
             <div className="px-4 pt-4 pb-6 space-y-2 sm:px-6">
             {navLinks.map((link) => (
@@ -183,7 +190,7 @@ export default function Navbar() {
                   handleNavClick(e, link.href);
                 }}
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  pathname === link.href ? 'text-primary bg-neutral-900' : 'text-neutral-300 hover:text-primary hover:bg-neutral-900'
+                  pathname === link.href ? 'text-primary bg-white dark:bg-neutral-900' : 'text-neutral-700 dark:text-neutral-300 hover:text-primary hover:bg-white dark:bg-neutral-900'
                 }`}
               >
                 {link.name}
@@ -191,23 +198,23 @@ export default function Navbar() {
             ))}
             </div>
           )}
-          <div className="pt-4 pb-6 border-t border-neutral-800/80">
+          <div className="pt-4 pb-6 border-t border-neutral-200 dark:border-neutral-800/80">
             <div className="flex flex-col px-4 sm:px-6 space-y-4">
               {!isMounted ? (
                 <div className="flex justify-center py-4">
-                  <div className="w-8 h-8 rounded-full border-2 border-neutral-800/80 border-t-primary animate-spin"></div>
+                  <div className="w-8 h-8 rounded-full border-2 border-neutral-200 dark:border-neutral-800/80 border-t-primary animate-spin"></div>
                 </div>
               ) : userName ? (
                 <>
-                  <div className="flex items-center gap-3 px-4 py-3 border border-neutral-800 rounded-xl bg-neutral-900/50 justify-center">
-                    <span className="text-base font-semibold text-neutral-100">👋 Hi, {userName}</span>
+                  <div className="flex items-center gap-3 px-4 py-3 border border-neutral-200 dark:border-neutral-800 rounded-xl bg-white dark:bg-neutral-900/50 justify-center">
+                    <span className="text-base font-semibold text-neutral-900 dark:text-neutral-100">👋 Hi, {userName}</span>
                   </div>
                   <button
                     onClick={() => {
                       handleLogout();
                       setIsMobileMenuOpen(false);
                     }}
-                    className="block w-full px-4 py-3 text-center rounded-full text-base font-bold bg-neutral-900 text-red-500 hover:bg-neutral-800 border border-neutral-800 transition-all"
+                    className="block w-full px-4 py-3 text-center rounded-full text-base font-bold bg-white dark:bg-neutral-900 text-red-500 hover:bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-800 transition-all"
                   >
                     Log out
                   </button>
@@ -217,7 +224,7 @@ export default function Navbar() {
                   <Link
                     href="/login"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="block text-base font-semibold text-neutral-400 hover:text-primary text-center"
+                    className="block text-base font-semibold text-neutral-600 dark:text-neutral-400 hover:text-primary text-center"
                   >
                     Log in
                   </Link>

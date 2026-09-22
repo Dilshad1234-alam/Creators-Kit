@@ -25,7 +25,7 @@ export default function MasterclassCard({ course, bgClass }) {
       )}
 
       {/* Icon / Image Container */}
-      <div className={`relative z-10 w-24 h-24 rounded-[2rem] flex items-center justify-center text-5xl mb-10 text-neutral-100 shadow-2xl ${bgClass} transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 ease-out overflow-hidden border border-white/10`}>
+      <div className={`relative z-10 w-24 h-24 rounded-[2rem] flex items-center justify-center text-5xl mb-10 text-neutral-900 dark:text-neutral-100 shadow-2xl ${bgClass} transform group-hover:scale-110 group-active:scale-110 group-hover:rotate-12 group-active:rotate-12 transition-all duration-500 ease-out overflow-hidden border border-white/10`}>
         {course.image ? (
           <img src={course.image} alt={course.title} className="w-full h-full object-cover" />
         ) : (
@@ -33,11 +33,11 @@ export default function MasterclassCard({ course, bgClass }) {
         )}
       </div>
       
-      <h3 className="relative z-10 text-3xl md:text-4xl font-black mb-5 text-neutral-100 group-hover:text-white transition-colors duration-300">
+      <h3 className="relative z-10 text-3xl md:text-4xl font-black mb-5 text-neutral-900 dark:text-white dark:group-hover:text-white group-hover:text-primary transition-colors duration-300">
         {course.title}
       </h3>
       
-      <p className="relative z-10 text-lg md:text-xl text-neutral-400 group-hover:text-neutral-300 font-medium leading-relaxed transition-colors duration-300 flex-grow">
+      <p className="relative z-10 text-lg md:text-xl text-neutral-600 dark:text-neutral-400 font-medium leading-relaxed transition-colors duration-300 flex-grow">
         {course.description}
       </p>
     </div>

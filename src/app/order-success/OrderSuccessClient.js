@@ -41,8 +41,8 @@ export default function OrderSuccessClient({ orderId }) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <div className="w-12 h-12 rounded-full border-4 border-neutral-800 border-t-green-500 animate-spin mb-4"></div>
-        <p className="text-neutral-400 font-medium tracking-wide">Retrieving your order details...</p>
+        <div className="w-12 h-12 rounded-full border-4 border-neutral-200 dark:border-neutral-800 border-t-green-500 animate-spin mb-4"></div>
+        <p className="text-neutral-600 dark:text-neutral-400 font-medium tracking-wide">Retrieving your order details...</p>
       </div>
     );
   }
@@ -55,8 +55,8 @@ export default function OrderSuccessClient({ orderId }) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </div>
-        <h2 className="text-3xl font-extrabold text-neutral-100 mb-3">Oops! Something went wrong.</h2>
-        <p className="text-neutral-400 mb-8 max-w-md mx-auto text-lg leading-relaxed">{error}</p>
+        <h2 className="text-3xl font-extrabold text-neutral-900 dark:text-neutral-100 mb-3">Oops! Something went wrong.</h2>
+        <p className="text-neutral-600 dark:text-neutral-400 mb-8 max-w-md mx-auto text-lg leading-relaxed">{error}</p>
         <button
           onClick={() => router.push('/')}
           className="bg-neutral-100 text-neutral-900 px-8 py-3.5 rounded-xl font-bold hover:bg-white transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:scale-105"
@@ -74,7 +74,7 @@ export default function OrderSuccessClient({ orderId }) {
       <div className="premium-glow-card rounded-[2rem]">
         
         {/* Header Section */}
-        <div className="px-8 pt-12 pb-10 text-center border-b border-neutral-800/80 bg-neutral-900/50 relative overflow-hidden">
+        <div className="px-8 pt-12 pb-10 text-center border-b border-neutral-200 dark:border-neutral-800/80 bg-white dark:bg-neutral-900/50 relative overflow-hidden">
           {/* Confetti / Glow */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[150px] bg-secondary/20 blur-[80px] pointer-events-none rounded-b-full"></div>
           
@@ -83,18 +83,18 @@ export default function OrderSuccessClient({ orderId }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-4xl font-black text-neutral-100 tracking-tight mb-3 relative z-10">Order Confirmed!</h1>
-          <p className="text-neutral-400 text-lg relative z-10 max-w-lg mx-auto">Thank you for your purchase. Your creator journey has officially begun.</p>
+          <h1 className="text-4xl font-black text-neutral-900 dark:text-neutral-100 tracking-tight mb-3 relative z-10">Order Confirmed!</h1>
+          <p className="text-neutral-600 dark:text-neutral-400 text-lg relative z-10 max-w-lg mx-auto">Thank you for your purchase. Your creator journey has officially begun.</p>
         </div>
 
         {/* Order Details Body */}
         <div className="p-8 sm:p-10 space-y-10">
           
           {/* Order ID & Status */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-background rounded-2xl border border-neutral-800">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-white dark:bg-background rounded-2xl border border-neutral-200 dark:border-neutral-800">
             <div>
               <p className="text-xs text-neutral-500 uppercase tracking-widest font-bold mb-1.5">Order Number</p>
-              <p className="text-neutral-100 font-mono font-medium text-xl">
+              <p className="text-neutral-900 dark:text-neutral-100 font-mono font-medium text-xl">
                 {order.orderId || order._id?.slice(-8).toUpperCase()}
               </p>
             </div>
@@ -116,10 +116,10 @@ export default function OrderSuccessClient({ orderId }) {
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                       Secure Delivery PIN
                     </h3>
-                    <p className="text-neutral-300 text-sm mb-4">Please provide this 6-digit PIN to the delivery executive to receive your package securely.</p>
-                    <div className="flex items-center justify-center gap-3 bg-background border border-primary/20 py-4 rounded-xl shadow-inner">
+                    <p className="text-neutral-700 dark:text-neutral-300 text-sm mb-4">Please provide this 6-digit PIN to the delivery executive to receive your package securely.</p>
+                    <div className="flex items-center justify-center gap-3 bg-white dark:bg-background border border-primary/20 py-4 rounded-xl shadow-inner">
                       {order.deliveryOtp.split('').map((digit, i) => (
-                        <div key={i} className="w-10 h-12 flex items-center justify-center bg-neutral-900 border border-neutral-700 rounded-lg text-2xl font-black text-primary tracking-widest shadow-md">
+                        <div key={i} className="w-10 h-12 flex items-center justify-center bg-white dark:bg-neutral-900 border border-neutral-700 rounded-lg text-2xl font-black text-primary tracking-widest shadow-md">
                           {digit}
                         </div>
                       ))}
@@ -128,24 +128,24 @@ export default function OrderSuccessClient({ orderId }) {
                 )}
 
                 {/* Customer Details */}
-                <div className="bg-neutral-800/20 p-6 rounded-2xl border border-neutral-800/50">
-                  <h3 className="text-sm text-neutral-500 uppercase tracking-widest font-bold mb-5 border-b border-neutral-800 pb-3 flex items-center gap-2">
+                <div className="bg-neutral-100 dark:bg-neutral-800/20 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800/50">
+                  <h3 className="text-sm text-neutral-500 uppercase tracking-widest font-bold mb-5 border-b border-neutral-200 dark:border-neutral-800 pb-3 flex items-center gap-2">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                     Customer Details
                   </h3>
                   <div className="space-y-4">
                 <div>
                   <p className="text-xs text-neutral-500 uppercase tracking-wider mb-1">Name</p>
-                  <p className="text-neutral-100 font-semibold text-lg">{order.customerName}</p>
+                  <p className="text-neutral-900 dark:text-neutral-100 font-semibold text-lg">{order.customerName}</p>
                 </div>
                 <div>
                   <p className="text-xs text-neutral-500 uppercase tracking-wider mb-1">Email</p>
-                  <p className="text-neutral-100 font-medium break-all">{order.customerEmail}</p>
+                  <p className="text-neutral-900 dark:text-neutral-100 font-medium break-all">{order.customerEmail}</p>
                 </div>
                 {order.shippingAddress && (
                   <div>
                     <p className="text-xs text-neutral-500 uppercase tracking-wider mb-1 mt-2">Shipping Address</p>
-                    <p className="text-neutral-300 font-medium leading-relaxed">
+                    <p className="text-neutral-700 dark:text-neutral-300 font-medium leading-relaxed">
                       {order.shippingAddress.street}<br/>
                       {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}
                     </p>
@@ -157,9 +157,9 @@ export default function OrderSuccessClient({ orderId }) {
             </div>
 
             {/* Order Summary */}
-            <div className="bg-neutral-800/20 p-6 rounded-2xl border border-neutral-800/50 flex flex-col justify-between">
+            <div className="bg-neutral-100 dark:bg-neutral-800/20 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800/50 flex flex-col justify-between">
               <div>
-                <h3 className="text-sm text-neutral-500 uppercase tracking-widest font-bold mb-5 border-b border-neutral-800 pb-3 flex items-center gap-2">
+                <h3 className="text-sm text-neutral-500 uppercase tracking-widest font-bold mb-5 border-b border-neutral-200 dark:border-neutral-800 pb-3 flex items-center gap-2">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
                   Order Summary
                 </h3>
@@ -167,19 +167,19 @@ export default function OrderSuccessClient({ orderId }) {
                   {order.items?.map((item, idx) => (
                     <div key={idx} className="flex justify-between items-start gap-4">
                       <div className="flex-1">
-                        <p className="text-neutral-100 font-semibold text-lg leading-tight mb-1">{item.name}</p>
+                        <p className="text-neutral-900 dark:text-neutral-100 font-semibold text-lg leading-tight mb-1">{item.name}</p>
                         <p className="text-sm text-neutral-500 font-medium">Qty: {item.quantity}</p>
                       </div>
-                      <p className="text-neutral-100 font-mono font-bold text-lg whitespace-nowrap">₹{item.price?.toLocaleString('en-IN')}</p>
+                      <p className="text-neutral-900 dark:text-neutral-100 font-mono font-bold text-lg whitespace-nowrap">₹{item.price?.toLocaleString('en-IN')}</p>
                     </div>
                   ))}
                 </div>
               </div>
               
-              <div className="pt-6 mt-6 border-t border-neutral-800">
+              <div className="pt-6 mt-6 border-t border-neutral-200 dark:border-neutral-800">
                 <div className="flex justify-between items-end">
-                  <p className="text-neutral-400 font-bold uppercase tracking-wider text-sm mb-1">Total Paid</p>
-                  <p className="text-3xl font-black text-neutral-100 tracking-tight">
+                  <p className="text-neutral-600 dark:text-neutral-400 font-bold uppercase tracking-wider text-sm mb-1">Total Paid</p>
+                  <p className="text-3xl font-black text-neutral-900 dark:text-neutral-100 tracking-tight">
                     ₹{order.totalAmount?.toLocaleString('en-IN')}
                   </p>
                 </div>
@@ -197,11 +197,11 @@ export default function OrderSuccessClient({ orderId }) {
             Access Your Products
           </Link>
           <div className="mt-8 flex justify-center gap-6">
-            <Link href="/" className="text-sm font-medium text-neutral-500 hover:text-neutral-100 transition-colors">
+            <Link href="/" className="text-sm font-medium text-neutral-500 hover:text-neutral-900 dark:text-neutral-100 transition-colors">
               Return Home
             </Link>
             <span className="text-neutral-700">•</span>
-            <Link href="/contact" className="text-sm font-medium text-neutral-500 hover:text-neutral-100 transition-colors">
+            <Link href="/contact" className="text-sm font-medium text-neutral-500 hover:text-neutral-900 dark:text-neutral-100 transition-colors">
               Need Help? Support
             </Link>
           </div>

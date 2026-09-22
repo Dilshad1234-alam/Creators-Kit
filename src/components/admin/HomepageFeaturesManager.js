@@ -111,16 +111,16 @@ export default function HomepageFeaturesManager() {
     }
   };
 
-  if (loading) return <div className="text-neutral-400 mt-8">Loading Homepage Features...</div>;
+  if (loading) return <div className="text-neutral-600 dark:text-neutral-400 mt-8">Loading Homepage Features...</div>;
 
   return (
     <>
-      <div className="bg-neutral-900/60 border border-neutral-800/80 shadow-2xl rounded-3xl p-8 backdrop-blur-xl mt-12">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl font-bold text-neutral-100">Manage Homepage Features (Kit Components)</h2>
+      <div className="bg-white dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800/80 shadow-2xl rounded-3xl p-8 backdrop-blur-xl mt-12">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-neutral-100">Manage Homepage Features (Kit Components)</h2>
           <button 
             onClick={handleAddNew}
-            className="px-6 py-2 bg-primary hover:bg-primary/80 text-neutral-100 font-bold rounded-full transition-all duration-300 text-sm shadow-[0_0_15px_rgba(245,158,11,0.4)]"
+            className="px-6 py-2 bg-primary hover:bg-primary/80 text-neutral-900 dark:text-neutral-100 font-bold rounded-full transition-all duration-300 text-sm shadow-[0_0_15px_rgba(245,158,11,0.4)]"
           >
             + Add New Feature
           </button>
@@ -129,7 +129,7 @@ export default function HomepageFeaturesManager() {
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="text-neutral-500 uppercase text-xs font-black tracking-wider border-b border-neutral-800/50">
+              <tr className="text-neutral-500 uppercase text-xs font-black tracking-wider border-b border-neutral-200 dark:border-neutral-800/50">
                 <th className="pb-4 pr-4">Order</th>
                 <th className="pb-4 pr-4">Name</th>
                 <th className="pb-4 px-4 w-[40%]">Description</th>
@@ -138,28 +138,28 @@ export default function HomepageFeaturesManager() {
             </thead>
             <tbody className="divide-y divide-zinc-800/30">
               {features.map((item) => (
-                <tr key={item._id} className="hover:bg-neutral-800/20 transition-colors">
-                  <td className="py-5 pr-4 text-neutral-400 font-bold">{item.order}</td>
+                <tr key={item._id} className="hover:bg-neutral-100 dark:bg-neutral-800/20 transition-colors">
+                  <td className="py-5 pr-4 text-neutral-600 dark:text-neutral-400 font-bold">{item.order}</td>
                   <td className="py-5 pr-4">
                     <div className="flex items-center gap-3">
-                      <div className="relative w-12 h-12 bg-neutral-800 rounded-lg overflow-hidden flex-shrink-0 border border-neutral-700/50">
+                      <div className="relative w-12 h-12 bg-neutral-100 dark:bg-neutral-800 rounded-lg overflow-hidden flex-shrink-0 border border-neutral-700/50">
                         {item.image ? (
                           <img src={item.image} alt={item.name} className="object-cover w-full h-full" />
                         ) : (
                           <div className="flex items-center justify-center w-full h-full text-xl">{item.icon}</div>
                         )}
                       </div>
-                      <span className="font-bold text-neutral-100">{item.name}</span>
+                      <span className="font-bold text-neutral-900 dark:text-neutral-100">{item.name}</span>
                     </div>
                   </td>
                   <td className="py-5 px-4">
-                    <p className="text-sm text-neutral-400 line-clamp-2">{item.description}</p>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2">{item.description}</p>
                   </td>
                   <td className="py-5 pl-4 text-right">
                     <div className="flex justify-end gap-2">
                       <button 
                         onClick={() => handleEdit(item)}
-                        className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-100 text-xs font-bold rounded-lg transition-colors"
+                        className="px-4 py-2 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100 text-xs font-bold rounded-lg transition-colors"
                       >
                         Edit
                       </button>
@@ -186,12 +186,12 @@ export default function HomepageFeaturesManager() {
       {isModalOpen && createPortal(
         <div className="fixed inset-0 z-[9999] flex items-center justify-center">
           <div className="absolute inset-0 bg-surface/80 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
-          <div className="relative bg-background border border-neutral-800 w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh]">
-            <div className="px-8 py-6 border-b border-neutral-800 flex justify-between items-center bg-neutral-900/50 rounded-t-3xl">
-              <h3 className="text-xl font-bold text-neutral-100">
+          <div className="relative bg-white dark:bg-background border border-neutral-200 dark:border-neutral-800 w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="px-8 py-6 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center bg-white dark:bg-neutral-900/50 rounded-t-3xl">
+              <h3 className="text-xl font-bold text-neutral-900 dark:text-neutral-100">
                 {editingItem ? 'Edit Feature' : 'Add New Feature'}
               </h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-neutral-500 hover:text-neutral-100 transition-colors">
+              <button onClick={() => setIsModalOpen(false)} className="text-neutral-500 hover:text-neutral-900 dark:text-neutral-100 transition-colors">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
@@ -206,7 +206,7 @@ export default function HomepageFeaturesManager() {
                       type="text" 
                       value={formData.name}
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 focus:border-primary focus:ring-1 focus:ring-primary/50 outline-none transition-all"
+                      className="w-full bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-neutral-900 dark:text-neutral-100 focus:border-primary focus:ring-1 focus:ring-primary/50 outline-none transition-all"
                     />
                   </div>
                   <div>
@@ -216,7 +216,7 @@ export default function HomepageFeaturesManager() {
                       type="number" 
                       value={formData.order}
                       onChange={(e) => setFormData({...formData, order: Number(e.target.value)})}
-                      className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 focus:border-primary focus:ring-1 focus:ring-primary/50 outline-none transition-all"
+                      className="w-full bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-neutral-900 dark:text-neutral-100 focus:border-primary focus:ring-1 focus:ring-primary/50 outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -228,7 +228,7 @@ export default function HomepageFeaturesManager() {
                     value={formData.description}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                     rows="3"
-                    className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 focus:border-primary focus:ring-1 focus:ring-primary/50 outline-none transition-all resize-none"
+                    className="w-full bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-neutral-900 dark:text-neutral-100 focus:border-primary focus:ring-1 focus:ring-primary/50 outline-none transition-all resize-none"
                   ></textarea>
                 </div>
 
@@ -239,7 +239,7 @@ export default function HomepageFeaturesManager() {
                       type="text" 
                       value={formData.icon}
                       onChange={(e) => setFormData({...formData, icon: e.target.value})}
-                      className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 focus:border-primary outline-none transition-all"
+                      className="w-full bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-neutral-900 dark:text-neutral-100 focus:border-primary outline-none transition-all"
                     />
                   </div>
                   <div>
@@ -248,7 +248,7 @@ export default function HomepageFeaturesManager() {
                       type="text" 
                       value={formData.image}
                       onChange={(e) => setFormData({...formData, image: e.target.value})}
-                      className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 focus:border-primary outline-none transition-all"
+                      className="w-full bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-neutral-900 dark:text-neutral-100 focus:border-primary outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -260,7 +260,7 @@ export default function HomepageFeaturesManager() {
                     onChange={(e) => setFormData({...formData, features: e.target.value})}
                     rows="2"
                     placeholder="E.g. High brightness, Adjustable stand, 3 color modes"
-                    className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 focus:border-primary outline-none transition-all resize-none"
+                    className="w-full bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-neutral-900 dark:text-neutral-100 focus:border-primary outline-none transition-all resize-none"
                   ></textarea>
                 </div>
 
@@ -271,7 +271,7 @@ export default function HomepageFeaturesManager() {
                       value={formData.useCase}
                       onChange={(e) => setFormData({...formData, useCase: e.target.value})}
                       rows="2"
-                      className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 focus:border-primary outline-none transition-all resize-none"
+                      className="w-full bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-neutral-900 dark:text-neutral-100 focus:border-primary outline-none transition-all resize-none"
                     ></textarea>
                   </div>
                   <div>
@@ -280,24 +280,24 @@ export default function HomepageFeaturesManager() {
                       value={formData.benefit}
                       onChange={(e) => setFormData({...formData, benefit: e.target.value})}
                       rows="2"
-                      className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 focus:border-primary outline-none transition-all resize-none"
+                      className="w-full bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-neutral-900 dark:text-neutral-100 focus:border-primary outline-none transition-all resize-none"
                     ></textarea>
                   </div>
                 </div>
 
               </div>
-              <div className="px-8 py-6 border-t border-neutral-800 bg-neutral-900/50 rounded-b-3xl flex justify-end gap-4">
+              <div className="px-8 py-6 border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 rounded-b-3xl flex justify-end gap-4">
                 <button 
                   type="button" 
                   onClick={() => setIsModalOpen(false)}
-                  className="px-6 py-3 font-bold text-neutral-400 hover:text-neutral-100 transition-colors"
+                  className="px-6 py-3 font-bold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:text-neutral-100 transition-colors"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit" 
                   disabled={isSaving}
-                  className="px-8 py-3 bg-primary hover:bg-primary/80 disabled:opacity-50 text-neutral-100 font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(245,158,11,0.3)] flex items-center gap-2"
+                  className="px-8 py-3 bg-primary hover:bg-primary/80 disabled:opacity-50 text-neutral-900 dark:text-neutral-100 font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(245,158,11,0.3)] flex items-center gap-2"
                 >
                   {isSaving ? 'Saving...' : 'Save Feature'}
                 </button>

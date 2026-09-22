@@ -10,7 +10,7 @@ function SidebarNav({ navItems }) {
   const currentTab = searchParams.get('tab');
 
   return (
-    <nav className="px-4 pb-8 space-y-2">
+    <nav className="px-4 pb-4 md:pb-8 flex flex-row md:flex-col gap-2 overflow-x-auto">
       {navItems.map((item, index) => {
         const isDashboard = item.path === '/admin';
         const isActive = isDashboard
@@ -21,13 +21,13 @@ function SidebarNav({ navItems }) {
           <Link
             key={index}
             href={item.path}
-            className={`flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all group ${
+            className={`flex items-center gap-2 md:gap-4 px-4 py-2 md:py-3 rounded-xl font-medium transition-all group shrink-0 whitespace-nowrap ${
               isActive
                 ? 'bg-primary text-neutral-950 shadow-lg shadow-primary/20'
-                : 'text-neutral-400 hover:bg-neutral-900 hover:text-neutral-100'
+                : 'text-neutral-600 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-900 hover:text-neutral-900 dark:hover:text-neutral-100'
             }`}
           >
-            <span className="text-xl group-hover:scale-110 transition-transform">{item.icon}</span>
+            <span className="text-lg md:text-xl group-hover:scale-110 transition-transform">{item.icon}</span>
             {item.name}
           </Link>
         );
@@ -51,7 +51,7 @@ export default function AdminLayout({ children }) {
   }, [router]);
 
   if (!isAuthorized) {
-    return <div className="min-h-screen bg-background flex items-center justify-center text-neutral-100">Verifying Access...</div>;
+    return <div className="min-h-screen bg-white dark:bg-background flex items-center justify-center text-neutral-900 dark:text-neutral-100">Verifying Access...</div>;
   }
 
   const navItems = [
@@ -65,11 +65,11 @@ export default function AdminLayout({ children }) {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-neutral-100 flex flex-col md:flex-row font-sans">
+    <div className="min-h-screen bg-white dark:bg-background text-neutral-900 dark:text-neutral-100 flex flex-col md:flex-row font-sans">
       {/* Sidebar Navigation */}
-      <aside className="w-full md:w-64 lg:w-72 bg-neutral-950 border-b md:border-r border-neutral-900 shrink-0 sticky top-0 md:h-screen overflow-y-auto z-20 shadow-2xl">
-        <div className="p-6 md:p-8 pb-4 flex flex-col items-start gap-1">
-          <Link href="/" className="relative block w-[200px] h-[65px] group mb-6">
+      <aside className="w-full md:w-64 lg:w-72 bg-white dark:bg-neutral-950 border-b md:border-r border-neutral-200 dark:border-neutral-900 shrink-0 sticky top-0 md:h-screen overflow-y-auto z-20 shadow-2xl">
+        <div className="p-4 md:p-8 pb-2 md:pb-4 flex flex-col items-start gap-1">
+          <Link href="/" className="relative block w-[140px] md:w-[200px] h-[40px] md:h-[65px] group mb-2 md:mb-6">
             <Image
               src="/logo kits.png - Edited.png"
               alt="Creators Kit Logo"

@@ -86,7 +86,8 @@ export default function CheckoutPage() {
 
   const saveOrderToDb = async (paymentOrderId) => {
     try {
-      const orderData = { ...getOrderData(), orderId: paymentOrderId || `COD-${Date.now()}` };
+      const orderId = paymentOrderId || `COD-${Date.now()}`;
+      const orderData = { ...getOrderData(), orderId };
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -97,8 +98,10 @@ export default function CheckoutPage() {
         console.error('Failed to save order:', errData.error);
         setCheckoutError('Failed to save order: ' + errData.error);
       }
+      return orderId;
     } catch (err) {
       console.error('Failed to save order to DB', err);
+      return null;
     }
   };
 
@@ -111,9 +114,9 @@ export default function CheckoutPage() {
       if (paymentMethod === 'cod') {
         // Mock successful COD checkout
         setTimeout(async () => {
-          await saveOrderToDb();
+          const savedOrderId = await saveOrderToDb();
           clearCart();
-          router.push('/order-success');
+          router.push(`/order-success${savedOrderId ? `?orderId=${savedOrderId}` : ''}`);
         }, 1000);
         return;
       }
@@ -141,9 +144,10 @@ export default function CheckoutPage() {
       // If keys are missing and the server returned a mock order, simulate a successful payment for testing
       if (order.id && order.id.startsWith('order_mock_')) {
         setTimeout(async () => {
-          await saveOrderToDb('mock_payment_' + Date.now());
+          const mockId = 'mock_payment_' + Date.now();
+          await saveOrderToDb(mockId);
           clearCart();
-          router.push('/order-success');
+          router.push(`/order-success?orderId=${mockId}`);
         }, 1000);
         return;
       }
@@ -212,7 +216,7 @@ export default function CheckoutPage() {
 
   if (!cart || cart.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background text-neutral-100">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-background text-neutral-900 dark:text-neutral-100">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">No items in checkout.</h1>
           <Link href="/product" className="text-primary hover:underline font-medium">Return to store</Link>
@@ -224,7 +228,7 @@ export default function CheckoutPage() {
   return (
     <>
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
-      <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="min-h-screen bg-white dark:bg-background py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         {/* Background Glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-primary/10 blur-[120px] rounded-full pointer-events-none"></div>
 
@@ -232,11 +236,11 @@ export default function CheckoutPage() {
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           
           {/* Left side: Checkout Form */}
-          <div className="w-full lg:flex-1 bg-neutral-900/80 backdrop-blur-xl border border-neutral-800/80 rounded-3xl p-6 shadow-2xl">
+          <div className="w-full lg:flex-1 bg-white dark:bg-neutral-900/80 backdrop-blur-xl border border-neutral-200 dark:border-neutral-800/80 rounded-3xl p-6 shadow-2xl">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Contact */}
               <section>
-                <h2 className="text-lg font-bold mb-3 text-neutral-100">Contact Information</h2>
+                <h2 className="text-lg font-bold mb-3 text-neutral-900 dark:text-neutral-100">Contact Information</h2>
                 <div>
                   <input
                     type="email"
@@ -245,14 +249,14 @@ export default function CheckoutPage() {
                     placeholder="Email address"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-neutral-800 text-neutral-100 placeholder-zinc-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors shadow-inner"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-background border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-zinc-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors shadow-inner"
                   />
                 </div>
               </section>
 
               {/* Shipping */}
               <section>
-                <h2 className="text-lg font-bold mb-3 text-neutral-100">Shipping Address</h2>
+                <h2 className="text-lg font-bold mb-3 text-neutral-900 dark:text-neutral-100">Shipping Address</h2>
                 <div className="grid grid-cols-2 gap-3">
                   <input
                     type="text"
@@ -261,7 +265,7 @@ export default function CheckoutPage() {
                     placeholder="First name"
                     value={formData.firstName}
                     onChange={handleChange}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-neutral-800 text-neutral-100 placeholder-zinc-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors shadow-inner"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-background border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-zinc-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors shadow-inner"
                   />
                   <input
                     type="text"
@@ -270,7 +274,7 @@ export default function CheckoutPage() {
                     placeholder="Last name"
                     value={formData.lastName}
                     onChange={handleChange}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-neutral-800 text-neutral-100 placeholder-zinc-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors shadow-inner"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-background border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-zinc-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors shadow-inner"
                   />
                   <input
                     type="text"
@@ -279,7 +283,7 @@ export default function CheckoutPage() {
                     placeholder="Street address"
                     value={formData.address}
                     onChange={handleChange}
-                    className="col-span-2 w-full px-3.5 py-2.5 rounded-xl bg-background border border-neutral-800 text-neutral-100 placeholder-zinc-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors shadow-inner"
+                    className="col-span-2 w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-background border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-zinc-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors shadow-inner"
                   />
                   <input
                     type="text"
@@ -288,7 +292,7 @@ export default function CheckoutPage() {
                     placeholder="City"
                     value={formData.city}
                     onChange={handleChange}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-neutral-800 text-neutral-100 placeholder-zinc-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors shadow-inner"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-background border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-zinc-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors shadow-inner"
                   />
                   <input
                     type="text"
@@ -297,7 +301,7 @@ export default function CheckoutPage() {
                     placeholder="ZIP code"
                     value={formData.zip}
                     onChange={handleChange}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-neutral-800 text-neutral-100 placeholder-zinc-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors shadow-inner"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-background border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-zinc-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors shadow-inner"
                   />
                 </div>
               </section>
@@ -305,7 +309,7 @@ export default function CheckoutPage() {
               {/* Payment */}
               <section>
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-bold text-neutral-100">Payment Method</h2>
+                  <h2 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">Payment Method</h2>
                   <div className="flex items-center text-[10px] text-green-400 font-medium bg-green-400/10 px-2 py-1 rounded-full border border-green-400/20">
                     <svg className="w-2.5 h-2.5 mr-1" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 2a5 5 0 00-5 5v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2H9V7a1 1 0 012 0v2h2V7a3 3 0 00-3-3z" clipRule="evenodd"></path>
@@ -316,7 +320,7 @@ export default function CheckoutPage() {
                 
                 <div className="space-y-3">
                   {/* Online Payment Option */}
-                  <label className={`block p-4 rounded-2xl border cursor-pointer transition-all duration-300 ${paymentMethod === 'online' ? 'bg-primary/10 border-primary shadow-[0_0_15px_rgba(245,158,11,0.1)]' : 'bg-background/50 border-neutral-800 hover:border-neutral-700'}`}>
+                  <label className={`block p-4 rounded-2xl border cursor-pointer transition-all duration-300 ${paymentMethod === 'online' ? 'bg-primary/10 border-primary shadow-[0_0_15px_rgba(245,158,11,0.1)]' : 'bg-white dark:bg-background/50 border-neutral-200 dark:border-neutral-800 hover:border-neutral-700'}`}>
                     <div className="flex items-center gap-3">
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'online' ? 'border-primary' : 'border-neutral-600'}`}>
                         {paymentMethod === 'online' && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
@@ -328,7 +332,7 @@ export default function CheckoutPage() {
                         </svg>
                       </div>
                       <div>
-                        <h3 className={`font-bold text-sm ${paymentMethod === 'online' ? 'text-neutral-100' : 'text-neutral-300'}`}>Pay Online (Razorpay)</h3>
+                        <h3 className={`font-bold text-sm ${paymentMethod === 'online' ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-700 dark:text-neutral-300'}`}>Pay Online (Razorpay)</h3>
                         <p className="text-neutral-500 text-xs mt-0.5">Credit/Debit, UPI & Netbanking</p>
                       </div>
                     </div>
@@ -336,16 +340,16 @@ export default function CheckoutPage() {
                   </label>
 
                   {/* Cash on Delivery Option */}
-                  <label className={`block p-4 rounded-2xl border cursor-pointer transition-all duration-300 ${paymentMethod === 'cod' ? 'bg-primary/10 border-primary shadow-[0_0_15px_rgba(245,158,11,0.1)]' : 'bg-background/50 border-neutral-800 hover:border-neutral-700'}`}>
+                  <label className={`block p-4 rounded-2xl border cursor-pointer transition-all duration-300 ${paymentMethod === 'cod' ? 'bg-primary/10 border-primary shadow-[0_0_15px_rgba(245,158,11,0.1)]' : 'bg-white dark:bg-background/50 border-neutral-200 dark:border-neutral-800 hover:border-neutral-700'}`}>
                     <div className="flex items-center gap-3">
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'cod' ? 'border-primary' : 'border-neutral-600'}`}>
                         {paymentMethod === 'cod' && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
                       </div>
-                      <div className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center p-2 shrink-0">
+                      <div className="w-10 h-10 bg-neutral-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center p-2 shrink-0">
                         <span className="text-xl">🚚</span>
                       </div>
                       <div>
-                        <h3 className={`font-bold text-sm ${paymentMethod === 'cod' ? 'text-neutral-100' : 'text-neutral-300'}`}>Cash on Delivery (COD)</h3>
+                        <h3 className={`font-bold text-sm ${paymentMethod === 'cod' ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-700 dark:text-neutral-300'}`}>Cash on Delivery (COD)</h3>
                         <p className="text-neutral-500 text-xs mt-0.5">Pay when you receive your order</p>
                       </div>
                     </div>
@@ -369,7 +373,7 @@ export default function CheckoutPage() {
                 className="w-full py-3 bg-primary text-neutral-950 rounded-xl font-bold text-lg hover:bg-primary-hover transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl hover:shadow-primary/40 hover:-translate-y-1 flex justify-center items-center mt-2"
               >
                 {loading ? (
-                  <svg className="animate-spin h-5 w-5 text-neutral-100" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-5 w-5 text-neutral-900 dark:text-neutral-100" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
@@ -384,8 +388,8 @@ export default function CheckoutPage() {
 
           {/* Right side: Order Summary */}
           <div className="w-full lg:w-[420px] lg:sticky lg:top-24">
-            <div className="bg-neutral-900/80 backdrop-blur-xl border border-neutral-800/80 rounded-3xl p-6 sm:p-8 shadow-2xl">
-              <h2 className="text-xl font-bold mb-6 text-neutral-100">Order Summary</h2>
+            <div className="bg-white dark:bg-neutral-900/80 backdrop-blur-xl border border-neutral-200 dark:border-neutral-800/80 rounded-3xl p-6 sm:p-8 shadow-2xl">
+              <h2 className="text-xl font-bold mb-6 text-neutral-900 dark:text-neutral-100">Order Summary</h2>
               
               <div className="space-y-4 mb-8">
                 {cart.map((item) => (
@@ -394,12 +398,12 @@ export default function CheckoutPage() {
                       <div className="grid grid-cols-3 gap-1.5 w-[140px]">
                         {item.images && item.images.length > 0 ? (
                           item.images.map((img, idx) => (
-                            <div key={idx} className="relative w-10 h-10 bg-background rounded-lg flex items-center justify-center border border-neutral-800 overflow-hidden shadow-inner">
+                            <div key={idx} className="relative w-10 h-10 bg-white dark:bg-background rounded-lg flex items-center justify-center border border-neutral-200 dark:border-neutral-800 overflow-hidden shadow-inner">
                               <Image src={img.src} alt={`${item.name} part ${idx + 1}`} fill className="object-contain p-1" />
                             </div>
                           ))
                         ) : (
-                          <div className="w-16 h-16 bg-background border border-neutral-800 rounded-xl flex items-center justify-center text-3xl shadow-inner col-span-3">
+                          <div className="w-16 h-16 bg-white dark:bg-background border border-neutral-200 dark:border-neutral-800 rounded-xl flex items-center justify-center text-3xl shadow-inner col-span-3">
                             📦
                           </div>
                         )}
@@ -409,10 +413,10 @@ export default function CheckoutPage() {
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-sm text-neutral-100 truncate">{item.name}</h4>
-                      <p className="text-xs text-neutral-400 mt-0.5">Complete bundle</p>
+                      <h4 className="font-bold text-sm text-neutral-900 dark:text-neutral-100 truncate">{item.name}</h4>
+                      <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">Complete bundle</p>
                     </div>
-                    <div className="font-semibold text-sm text-neutral-100">
+                    <div className="font-semibold text-sm text-neutral-900 dark:text-neutral-100">
                       ₹{(item.price * item.quantity).toLocaleString()}
                     </div>
                   </div>
@@ -420,21 +424,21 @@ export default function CheckoutPage() {
               </div>
 
               {/* Coupon Section */}
-              <div className="mb-6 bg-neutral-950/50 p-4 rounded-2xl border border-neutral-800/50">
+              <div className="mb-6 bg-neutral-950/50 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800/50">
                 <div className="flex gap-2">
                   <input
                     type="text"
                     placeholder="Discount code"
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                    className="flex-1 bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-neutral-100 uppercase placeholder:normal-case placeholder-zinc-500 focus:outline-none focus:border-primary"
+                    className="flex-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-neutral-900 dark:text-neutral-100 uppercase placeholder:normal-case placeholder-zinc-500 focus:outline-none focus:border-primary"
                     disabled={appliedCoupon}
                   />
                   {appliedCoupon ? (
                     <button
                       type="button"
                       onClick={() => { setAppliedCoupon(null); setCouponCode(''); }}
-                      className="px-4 py-2.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-100 rounded-xl text-sm font-bold transition-colors"
+                      className="px-4 py-2.5 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-xl text-sm font-bold transition-colors"
                     >
                       Remove
                     </button>
@@ -443,7 +447,7 @@ export default function CheckoutPage() {
                       type="button"
                       onClick={handleApplyCoupon}
                       disabled={!couponCode || couponLoading}
-                      className="px-4 py-2.5 bg-primary hover:bg-primary-hover text-neutral-100 rounded-xl text-sm font-bold transition-colors disabled:opacity-50"
+                      className="px-4 py-2.5 bg-primary hover:bg-primary-hover text-neutral-900 dark:text-neutral-100 rounded-xl text-sm font-bold transition-colors disabled:opacity-50"
                     >
                       {couponLoading ? '...' : 'Apply'}
                     </button>
@@ -453,10 +457,10 @@ export default function CheckoutPage() {
                 {appliedCoupon && <p className="text-emerald-400 text-xs mt-2">Discount applied: -₹{appliedCoupon.discountAmount.toLocaleString()}</p>}
               </div>
 
-              <div className="border-t border-neutral-800/80 pt-6 space-y-3 text-sm text-neutral-400 mb-6">
+              <div className="border-t border-neutral-200 dark:border-neutral-800/80 pt-6 space-y-3 text-sm text-neutral-600 dark:text-neutral-400 mb-6">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span className="font-medium text-neutral-100">₹{cartTotal.toLocaleString()}</span>
+                  <span className="font-medium text-neutral-900 dark:text-neutral-100">₹{cartTotal.toLocaleString()}</span>
                 </div>
                 {appliedCoupon && (
                   <div className="flex justify-between text-primary">
@@ -470,11 +474,11 @@ export default function CheckoutPage() {
                 </div>
               </div>
               
-              <div className="border-t border-neutral-800/80 pt-6 flex justify-between items-center">
-                <span className="text-lg font-bold text-neutral-100">Total</span>
+              <div className="border-t border-neutral-200 dark:border-neutral-800/80 pt-6 flex justify-between items-center">
+                <span className="text-lg font-bold text-neutral-900 dark:text-neutral-100">Total</span>
                 <div className="text-right">
                   <span className="text-xs text-neutral-500 mr-2 font-medium">INR</span>
-                  <span className="text-2xl font-black text-neutral-100 tracking-tight">₹{finalTotal.toLocaleString()}</span>
+                  <span className="text-2xl font-black text-neutral-900 dark:text-neutral-100 tracking-tight">₹{finalTotal.toLocaleString()}</span>
                 </div>
               </div>
             </div>
