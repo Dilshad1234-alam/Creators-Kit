@@ -5,9 +5,17 @@ export const metadata = {
   description: 'Read the latest updates, tips, and success stories from the Creators Kit community.',
 };
 
+export const dynamic = 'force-dynamic';
+
+const getBaseUrl = () => {
+  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return 'http://localhost:3000';
+};
+
 const getBlogs = async () => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/blogs`, {
+    const res = await fetch(`${getBaseUrl()}/api/blogs`, {
       cache: 'no-store',
     });
     if (!res.ok) throw new Error('Failed to fetch blogs');

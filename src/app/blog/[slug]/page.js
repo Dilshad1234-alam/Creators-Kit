@@ -1,11 +1,19 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
+
+const getBaseUrl = () => {
+  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return 'http://localhost:3000';
+};
+
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/blogs/${slug}`, {
+    const res = await fetch(`${getBaseUrl()}/api/blogs/${slug}`, {
       cache: 'no-store',
     });
     if (!res.ok) return { title: 'Blog Not Found' };
@@ -22,7 +30,7 @@ export async function generateMetadata({ params }) {
 
 const getBlog = async (slug) => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/blogs/${slug}`, {
+    const res = await fetch(`${getBaseUrl()}/api/blogs/${slug}`, {
       cache: 'no-store',
     });
     if (!res.ok) {
