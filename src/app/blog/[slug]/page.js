@@ -62,7 +62,7 @@ export default async function BlogDetailPage({ params }) {
             Back to Blog
           </Link>
           <span className="text-neutral-600">•</span>
-          <span>{new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+          <span suppressHydrationWarning>{new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
         </div>
         
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-neutral-900 dark:text-white leading-tight mb-8">

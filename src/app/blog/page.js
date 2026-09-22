@@ -37,7 +37,7 @@ export default async function BlogListingPage() {
       excerpt: 'Discover the exact workflow, scripting, and lighting setup Sarah used to skyrocket her channel growth and land her first massive brand deal within just 6 months.',
       author: 'Sarah Jenkins',
       image: '/kits 16.jpg - Edited.png',
-      createdAt: new Date().toISOString(),
+      createdAt: '2026-09-22T10:00:00.000Z',
       actionText: 'Read Story'
     },
     {
@@ -47,7 +47,7 @@ export default async function BlogListingPage() {
       excerpt: 'A behind-the-scenes look at how complete beginners are mastering video editing and color grading using our step-by-step curriculum.',
       author: 'Michael Chen',
       image: '/kits 14.jpg - Edited.png',
-      createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+      createdAt: '2026-09-20T10:00:00.000Z',
       actionText: 'Watch Insights'
     },
     {
@@ -57,7 +57,7 @@ export default async function BlogListingPage() {
       excerpt: 'Poor audio and flat lighting kill audience retention instantly. Learn how upgrading to the Creator Kit ecosystem boosted average view duration.',
       author: 'Alex Rivera',
       image: '/kits 17.jpg - Edited.png',
-      createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+      createdAt: '2026-09-15T10:00:00.000Z',
       actionText: 'Read Story'
     }
   ];
@@ -102,7 +102,7 @@ export default async function BlogListingPage() {
                 {/* Content */}
                 <div className="p-5 md:p-8 flex flex-col flex-1 relative bg-white dark:bg-neutral-900">
                   <div className="flex items-center gap-2 md:gap-3 text-[10px] md:text-xs font-bold text-primary tracking-widest uppercase mb-3 md:mb-4">
-                    <span>{new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                    <span suppressHydrationWarning>{new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                     <span className="text-neutral-600">•</span>
                     <span className="text-neutral-600 dark:text-neutral-400">{blog.author}</span>
                   </div>
