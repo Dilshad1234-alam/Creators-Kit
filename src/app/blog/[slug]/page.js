@@ -55,9 +55,9 @@ export default async function BlogDetailPage({ params }) {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-background pt-32 pb-24">
+    <div className="min-h-screen bg-white dark:bg-background pt-24 md:pt-32 pb-16 md:pb-24">
       {/* Article Header */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 md:mb-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
         <div className="flex items-center gap-3 text-sm font-bold text-primary tracking-widest uppercase mb-6">
           <Link href="/blog" className="hover:text-neutral-900 dark:text-white transition-colors flex items-center gap-2">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
@@ -67,7 +67,7 @@ export default async function BlogDetailPage({ params }) {
           <span suppressHydrationWarning>{new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
         </div>
         
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-neutral-900 dark:text-white leading-tight mb-8">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-neutral-900 dark:text-white leading-tight mb-6 md:mb-8">
           {blog.title}
         </h1>
         
@@ -83,8 +83,8 @@ export default async function BlogDetailPage({ params }) {
       </div>
 
       {/* Hero Image */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 animate-in fade-in slide-in-from-bottom-12 duration-700 delay-150">
-        <div className="relative w-full aspect-video rounded-[2rem] overflow-hidden border border-neutral-200 dark:border-neutral-800 shadow-[0_30px_60px_rgba(0,0,0,0.5)]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-10 md:mb-16 animate-in fade-in slide-in-from-bottom-12 duration-700 delay-150">
+        <div className="relative w-full aspect-video rounded-3xl md:rounded-[2rem] overflow-hidden border border-neutral-200 dark:border-neutral-800 shadow-[0_30px_60px_rgba(0,0,0,0.5)]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img 
             src={blog.image} 
@@ -96,7 +96,7 @@ export default async function BlogDetailPage({ params }) {
 
       {/* Content Body */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-        <div className="premium-glow-card p-8 sm:p-12 rounded-[2rem]">
+        <div className="premium-glow-card p-5 sm:p-8 md:p-12 rounded-3xl md:rounded-[2rem]">
           <div 
             className="prose prose-invert prose-lg prose-neutral max-w-none 
               prose-headings:text-white prose-headings:font-bold 
@@ -108,10 +108,10 @@ export default async function BlogDetailPage({ params }) {
         </div>
 
         {/* CTA Footer */}
-        <div className="mt-16 text-center bg-gradient-to-b from-transparent to-neutral-900/50 rounded-[2rem] p-12 border border-neutral-200 dark:border-neutral-800/50">
-          <h3 className="text-2xl font-black text-neutral-900 dark:text-white mb-4">Ready to start your journey?</h3>
-          <p className="text-neutral-600 dark:text-neutral-400 mb-8 max-w-lg mx-auto">Get the tools and strategies used by top creators to build and monetize your audience.</p>
-          <Link href="/product" className="inline-flex justify-center items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary to-primary-hover text-neutral-950 rounded-full font-extrabold text-lg shadow-[0_0_30px_rgba(245,158,11,0.3)] hover:shadow-[0_0_40px_rgba(245,158,11,0.5)] hover:-translate-y-1 transition-all">
+        <div className="mt-10 md:mt-16 text-center bg-gradient-to-b from-transparent to-neutral-900/50 rounded-3xl md:rounded-[2rem] p-6 sm:p-8 md:p-12 border border-neutral-200 dark:border-neutral-800/50">
+          <h3 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mb-3 md:mb-4">Ready to start your journey?</h3>
+          <p className="text-sm sm:text-base text-neutral-600 dark:text-neutral-400 mb-6 md:mb-8 max-w-lg mx-auto">Get the tools and strategies used by top creators to build and monetize your audience.</p>
+          <Link href="/product" className="inline-flex justify-center items-center gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-primary to-primary-hover text-neutral-950 rounded-full font-extrabold text-base sm:text-lg shadow-[0_0_30px_rgba(245,158,11,0.3)] hover:shadow-[0_0_40px_rgba(245,158,11,0.5)] hover:-translate-y-1 transition-all">
             Get the Creators Kit
           </Link>
         </div>

@@ -97,7 +97,7 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
               }`}>
                 {/* Base Fixed Asset */}
                 <Image 
-                  src={!isLightOn ? '/bulb 9.png' : lightColor === 'white' ? '/bulb 9.png' : '/bulb 10.png'} 
+                  src={!isLightOn ? '/bulb 9.png' : lightColor === 'white' ? '/bulb 9.png' : '/bulb 11.jpg - Edited.png'} 
                   alt="Creators Kit Bundle"
                   fill
                   className="object-contain z-10"
