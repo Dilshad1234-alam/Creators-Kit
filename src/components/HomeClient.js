@@ -8,19 +8,38 @@ import MasterclassCard from './MasterclassCard';
 import InteractiveLightCard from './InteractiveLightCard';
 
 export default function HomeClient({ contentMap, kitComponents, masteryCourses }) {
-  const [lightMode, setLightMode] = useState(() => {
+  const [isLightOn, setIsLightOn] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('heroLightMode') || 'white';
+      return localStorage.getItem('heroLightState') !== 'off';
+    }
+    return true;
+  });
+  const [lightColor, setLightColor] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('heroLightColor') || 'white';
     }
     return 'white';
   });
+
   const [openFaqIndex, setOpenFaqIndex] = useState(-1);
 
-  const handleLightModeChange = (mode) => {
-    setLightMode(mode);
+  const handlePowerChange = (power) => {
+    setIsLightOn(power);
     if (typeof window !== 'undefined') {
-    localStorage.setItem('heroLightMode', mode);
-  }
+      localStorage.setItem('heroLightState', power ? 'on' : 'off');
+      if (power) {
+         setLightColor('white');
+         localStorage.setItem('heroLightColor', 'white');
+      }
+    }
+  };
+
+  const handleColorChange = (color) => {
+    if (!isLightOn) return;
+    setLightColor(color);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('heroLightColor', color);
+    }
   };
 
   return (
@@ -28,23 +47,23 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
       <main className="flex-grow w-full">
         {/* 1. Hero Section (7.1) */}
         <section className="relative w-full pt-8 md:pt-12 pb-4 overflow-hidden bg-white dark:bg-background">
-          <div className="w-full grid grid-cols-1 lg:grid-cols-12 items-center gap-12 px-6 lg:px-12 relative z-10">
+          <div className="w-full grid grid-cols-1 lg:grid-cols-12 items-center lg:items-end gap-12 px-6 lg:px-12 relative z-10">
             
             {/* Left Column (Text & CTAs) */}
-            <div className="lg:col-span-6 lg:col-start-2 flex flex-col items-start text-left transition-all">
+            <div className="lg:col-span-6 lg:col-start-2 flex flex-col items-start text-left transition-all lg:pb-8">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FF6B4A]/10 text-[#FF6B4A] text-sm font-bold mb-8 border border-[#FF6B4A]/20 shadow-sm animate-fade-in-up">
                 <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
                 {contentMap['hero_badge'] || '🔥 All-in-One Creator Bundle'}
               </div>
               
-              <h1 className="text-5xl md:text-7xl font-extrabold mb-6 leading-tight tracking-tight drop-shadow-lg">
+              <h1 className="text-4xl md:text-6xl font-extrabold mb-4 leading-snug tracking-tight drop-shadow-lg">
                 {contentMap['hero_heading'] || 'Unbox your potential'} <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-light">
                   {contentMap['hero_subheading'] || 'The Complete Creator Bundle'}
                 </span>
               </h1>
               
-              <p className="w-full max-w-2xl text-lg md:text-xl text-neutral-600 dark:text-zinc-400 mb-10 leading-relaxed font-medium">
+              <p className="w-full max-w-2xl text-base md:text-lg text-neutral-600 dark:text-zinc-400 mb-8 leading-snug font-medium">
                 {contentMap['hero_description'] || 'Stop guessing what gear you need. We provide the professional equipment, expert courses, and tactile resources so you can focus on what matters: making great content.'}
               </p>
               
@@ -66,19 +85,19 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
 
             {/* Right Column (Visual) */}
           <div className="lg:col-span-5 relative w-full mt-12 lg:mt-0 flex justify-end items-center pr-0 lg:pr-12">
-            <div className="relative w-full max-w-[800px] flex flex-col items-center">
+            <div className="relative w-full max-w-md lg:max-w-lg flex flex-col items-center">
     
               {/* Ring Light Image */}
-              <div suppressHydrationWarning={true} className={`pointer-events-none relative w-full h-[500px] lg:h-[600px] flex justify-center items-center transition-all duration-700 ease-in-out will-change-transform transform-gpu ${
-                lightMode === 'white' 
+              <div suppressHydrationWarning={true} className={`pointer-events-none relative w-full h-[300px] sm:h-[400px] lg:h-[450px] flex justify-center items-center transition-all duration-700 ease-in-out will-change-transform transform-gpu ${
+                !isLightOn 
+                  ? 'brightness-50 grayscale-[0.5] drop-shadow-none'
+                  : lightColor === 'white'
                   ? 'drop-shadow-[0_0_60px_rgba(255,255,255,0.3)] brightness-110'
-                  : lightMode === 'warm'
-                  ? 'drop-shadow-[0_0_60px_rgba(245,158,11,0.4)] sepia-[0.3] hue-rotate-[-10deg]'
-                  : 'brightness-50 grayscale-[0.5] drop-shadow-none'
+                  : 'drop-shadow-[0_0_60px_rgba(245,158,11,0.4)] sepia-[0.3] hue-rotate-[-10deg]'
               }`}>
                 {/* Base Fixed Asset */}
                 <Image 
-                  src={lightMode === 'white' ? '/bulb-white.png' : lightMode === 'warm' ? '/bulb-warm.png' : '/bulb-white.png'} 
+                  src={!isLightOn ? '/bulb 9.png' : lightColor === 'white' ? '/bulb 9.png' : '/bulb 10.png'} 
                   alt="Creators Kit Bundle"
                   fill
                   className="object-contain z-10"
@@ -87,49 +106,60 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
               </div>
 
               {/* Interactive Controls */}
-              <div className="pointer-events-auto flex items-center gap-2 sm:gap-4 mt-8 bg-white dark:bg-neutral-900/80 p-2 sm:p-3 rounded-full border border-neutral-200 dark:border-neutral-800/80 shadow-[0_10px_30px_rgba(0,0,0,0.5)] backdrop-blur-md relative z-50">
+              <div className="pointer-events-auto flex items-center gap-1.5 sm:gap-3 mt-6 bg-white dark:bg-neutral-900/80 p-1.5 sm:p-2 rounded-full border border-neutral-200 dark:border-neutral-800/80 shadow-[0_10px_30px_rgba(0,0,0,0.5)] backdrop-blur-md relative z-50">
       
                 {/* White Light Button */}
                 <button 
-                  onClick={() => handleLightModeChange('white')}
-                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 border whitespace-nowrap ${
-                    lightMode === 'white' 
+                  onClick={() => handleColorChange('white')}
+                  className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-[10px] sm:text-xs font-bold transition-all duration-300 border whitespace-nowrap ${
+                    lightColor === 'white' 
                       ? 'bg-neutral-800 text-white shadow-[0_0_15px_rgba(255,255,255,0.2)] border-neutral-600' 
                       : 'bg-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800/50 border-transparent'
                   }`}
                 >
-                  <div className={`w-3 h-3 rounded-full transition-all duration-300 ${lightMode === 'white' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'bg-neutral-500'}`}></div>
+                  <div className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${lightColor === 'white' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'bg-neutral-500'}`}></div>
                   White Light
                 </button>
       
                 {/* Warm Light Button */}
                 <button 
-                  onClick={() => handleLightModeChange('warm')}
-                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 border whitespace-nowrap ${
-                    lightMode === 'warm' 
+                  onClick={() => handleColorChange('warm')}
+                  className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-[10px] sm:text-xs font-bold transition-all duration-300 border whitespace-nowrap ${
+                    lightColor === 'warm' 
                       ? 'bg-neutral-800 text-primary shadow-[0_0_15px_rgba(245,158,11,0.2)] border-primary/50' 
                       : 'bg-transparent text-neutral-600 dark:text-neutral-400 hover:text-primary hover:bg-neutral-100 dark:hover:bg-neutral-800/50 border-transparent'
                   }`}
                 >
-                  <div className={`w-3 h-3 rounded-full transition-all duration-300 ${lightMode === 'warm' ? 'bg-primary shadow-[0_0_8px_rgba(245,158,11,0.8)]' : 'bg-neutral-500'}`}></div>
+                  <div className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${lightColor === 'warm' ? 'bg-primary shadow-[0_0_8px_rgba(245,158,11,0.8)]' : 'bg-neutral-500'}`}></div>
                   Warm Light
                 </button>
       
-                <div className="w-[1px] h-6 sm:h-8 bg-neutral-100 dark:bg-neutral-800 mx-1 sm:mx-2"></div>
+                <div className="w-[1px] h-4 sm:h-6 bg-neutral-100 dark:bg-neutral-800 mx-0.5 sm:mx-1"></div>
       
-                {/* Power / Off Button */}
+                {/* ON Button */}
                 <button 
-                  onClick={() => handleLightModeChange('off')}
-                  className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full transition-all duration-300 border flex-shrink-0 ${
-                    lightMode === 'off'
-                      ? 'bg-red-500/20 text-red-500 border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.3)]'
+                  onClick={() => handlePowerChange(true)}
+                  className={`flex items-center justify-center px-2 sm:px-3 h-6 sm:h-8 rounded-full text-[10px] sm:text-xs font-bold transition-all duration-300 border flex-shrink-0 ${
+                    isLightOn
+                      ? 'bg-green-500/20 text-green-600 dark:text-green-400 border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.3)]'
+                      : 'bg-transparent text-neutral-600 dark:text-neutral-400 border-transparent hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800/50'
+                  }`}
+                  title="Turn On"
+                >
+                  ON
+                </button>
+ 
+                {/* OFF Button */}
+                <button 
+                  onClick={() => handlePowerChange(false)}
+                  className={`flex items-center justify-center px-2 sm:px-3 h-6 sm:h-8 rounded-full text-[10px] sm:text-xs font-bold transition-all duration-300 border flex-shrink-0 ${
+                    !isLightOn
+                      ? 'bg-red-500/20 text-red-600 dark:text-red-400 border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.3)]'
                       : 'bg-transparent text-neutral-600 dark:text-neutral-400 border-transparent hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800/50'
                   }`}
                   title="Turn Off"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
+                  OFF
                 </button>
 
               </div>
