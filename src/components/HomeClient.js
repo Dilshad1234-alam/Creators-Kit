@@ -65,76 +65,76 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
             </div>
 
             {/* Right Column (Visual) */}
-<div className="lg:col-span-5 relative w-full mt-12 lg:mt-0 flex justify-end items-center pr-0 lg:pr-12">
-  <div className="relative w-full max-w-[800px] flex flex-col items-center">
+          <div className="lg:col-span-5 relative w-full mt-12 lg:mt-0 flex justify-end items-center pr-0 lg:pr-12">
+            <div className="relative w-full max-w-[800px] flex flex-col items-center">
     
-    {/* Ring Light Image */}
-    <div suppressHydrationWarning={true} className={`pointer-events-none relative w-full h-[500px] lg:h-[600px] flex justify-center items-center transition-all duration-700 ease-in-out will-change-transform transform-gpu ${
-      lightMode === 'white' 
-        ? 'drop-shadow-[0_0_60px_rgba(255,255,255,0.3)] brightness-110'
-        : lightMode === 'warm'
-        ? 'drop-shadow-[0_0_60px_rgba(245,158,11,0.4)] sepia-[0.3] hue-rotate-[-10deg]'
-        : 'brightness-50 grayscale-[0.5] drop-shadow-none'
-    }`}>
-      {/* Base Fixed Asset */}
-      <Image 
-        src={lightMode === 'white' ? '/bulb 6.png' : lightMode === 'warm' ? '/bulb 5.png' : '/kits 17.jpg - Edited.png'} 
-        alt="Creators Kit Bundle"
-        fill
-        className="object-contain z-10"
-        priority
-      />
-    </div>
+              {/* Ring Light Image */}
+              <div suppressHydrationWarning={true} className={`pointer-events-none relative w-full h-[500px] lg:h-[600px] flex justify-center items-center transition-all duration-700 ease-in-out will-change-transform transform-gpu ${
+                lightMode === 'white' 
+                  ? 'drop-shadow-[0_0_60px_rgba(255,255,255,0.3)] brightness-110'
+                  : lightMode === 'warm'
+                  ? 'drop-shadow-[0_0_60px_rgba(245,158,11,0.4)] sepia-[0.3] hue-rotate-[-10deg]'
+                  : 'brightness-50 grayscale-[0.5] drop-shadow-none'
+              }`}>
+                {/* Base Fixed Asset */}
+                <Image 
+                  src={lightMode === 'white' ? '/bulb.jpg - Edited.png' : lightMode === 'warm' ? '/bulb 8.jpg - Edited.png' : '/bulb.jpg - Edited.png'} 
+                  alt="Creators Kit Bundle"
+                  fill
+                  className="object-contain z-10"
+                  priority
+                />
+              </div>
 
-    {/* Interactive Controls */}
-    <div className="pointer-events-auto flex items-center gap-2 sm:gap-4 mt-8 bg-white dark:bg-neutral-900/80 p-2 sm:p-3 rounded-full border border-neutral-200 dark:border-neutral-800/80 shadow-[0_10px_30px_rgba(0,0,0,0.5)] backdrop-blur-md relative z-50">
+              {/* Interactive Controls */}
+              <div className="pointer-events-auto flex items-center gap-2 sm:gap-4 mt-8 bg-white dark:bg-neutral-900/80 p-2 sm:p-3 rounded-full border border-neutral-200 dark:border-neutral-800/80 shadow-[0_10px_30px_rgba(0,0,0,0.5)] backdrop-blur-md relative z-50">
       
-      {/* White Light Button */}
-      <button 
-        onClick={() => handleLightModeChange('white')}
-        className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 border whitespace-nowrap ${
-          lightMode === 'white' 
-            ? 'bg-neutral-800 text-white shadow-[0_0_15px_rgba(255,255,255,0.2)] border-neutral-600' 
-            : 'bg-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800/50 border-transparent'
-        }`}
-      >
-        <div className={`w-3 h-3 rounded-full transition-all duration-300 ${lightMode === 'white' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'bg-neutral-500'}`}></div>
-        White Light
-      </button>
+                {/* White Light Button */}
+                <button 
+                  onClick={() => handleLightModeChange('white')}
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 border whitespace-nowrap ${
+                    lightMode === 'white' 
+                      ? 'bg-neutral-800 text-white shadow-[0_0_15px_rgba(255,255,255,0.2)] border-neutral-600' 
+                      : 'bg-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800/50 border-transparent'
+                  }`}
+                >
+                  <div className={`w-3 h-3 rounded-full transition-all duration-300 ${lightMode === 'white' ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'bg-neutral-500'}`}></div>
+                  White Light
+                </button>
       
-      {/* Warm Light Button */}
-      <button 
-        onClick={() => handleLightModeChange('warm')}
-        className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 border whitespace-nowrap ${
-          lightMode === 'warm' 
-            ? 'bg-neutral-800 text-primary shadow-[0_0_15px_rgba(245,158,11,0.2)] border-primary/50' 
-            : 'bg-transparent text-neutral-600 dark:text-neutral-400 hover:text-primary hover:bg-neutral-100 dark:hover:bg-neutral-800/50 border-transparent'
-        }`}
-      >
-        <div className={`w-3 h-3 rounded-full transition-all duration-300 ${lightMode === 'warm' ? 'bg-primary shadow-[0_0_8px_rgba(245,158,11,0.8)]' : 'bg-neutral-500'}`}></div>
-        Warm Light
-      </button>
+                {/* Warm Light Button */}
+                <button 
+                  onClick={() => handleLightModeChange('warm')}
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 border whitespace-nowrap ${
+                    lightMode === 'warm' 
+                      ? 'bg-neutral-800 text-primary shadow-[0_0_15px_rgba(245,158,11,0.2)] border-primary/50' 
+                      : 'bg-transparent text-neutral-600 dark:text-neutral-400 hover:text-primary hover:bg-neutral-100 dark:hover:bg-neutral-800/50 border-transparent'
+                  }`}
+                >
+                  <div className={`w-3 h-3 rounded-full transition-all duration-300 ${lightMode === 'warm' ? 'bg-primary shadow-[0_0_8px_rgba(245,158,11,0.8)]' : 'bg-neutral-500'}`}></div>
+                  Warm Light
+                </button>
       
-      <div className="w-[1px] h-6 sm:h-8 bg-neutral-100 dark:bg-neutral-800 mx-1 sm:mx-2"></div>
+                <div className="w-[1px] h-6 sm:h-8 bg-neutral-100 dark:bg-neutral-800 mx-1 sm:mx-2"></div>
       
-      {/* Power / Off Button */}
-      <button 
-        onClick={() => handleLightModeChange('off')}
-        className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full transition-all duration-300 border flex-shrink-0 ${
-          lightMode === 'off'
-            ? 'bg-red-500/20 text-red-500 border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.3)]'
-            : 'bg-transparent text-neutral-600 dark:text-neutral-400 border-transparent hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800/50'
-        }`}
-        title="Turn Off"
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-      </button>
+                {/* Power / Off Button */}
+                <button 
+                  onClick={() => handleLightModeChange('off')}
+                  className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full transition-all duration-300 border flex-shrink-0 ${
+                    lightMode === 'off'
+                      ? 'bg-red-500/20 text-red-500 border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.3)]'
+                      : 'bg-transparent text-neutral-600 dark:text-neutral-400 border-transparent hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800/50'
+                  }`}
+                  title="Turn Off"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </button>
 
-    </div>
-  </div>
-</div>
+              </div>
+            </div>
+          </div>
 
           </div>
           
