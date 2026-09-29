@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
   /* Brand Colors */
@@ -41,22 +41,15 @@
 }
 
 :root {
-  --background: #F8FAFC;
-  --foreground: #0F172A;
-  --surface: #FFFFFF;
+  --background: #FDFBF7;
+  --foreground: #900606;
+  --surface: #FAF7F0;
   --card-inset: 0px;
   --card-border-color: #E2E8F0;
   --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
 }
 
-.dark {
-  --background: #0B0F19;
-  --foreground: #94A3B8;
-  --surface: #131C2E;
-  --card-inset: 2px;
-  --card-border-color: transparent;
-  --card-shadow: none;
-}
+
 
 body {
   background: var(--background);
@@ -88,58 +81,17 @@ body {
   100% { transform: translateX(-50%); }
 }
 
-@layer components {
-  .premium-glow-card {
-    position: relative;
-    overflow: hidden;
-    z-index: 1;
-    transition: all 0.4s ease-out;
-    border: 1px solid var(--card-border-color) !important;
-    box-shadow: var(--card-shadow);
-  }
 
-  .premium-glow-card:hover,
-  .premium-glow-card:focus-within {
-    transform: translateY(-6px);
-    box-shadow: 0 0 60px 15px rgba(245, 158, 11, 0.5);
-  }
-
-  .premium-glow-card::before {
-    content: '';
-    position: absolute;
-    width: 250%;
-    height: 250%;
-    top: -75%;
-    left: -75%;
-    background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(245, 158, 11, 0.8) 60deg, transparent 120deg, transparent 180deg, rgba(56, 189, 248, 0.8) 240deg, transparent 300deg);
-    animation: spin-slow 4s linear infinite;
+@keyframes pageEnter {
+  0% {
     opacity: 0;
-    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    z-index: -2;
-    pointer-events: none;
+    transform: translateY(8px);
   }
-
-  .premium-glow-card::after {
-    content: '';
-    position: absolute;
-    inset: var(--card-inset);
-    border-radius: inherit;
-    background: var(--surface);
-    z-index: -1;
-    pointer-events: none;
-  }
-
-  .premium-glow-card:hover::before,
-  .premium-glow-card:focus-within::before {
+  100% {
     opacity: 1;
+    transform: translateY(0);
   }
 }
-
-@keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.animate-page-enter {
+  animation: pageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

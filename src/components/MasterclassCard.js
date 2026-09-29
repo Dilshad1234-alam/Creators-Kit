@@ -16,16 +16,16 @@ export default function MasterclassCard({ course, bgClass }) {
   };
 
   return (
-    <div className="premium-glow-card p-10 md:p-12 rounded-[2.5rem] md:rounded-[3rem] group flex flex-col h-full w-full">
+    <div className=" p-10 md:p-12 rounded-[2.5rem] md:rounded-[3rem] group flex flex-col h-full w-full">
       {/* Included Free Ribbon */}
       {course.badge && (
-        <div className="absolute top-8 right-8 bg-green-500/20 text-green-400 border border-green-500/30 font-bold px-4 py-1.5 rounded-full text-sm z-20 shadow-[0_0_15px_rgba(34,197,94,0.2)] backdrop-blur-md">
+        <div className="absolute top-8 right-8 bg-[#900606]/20 text-green-400 border border-[#900606]/30 font-bold px-4 py-1.5 rounded-full text-sm z-20 shadow-[0_0_15px_rgba(34,197,94,0.2)] backdrop-blur-md">
           {course.badge}
         </div>
       )}
 
       {/* Icon / Image Container */}
-      <div className={`relative z-10 w-24 h-24 rounded-[2rem] flex items-center justify-center text-5xl mb-10 text-neutral-900 dark:text-neutral-100 shadow-2xl ${bgClass} transform group-hover:scale-110 group-active:scale-110 group-hover:rotate-12 group-active:rotate-12 transition-all duration-500 ease-out overflow-hidden border border-white/10`}>
+      <div className={`relative z-10 w-24 h-24 rounded-[2rem] flex items-center justify-center text-5xl mb-10 text-[#900606] dark:text-neutral-100 shadow-2xl ${bgClass} transform group-hover:scale-110 group-active:scale-110 group-hover:rotate-12 group-active:rotate-12 transition-all duration-500 ease-out overflow-hidden border border-white/10`}>
         {course.image ? (
           <img src={course.image} alt={course.title} className="w-full h-full object-cover" />
         ) : (
@@ -33,7 +33,7 @@ export default function MasterclassCard({ course, bgClass }) {
         )}
       </div>
       
-      <h3 className="relative z-10 text-3xl md:text-4xl font-black mb-5 text-neutral-900 dark:text-white dark:group-hover:text-white group-hover:text-primary transition-colors duration-300">
+      <h3 className="relative z-10 text-3xl md:text-4xl font-black mb-5 text-[#900606] dark:text-white dark:group-hover:text-white group-hover:text-[#900606] transition-colors duration-300">
         {course.title}
       </h3>
       

@@ -67,57 +67,57 @@ export default async function BlogListingPage() {
   const blogs = fetchedBlogs.length > 0 ? fetchedBlogs : DUMMY_BLOGS;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-background pt-8 md:pt-12 pb-16 md:pb-24">
+    <div className="min-h-screen bg-[#FDFBF7] dark:bg-background pt-32 md:pt-40 pb-16 md:pb-24">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-6 md:mb-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
-          <h1 className="text-3xl md:text-5xl font-black text-neutral-900 dark:text-white mb-4 md:mb-6 tracking-tight">
-            Creators <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-light">Journal</span>
+        <div className="text-center max-w-3xl mx-auto mb-10 md:mb-16 animate-in fade-in slide-in-from-bottom-8 duration-700">
+          <h1 className="text-4xl md:text-6xl font-black text-[#900606] dark:text-white mb-4 md:mb-6 tracking-tight">
+            Creators Journal
           </h1>
-          <p className="text-neutral-600 dark:text-neutral-400 text-base md:text-xl px-2 md:px-0">
+          <p className="text-neutral-600 dark:text-neutral-400 text-lg md:text-xl px-2 md:px-0">
             Success stories, creator tips, and updates to fuel your journey.
           </p>
         </div>
 
         {/* Blog Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
           {blogs.map((blog, idx) => (
             <Link 
               key={blog._id} 
               href={blog.slug === '#' ? '#' : `/blog/${blog.slug}`}
-              className="premium-glow-card group flex flex-col rounded-[2rem] animate-in fade-in slide-in-from-bottom-8 h-full p-[2px]"
+              className="group flex flex-col animate-in fade-in slide-in-from-bottom-8 h-full bg-white dark:bg-[#900606]/40 rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
               style={{ animationDelay: `${idx * 100}ms` }}
             >
-              <div className="flex flex-col h-full w-full rounded-[calc(2rem-2px)] overflow-hidden bg-white dark:bg-neutral-900">
+              <div className="flex flex-col h-full w-full">
                 {/* Thumbnail */}
-                <div className="relative h-56 md:h-72 w-full overflow-hidden border-b border-neutral-200 dark:border-neutral-800/50 shrink-0">
-                  <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
+                <div className="relative h-48 md:h-56 w-full overflow-hidden shrink-0 bg-neutral-100">
+                  <div className="absolute inset-0 bg-[#900606]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img 
                     src={blog.image || '/placeholder.png'} 
                     alt={blog.title}
-                    className="w-full h-full object-cover object-[center_20%] transform group-hover:scale-110 transition-transform duration-700"
+                    className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700"
                   />
                 </div>
                 
                 {/* Content */}
-                <div className="p-5 md:p-8 flex flex-col flex-1 relative bg-white dark:bg-neutral-900">
-                  <div className="flex items-center gap-2 md:gap-3 text-[10px] md:text-xs font-bold text-primary tracking-widest uppercase mb-3 md:mb-4">
+                <div className="flex flex-col flex-1 p-5 md:p-6">
+                  <div className="flex items-center gap-2 md:gap-3 text-[11px] md:text-xs font-bold text-[#900606] tracking-widest uppercase mb-3">
                     <span suppressHydrationWarning>{new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                    <span className="text-neutral-600">•</span>
-                    <span className="text-neutral-600 dark:text-neutral-400">{blog.author}</span>
+                    <span className="text-neutral-400">•</span>
+                    <span className="text-[#900606]">{blog.author}</span>
                   </div>
                   
-                  <h2 className="text-xl md:text-2xl font-bold text-neutral-900 dark:text-white mb-2 md:mb-4 group-hover:text-primary transition-colors line-clamp-2 leading-tight">
+                  <h2 className="text-xl font-bold text-neutral-900 dark:text-white mb-3 group-hover:text-[#900606] transition-colors duration-200 leading-tight line-clamp-2">
                     {blog.title}
                   </h2>
                   
-                  <p className="text-sm md:text-base text-neutral-600 dark:text-neutral-400 mb-4 md:mb-8 line-clamp-3 flex-1 leading-relaxed">
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6 line-clamp-3 flex-1 leading-relaxed">
                     {blog.excerpt}
                   </p>
                   
-                  <div className="mt-auto flex items-center text-xs md:text-sm font-bold text-neutral-900 dark:text-white group-hover:text-primary transition-colors">
+                  <div className="mt-auto pt-4 border-t border-neutral-100 dark:border-neutral-800 flex items-center text-sm font-bold text-[#900606] group-hover:text-black dark:group-hover:text-neutral-300 transition-colors">
                     {blog.actionText || 'Read Story'}
                     <svg className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
