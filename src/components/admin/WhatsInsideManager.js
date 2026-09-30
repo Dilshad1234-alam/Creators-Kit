@@ -21,7 +21,7 @@ export default function WhatsInsideManager() {
  fetchItems();
 }, []);
 
- const fetchItems = async () => {
+  async function fetchItems() {
  try {
  const res = await fetch('/api/whats-inside');
  const data = await res.json();
@@ -81,7 +81,7 @@ export default function WhatsInsideManager() {
  setEditingItem(null);
  setFormData(initialFormState);
 } else {
- alert('Failed to update: ' + data.message);
+ alert('Failed to update: ' + (data.error || data.message || 'Unknown error'));
 }
 } else {
  const res = await fetch('/api/whats-inside', {
@@ -116,19 +116,19 @@ export default function WhatsInsideManager() {
 
  return (
  <>
- <div className="bg-[#FDFBF7] border border-neutral-200 shadow-2xl rounded-3xl p-8 backdrop-blur-xl mt-12">
+ <div className="bg-[#FDFBF7] border border-neutral-200 shadow-2xl rounded-3xl p-4 md:p-8 backdrop-blur-xl mt-12 w-full max-w-full overflow-hidden">
  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
  <h2 className="text-xl sm:text-2xl font-bold text-[#900606]">Manage What's Inside Grid</h2>
  <button 
  onClick={handleAddNewClick}
- className="px-6 py-2 bg-[#900606] hover:bg-[#900606]/80 text-[#900606] font-bold rounded-full transition-all duration-300 text-sm shadow-[0_0_15px_rgba(245,158,11,0.4)]"
+ className="px-6 py-2 bg-[#900606] hover:bg-[#900606]/80 text-white font-bold rounded-full transition-all duration-300 text-sm shadow-[0_0_15px_rgba(245,158,11,0.4)]"
  >
  + Add New Item
  </button>
  </div>
  
- <div className="overflow-x-auto">
- <table className="w-full text-left">
+ <div className="overflow-x-auto w-full">
+ <table className="w-full text-left min-w-[500px]">
  <thead>
  <tr className="text-neutral-500 uppercase text-xs font-black tracking-wider border-b border-neutral-200">
  <th className="pb-4 pr-4">Item Name</th>
@@ -143,7 +143,7 @@ export default function WhatsInsideManager() {
  <div className="flex items-center gap-4">
  {p.image ? (
  <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-[#FDFBF7] border border-neutral-200 flex-shrink-0">
- <Image src={p.image} alt={p.name} fill className="object-contain p-1" />
+ <Image src={p.image} alt={p.name} fill sizes="48px" className="object-contain p-1" />
  </div>
  ) : (
  <div className="w-12 h-12 rounded-lg bg-[#FDFBF7] border border-neutral-200 flex-shrink-0 flex items-center justify-center text-neutral-600">
@@ -196,9 +196,8 @@ export default function WhatsInsideManager() {
  </div>
 
  {isModalOpen && (
- <div className="fixed inset-0 z-[9999] flex items-center justify-center">
- <div className="absolute inset-0 bg-surface/80 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
- <div className="relative bg-[#FDFBF7] border border-neutral-200 w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh]">
+ <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-md">
+ <div className="relative w-full max-w-2xl mx-4 bg-white border border-neutral-200 rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
  <div className="px-8 py-6 border-b border-neutral-200 flex justify-between items-center bg-[#FDFBF7] rounded-t-3xl">
  <h3 className="text-xl font-bold text-[#900606]">
  {editingItem ? 'Edit Item' : 'Add New Item'}
@@ -255,7 +254,7 @@ export default function WhatsInsideManager() {
  <button 
  type="submit" 
  disabled={isSaving}
- className="px-8 py-3 bg-[#900606] hover:bg-[#900606]/80 disabled:opacity-50 text-[#900606] font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(245,158,11,0.3)] flex items-center gap-2"
+ className="px-8 py-3 bg-[#900606] hover:bg-[#900606]/80 disabled:opacity-50 text-white font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(245,158,11,0.3)] flex items-center gap-2"
  >
  {isSaving ? 'Saving...' : 'Save Item'}
  </button>

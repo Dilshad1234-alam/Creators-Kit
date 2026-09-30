@@ -100,19 +100,19 @@ export default function MasterclassesManager() {
 
  return (
  <>
- <div className="bg-[#FDFBF7] border border-neutral-200 shadow-2xl rounded-3xl p-8 backdrop-blur-xl mt-12">
+ <div className="bg-[#FDFBF7] border border-neutral-200 shadow-2xl rounded-3xl p-4 md:p-8 backdrop-blur-xl mt-12 w-full max-w-full overflow-hidden">
  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
  <h2 className="text-xl sm:text-2xl font-bold text-[#900606]">Manage Masterclasses / Mastery Courses</h2>
  <button 
  onClick={handleAddNew}
- className="px-6 py-2 bg-[#900606] hover:bg-[#900606]/80 text-[#900606] font-bold rounded-full transition-all duration-300 text-sm shadow-[0_0_15px_rgba(245,158,11,0.4)]"
+ className="px-6 py-2 bg-[#900606] hover:bg-[#900606]/80 text-white font-bold rounded-full transition-all duration-300 text-sm shadow-[0_0_15px_rgba(245,158,11,0.4)]"
  >
  + Add New Course
  </button>
  </div>
  
- <div className="overflow-x-auto">
- <table className="w-full text-left">
+ <div className="overflow-x-auto w-full">
+ <table className="w-full text-left min-w-[600px]">
  <thead>
  <tr className="text-neutral-500 uppercase text-xs font-black tracking-wider border-b border-neutral-200">
  <th className="pb-4 pr-4">Order</th>
@@ -143,7 +143,7 @@ export default function MasterclassesManager() {
  </td>
  <td className="py-5 px-4">
  {item.badge && (
- <span className="bg-[#900606]/10 text-[#900606] px-3 py-1 rounded-full text-xs font-bold border border-[#900606]/20">
+ <span className="bg-[#900606]/10 text-[#900606] px-3 py-1 rounded-full text-xs font-bold border border-[#900606]/20 whitespace-nowrap inline-block">
  {item.badge}
  </span>
  )}
@@ -259,7 +259,7 @@ export default function MasterclassesManager() {
  <button 
  type="submit" 
  disabled={isSaving}
- className="px-8 py-3 bg-[#900606] hover:bg-[#900606]/80 disabled:opacity-50 text-[#900606] font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(245,158,11,0.3)] flex items-center gap-2"
+ className="px-8 py-3 bg-[#900606] hover:bg-[#900606]/80 disabled:opacity-50 text-white font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(245,158,11,0.3)] flex items-center gap-2"
  >
  {isSaving ? 'Saving...' : 'Save Course'}
  </button>

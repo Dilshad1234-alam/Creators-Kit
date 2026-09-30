@@ -27,7 +27,7 @@ export default function AboutPage() {
     <div className={`min-h-screen ${isDarkMode ? 'bg-[#0B0F19] text-neutral-100' : 'bg-[#FDFBF7] text-neutral-900'} w-full font-sans overflow-hidden pb-16 md:pb-24`}>
       
       {/* Editorial Header Section */}
-      <section className="pt-32 md:pt-48 px-6 lg:px-16 max-w-[1600px] mx-auto">
+      <section className="pt-24 md:pt-48 px-4 md:px-8 lg:px-16 max-w-[1600px] mx-auto">
         <h1 className="text-6xl md:text-8xl lg:text-[10rem] font-black text-[#900606] tracking-tighter uppercase mb-12 border-b-[6px] border-[#900606] pb-6 leading-none">
           About Us.
         </h1>
@@ -50,7 +50,7 @@ export default function AboutPage() {
       </section>
 
       {/* Featured Imagery & Pull Quote */}
-      <section className="px-6 lg:px-16 max-w-[1600px] mx-auto mb-24 lg:mb-32">
+      <section className="px-4 md:px-8 lg:px-16 max-w-[1600px] mx-auto mb-20 lg:mb-32">
         <div className="relative w-full aspect-video md:aspect-[21/9] rounded-[2rem] overflow-hidden mb-16 lg:mb-24 shadow-xl group bg-neutral-900">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img 
@@ -71,7 +71,7 @@ export default function AboutPage() {
       </section>
 
       {/* The Team Section */}
-      <section className="px-6 lg:px-16 max-w-[1600px] mx-auto mb-24 lg:mb-32">
+      <section className="px-4 md:px-8 lg:px-16 max-w-[1600px] mx-auto mb-20 lg:mb-32">
         <h2 className="text-4xl md:text-7xl lg:text-8xl font-black text-[#900606] tracking-tighter uppercase mb-12 md:mb-16 border-b-2 border-[#900606]/30 pb-4">
           The Team.
         </h2>
@@ -110,22 +110,22 @@ export default function AboutPage() {
 
         {/* Impact Metrics / Stats Bar */}
         <div className="border-t-[3px] border-b-[3px] border-[#900606] py-16 md:py-20">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-12 text-center">
             <div className="flex flex-col items-center">
-              <div className="text-6xl md:text-8xl font-black text-[#900606] tracking-tighter mb-2 md:mb-4">600</div>
-              <div className="text-xs md:text-sm font-bold text-neutral-600 ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'} uppercase tracking-widest">Happy Creators</div>
+              <div className="text-4xl sm:text-6xl md:text-8xl font-black text-[#900606] tracking-tighter mb-2 md:mb-4">600</div>
+              <div className="text-[10px] sm:text-xs md:text-sm font-bold text-neutral-600 ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'} uppercase tracking-widest">Happy Creators</div>
             </div>
             <div className="flex flex-col items-center">
-              <div className="text-6xl md:text-8xl font-black text-[#900606] tracking-tighter mb-2 md:mb-4">700</div>
-              <div className="text-xs md:text-sm font-bold text-neutral-600 ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'} uppercase tracking-widest">Studios Built</div>
+              <div className="text-4xl sm:text-6xl md:text-8xl font-black text-[#900606] tracking-tighter mb-2 md:mb-4">700</div>
+              <div className="text-[10px] sm:text-xs md:text-sm font-bold text-neutral-600 ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'} uppercase tracking-widest">Studios Built</div>
             </div>
             <div className="flex flex-col items-center">
-              <div className="text-6xl md:text-8xl font-black text-[#900606] tracking-tighter mb-2 md:mb-4">1.2<span className="text-4xl md:text-6xl">M</span></div>
-              <div className="text-xs md:text-sm font-bold text-neutral-600 ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'} uppercase tracking-widest">Hours Saved</div>
+              <div className="text-4xl sm:text-6xl md:text-8xl font-black text-[#900606] tracking-tighter mb-2 md:mb-4">1.2<span className="text-2xl sm:text-4xl md:text-6xl">M</span></div>
+              <div className="text-[10px] sm:text-xs md:text-sm font-bold text-neutral-600 ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'} uppercase tracking-widest">Hours Saved</div>
             </div>
             <div className="flex flex-col items-center">
-              <div className="text-6xl md:text-8xl font-black text-[#900606] tracking-tighter mb-2 md:mb-4">110</div>
-              <div className="text-xs md:text-sm font-bold text-neutral-600 ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'} uppercase tracking-widest">Countries</div>
+              <div className="text-4xl sm:text-6xl md:text-8xl font-black text-[#900606] tracking-tighter mb-2 md:mb-4">110</div>
+              <div className="text-[10px] sm:text-xs md:text-sm font-bold text-neutral-600 ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'} uppercase tracking-widest">Countries</div>
             </div>
           </div>
         </div>

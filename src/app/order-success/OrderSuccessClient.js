@@ -76,10 +76,16 @@ export default function OrderSuccessClient({ orderId}) {
  deliveryDate.setDate(deliveryDate.getDate() + 3);
  
  const formattedDeliveryDate = deliveryDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric'});
- const displayOrderId = order.orderId || order._id?.slice(-8).toUpperCase();
+ const displayOrderId = order._id;
 
- return (
- <div className="max-w-4xl mx-auto w-full relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 px-4 py-2">
+  const timelineSteps = ['Pending', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered'];
+  const uiLabels = ['Confirmed', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered'];
+  let currentStepIndex = timelineSteps.indexOf(order.status);
+  if (currentStepIndex === -1 && order.status !== 'Cancelled') currentStepIndex = 0;
+  const progressPercentage = order.status === 'Cancelled' ? 0 : (currentStepIndex / (timelineSteps.length - 1)) * 100;
+
+  return (
+ <div className="max-w-[90rem] mx-auto w-full relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 px-4 py-2">
  {/* Top Banner */}
  <div className="bg-[#FDFBF7] rounded-2xl shadow-sm border border-neutral-200 overflow-hidden mb-4">
  <div className="p-4 sm:p-6 text-center bg-green-50 border-b border-green-100">
@@ -117,55 +123,35 @@ export default function OrderSuccessClient({ orderId}) {
  <div className="relative">
  {/* Progress Line */}
  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-neutral-200 rounded-full"></div>
- {/* Active Progress Line */}
- <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[25%] h-1 bg-[#900606] rounded-full"></div>
- 
- <div className="relative flex justify-between">
- {/* Step 1 */}
- <div className="flex flex-col items-center">
- <div className="w-8 h-8 rounded-full bg-[#900606] flex items-center justify-center border-4 border-white z-10">
- <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
- </svg>
- </div>
- <p className="text-xs sm:text-sm font-semibold text-[#900606] mt-3 text-center">Confirmed</p>
- </div>
+  {/* Active Progress Line */}
+  <div className={`absolute left-0 top-1/2 -translate-y-1/2 h-1 rounded-full ${order.status === 'Cancelled' ? 'bg-red-500' : 'bg-[#900606]'} transition-all duration-700`} style={{ width: `${progressPercentage}%` }}></div>
+  
+  <div className="relative flex justify-between">
+  {uiLabels.map((label, index) => {
+    const isCompleted = order.status !== 'Cancelled' && index <= currentStepIndex;
+    const isCurrent = order.status !== 'Cancelled' && index === currentStepIndex;
+    
+    return (
+      <div key={label} className="flex flex-col items-center">
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center border-4 z-10 transition-colors duration-500 ${isCompleted ? 'bg-[#900606] border-white' : 'bg-[#FDFBF7] border-neutral-200'}`}>
+          {isCompleted ? (
+            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+            </svg>
+          ) : (
+            <div className="w-2.5 h-2.5 rounded-full bg-neutral-300"></div>
+          )}
+        </div>
+        <p className={`text-xs sm:text-sm mt-3 text-center transition-colors duration-500 ${isCurrent ? 'font-bold text-[#900606]' : isCompleted ? 'font-semibold text-[#900606]' : 'font-medium text-neutral-500'}`}>
+          {label}
+        </p>
+      </div>
+    );
+  })}
+  </div>
+  </div>
 
- {/* Step 2 */}
- <div className="flex flex-col items-center">
- <div className="w-8 h-8 rounded-full bg-[#FDFBF7] flex items-center justify-center border-4 border-neutral-200 z-10">
- <div className="w-2.5 h-2.5 rounded-full bg-neutral-300"></div>
- </div>
- <p className="text-xs sm:text-sm font-medium text-neutral-500 mt-3 text-center">Packed</p>
- </div>
-
- {/* Step 3 */}
- <div className="flex flex-col items-center">
- <div className="w-8 h-8 rounded-full bg-[#FDFBF7] flex items-center justify-center border-4 border-neutral-200 z-10">
- <div className="w-2.5 h-2.5 rounded-full bg-neutral-300"></div>
- </div>
- <p className="text-xs sm:text-sm font-medium text-neutral-500 mt-3 text-center">Shipped</p>
- </div>
-
- {/* Step 4 */}
- <div className="flex flex-col items-center">
- <div className="w-8 h-8 rounded-full bg-[#FDFBF7] flex items-center justify-center border-4 border-neutral-200 z-10">
- <div className="w-2.5 h-2.5 rounded-full bg-neutral-300"></div>
- </div>
- <p className="text-xs sm:text-sm font-medium text-neutral-500 mt-3 text-center">Out for Delivery</p>
- </div>
-
- {/* Step 5 */}
- <div className="flex flex-col items-center">
- <div className="w-8 h-8 rounded-full bg-[#FDFBF7] flex items-center justify-center border-4 border-neutral-200 z-10">
- <div className="w-2.5 h-2.5 rounded-full bg-neutral-300"></div>
- </div>
- <p className="text-xs sm:text-sm font-medium text-neutral-500 mt-3 text-center">Delivered</p>
- </div>
- </div>
- </div>
- 
- {order.deliveryOtp && (
+  {order.deliveryOtp && (
  <div className="mt-6 bg-blue-50 border border-blue-100 rounded-xl p-3 flex items-center gap-3">
  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
  <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -187,8 +173,8 @@ export default function OrderSuccessClient({ orderId}) {
  {order.items?.map((item, idx) => (
  <div key={idx} className="flex gap-3 sm:gap-4 pb-4 border-b border-neutral-100 last:border-0 last:pb-0">
  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-neutral-100 rounded-xl border border-neutral-200 flex items-center justify-center shrink-0 overflow-hidden relative">
- {item.image ? (
- <Image src={item.image} alt={item.name} fill className="object-cover" />
+ {(item.image || item.img || (item.images && item.images.length > 0)) ? (
+ <Image src={item.image || item.img || item.images[0].src} alt={item.name} fill className="object-contain p-2 mix-blend-multiply" />
  ) : (
  <span className="text-3xl">📦</span>
  )}
@@ -276,3 +262,7 @@ export default function OrderSuccessClient({ orderId}) {
  </div>
  );
 }
+
+
+
+

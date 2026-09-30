@@ -160,8 +160,18 @@ export default function ProductPage() {
 };
   if (!mounted) return null;
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center relative overflow-hidden">
+        <div className="w-12 h-12 rounded-full border-4 border-neutral-200 border-t-[#900606] animate-spin"></div>
+      </div>
+    );
+  }
+
+  const currentImageData = product.images[currentImage] || product.images[0] || { src: '/placeholder.png', bg: 'bg-[#FDFBF7]', title: 'Product', description: '' };
+
  return (
- <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-[#0B0F19] text-neutral-100' : 'bg-[#FDFBF7] text-neutral-900'} font-sans w-full`}>
+ <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-[#0B0F19] text-neutral-100' : 'bg-[#FDFBF7] text-neutral-900'} font-sans w-full pb-24 md:pb-0`}>
     <main className="flex-grow w-full">
  
  {/* Sticky Action Bar for Mobile (Hidden on Desktop) */}
@@ -176,20 +186,20 @@ export default function ProductPage() {
  </div>
 
  {/* 1. Main Product Overview Section */}
- <section className={`w-full ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-[#FDFBF7]'} py-4 min-h-[calc(100vh-5rem)] flex items-center justify-center border-b relative overflow-hidden`}>
+ <section className={`w-full ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-[#FDFBF7]'} pt-24 md:pt-32 pb-12 min-h-[calc(100vh-5rem)] flex items-center justify-center border-b relative overflow-hidden`}>
  <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-#FF6B4A/10 via-transparent to-transparent opacity-70 pointer-events-none"></div>
 
- <div className="w-full px-6 md:px-12 lg:px-24 mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-24 relative z-10">
+ <div className="w-full px-4 md:px-8 lg:px-24 mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-24 relative z-10">
  
  {/* Left: Product Gallery */}
  <div className="flex flex-col gap-4">
  {/* Main Image Viewport */}
- <div className={`w-full max-w-md mx-auto aspect-square rounded-[3rem] shadow-sm flex items-center justify-center transition-all duration-700 ease-in-out relative overflow-hidden ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-[#FDFBF7]'} p-4 md:p-6 hover:border-[#900606] active:border-[#900606] transform hover:scale-[1.02] active:scale-[1.02] will-change-transform ${product.images[currentImage].bg}`}>
+ <div className={`w-full max-w-md mx-auto aspect-square rounded-[3rem] shadow-sm flex items-center justify-center transition-all duration-700 ease-in-out relative overflow-hidden ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-[#FDFBF7]'} p-4 md:p-6 hover:border-[#900606] active:border-[#900606] transform hover:scale-[1.02] active:scale-[1.02] will-change-transform ${currentImageData.bg}`}>
  <Image
- src={product.images[currentImage].src}
+ src={currentImageData.src || '/placeholder.png'}
  alt="Product Image"
  fill
- className="object-contain p-6  transform transition-all duration-500 ease-in-out hover:scale-110 active:scale-110 will-change-transform cursor-zoom-in"
+ className="object-contain p-1 sm:p-6 transform transition-all duration-500 ease-in-out hover:scale-110 active:scale-110 will-change-transform cursor-zoom-in"
  />
  </div>
  
@@ -205,7 +215,7 @@ export default function ProductPage() {
   : 'border-transparent opacity-70 hover:opacity-100 hover:scale-105 hover:border-[#900606] hover:shadow-md'
 }`}
  >
- <Image src={img.src} alt="Thumbnail" fill className="object-contain p-2 " />
+ <Image src={img.src || '/placeholder.png'} alt="Thumbnail" fill sizes="(max-width: 768px) 20vw, 10vw" className="object-contain p-2 " />
  </button>
  ))}
  </div>
@@ -215,14 +225,14 @@ export default function ProductPage() {
  <div className="flex flex-col justify-center">
  
  <h1 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif tracking-tight mb-2 ${isDarkMode ? 'text-neutral-200' : 'text-neutral-900'} uppercase`} style={{ fontFamily: 'Georgia, serif'}}>
- {product.images[currentImage].title}
+ {currentImageData.title}
  </h1>
  <h2 className={`text-sm md:text-md lg:text-lg ${isDarkMode ? 'text-neutral-200' : 'text-neutral-500'} tracking-[0.2em] md:tracking-[0.3em] uppercase mb-4`}>
  {product.subheading}
  </h2>
  
- <p className={`text-base md:text-lg ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'} mb-4 md:mb-6 leading-relaxed font-medium`}>
- {product.images[currentImage].description}
+ <p className={`text-[17px] md:text-lg ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'} mb-4 md:mb-6 leading-relaxed font-medium`}>
+ {currentImageData.description}
  </p>
 
  {/* Pricing & Offer Area */}
@@ -279,10 +289,10 @@ export default function ProductPage() {
   <section className={`w-full py-10 md:py-16 ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-[#FDFBF7]'} relative z-10 border-t`}>
       <div className="w-full px-6 md:px-12 lg:px-24 mx-auto text-center mb-10">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-[#900606] mb-4">Need Just One Piece?</h2>
-        <p className={`text-sm md:text-base ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'} font-medium`}>Build your own setup by purchasing our premium gear individually.</p>
+        <p className={`text-[15px] md:text-base ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'} font-medium`}>Build your own setup by purchasing our premium gear individually.</p>
       </div>
  
-    <div className="w-full px-6 md:px-12 lg:px-24 mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
+    <div className="w-full px-4 md:px-8 lg:px-24 mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
     {individualProducts.map((item) => (
           <div key={item._id || item.id} className={`group flex flex-col ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-[#FDFBF7]'} rounded-[2rem] p-3 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 cursor-pointer`}>
             {/* Image Container */}
@@ -319,7 +329,7 @@ export default function ProductPage() {
                 </div>
               </div>
               
-              <h3 className="font-extrabold text-[#900606] mb-2 text-sm md:text-base text-left line-clamp-1">{item.name}</h3>
+              <h3 className="font-extrabold text-[#900606] mb-2 text-[15px] md:text-base text-left line-clamp-1">{item.name}</h3>
               
             <div className="flex items-center gap-2 text-left mb-4">
               <span className="font-black text-[#900606] text-lg">₹{item.price}</span>
@@ -341,7 +351,7 @@ export default function ProductPage() {
 
   {/* 2. Flash Sale Promotional Banner */}
   <section className={`w-full py-12 md:py-20 ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-[#FDFBF7]'} border-t`}>
-    <div className="w-full px-6 md:px-12 lg:px-24 mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+    <div className="w-full px-4 md:px-8 lg:px-24 mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-stretch">
       {/* Left: Twin Images Pair 1 */}
       <div className="grid grid-cols-2 gap-4 h-full relative">
         <div className={`relative w-full h-full min-h-[300px] md:min-h-[400px] rounded-[3rem] overflow-hidden ${isDarkMode ? 'bg-[#131C2E]' : 'bg-neutral-100'} group cursor-pointer z-10`}>
@@ -369,7 +379,7 @@ export default function ProductPage() {
 
  {/* 4. Details Tabs (Shipping/Policies) & FAQ */}
  <section className={`w-full py-12 md:py-24 ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-[#FDFBF7]'} border-t`}>
- <div className="w-full px-6 md:px-12 lg:px-24 mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-24">
+ <div className="w-full px-4 md:px-8 lg:px-24 mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-24">
  
  {/* Policies */}
  <div>
@@ -383,7 +393,7 @@ export default function ProductPage() {
  </div>
  <h3 className="text-lg md:text-xl font-bold text-[#900606]">Fast & Free Shipping</h3>
  </div>
- <p className={`text-sm md:text-base ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'} font-medium leading-relaxed`}>We process all orders within 24 hours. Standard delivery takes 3-5 business days nationwide absolutely free.</p>
+ <p className={`text-[15px] md:text-base ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'} font-medium leading-relaxed`}>We process all orders within 24 hours. Standard delivery takes 3-5 business days nationwide absolutely free.</p>
  </div>
  
  <div className={`${isDarkMode ? 'bg-[#0B0F19]' : 'bg-[#FDFBF7]'} p-6 md:p-8 rounded-3xl`}>
@@ -393,7 +403,7 @@ export default function ProductPage() {
  </div>
  <h3 className="text-lg md:text-xl font-bold text-[#900606]">30-Day Guarantee</h3>
  </div>
- <p className={`text-sm md:text-base ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'} font-medium leading-relaxed`}>If you're not completely satisfied with the kit, simply return it within 30 days for a full, no-questions-asked refund.</p>
+ <p className={`text-[15px] md:text-base ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'} font-medium leading-relaxed`}>If you're not completely satisfied with the kit, simply return it within 30 days for a full, no-questions-asked refund.</p>
  </div>
  </div>
  </div>
@@ -405,18 +415,18 @@ export default function ProductPage() {
  {faqs.map((faq, index) => (
  <div key={index} className={`border ${openFaqIndex === index ? 'border-[#900606]' : ' '} rounded-[1.5rem] overflow-hidden ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-[#FDFBF7]'} transition-colors duration-300`}>
  <button
- className={`w-full px-6 py-4 md:px-8 md:py-6 text-left flex justify-between items-center hover:${isDarkMode ? 'bg-[#131C2E]' : 'bg-neutral-100'} transition-colors`}
+ className={`w-full px-5 py-4 md:px-8 md:py-6 text-left flex justify-between items-center hover:${isDarkMode ? 'bg-[#131C2E]' : 'bg-neutral-100'} transition-colors`}
  onClick={() => setOpenFaqIndex(openFaqIndex === index ? -1 : index)}
  >
- <span className="font-bold text-base md:text-lg text-[#900606] pr-4">{faq.question}</span>
+ <span className="font-bold text-[17px] md:text-lg text-[#900606] pr-4">{faq.question}</span>
  <div className={`flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-colors duration-300 ${openFaqIndex === index ? 'bg-[#900606]/20 text-[#900606]' : `${isDarkMode ? 'bg-[#131C2E]' : 'bg-neutral-100'} ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'}`}`}>
  <svg className={`w-4 h-4 md:w-5 md:h-5 transform transition-transform duration-300 ${openFaqIndex === index ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
  </svg>
  </div>
  </button>
- <div className={`px-6 md:px-8 overflow-hidden transition-all duration-300 ease-in-out ${openFaqIndex === index ? 'max-h-96 pb-4 md:pb-6 opacity-100' : 'max-h-0 opacity-0'}`}>
- <p className={`text-sm md:text-base ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'} font-medium leading-relaxed`}>{faq.answer}</p>
+ <div className={`px-5 md:px-8 overflow-hidden transition-all duration-300 ease-in-out ${openFaqIndex === index ? 'max-h-96 pb-4 md:pb-6 opacity-100' : 'max-h-0 opacity-0'}`}>
+ <p className={`text-[15px] md:text-base ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'} font-medium leading-relaxed`}>{faq.answer}</p>
  </div>
  </div>
  ))}

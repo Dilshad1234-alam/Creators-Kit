@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function AuthContainer({ initialMode = 'login' }) {
   const router = useRouter();
@@ -90,12 +91,6 @@ export default function AuthContainer({ initialMode = 'login' }) {
             ${isLogin ? 'translate-x-0 opacity-100 z-20' : 'translate-x-[100%] md:translate-x-[20%] opacity-0 z-0 pointer-events-none'}`}
         >
           <div className="w-full max-w-md">
-            <Link href="/" className="inline-block mb-10">
-              <span className="text-4xl font-black text-[#900606] tracking-tight hover:text-[#900606] transition-colors">
-                Creators Kit.
-              </span>
-            </Link>
-            
             <h2 className="text-4xl font-bold text-[#900606] mb-3">Sign in</h2>
             <p className="text-lg text-neutral-500 mb-10">Use your account to continue</p>
             
@@ -175,12 +170,6 @@ export default function AuthContainer({ initialMode = 'login' }) {
             ${!isLogin ? 'translate-x-0 opacity-100 z-20' : 'translate-x-[100%] md:translate-x-[20%] opacity-0 z-0 pointer-events-none'}`}
         >
           <div className="w-full max-w-md">
-            <Link href="/" className="inline-block mb-10">
-              <span className="text-4xl font-black text-[#900606] tracking-tight hover:text-[#900606] transition-colors">
-                Creators Kit.
-              </span>
-            </Link>
-            
             <h2 className="text-4xl font-bold text-[#900606] mb-3">Create Account</h2>
             <p className="text-lg text-neutral-500 mb-10">Join us and start your journey</p>
             
@@ -253,6 +242,11 @@ export default function AuthContainer({ initialMode = 'login' }) {
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#900606] rounded-full mix-blend-multiply filter blur-3xl opacity-20 -translate-x-1/2 translate-y-1/2"></div>
           
           <div className={`transition-all duration-1000 ease-in-out absolute flex flex-col items-center justify-center w-full px-16 ${isLogin ? 'opacity-100 translate-x-0 delay-300' : 'opacity-0 translate-x-[20%] pointer-events-none'}`}>
+            <Link href="/" className="inline-block mb-12 cursor-pointer group hover:scale-105 transition-transform">
+              <span className="text-3xl lg:text-5xl font-black text-white tracking-tight drop-shadow-md">
+                Creators kit
+              </span>
+            </Link>
             <h2 className="text-6xl font-black mb-8 tracking-tight text-white">Hello, Friend!</h2>
             <p className="text-emerald-100/80 text-xl mb-12 leading-relaxed max-w-md">
               Enter your personal details and start journey with us today. Create your own premium setup.
@@ -266,6 +260,11 @@ export default function AuthContainer({ initialMode = 'login' }) {
           </div>
 
           <div className={`transition-all duration-1000 ease-in-out absolute flex flex-col items-center justify-center w-full px-16 ${!isLogin ? 'opacity-100 translate-x-0 delay-300' : 'opacity-0 -translate-x-[20%] pointer-events-none'}`}>
+            <Link href="/" className="inline-block mb-12 cursor-pointer group hover:scale-105 transition-transform">
+              <span className="text-3xl lg:text-5xl font-black text-white tracking-tight drop-shadow-md">
+                Creators kit
+              </span>
+            </Link>
             <h2 className="text-6xl font-black mb-8 tracking-tight text-white">Welcome Back!</h2>
             <p className="text-emerald-100/80 text-xl mb-12 leading-relaxed max-w-md">
               To keep connected with us please login with your personal info. Your gear is waiting.

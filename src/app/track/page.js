@@ -140,7 +140,7 @@ export default function TrackOrderPage() {
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-neutral-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
                           {/* Placeholder Image */}
-                          <img src="/kit logo 2.png - Edited.png" alt="Item" className="w-8 h-8 object-contain opacity-50" />
+                          <img src="/logo-kits.png" alt="Item" className="w-8 h-8 object-contain opacity-50" />
                         </div>
                         <div>
                           <p className="font-bold text-neutral-900 dark:text-white line-clamp-1">{item.name}</p>
@@ -173,3 +173,4 @@ export default function TrackOrderPage() {
     </div>
   );
 }
+

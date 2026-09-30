@@ -41,7 +41,7 @@ const OrderSchema = new mongoose.Schema({
 },
  status: {
  type: String,
- enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
+ enum: ['Pending', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'],
  default: 'Pending',
 },
  paymentStatus: {
@@ -65,3 +65,4 @@ if (mongoose.models.Order) {
 }
 
 export default mongoose.model('Order', OrderSchema);
+

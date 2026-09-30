@@ -5,7 +5,8 @@ import WhatsInside from '@/models/WhatsInside';
 
 export async function PUT(req, { params}) {
  await dbConnect();
- const { id} = params;
+ const resolvedParams = await params;
+  const { id } = resolvedParams;
 
  try {
  const body = await req.json();

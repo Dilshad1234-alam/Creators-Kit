@@ -108,19 +108,19 @@ export default function BlogsManager() {
  if (isLoading) return <div className="text-[#900606]">Loading blogs...</div>;
 
  return (
- <div className="bg-[#FDFBF7] rounded-3xl border border-neutral-200 p-8 shadow-xl">
+ <div className="bg-[#FDFBF7] rounded-3xl border border-neutral-200 p-4 md:p-8 shadow-xl w-full max-w-full overflow-hidden">
  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
  <h2 className="text-xl sm:text-2xl font-bold text-[#900606]">Manage Blogs</h2>
  <button 
  onClick={() => openModal()} 
- className="bg-[#900606] text-[#900606] font-bold px-6 py-3 rounded-full hover:bg-[#700505] transition-colors"
+ className="bg-[#900606] text-white font-medium px-6 py-3 rounded-full hover:bg-[#700505] transition-colors"
  >
- + Add New Blog
+ Add Blog
  </button>
  </div>
 
- <div className="overflow-x-auto">
- <table className="w-full text-left text-neutral-700">
+ <div className="overflow-x-auto w-full">
+ <table className="w-full text-left text-neutral-700 min-w-[700px]">
  <thead className="text-xs uppercase bg-neutral-100 text-neutral-600">
  <tr>
  <th className="px-6 py-4 rounded-tl-xl rounded-bl-xl">Image</th>
@@ -163,8 +163,8 @@ export default function BlogsManager() {
  </div>
 
  {isModalOpen && (
- <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#900606]/80 backdrop-blur-sm">
- <div className="bg-[#FDFBF7] border border-neutral-200 rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+ <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md">
+ <div className="w-full max-w-2xl mx-4 bg-white border border-neutral-200 rounded-2xl shadow-2xl p-8 max-h-[90vh] overflow-y-auto">
  <h3 className="text-2xl font-bold text-[#900606] mb-6">
  {editingBlog ? 'Edit Blog Post' : 'Add New Blog Post'}
  </h3>
@@ -246,7 +246,7 @@ export default function BlogsManager() {
  </button>
  <button 
  type="submit" 
- className="bg-[#900606] text-[#900606] font-bold px-8 py-3 rounded-xl hover:bg-[#700505] transition-colors shadow-lg shadow-primary/20"
+ className="bg-[#900606] text-white font-medium px-8 py-3 rounded-xl hover:bg-[#700505] transition-colors shadow-lg shadow-primary/20"
  >
  {editingBlog ? 'Update Blog' : 'Publish Blog'}
  </button>

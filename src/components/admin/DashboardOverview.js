@@ -128,17 +128,71 @@ export default function DashboardOverview() {
  </div>
  <p className="text-5xl font-black text-[#900606] mt-2">{stats.customers}</p>
  </div>
- </div>
+  </div>
 
- {/* Recent Activity Table */}
- <div className="bg-[#FDFBF7] border border-neutral-200 shadow-2xl rounded-3xl p-8 backdrop-blur-xl">
- <h2 className="text-2xl font-bold text-[#900606] mb-8 flex items-center gap-3">
+  {/* Sales Report / Analytics Section */}
+  <div className="bg-[#FDFBF7] dark:bg-[#131C2E] border border-neutral-200 dark:border-neutral-800 shadow-2xl rounded-3xl p-4 md:p-8 backdrop-blur-xl w-full max-w-full overflow-hidden">
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div>
+        <h2 className="text-2xl font-bold text-neutral-900 dark:text-white flex items-center gap-3">
+          Sales Analytics
+          <span className="bg-[#900606]/10 text-[#900606] text-xs font-bold px-3 py-1 rounded-full">This Year</span>
+        </h2>
+        <p className="text-neutral-500 text-sm mt-1">Monthly revenue and order volume comparison.</p>
+      </div>
+      <div className="flex gap-2 bg-neutral-100 dark:bg-neutral-800 p-1 rounded-lg">
+        <button className="px-4 py-1.5 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white text-sm font-semibold rounded-md shadow-sm">Revenue</button>
+        <button className="px-4 py-1.5 text-neutral-500 dark:text-neutral-400 text-sm font-semibold hover:text-neutral-900 rounded-md">Orders</button>
+      </div>
+    </div>
+    
+    <div className="w-full overflow-x-auto pb-2">
+      <div className="min-w-[600px] h-72 flex items-end justify-between gap-2 px-2 pb-6 border-b border-neutral-200 dark:border-neutral-800 relative">
+      {/* Background Grid Lines */}
+      <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-6">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="w-full border-b border-neutral-100 dark:border-neutral-800/50"></div>
+        ))}
+      </div>
+
+      {/* Bar Chart Mockup */}
+      {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((month, i) => {
+        const heightPrimary = Math.floor(Math.random() * (95 - 40 + 1) + 40);
+        const heightSecondary = Math.floor(heightPrimary * (Math.random() * 0.4 + 0.4));
+        return (
+          <div key={month} className="flex flex-col items-center gap-2 group relative z-10 w-full">
+            <div className="flex items-end justify-center w-full gap-1 h-56">
+              <div className="w-1/3 md:w-4 bg-[#900606] rounded-t-sm shadow-sm group-hover:bg-[#b00808] transition-colors" style={{ height: `${heightPrimary}%` }}></div>
+              <div className="w-1/3 md:w-4 bg-[#F87171] rounded-t-sm shadow-sm group-hover:bg-[#FCA5A5] transition-colors" style={{ height: `${heightSecondary}%` }}></div>
+            </div>
+            <span className="text-xs font-semibold text-neutral-400 mt-2">{month}</span>
+          </div>
+        );
+      })}
+      </div>
+    </div>
+    
+    <div className="flex gap-6 mt-6 justify-center">
+      <div className="flex items-center gap-2">
+        <span className="w-3 h-3 rounded-full bg-[#900606]"></span>
+        <span className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">Direct Sales</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="w-3 h-3 rounded-full bg-[#F87171]"></span>
+        <span className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">Affiliate Sales</span>
+      </div>
+    </div>
+  </div>
+
+  {/* Recent Activity Table */}
+  <div className="bg-[#FDFBF7] border border-neutral-200 shadow-2xl rounded-3xl p-4 md:p-8 backdrop-blur-xl w-full max-w-full overflow-hidden">
+ <h2 className="text-xl md:text-2xl font-bold text-[#900606] mb-6 md:mb-8 flex flex-wrap items-center gap-3">
  Recent Orders & Store Activity
  <span className="bg-neutral-100 text-neutral-600 text-xs font-bold px-3 py-1 rounded-full">Last 5 Orders</span>
  </h2>
  
- <div className="overflow-x-auto">
- <table className="w-full text-left">
+ <div className="overflow-x-auto w-full">
+ <table className="w-full text-left min-w-[600px]">
  <thead>
  <tr className="text-neutral-500 uppercase text-xs font-black tracking-wider border-b border-neutral-200">
  <th className="pb-4 pr-4">Order Details</th>

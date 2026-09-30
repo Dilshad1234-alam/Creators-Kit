@@ -10,7 +10,7 @@ export default function OrdersManager() {
  fetchOrders();
 }, []);
 
- const fetchOrders = async () => {
+  async function fetchOrders() {
  try {
  const res = await fetch('/api/orders');
  const data = await res.json();
@@ -82,10 +82,7 @@ export default function OrdersManager() {
  );
 
  return (
- <div className="bg-[#FDFBF7] border border-neutral-200 rounded-3xl p-8 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
- {/* Decorative Gradient Elements */}
- <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#FF3B14] to-transparent opacity-50"></div>
- <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#900606] rounded-full mix-blend-screen filter blur-[100px] opacity-10 pointer-events-none"></div>
+ <div className="bg-[#FDFBF7] border border-neutral-200 rounded-3xl p-8 shadow-sm">
 
  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 md:mb-8 relative z-10">
  <div>
@@ -99,7 +96,7 @@ export default function OrdersManager() {
  </div>
 
  <div className="overflow-x-auto relative z-10">
- <table className="w-full text-left border-collapse min-w-[1200px]">
+ <table className="w-full text-left border-collapse min-w-max md:min-w-full">
  <thead>
  <tr className="text-neutral-600 uppercase text-[10px] font-black tracking-widest border-b border-neutral-200">
  <th className="pb-4 pr-4 w-[12%]">Order Info</th>
@@ -114,7 +111,7 @@ export default function OrdersManager() {
  <tbody className="divide-y divide-zinc-800/30">
  {orders.map((o) => (
  <tr key={o._id} className="hover:bg-white/[0.02] transition-colors group">
- <td className="py-6 pr-4 align-top">
+ <td className="py-4 pr-4 align-middle">
  <div className="font-bold text-[#900606] text-sm mb-1">{o.orderId ||`ORD-${o._id.substring(o._id.length - 6).toUpperCase()}`}</div>
  <div className="text-[10px] font-mono text-neutral-500 mb-2 truncate max-w-[100px]">{o._id}</div>
  <div className="text-xs text-neutral-600 flex items-center gap-1 mb-2">
@@ -130,24 +127,24 @@ export default function OrdersManager() {
  </td>
  
  {/* Customer Name only */}
- <td className="py-6 px-4 align-top">
+ <td className="py-4 px-4 align-middle">
  <div className="flex items-center gap-3">
  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-neutral-700 to-neutral-900 flex items-center justify-center text-xs font-bold text-[#900606] border border-neutral-700 shadow-inner flex-shrink-0">
  {getInitials(o.customerName)}
  </div>
- <div className="font-bold text-neutral-800 text-sm whitespace-nowrap">{o.customerName}</div>
+ <div className="font-bold text-neutral-800 text-sm truncate max-w-[120px]" title={o.customerName}>{o.customerName}</div>
  </div>
  </td>
 
  {/* Email Column */}
- <td className="py-6 px-4 align-top">
- <a href={`mailto:${o.customerEmail}`} className="text-sm text-neutral-700 hover:text-[#900606] transition-colors inline-block">{o.customerEmail}</a>
+ <td className="py-4 px-4 align-middle">
+ <a href={`mailto:${o.customerEmail}`} className="text-sm text-neutral-700 hover:text-[#900606] transition-colors inline-block max-w-[150px] truncate" title={o.customerEmail}>{o.customerEmail}</a>
  </td>
 
  {/* Address Column */}
- <td className="py-6 px-4 align-top">
+ <td className="py-4 px-4 align-middle">
  {o.shippingAddress ? (
- <div className="text-sm text-neutral-600 leading-relaxed max-w-[200px]">
+ <div className="text-sm text-neutral-600 leading-relaxed max-w-[200px] break-words">
  <span className="text-neutral-800 block">{o.shippingAddress.street}</span>
  {o.shippingAddress.city}{o.shippingAddress.state ?`, ${o.shippingAddress.state}` : ''} {o.shippingAddress.zipCode}<br/>
  {o.shippingAddress.country}
@@ -157,7 +154,7 @@ export default function OrdersManager() {
  )}
  </td>
 
- <td className="py-6 px-4 align-top">
+ <td className="py-4 px-4 align-middle">
  <div className="space-y-1.5">
  {o.items?.map((item, idx) => (
  <div key={idx} className="flex justify-between items-center bg-[#FDFBF7] p-2 rounded-md border border-neutral-200 group-hover:border-neutral-700/50 transition-colors">
@@ -172,7 +169,7 @@ export default function OrdersManager() {
  ))}
  </div>
  </td>
- <td className="py-6 px-4 align-top">
+ <td className="py-4 px-4 align-middle">
  <div className="font-black text-[#900606] text-lg tracking-tight mb-2">₹{o.totalAmount?.toLocaleString()}</div>
  <div className="flex flex-col gap-1.5">
  <button 
@@ -192,7 +189,7 @@ export default function OrdersManager() {
  </button>
  </div>
  </td>
- <td className="py-6 px-4 align-top">
+ <td className="py-4 px-4 align-middle">
  <div className={`relative inline-block border rounded-full overflow-hidden transition-all duration-300 ${getStatusColor(o.status)}`}>
  <select 
  value={o.status}

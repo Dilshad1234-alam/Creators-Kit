@@ -30,7 +30,7 @@ export default function ProductsManager() {
  fetchProducts();
 }, []);
 
- const fetchProducts = async () => {
+  async function fetchProducts() {
  try {
  const res = await fetch('/api/products');
  const data = await res.json();
@@ -148,19 +148,19 @@ export default function ProductsManager() {
 }
 
  const renderTable = (title, items, defaultCategory) => (
- <div className="bg-[#FDFBF7] border border-neutral-200 shadow-2xl rounded-3xl p-8 backdrop-blur-xl">
+ <div className="bg-[#FDFBF7] border border-neutral-200 shadow-2xl rounded-3xl p-4 md:p-8 backdrop-blur-xl w-full max-w-full overflow-hidden">
  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
  <h2 className="text-xl sm:text-2xl font-bold text-[#900606]">{title}</h2>
  <button 
  onClick={() => handleAddNewClick(defaultCategory)}
- className="px-6 py-2 bg-[#900606] hover:bg-[#900606]/80 text-[#900606] font-bold rounded-full transition-all duration-300 text-sm shadow-[0_0_15px_rgba(245,158,11,0.4)]"
+ className="px-6 py-2 bg-[#900606] hover:bg-[#900606]/80 text-white font-bold rounded-full transition-all duration-300 text-sm shadow-[0_0_15px_rgba(245,158,11,0.4)]"
  >
  + Add New Product
  </button>
  </div>
  
- <div className="overflow-x-auto">
- <table className="w-full text-left">
+ <div className="overflow-x-auto w-full">
+ <table className="w-full text-left min-w-[700px]">
  <thead>
  <tr className="text-neutral-500 uppercase text-xs font-black tracking-wider border-b border-neutral-200">
  <th className="pb-4 pr-4">Product Name</th>
@@ -178,7 +178,7 @@ export default function ProductsManager() {
  <div className="flex items-center gap-4">
  {p.image ? (
  <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-[#FDFBF7] border border-neutral-200 flex-shrink-0">
- <Image src={p.image} alt={p.name} fill className="object-contain p-1" />
+ <Image src={p.image} alt={p.name} fill sizes="48px" className="object-contain p-1" />
  </div>
  ) : (
  <div className="w-12 h-12 rounded-lg bg-[#FDFBF7] border border-neutral-200 flex-shrink-0 flex items-center justify-center text-neutral-600">
@@ -258,10 +258,10 @@ export default function ProductsManager() {
 
  {/* Add/Edit Product Modal */}
  {isModalOpen && (
- <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-surface/60 backdrop-blur-sm">
- <div className="bg-[#FDFBF7] border border-neutral-200 rounded-3xl w-full max-w-lg shadow-2xl relative flex flex-col max-h-[90vh]">
- <div className="px-8 pt-8 pb-6 shrink-0 border-b border-neutral-200">
- <h2 className="text-2xl font-bold text-[#900606] m-0">
+ <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+ <div className="bg-[#FDFBF7] border border-neutral-200 rounded-3xl w-full max-w-lg shadow-2xl relative flex flex-col max-h-[90vh] mt-12 overflow-hidden">
+ <div className="px-8 pt-10 pb-6 shrink-0 border-b border-neutral-200 bg-[#FDFBF7] z-10">
+ <h2 className="text-3xl font-black text-[#900606] m-0 leading-tight">
  {editingProduct ? 'Edit Product' : 'Add New Product'}
  </h2>
  </div>
@@ -400,7 +400,7 @@ export default function ProductsManager() {
  )}
  </div>
 
- <div className="px-8 py-6 shrink-0 border-t border-neutral-200 flex justify-end gap-3 bg-[#FDFBF7] rounded-b-3xl">
+ <div className="px-8 py-6 shrink-0 border-t border-neutral-200 flex justify-center gap-4 bg-[#FDFBF7] rounded-b-3xl">
  <button 
  type="button"
  onClick={() => { setIsModalOpen(false); setEditingProduct(null);}}
@@ -411,7 +411,7 @@ export default function ProductsManager() {
  <button 
  type="submit"
  disabled={isSaving}
- className="px-8 py-3 bg-[#900606] hover:bg-[#900606]/80 text-[#900606] font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(245,158,11,0.4)] disabled:opacity-50"
+ className="px-8 py-3 bg-[#900606] hover:bg-[#900606]/80 text-white font-medium rounded-xl transition-all shadow-[0_0_15px_rgba(245,158,11,0.4)] disabled:opacity-50"
  >
  {isSaving ? 'Saving...' : editingProduct ? 'Save Changes' : 'Add Product'}
  </button>

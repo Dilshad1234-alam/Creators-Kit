@@ -99,14 +99,14 @@ export default function CouponsManager() {
  if (loading) return <div className="text-neutral-600">Loading coupons...</div>;
 
  return (
- <div className="bg-[#FDFBF7] border border-neutral-200 rounded-3xl p-8 backdrop-blur-xl">
+ <div className="bg-[#FDFBF7] border border-neutral-200 rounded-3xl p-8">
  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
  <h2 className="text-xl sm:text-2xl font-bold text-[#900606]">Coupons & Discounts</h2>
  <button 
  onClick={() => setIsModalOpen(true)}
- className="bg-[#900606] hover:bg-[#900606]/90 text-[#900606] px-4 py-2 rounded-xl font-bold transition-colors"
+ className="bg-[#900606] hover:bg-[#900606]/90 text-white px-4 py-2 rounded-xl font-medium transition-colors"
  >
- + Create Coupon
+ Add Coupon
  </button>
  </div>
  
@@ -188,8 +188,8 @@ export default function CouponsManager() {
  </div>
 
  {isModalOpen && (
- <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface/60 backdrop-blur-sm">
- <div className="bg-[#FDFBF7] border border-neutral-200 rounded-3xl p-8 w-full max-w-md shadow-2xl">
+ <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md">
+ <div className="w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
  <h3 className="text-xl font-bold text-[#900606] mb-6">Create New Coupon</h3>
  <form onSubmit={handleCreate} className="space-y-4">
  <div>
@@ -259,9 +259,9 @@ export default function CouponsManager() {
  </button>
  <button 
  type="submit"
- className="flex-1 px-4 py-3 rounded-xl font-bold text-[#900606] bg-[#900606] hover:bg-[#900606]/90 transition-colors shadow-lg shadow-primary/20"
+ className="flex-1 px-4 py-3 rounded-xl font-medium text-white bg-[#900606] hover:bg-[#900606]/90 transition-colors shadow-lg shadow-primary/20"
  >
- Create
+ Add Coupon
  </button>
  </div>
  </form>

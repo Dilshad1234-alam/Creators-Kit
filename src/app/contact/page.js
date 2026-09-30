@@ -5,10 +5,34 @@ import { useState } from 'react';
 export default function ContactPage() {
   const [status, setStatus] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus('Thanks for reaching out! We will get back to you within 24 hours.');
-    e.target.reset();
+    setStatus('Sending...');
+    
+    const formData = {
+      name: e.target.name.value,
+      email: e.target.email.value,
+      message: e.target.message.value
+    };
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json();
+      
+      if (data.success) {
+        setStatus('Thanks for reaching out! We will get back to you within 24 hours.');
+        e.target.reset();
+      } else {
+        setStatus('Failed to send message: ' + (data.error || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus('Failed to send message.');
+    }
   };
 
   return (
@@ -63,7 +87,7 @@ export default function ContactPage() {
                 <label htmlFor="name" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Full Name</label>
                 <input
                   type="text"
-                  id="name"
+                  id="name" name="name"
                   required
                   className="w-full px-4 py-3 rounded-xl bg-[#FDFBF7] dark:bg-background border border-neutral-700 text-[#900606] dark:text-neutral-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#900606]"
                   placeholder="John Doe"
@@ -73,7 +97,7 @@ export default function ContactPage() {
                 <label htmlFor="email" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Email Address</label>
                 <input
                   type="email"
-                  id="email"
+                  id="email" name="email"
                   required
                   className="w-full px-4 py-3 rounded-xl bg-[#FDFBF7] dark:bg-background border border-neutral-700 text-[#900606] dark:text-neutral-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#900606]"
                   placeholder="john@example.com"
@@ -82,7 +106,7 @@ export default function ContactPage() {
               <div>
                 <label htmlFor="message" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Message</label>
                 <textarea
-                  id="message"
+                  id="message" name="message"
                   required
                   rows="4"
                   className="w-full px-4 py-3 rounded-xl bg-[#FDFBF7] dark:bg-background border border-neutral-700 text-[#900606] dark:text-neutral-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#900606] resize-none"

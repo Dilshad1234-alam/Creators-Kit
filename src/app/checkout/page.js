@@ -91,7 +91,7 @@ export default function CheckoutPage() {
  name: item.name,
  price: item.price,
  quantity: item.quantity,
- image: (item.images && item.images.length > 0) ? (item.images[0].src || item.images[0]) : null
+ image: item.img || ((item.images && item.images.length > 0) ? (item.images[0].src || item.images[0]) : null)
 })),
  totalAmount: finalTotal,
  status: 'Processing' 
@@ -484,3 +484,4 @@ export default function CheckoutPage() {
  </>
  );
 }
+

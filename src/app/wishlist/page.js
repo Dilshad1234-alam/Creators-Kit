@@ -14,8 +14,8 @@ export default function WishlistPage() {
     removeFromWishlist(item._id || item.id);
   };
   return (
-    <div className="min-h-screen bg-[#FDFBF7] dark:bg-[#0B0F19] text-[#900606] dark:text-neutral-100 py-12 md:py-24 transition-colors duration-300 animate-page-enter">
-      <div className="w-full px-6 md:px-12 lg:px-24 mx-auto pt-16">
+    <div className="min-h-screen bg-[#FDFBF7] dark:bg-[#0B0F19] text-[#900606] dark:text-neutral-100 pt-28 pb-12 md:pt-36 md:pb-24 transition-colors duration-300 animate-page-enter">
+      <div className="w-full px-6 md:px-12 lg:px-24 mx-auto pt-5">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4 tracking-tight text-[#900606] text-center">Your Wishlist</h1>
         <p className="text-neutral-600 dark:text-neutral-400 text-center mb-12 font-medium">Saved items you want to keep an eye on.</p>
 
@@ -69,3 +69,4 @@ export default function WishlistPage() {
     </div>
   );
 }
+

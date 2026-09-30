@@ -67,7 +67,7 @@ export default async function BlogListingPage() {
   const blogs = fetchedBlogs.length > 0 ? fetchedBlogs : DUMMY_BLOGS;
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] dark:bg-background pt-32 md:pt-40 pb-16 md:pb-24">
+    <div className="min-h-screen bg-[#FDFBF7] dark:bg-background pt-32 md:pt-40 pb-12 md:pb-24">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
@@ -81,7 +81,7 @@ export default async function BlogListingPage() {
         </div>
 
         {/* Blog Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
           {blogs.map((blog, idx) => (
             <Link 
               key={blog._id} 
@@ -109,7 +109,7 @@ export default async function BlogListingPage() {
                     <span className="text-[#900606]">{blog.author}</span>
                   </div>
                   
-                  <h2 className="text-xl font-bold text-neutral-900 dark:text-white mb-3 group-hover:text-[#900606] transition-colors duration-200 leading-tight line-clamp-2">
+                  <h2 className="text-xl font-bold text-neutral-900 dark:text-white mb-3 group-hover:text-[#900606] transition-colors duration-200 leading-tight line-clamp-3">
                     {blog.title}
                   </h2>
                   

@@ -53,13 +53,14 @@ export default function Navbar() {
       <div className="w-full h-[70px] md:h-[80px] px-4 md:px-6 flex items-center justify-between transition-colors duration-300">
         {/* Brand Logo */}
         <div className="flex-1 flex items-center justify-start h-full">
-          <Link href="/" className="relative flex items-center group">
-            <div className="relative h-[90px] md:h-[109px] w-[280px] md:w-[340px] overflow-hidden">
+          <Link href="/" className="relative flex items-center">
+            <div className="relative h-[70px] w-[230px] sm:w-[260px] md:h-[109px] md:w-[340px] overflow-hidden ml-2 md:ml-0">
               <Image
-                src="/kit logo 2.png - Edited.png"
+                src="/logo-kits.png"
                 alt="Creators Kit Logo"
                 fill
-                className="object-contain object-left transform transition-transform duration-300 group-hover:scale-105"
+                sizes="(max-width: 768px) 260px, 340px"
+                className="object-contain object-left scale-[1.15] md:scale-100 transform transition-transform duration-300"
                 priority
               />
             </div>
@@ -68,7 +69,7 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           {!pathname.startsWith('/admin') && (
-            <nav className="flex-1 hidden lg:flex items-center justify-center space-x-1">
+            <nav className="flex-1 hidden md:flex items-center justify-center space-x-1">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
@@ -87,7 +88,7 @@ export default function Navbar() {
           )}
 
           {/* Desktop Actions */}
-          <div className="flex-1 hidden lg:flex items-center justify-end space-x-1 h-full">
+          <div className="flex-1 hidden md:flex items-center justify-end space-x-1 h-full">
             {!isMounted ? (
               <div className="flex items-center gap-4 w-[140px] justify-end">
                 <div className="w-8 h-8 rounded-full border-2 border-neutral-200 dark:border-neutral-800/80 border-t-primary animate-spin"></div>
@@ -152,7 +153,7 @@ export default function Navbar() {
           </div>
 
           {/* Mobile menu button */}
-          <div className="flex-1 flex justify-end lg:hidden items-center space-x-2 h-full mr-1">
+          <div className="flex-1 flex justify-end md:hidden items-center space-x-1 sm:space-x-2 h-full">
             {/* Mobile Wishlist Icon */}
             {!pathname.startsWith('/admin') && (
               <Link href="/wishlist" className="relative p-2 text-neutral-600 hover:text-red-500 transition-colors">
@@ -203,70 +204,78 @@ export default function Navbar() {
 
 
       {/* Mobile Navigation Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-neutral-200 dark:border-neutral-800 bg-[#FDFBF7] dark:bg-[#900606] absolute w-full left-0 shadow-2xl transition-colors duration-300">
-          {!pathname.startsWith('/admin') && (
-            <div className="px-4 pt-4 pb-6 space-y-2 sm:px-6">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                onClick={(e) => {
-                  setIsMobileMenuOpen(false);
-                  handleNavClick(e, link.href);
-                }}
-                className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  pathname === link.href ? 'text-[#900606] bg-[#FDFBF7] dark:bg-[#900606]' : 'text-neutral-700 dark:text-neutral-300 hover:text-[#900606] hover:bg-[#FDFBF7] dark:bg-[#900606]'
-                }`}
-              >
-                {link.name}
-              </Link>
-            ))}
-            </div>
-          )}
-          <div className="pt-4 pb-6 border-t border-neutral-200 dark:border-neutral-800/80">
-            <div className="flex flex-col px-4 sm:px-6 space-y-4">
-              {!isMounted ? (
-                <div className="flex justify-center py-4">
-                  <div className="w-8 h-8 rounded-full border-2 border-neutral-200 dark:border-neutral-800/80 border-t-primary animate-spin"></div>
-                </div>
-              ) : userName ? (
-                <>
-                  <Link href="/account" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 border border-neutral-200 dark:border-neutral-800 rounded-xl bg-[#FDFBF7] dark:bg-[#900606]/50 justify-center hover:bg-neutral-100 dark:hover:bg-[#900606]/70 cursor-pointer transition-colors">
-                    <span className="text-base font-semibold text-[#900606] dark:text-neutral-100">👋 Hi, {userName}</span>
-                  </Link>
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="block w-full px-4 py-3 text-center rounded-full text-base font-bold bg-[#FDFBF7] dark:bg-[#900606] text-red-500 hover:bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-800 transition-all"
-                  >
-                    Log out
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    href="/login"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="block text-base font-semibold text-neutral-600 dark:text-neutral-400 hover:text-[#900606] text-center"
-                  >
-                    Log in
-                  </Link>
-                  <Link
-                    href="/register"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="block w-full px-4 py-3 text-center rounded-full text-base font-bold bg-[#900606] text-white hover:bg-[#700505] shadow-lg shadow-primary/30 transition-all"
-                  >
-                    Get Started
-                  </Link>
-                </>
-              )}
-            </div>
+      <div 
+        className={`md:hidden absolute w-full left-0 top-full bg-white dark:bg-[#0B0F19] shadow-2xl transition-all duration-300 ease-in-out overflow-hidden ${
+          isMobileMenuOpen ? 'max-h-[600px] opacity-100 border-t border-neutral-200 dark:border-neutral-800' : 'max-h-0 opacity-0 border-t-0'
+        }`}
+      >
+        {!pathname.startsWith('/admin') && (
+          <div className="px-4 pt-4 pb-6 space-y-2 sm:px-6">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              onClick={(e) => {
+                setIsMobileMenuOpen(false);
+                handleNavClick(e, link.href);
+              }}
+              className={`block px-3 py-2 rounded-md text-base font-medium ${
+                pathname === link.href ? 'text-[#900606] bg-neutral-100 dark:bg-neutral-800' : 'text-neutral-700 dark:text-neutral-300 hover:text-[#900606] hover:bg-neutral-50 dark:hover:bg-neutral-800'
+              }`}
+            >
+              {link.name}
+            </Link>
+          ))}
+          </div>
+        )}
+        <div className="pt-4 pb-6 border-t border-neutral-200 dark:border-neutral-800/80">
+          <div className="flex flex-col px-4 sm:px-6 space-y-4">
+            {!isMounted ? (
+              <div className="flex justify-center py-4">
+                <div className="w-8 h-8 rounded-full border-2 border-neutral-200 dark:border-neutral-800/80 border-t-primary animate-spin"></div>
+              </div>
+            ) : userName ? (
+              <>
+                <Link href="/account" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 border border-neutral-200 dark:border-neutral-800 rounded-xl bg-neutral-50 dark:bg-neutral-800/50 justify-center hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer transition-colors">
+                  <span className="text-base font-semibold text-[#900606] dark:text-neutral-100">👋 Hi, {userName}</span>
+                </Link>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="block w-full px-4 py-3 text-center rounded-full text-base font-bold bg-white dark:bg-[#0B0F19] text-red-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 border border-neutral-200 dark:border-neutral-800 transition-all"
+                >
+                  Log out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block text-base font-semibold text-neutral-600 dark:text-neutral-400 hover:text-[#900606] text-center"
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/register"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block w-full px-4 py-3 text-center rounded-full text-base font-bold bg-[#900606] text-white hover:bg-[#700505] shadow-lg shadow-primary/30 transition-all"
+                >
+                  Get Started
+                </Link>
+              </>
+            )}
           </div>
         </div>
-      )}
+      </div>
     </header>
   );
 }
+
+
+
+
+
+
