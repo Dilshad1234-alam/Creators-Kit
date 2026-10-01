@@ -322,6 +322,7 @@ function AccountContent() {
   const validTabs = ['user-info', 'orders', 'setting', 'notifications'];
   const tabParam = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState(validTabs.includes(tabParam) ? tabParam : 'user-info');
+  const [isInitializing, setIsInitializing] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -333,46 +334,56 @@ function AccountContent() {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      // 1. Get registration data from session
-      const userName = sessionStorage.getItem('userName') || '';
-      const userEmail = sessionStorage.getItem('userEmail') || '';
+      const sessionEmail = sessionStorage.getItem('userEmail');
       
+      if (!sessionEmail) {
+        // Not logged in, redirect
+        router.push('/login?redirect=/account');
+        return;
+      }
+
       let newFormData = {
-        name: userName,
-        email: userEmail,
+        name: sessionStorage.getItem('userName') || '',
+        email: sessionEmail,
         phone: '',
         location: '',
         postalCode: '',
         profileImage: ''
       };
 
-      const savedData = localStorage.getItem('creatorsKitUserInfo');
-      if (savedData) {
-        const parsedData = JSON.parse(savedData);
-        // Apply saved name/email along with other fields so user edits persist across refreshes
-        newFormData = { 
-          ...newFormData, 
-          name: parsedData.name || newFormData.name,
-          email: parsedData.email || newFormData.email,
-          phone: parsedData.phone || newFormData.phone,
-          location: parsedData.location || newFormData.location,
-          postalCode: parsedData.postalCode || newFormData.postalCode,
-          profileImage: parsedData.profileImage || newFormData.profileImage
-        };
+      try {
+        const res = await fetch(`/api/user/profile?email=${encodeURIComponent(sessionEmail)}`);
+        if (res.ok) {
+          const result = await res.json();
+          if (result.success && result.data) {
+            newFormData = {
+              ...newFormData,
+              name: result.data.name || newFormData.name,
+              phone: result.data.phone || '',
+              location: result.data.location || '',
+              postalCode: result.data.postalCode || '',
+              profileImage: result.data.profileImage || ''
+            };
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching user profile:', err);
       }
 
-      // 2. Fetch latest order to sync shipping/checkout details
-      if (userEmail) {
+      // We no longer strictly need to fetch latest order just to sync checkout details, 
+      // since the profile API should have the latest user info. 
+      // But we can keep it as a fallback if phone is still empty.
+      if (!newFormData.phone) {
         try {
-          const res = await fetch(`/api/user/orders?email=${encodeURIComponent(userEmail)}`);
+          const res = await fetch(`/api/user/orders?email=${encodeURIComponent(sessionEmail)}`);
           if (res.ok) {
             const result = await res.json();
             if (result.success && result.data && result.data.length > 0) {
               const latestOrder = result.data[0];
               const c = latestOrder.customer || {};
               newFormData.phone = c.phone || newFormData.phone;
-              newFormData.location = c.address ? `${c.address}${c.city ? ', ' + c.city : ''}${c.state ? ', ' + c.state : ''}` : newFormData.location;
-              newFormData.postalCode = c.zipCode || newFormData.postalCode;
+              newFormData.location = newFormData.location || (c.address ? `${c.address}${c.city ? ', ' + c.city : ''}${c.state ? ', ' + c.state : ''}` : '');
+              newFormData.postalCode = newFormData.postalCode || (c.zipCode || '');
             }
           }
         } catch (err) {
@@ -381,23 +392,42 @@ function AccountContent() {
       }
 
       setFormData(newFormData);
+      setIsInitializing(false);
     };
 
     fetchUserData();
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
     router.replace(`${pathname}?tab=${tabId}`, { scroll: false });
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    localStorage.setItem('creatorsKitUserInfo', JSON.stringify(formData));
-    sessionStorage.setItem('userEmail', formData.email);
-    sessionStorage.setItem('userName', formData.name);
-    // Optional alert to let the user know it was saved
-    alert('Profile saved successfully!');
+    
+    try {
+      const res = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (res.ok) {
+        localStorage.setItem('creatorsKitUserInfo', JSON.stringify(formData));
+        sessionStorage.setItem('userEmail', formData.email);
+        sessionStorage.setItem('userName', formData.name);
+        alert('Profile saved successfully!');
+      } else {
+        const errorData = await res.json();
+        alert(`Failed to save profile: ${errorData.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      alert('An error occurred while saving profile.');
+    }
   };
 
   const handleImageUpload = (e) => {
@@ -547,6 +577,14 @@ function AccountContent() {
     }
   };
 
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen bg-[#FDFBF7] dark:bg-background pt-32 pb-16 md:pb-24 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-full border-4 border-neutral-200 border-t-[#900606] animate-spin"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#FDFBF7] dark:bg-background pt-32 pb-16 md:pb-24">
       <div className="w-full px-4 md:px-8 lg:px-12">
@@ -582,7 +620,13 @@ function AccountContent() {
               <div className="my-4 border-t border-neutral-200 dark:border-neutral-800 px-4"></div>
               
               <button
-                onClick={() => alert('Logging out...')}
+                onClick={() => {
+                  localStorage.removeItem('creatorsKitUserInfo');
+                  sessionStorage.removeItem('userName');
+                  sessionStorage.removeItem('userEmail');
+                  sessionStorage.removeItem('userRole');
+                  window.location.href = '/login';
+                }}
                 className="flex items-center gap-4 px-5 py-4 rounded-[1rem] font-bold transition-all text-left text-red-500 hover:bg-red-50 hover:shadow-sm dark:hover:bg-red-950/20"
               >
                 <span className="opacity-70 group-hover:opacity-100">

@@ -12,12 +12,20 @@ export const sendEmail = async ({ to, subject, html}) => {
 
     // Use actual SMTP if configured
     if (process.env.SMTP_HOST && process.env.SMTP_PORT) {
+        console.log("SMTP Config loading:");
+        console.log("SMTP_HOST:", process.env.SMTP_HOST);
+        console.log("SMTP_PORT:", process.env.SMTP_PORT);
+        console.log("SMTP_USER:", process.env.SMTP_USER);
+        console.log("SMTP_EMAIL:", process.env.SMTP_EMAIL);
+        console.log("SMTP_PASS:", process.env.SMTP_PASS ? "*** (set)" : "undefined");
+        
         transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: parseInt(process.env.SMTP_PORT, 10),
+        secure: parseInt(process.env.SMTP_PORT, 10) === 465, // true for 465, false for other ports
         auth: {
-        user: process.env.SMTP_EMAIL,
-        pass: process.env.SMTP_PASSWORD,
+        user: process.env.SMTP_USER || process.env.SMTP_EMAIL,
+        pass: process.env.SMTP_PASS,
     },
     });
     } else {
@@ -35,7 +43,7 @@ export const sendEmail = async ({ to, subject, html}) => {
     }
 
     const info = await transporter.sendMail({
-        from: process.env.FROM_EMAIL || '"Creators Kit" <noreply@creatorskit.com>',
+        from: process.env.FROM_EMAIL || '"Creators Kit" <support@creatorskithub.com>',
         to,
         subject,
         html,
@@ -50,7 +58,11 @@ export const sendEmail = async ({ to, subject, html}) => {
 
     return { success: true, messageId: info.messageId};
     } catch (error) {
-        console.error('Email sending failed:', error);
+        console.error('Email sending failed:', error.message);
+        if (error.responseCode === 535) {
+            console.error("  -> [SMTP Auth Error]: Check if your SMTP_USER or SMTP_PASS is correct.");
+            console.error("  -> If your password has special characters, enclose it in quotes in .env.local.");
+        }
     // Instead of completely crashing, we throw a controlled error that can be caught
         throw new Error('Failed to send email. Please try again later.');
     }

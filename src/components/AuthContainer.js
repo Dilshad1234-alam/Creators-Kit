@@ -44,12 +44,20 @@ export default function AuthContainer({ initialMode = 'login' }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Something went wrong');
       
-      sessionStorage.setItem('userName', data.name || loginData.email.split('@')[0]);
-      sessionStorage.setItem('userEmail', data.email || loginData.email);
-      sessionStorage.setItem('userRole', data.role || 'user');
+      const userData = {
+        name: data.name || loginData.email.split('@')[0],
+        email: data.email || loginData.email,
+        role: data.role || 'user'
+      };
+      
+      sessionStorage.setItem('userName', userData.name);
+      sessionStorage.setItem('userEmail', userData.email);
+      sessionStorage.setItem('userRole', userData.role);
+      localStorage.setItem('creatorsKitUserInfo', JSON.stringify(userData));
+      
       const urlParams = new URLSearchParams(window.location.search);
       let redirectUrl = urlParams.get('redirect') || '/';
-      if (data.role === 'admin' && redirectUrl === '/') redirectUrl = '/admin';
+      if (userData.role === 'admin' && redirectUrl === '/') redirectUrl = '/admin';
       window.location.href = redirectUrl;
     } catch (err) {
       setLoginError(err.message);

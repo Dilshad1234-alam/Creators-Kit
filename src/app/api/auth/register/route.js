@@ -70,16 +70,16 @@ export async function POST(req) {
  { message: 'Registration initiated. Please verify OTP.', email: pendingUser.email},
  { status: 201}
  );
-} catch (emailErr) {
- console.error('Email error in register:', emailErr.message);
- pendingUser.otpCode = undefined;
- pendingUser.otpExpire = undefined;
- await pendingUser.save({ validateBeforeSave: false});
+ } catch (emailErr) {
+  console.error('Email error in register:', emailErr.message);
+ console.log('--- OTP FOR TESTING (EMAIL FAILED) ---');
+ console.log('OTP Code: ' + otp);
+ console.log('--------------------------------------');
  return NextResponse.json(
- { error: 'Registration succeeded, but failed to send verification email. Please try again or request a new OTP.'},
- { status: 500}
+ { message: 'Registration initiated, but email failed. Check terminal for OTP.', email: pendingUser.email },
+ { status: 201 }
  );
-}
+ }
 } catch (error) {
  console.error('Registration Error:', error);
  return NextResponse.json(
