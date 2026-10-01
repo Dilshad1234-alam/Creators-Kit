@@ -15,12 +15,13 @@ export async function POST(req) {
 
     await connectDB();
 
-    const user = await User.findOne({ email });
-    if (!user) {
-      return NextResponse.json({ error: 'User not found.' }, { status: 404 });
-    }
+    const user = await User.findOne({
+      email,
+      otpCode: otp,
+      otpExpire: { $gt: Date.now() }
+    });
 
-    if (user.otpCode !== otp || user.otpExpire < Date.now()) {
+    if (!user) {
       return NextResponse.json(
         { error: 'Invalid or expired OTP.' },
         { status: 400 }
