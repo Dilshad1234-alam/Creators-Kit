@@ -103,9 +103,10 @@ export default function UserOrdersPage() {
               const displayOrderId = order._id;
               
               const statusStyles = {
-                Pending: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-                Processing: 'bg-blue-50 text-blue-700 border-blue-200',
+                Confirmed: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+                Packed: 'bg-blue-50 text-blue-700 border-blue-200',
                 Shipped: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                'Out for Delivery': 'bg-orange-50 text-orange-700 border-orange-200',
                 Delivered: 'bg-green-50 text-green-700 border-green-200',
                 Cancelled: 'bg-red-50 text-red-700 border-red-200',
               };
@@ -131,6 +132,12 @@ export default function UserOrdersPage() {
                         <p className="text-neutral-500 mb-0.5">Order #</p>
                         <p className="font-mono font-bold text-[#900606]">{displayOrderId}</p>
                       </div>
+                      {order.deliveryOtp && (
+                        <div>
+                          <p className="text-neutral-500 mb-0.5">Delivery PIN</p>
+                          <p className="font-bold text-blue-600 tracking-widest">{order.deliveryOtp}</p>
+                        </div>
+                      )}
                     </div>
                     <div className="flex items-center gap-3 w-full sm:w-auto">
                       <span className={`px-4 py-1.5 rounded-full text-xs font-bold border ${statusClass} flex-1 sm:flex-none text-center`}>

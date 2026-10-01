@@ -38,7 +38,7 @@ export async function POST(req) {
  body.totalAmount = body.amount;
 }
  if (!body.status) {
- body.status = 'Pending';
+ body.status = 'Confirmed';
 }
 
  // Assign COD defaults and generate Delivery OTP if not already provided

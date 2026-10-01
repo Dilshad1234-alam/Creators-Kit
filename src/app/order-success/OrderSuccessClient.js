@@ -30,13 +30,15 @@ export default function OrderSuccessClient({ orderId}) {
  
  setOrder(data);
 } catch (err) {
- setError(err.message);
+ setError((prev) => prev ? prev : err.message);
 } finally {
  setLoading(false);
 }
 };
 
  fetchOrder();
+ const intervalId = setInterval(fetchOrder, 3000);
+ return () => clearInterval(intervalId);
 }, [orderId]);
 
  if (loading) {
@@ -78,7 +80,7 @@ export default function OrderSuccessClient({ orderId}) {
  const formattedDeliveryDate = deliveryDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric'});
  const displayOrderId = order._id;
 
-  const timelineSteps = ['Pending', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered'];
+  const timelineSteps = ['Confirmed', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered'];
   const uiLabels = ['Confirmed', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered'];
   let currentStepIndex = timelineSteps.indexOf(order.status);
   if (currentStepIndex === -1 && order.status !== 'Cancelled') currentStepIndex = 0;

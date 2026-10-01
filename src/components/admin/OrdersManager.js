@@ -61,9 +61,10 @@ export default function OrdersManager() {
 
  const getStatusColor = (status) => {
  switch(status) {
- case 'Pending': return 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20';
- case 'Processing': return 'text-purple-500 bg-purple-500/10 border-purple-500/20';
+ case 'Confirmed': return 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20';
+ case 'Packed': return 'text-purple-500 bg-purple-500/10 border-purple-500/20';
  case 'Shipped': return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
+ case 'Out for Delivery': return 'text-orange-500 bg-orange-500/10 border-orange-500/20';
  case 'Delivered': return 'text-[#900606] bg-[#900606]/10 border-[#900606]/20';
  case 'Cancelled': return 'text-rose-500 bg-rose-500/10 border-rose-500/20';
  default: return 'text-neutral-500 bg-neutral-500/10 border-neutral-500/20';
@@ -218,9 +219,10 @@ export default function OrdersManager() {
 }}
  className="appearance-none bg-transparent pl-3 pr-8 py-1.5 text-xs font-bold w-full outline-none cursor-pointer z-10 relative"
  >
- <option value="Pending" className="bg-[#FDFBF7] text-yellow-500">Pending</option>
- <option value="Processing" className="bg-[#FDFBF7] text-purple-500">Processing</option>
+ <option value="Confirmed" className="bg-[#FDFBF7] text-yellow-500">Confirmed</option>
+ <option value="Packed" className="bg-[#FDFBF7] text-purple-500">Packed</option>
  <option value="Shipped" className="bg-[#FDFBF7] text-blue-500">Shipped</option>
+ <option value="Out for Delivery" className="bg-[#FDFBF7] text-orange-500">Out for Delivery</option>
  <option value="Delivered" className="bg-[#FDFBF7] text-[#900606]">Delivered</option>
  <option value="Cancelled" className="bg-[#FDFBF7] text-rose-500">Cancelled</option>
  </select>

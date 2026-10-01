@@ -45,6 +45,7 @@ export default function AuthContainer({ initialMode = 'login' }) {
       if (!res.ok) throw new Error(data.error || 'Something went wrong');
       
       sessionStorage.setItem('userName', data.name || loginData.email.split('@')[0]);
+      sessionStorage.setItem('userEmail', data.email || loginData.email);
       sessionStorage.setItem('userRole', data.role || 'user');
       const urlParams = new URLSearchParams(window.location.search);
       let redirectUrl = urlParams.get('redirect') || '/';

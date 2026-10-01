@@ -1,43 +1,430 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import { useTheme } from '@/components/ThemeProvider';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import Link from 'next/link';
 
-export default function AccountPage() {
+function AccountOrdersTab({ email }) {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!email) {
+      setLoading(false);
+      return;
+    }
+    const fetchOrders = async () => {
+      try {
+        const res = await fetch(`/api/user/orders?email=${encodeURIComponent(email)}`);
+        const data = await res.json();
+        if (data.success) {
+          setOrders(data.data);
+        } else {
+          setError(data.error || 'Failed to load orders.');
+        }
+      } catch (err) {
+        setError('An error occurred while fetching orders.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrders();
+  }, [email]);
+
+  if (loading) {
+    return (
+      <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 md:p-12 shadow-sm border border-neutral-100 dark:border-neutral-800 animate-pulse flex justify-center items-center min-h-[400px]">
+        <div className="w-10 h-10 rounded-full border-4 border-neutral-200 border-t-[#900606] animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 md:p-12 shadow-sm border border-neutral-100 dark:border-neutral-800">
+        <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100">{error}</div>
+      </div>
+    );
+  }
+
+  if (orders.length === 0) {
+    return (
+      <div className="bg-white dark:bg-neutral-900 rounded-3xl p-16 text-center shadow-sm border border-neutral-100 dark:border-neutral-800 flex flex-col items-center">
+        <span className="text-6xl mb-6">🛍️</span>
+        <h2 className="text-2xl font-bold mb-3 text-[#900606]">No orders placed yet</h2>
+        <p className="text-neutral-500 mb-8 max-w-md mx-auto">Looks like you haven't bought anything from us yet. Explore our gear and build your ultimate setup!</p>
+        <Link href="/product" className="px-8 py-3 bg-[#900606] text-white rounded-xl font-bold hover:bg-[#700505] transition-colors shadow-md">
+          Start Shopping
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 md:p-12 shadow-sm border border-neutral-100 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <h2 className="text-2xl font-bold mb-8 text-neutral-800 dark:text-white">My Orders</h2>
+      <div className="space-y-6">
+        {orders.map((order) => {
+          const statusStyles = {
+            Confirmed: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+            Packed: 'bg-blue-50 text-blue-700 border-blue-200',
+            Shipped: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+            'Out for Delivery': 'bg-orange-50 text-orange-700 border-orange-200',
+            Delivered: 'bg-green-50 text-green-700 border-green-200',
+            Cancelled: 'bg-red-50 text-red-700 border-red-200',
+          };
+          const statusClass = statusStyles[order.status] || 'bg-neutral-50 text-neutral-600 border-neutral-200';
+
+          return (
+            <div key={order._id} className="border border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden hover:shadow-md transition-shadow">
+              <div className="bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-800 px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+                  <div>
+                    <p className="text-neutral-500 dark:text-neutral-400 mb-0.5">Order Placed</p>
+                    <p className="font-semibold text-neutral-800 dark:text-white">
+                      {new Date(order.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-neutral-500 dark:text-neutral-400 mb-0.5">Total</p>
+                    <p className="font-semibold text-neutral-800 dark:text-white">₹{order.totalAmount?.toLocaleString('en-IN')}</p>
+                  </div>
+                  <div>
+                    <p className="text-neutral-500 dark:text-neutral-400 mb-0.5">Order #</p>
+                    <p className="font-mono font-bold text-[#900606]">{order._id}</p>
+                  </div>
+                  {order.deliveryOtp && (
+                    <div>
+                      <p className="text-neutral-500 dark:text-neutral-400 mb-0.5">Delivery PIN</p>
+                      <p className="font-bold text-blue-600 tracking-widest">{order.deliveryOtp}</p>
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <span className={`px-4 py-1.5 rounded-full text-xs font-bold border ${statusClass} flex-1 sm:flex-none text-center`}>
+                    {order.status}
+                  </span>
+                  <Link 
+                    href={`/order-success?orderId=${order._id}`}
+                    className="px-4 py-1.5 border border-neutral-300 dark:border-neutral-700 rounded-full text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex-1 sm:flex-none text-center"
+                  >
+                    View Details
+                  </Link>
+                </div>
+              </div>
+              
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {order.items?.map((item, idx) => (
+                    <div key={idx} className="flex gap-4 items-center">
+                      <div className="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
+                        {item.image ? (
+                          <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-2xl">📦</span>
+                        )}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-[#900606] dark:text-red-400 line-clamp-1 text-sm">{item.name}</h4>
+                        <p className="text-xs text-neutral-500 mt-0.5">Qty: {item.quantity}</p>
+                        <p className="font-bold text-neutral-800 dark:text-white mt-1 text-sm">₹{item.price?.toLocaleString('en-IN')}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function AccountSettingsTab({ email, theme, toggleTheme }) {
+  const [emailNotifs, setEmailNotifs] = useState(true);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [pwData, setPwData] = useState({ current: '', newPw: '' });
+  const [pwStatus, setPwStatus] = useState('');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('creatorsKitEmailNotifs');
+    if (saved !== null) setEmailNotifs(saved === 'true');
+  }, []);
+
+  const toggleNotifs = () => {
+    const newVal = !emailNotifs;
+    setEmailNotifs(newVal);
+    localStorage.setItem('creatorsKitEmailNotifs', newVal.toString());
+  };
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    setPwStatus('Changing...');
+    try {
+      const res = await fetch('/api/user/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, currentPassword: pwData.current, newPassword: pwData.newPw })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPwStatus('Password updated successfully!');
+        setPwData({ current: '', newPw: '' });
+        setTimeout(() => setShowPasswordModal(false), 2000);
+      } else {
+        setPwStatus(data.error || 'Failed to update password');
+      }
+    } catch (err) {
+      setPwStatus('An error occurred');
+    }
+  };
+
+  return (
+    <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 md:p-12 shadow-sm border border-neutral-100 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
+      <h2 className="text-2xl font-bold mb-8 text-neutral-800 dark:text-white">Settings</h2>
+      
+      {showPasswordModal && (
+        <div className="absolute inset-0 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm z-10 flex items-center justify-center p-8 rounded-3xl">
+          <form onSubmit={handlePasswordChange} className="bg-white dark:bg-neutral-800 p-8 rounded-2xl shadow-xl w-full max-w-md border border-neutral-200 dark:border-neutral-700 animate-in zoom-in-95 duration-200">
+            <h3 className="font-bold text-xl mb-4 text-neutral-800 dark:text-white">Change Password</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-bold text-neutral-700 dark:text-neutral-300">Current Password</label>
+                <input type="password" required value={pwData.current} onChange={e => setPwData({...pwData, current: e.target.value})} className="w-full px-4 py-2 mt-1 rounded-xl border border-neutral-200 dark:border-neutral-700 dark:bg-neutral-900 focus:outline-none focus:border-[#900606]" />
+              </div>
+              <div>
+                <label className="text-sm font-bold text-neutral-700 dark:text-neutral-300">New Password</label>
+                <input type="password" required value={pwData.newPw} onChange={e => setPwData({...pwData, newPw: e.target.value})} className="w-full px-4 py-2 mt-1 rounded-xl border border-neutral-200 dark:border-neutral-700 dark:bg-neutral-900 focus:outline-none focus:border-[#900606]" />
+              </div>
+              {pwStatus && <p className={`text-sm font-semibold ${pwStatus.includes('success') ? 'text-green-600' : 'text-[#900606]'}`}>{pwStatus}</p>}
+              <div className="flex gap-4 mt-6">
+                <button type="button" onClick={() => { setShowPasswordModal(false); setPwStatus(''); }} className="flex-1 py-2 font-bold text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-xl transition-colors">Cancel</button>
+                <button type="submit" className="flex-1 py-2 font-bold text-white bg-[#900606] hover:bg-[#700505] rounded-xl transition-colors">Update</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      )}
+
+      <div className="space-y-6">
+        <div className="flex items-center justify-between p-5 border border-neutral-200 dark:border-neutral-800 rounded-2xl">
+          <div>
+            <h4 className="font-bold text-neutral-800 dark:text-white">Email Notifications</h4>
+            <p className="text-sm text-neutral-500 mt-1">Receive order updates and offers</p>
+          </div>
+          <div onClick={toggleNotifs} className={`w-12 h-6 rounded-full relative cursor-pointer shadow-inner transition-colors duration-300 ${emailNotifs ? 'bg-[#900606]' : 'bg-neutral-300 dark:bg-neutral-600'}`}>
+            <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 shadow-sm transition-transform duration-300 ${emailNotifs ? 'translate-x-6' : 'translate-x-0.5'}`}></div>
+          </div>
+        </div>
+        <div className="flex items-center justify-between p-5 border border-neutral-200 dark:border-neutral-800 rounded-2xl">
+          <div>
+            <h4 className="font-bold text-neutral-800 dark:text-white">Dark Mode</h4>
+            <p className="text-sm text-neutral-500 mt-1">Toggle dark theme appearance</p>
+          </div>
+          <div onClick={toggleTheme} className={`w-12 h-6 rounded-full relative cursor-pointer shadow-inner transition-colors duration-300 ${theme === 'dark' ? 'bg-[#900606]' : 'bg-neutral-300 dark:bg-neutral-600'}`}>
+            <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 shadow-sm transition-transform duration-300 ${theme === 'dark' ? 'translate-x-6' : 'translate-x-0.5'}`}></div>
+          </div>
+        </div>
+        <div className="pt-6 mt-6 border-t border-neutral-100 dark:border-neutral-800">
+          <h3 className="font-bold text-neutral-800 dark:text-white mb-4 text-lg">Security</h3>
+          <button onClick={() => setShowPasswordModal(true)} className="px-6 py-3 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl font-bold text-neutral-700 dark:text-neutral-300 hover:border-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
+            Change Password
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AccountNotificationsTab({ email }) {
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!email) {
+      setLoading(false);
+      return;
+    }
+    const fetchNotifs = async () => {
+      try {
+        const res = await fetch(`/api/user/notifications?email=${encodeURIComponent(email)}`);
+        const data = await res.json();
+        if (data.success) {
+          setNotifications(data.data);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNotifs();
+  }, [email]);
+
+  const timeAgo = (dateStr) => {
+    const seconds = Math.floor((new Date() - new Date(dateStr)) / 1000);
+    let interval = seconds / 86400;
+    if (interval >= 1) return Math.floor(interval) + " days ago";
+    interval = seconds / 3600;
+    if (interval >= 1) return Math.floor(interval) + " hours ago";
+    interval = seconds / 60;
+    if (interval >= 1) return Math.floor(interval) + " mins ago";
+    return Math.floor(seconds) + " secs ago";
+  };
+
+  return (
+    <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 md:p-12 shadow-sm border border-neutral-100 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <h2 className="text-2xl font-bold mb-8 text-neutral-800 dark:text-white">Notifications</h2>
+      {loading ? (
+        <div className="flex justify-center p-8"><div className="w-8 h-8 rounded-full border-4 border-neutral-200 border-t-[#900606] animate-spin"></div></div>
+      ) : notifications.length === 0 ? (
+        <div className="flex flex-col items-center justify-center p-16 text-center border border-dashed border-neutral-200 dark:border-neutral-800 rounded-2xl bg-neutral-50/50 dark:bg-neutral-800/30">
+          <div className="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mb-4 text-neutral-400 dark:text-neutral-500">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+          </div>
+          <h3 className="text-lg font-bold text-neutral-800 dark:text-neutral-200 mb-2">You're all caught up!</h3>
+          <p className="text-neutral-500 max-w-sm">When you place orders or receive exclusive offers, your notifications will appear right here.</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {notifications.map((notif) => (
+            <div key={notif._id} className={`p-5 rounded-2xl border ${notif.unread ? 'border-[#900606]/30 bg-[#900606]/5' : 'border-neutral-200 dark:border-neutral-800 bg-transparent'} flex gap-4 transition-all hover:shadow-sm`}>
+              <div className="mt-1 shrink-0">
+                {notif.unread ? (
+                  <div className="w-3 h-3 bg-[#900606] rounded-full shadow-sm"></div>
+                ) : (
+                  <div className="w-3 h-3 bg-neutral-300 dark:bg-neutral-600 rounded-full"></div>
+                )}
+              </div>
+              <div>
+                <h4 className={`font-bold ${notif.unread ? 'text-[#900606] dark:text-white' : 'text-neutral-800 dark:text-neutral-200'}`}>{notif.title}</h4>
+                <p className="text-neutral-600 dark:text-neutral-400 text-sm mt-1 mb-2">{notif.desc}</p>
+                <p className="text-xs text-neutral-500 font-bold uppercase tracking-wider">{timeAgo(notif.createdAt)}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AccountContent() {
   const { theme, toggleTheme, mounted } = useTheme();
-  const [activeTab, setActiveTab] = useState('user-info');
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  
+  const validTabs = ['user-info', 'orders', 'setting', 'notifications'];
+  const tabParam = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(validTabs.includes(tabParam) ? tabParam : 'user-info');
   const [formData, setFormData] = useState({
-    name: 'Md Dilshad',
-    fullName: 'Md Dilshad',
-    email: 'dilshad@creatorskit.com',
+    name: '',
+    email: '',
     phone: '',
     location: '',
-    postalCode: ''
+    postalCode: '',
+    profileImage: ''
   });
 
   useEffect(() => {
-    const savedData = localStorage.getItem('creatorsKitUserInfo');
-    if (savedData) {
-      setFormData(JSON.parse(savedData));
-    }
-  }, []);
+    const fetchUserData = async () => {
+      // 1. Get registration data from session
+      const userName = sessionStorage.getItem('userName') || '';
+      const userEmail = sessionStorage.getItem('userEmail') || '';
+      
+      let newFormData = {
+        name: userName,
+        email: userEmail,
+        phone: '',
+        location: '',
+        postalCode: '',
+        profileImage: ''
+      };
+
+      const savedData = localStorage.getItem('creatorsKitUserInfo');
+      if (savedData) {
+        const parsedData = JSON.parse(savedData);
+        // Apply saved name/email along with other fields so user edits persist across refreshes
+        newFormData = { 
+          ...newFormData, 
+          name: parsedData.name || newFormData.name,
+          email: parsedData.email || newFormData.email,
+          phone: parsedData.phone || newFormData.phone,
+          location: parsedData.location || newFormData.location,
+          postalCode: parsedData.postalCode || newFormData.postalCode,
+          profileImage: parsedData.profileImage || newFormData.profileImage
+        };
+      }
+
+      // 2. Fetch latest order to sync shipping/checkout details
+      if (userEmail) {
+        try {
+          const res = await fetch(`/api/user/orders?email=${encodeURIComponent(userEmail)}`);
+          if (res.ok) {
+            const result = await res.json();
+            if (result.success && result.data && result.data.length > 0) {
+              const latestOrder = result.data[0];
+              const c = latestOrder.customer || {};
+              newFormData.phone = c.phone || newFormData.phone;
+              newFormData.location = c.address ? `${c.address}${c.city ? ', ' + c.city : ''}${c.state ? ', ' + c.state : ''}` : newFormData.location;
+              newFormData.postalCode = c.zipCode || newFormData.postalCode;
+            }
+          }
+        } catch (err) {
+          console.error('Error fetching user orders for profile sync:', err);
+        }
+      }
+
+      setFormData(newFormData);
+    };
+
+    fetchUserData();
+  }, [searchParams]);
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    router.replace(`${pathname}?tab=${tabId}`, { scroll: false });
+  };
 
   const handleSave = (e) => {
     e.preventDefault();
     localStorage.setItem('creatorsKitUserInfo', JSON.stringify(formData));
+    sessionStorage.setItem('userEmail', formData.email);
+    sessionStorage.setItem('userName', formData.name);
+    // Optional alert to let the user know it was saved
+    alert('Profile saved successfully!');
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => {
+          const updated = { ...prev, profileImage: reader.result };
+          localStorage.setItem('creatorsKitUserInfo', JSON.stringify(updated));
+          return updated;
+        });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const navItems = [
     { 
       id: 'user-info', 
-      label: 'User info', 
+      label: 'User', 
       icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg> 
     },
-    { 
-      id: 'favorites', 
-      label: 'Favorites', 
-      icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg> 
+    {
+      id: 'orders',
+      label: 'My Orders',
+      icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
     },
 
     { 
@@ -63,17 +450,18 @@ export default function AccountPage() {
               <div className="relative mb-4">
                 <div className="w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-[6px] border-white shadow-md bg-neutral-200">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/placeholder.png" alt="Profile" className="w-full h-full object-cover" />
+                  <img src={formData.profileImage || "/placeholder.png"} alt="Profile" className="w-full h-full object-cover" />
                 </div>
                 {/* Edit badge */}
-                <button className="absolute bottom-0 right-0 bg-[#900606] text-white p-2.5 rounded-full shadow-lg hover:bg-[#700505] transition-transform hover:scale-110 border-2 border-white">
+                <label className="absolute bottom-0 right-0 bg-[#900606] text-white p-2.5 rounded-full shadow-lg hover:bg-[#700505] transition-transform hover:scale-110 border-2 border-white cursor-pointer">
                   <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                   </svg>
-                </button>
+                  <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                </label>
               </div>
-              <h2 className="font-bold text-2xl text-neutral-800 dark:text-neutral-100">Md Dilshad</h2>
-              <p className="text-neutral-500 font-medium mt-1">dilshad@creatorskit.com</p>
+              <h2 className="font-bold text-2xl text-neutral-800 dark:text-neutral-100">{formData.name || 'User'}</h2>
+              <p className="text-neutral-500 font-medium mt-1">{formData.email || 'Email not available'}</p>
             </div>
 
             <div className="border-t border-neutral-100 dark:border-neutral-800 mb-10"></div>
@@ -88,16 +476,6 @@ export default function AccountPage() {
                     type="text" 
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className="w-full px-5 py-3.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#900606]/50 focus:border-[#900606] bg-neutral-50/50 hover:bg-neutral-50 dark:bg-neutral-800/50 dark:border-neutral-700 transition-colors font-medium text-neutral-800" 
-                  />
-                </div>
-                
-                <div className="space-y-2.5">
-                  <label className="text-sm font-bold text-neutral-800 dark:text-neutral-300">Full Name</label>
-                  <input 
-                    type="text" 
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({...formData, fullName: e.target.value})}
                     className="w-full px-5 py-3.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#900606]/50 focus:border-[#900606] bg-neutral-50/50 hover:bg-neutral-50 dark:bg-neutral-800/50 dark:border-neutral-700 transition-colors font-medium text-neutral-800" 
                   />
                 </div>
@@ -158,98 +536,12 @@ export default function AccountPage() {
             </form>
           </div>
         );
-      case 'favorites':
-        return (
-          <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 md:p-12 shadow-sm border border-neutral-100 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <h2 className="text-2xl font-bold mb-8 text-neutral-800 dark:text-white capitalize">Favorites</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-              {[
-                { name: 'Professional LED Ring Light', price: '₹3999', img: '/kits-26-1.jpg' },
-                { name: 'Flexible Desk Tripod', price: '₹999', img: '/kits-27-1.jpg' }
-              ].map((item, idx) => (
-                <div key={idx} className="border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 flex flex-col gap-4 group hover:shadow-md transition-shadow">
-                  <div className="w-full aspect-square bg-neutral-100 dark:bg-neutral-800 rounded-xl overflow-hidden relative">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={item.img} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-neutral-800 dark:text-white text-lg leading-tight">{item.name}</h3>
-                    <p className="text-[#900606] font-bold mt-1.5">{item.price}</p>
-                  </div>
-                  <div className="flex gap-2 mt-auto pt-2">
-                    <button className="flex-1 py-2.5 bg-[#900606] text-white rounded-xl font-bold hover:bg-[#700505] transition-colors text-sm shadow-sm hover:shadow-md">Move to Cart</button>
-                    <button className="px-3 py-2.5 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 dark:hover:bg-red-900/20 transition-colors">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
+      case 'orders':
+        return <AccountOrdersTab email={formData.email} />;
       case 'setting':
-        return (
-          <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 md:p-12 shadow-sm border border-neutral-100 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <h2 className="text-2xl font-bold mb-8 text-neutral-800 dark:text-white">Settings</h2>
-            <div className="space-y-6">
-              <div className="flex items-center justify-between p-5 border border-neutral-200 dark:border-neutral-800 rounded-2xl">
-                <div>
-                  <h4 className="font-bold text-neutral-800 dark:text-white">Email Notifications</h4>
-                  <p className="text-sm text-neutral-500 mt-1">Receive order updates and offers</p>
-                </div>
-                <div className="w-12 h-6 bg-[#900606] rounded-full relative cursor-pointer shadow-inner">
-                  <div className="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
-                </div>
-              </div>
-              <div className="flex items-center justify-between p-5 border border-neutral-200 dark:border-neutral-800 rounded-2xl">
-                <div>
-                  <h4 className="font-bold text-neutral-800 dark:text-white">Dark Mode</h4>
-                  <p className="text-sm text-neutral-500 mt-1">Toggle dark theme appearance</p>
-                </div>
-                <div 
-                  onClick={toggleTheme}
-                  className={`w-12 h-6 rounded-full relative cursor-pointer shadow-inner transition-colors duration-300 ${theme === 'dark' ? 'bg-[#900606]' : 'bg-neutral-300 dark:bg-neutral-600'}`}
-                >
-                  <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 shadow-sm transition-transform duration-300 ${theme === 'dark' ? 'translate-x-6' : 'translate-x-0.5'}`}></div>
-                </div>
-              </div>
-              <div className="pt-6 mt-6 border-t border-neutral-100 dark:border-neutral-800">
-                <h3 className="font-bold text-neutral-800 dark:text-white mb-4 text-lg">Security</h3>
-                <button className="px-6 py-3 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl font-bold text-neutral-700 dark:text-neutral-300 hover:border-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
-                  Change Password
-                </button>
-              </div>
-            </div>
-          </div>
-        );
+        return <AccountSettingsTab email={formData.email} theme={theme} toggleTheme={toggleTheme} />;
       case 'notifications':
-        return (
-          <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 md:p-12 shadow-sm border border-neutral-100 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <h2 className="text-2xl font-bold mb-8 text-neutral-800 dark:text-white">Notifications</h2>
-            <div className="space-y-4">
-              {[
-                { title: 'Order Delivered', desc: 'Your Creator Bundle Pro has been delivered.', time: '2 hours ago', unread: true },
-                { title: 'Special Offer', desc: 'Get 20% off on all lighting equipment this week.', time: '1 day ago', unread: false },
-                { title: 'Security Alert', desc: 'New login detected from Chrome on Windows.', time: '3 days ago', unread: false }
-              ].map((notif, idx) => (
-                <div key={idx} className={`p-5 rounded-2xl border ${notif.unread ? 'border-[#900606]/30 bg-[#900606]/5' : 'border-neutral-200 dark:border-neutral-800 bg-transparent'} flex gap-4 transition-all hover:shadow-sm`}>
-                  <div className="mt-1 shrink-0">
-                    {notif.unread ? (
-                      <div className="w-3 h-3 bg-[#900606] rounded-full shadow-sm"></div>
-                    ) : (
-                      <div className="w-3 h-3 bg-neutral-300 dark:bg-neutral-600 rounded-full"></div>
-                    )}
-                  </div>
-                  <div>
-                    <h4 className={`font-bold ${notif.unread ? 'text-[#900606] dark:text-white' : 'text-neutral-800 dark:text-neutral-200'}`}>{notif.title}</h4>
-                    <p className="text-neutral-600 dark:text-neutral-400 text-sm mt-1 mb-2">{notif.desc}</p>
-                    <p className="text-xs text-neutral-500 font-bold uppercase tracking-wider">{notif.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
+        return <AccountNotificationsTab email={formData.email} />;
       default:
         return null;
     }
@@ -273,7 +565,7 @@ export default function AccountPage() {
               {navItems.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => setActiveTab(item.id)}
+                  onClick={() => handleTabChange(item.id)}
                   className={`flex items-center gap-4 px-5 py-4 rounded-[1rem] font-bold transition-all text-left ${
                     activeTab === item.id 
                     ? 'bg-[#900606] text-white shadow-md' 
@@ -309,5 +601,17 @@ export default function AccountPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AccountPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#FDFBF7] dark:bg-background pt-32 pb-16 md:pb-24 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-full border-4 border-neutral-200 border-t-[#900606] animate-spin"></div>
+      </div>
+    }>
+      <AccountContent />
+    </Suspense>
   );
 }

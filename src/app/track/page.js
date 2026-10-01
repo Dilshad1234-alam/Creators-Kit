@@ -7,34 +7,64 @@ export default function TrackOrderPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [trackingResult, setTrackingResult] = useState(null);
 
-  const handleTrack = (e) => {
+  const [error, setError] = useState(null);
+
+  const handleTrack = async (e) => {
     e.preventDefault();
     if (!trackingInput.trim()) return;
     
     setIsSearching(true);
     setTrackingResult(null);
+    setError(null);
     
-    // Simulate API call processing
-    setTimeout(() => {
-      setIsSearching(false);
-      setTrackingResult({
-        orderId: trackingInput.startsWith('#') ? trackingInput.toUpperCase() : `#CK-${Math.floor(10000 + Math.random() * 90000)}`,
-        status: 'shipped',
-        estimatedDelivery: 'Oct 03, 2026',
-        courier: 'Blue Dart / FedEx Express',
-        trackingNumber: 'TRK' + Math.floor(100000000 + Math.random() * 900000000),
-        items: [
-          { name: 'The Complete Creator Bundle', qty: 1, price: '₹3,999' }
-        ],
-        timeline: [
-          { id: 1, status: 'Order Placed', date: 'Sep 27, 2026', time: '10:30 AM', completed: true },
-          { id: 2, status: 'Packed & Processed', date: 'Sep 28, 2026', time: '02:15 PM', completed: true },
-          { id: 3, status: 'Shipped', date: 'Sep 29, 2026', time: '09:00 AM', completed: true, current: true },
-          { id: 4, status: 'Out for Delivery', date: 'Pending', time: '', completed: false },
-          { id: 5, status: 'Delivered', date: 'Pending', time: '', completed: false }
-        ]
+    try {
+      const res = await fetch(`/api/orders/${encodeURIComponent(trackingInput.replace('#', ''))}`);
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error || 'Order not found. Please check your Order ID.');
+      }
+      
+      const order = data;
+      const orderDate = new Date(order.createdAt);
+      
+      const deliveryDate = new Date(orderDate);
+      deliveryDate.setDate(deliveryDate.getDate() + 3);
+      const estimatedDelivery = deliveryDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      
+      const statuses = ['Confirmed', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered'];
+      let currentIdx = statuses.indexOf(order.status);
+      if (currentIdx === -1 && order.status !== 'Cancelled') currentIdx = 0;
+
+      const timeline = statuses.map((status, index) => {
+        let isCompleted = order.status !== 'Cancelled' && index <= currentIdx;
+        let isCurrent = order.status !== 'Cancelled' && index === currentIdx;
+        return {
+          id: index + 1,
+          status,
+          date: isCompleted ? (index === 0 ? orderDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Pending') : 'Pending',
+          time: '',
+          completed: isCompleted,
+          current: isCurrent
+        };
       });
-    }, 1500);
+
+      setTrackingResult({
+        orderId: order._id,
+        status: order.status,
+        estimatedDelivery,
+        courier: 'Fast Delivery',
+        trackingNumber: 'TRK-' + order._id.substring(order._id.length - 8).toUpperCase(),
+        items: order.items || [],
+        timeline,
+        totalAmount: order.totalAmount,
+        customerEmail: order.customerEmail
+      });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   return (
@@ -79,6 +109,12 @@ export default function TrackOrderPage() {
             </button>
           </form>
         </div>
+        
+        {error && (
+          <div className="max-w-2xl mx-auto bg-red-50 border border-red-200 text-red-600 rounded-2xl p-4 text-center mb-8 font-semibold">
+            {error}
+          </div>
+        )}
 
         {/* Tracking Result */}
         {trackingResult && (
@@ -139,15 +175,18 @@ export default function TrackOrderPage() {
                     <div key={index} className="flex justify-between items-center bg-white dark:bg-[#131C2E] p-4 rounded-2xl shadow-sm border border-neutral-100 dark:border-neutral-800/50">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-neutral-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
-                          {/* Placeholder Image */}
-                          <img src="/logo-kits.png" alt="Item" className="w-8 h-8 object-contain opacity-50" />
+                          {item.image ? (
+                            <img src={item.image} alt={item.name} className="w-8 h-8 object-contain" />
+                          ) : (
+                            <span className="text-xl">📦</span>
+                          )}
                         </div>
                         <div>
                           <p className="font-bold text-neutral-900 dark:text-white line-clamp-1">{item.name}</p>
-                          <p className="text-sm font-semibold text-neutral-500">Qty: {item.qty}</p>
+                          <p className="text-sm font-semibold text-neutral-500">Qty: {item.quantity || item.qty}</p>
                         </div>
                       </div>
-                      <p className="font-black text-[#900606]">{item.price}</p>
+                      <p className="font-black text-[#900606]">₹{item.price?.toLocaleString('en-IN')}</p>
                     </div>
                   ))}
                 </div>
@@ -155,7 +194,7 @@ export default function TrackOrderPage() {
                 <div className="mt-8 pt-6 border-t border-neutral-200 dark:border-neutral-800">
                   <div className="flex justify-between items-center text-lg">
                     <span className="font-bold text-neutral-600 dark:text-neutral-400">Total Paid</span>
-                    <span className="font-black text-2xl text-neutral-900 dark:text-white">₹3,999</span>
+                    <span className="font-black text-2xl text-neutral-900 dark:text-white">₹{trackingResult.totalAmount?.toLocaleString('en-IN')}</span>
                   </div>
                 </div>
               </div>

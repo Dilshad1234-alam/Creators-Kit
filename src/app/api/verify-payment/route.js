@@ -38,7 +38,7 @@ export async function POST(req) {
  const newOrder = await Order.create({
  ...orderData,
  orderId: razorpay_payment_id, // Store the payment ID for reference
- status: 'Processing',
+ status: 'Confirmed',
  paymentStatus: 'Paid',
  paymentMode: 'Online',
  deliveryOtp: deliveryOtp,
@@ -97,15 +97,14 @@ export async function POST(req) {
     </div>
   `;
 
-  try {
-    await sendEmail({
-      to: orderData.customerEmail,
-      subject: `Order Confirmed - Creators kit (${razorpay_payment_id})`,
-      html: emailHtml
-    });
-  } catch (emailError) {
-    console.error('Failed to send order confirmation email:', emailError);
-  }
+  // Send email asynchronously to avoid blocking the response
+  sendEmail({
+    to: orderData.customerEmail,
+    subject: `Order Confirmed - Creators kit (${razorpay_payment_id})`,
+    html: emailHtml
+  }).catch(emailError => {
+    console.error('Failed to send order confirmation email asynchronously:', emailError);
+  });
 
   return NextResponse.json({ success: true, order: newOrder});
 } catch (error) {

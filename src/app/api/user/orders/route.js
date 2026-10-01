@@ -7,12 +7,28 @@ export async function GET(req) {
     await dbConnect();
     const { searchParams } = new URL(req.url);
     const email = searchParams.get('email');
+    const userId = searchParams.get('userId');
 
-    if (!email) {
-      return NextResponse.json({ success: false, error: 'Email is required' }, { status: 400 });
+    if (!email && !userId) {
+      return NextResponse.json({ success: false, error: 'Email or User ID is required' }, { status: 400 });
     }
 
-    const orders = await Order.find({ customerEmail: email }).sort({ createdAt: -1 });
+    const query = { $or: [] };
+    if (email) {
+      query.$or.push(
+        { customerEmail: email },
+        { email: email },
+        { 'customer.email': email }
+      );
+    }
+    if (userId) {
+      query.$or.push(
+        { userId: userId },
+        { user: userId }
+      );
+    }
+
+    const orders = await Order.find(query).sort({ createdAt: -1 });
     return NextResponse.json({ success: true, data: orders });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

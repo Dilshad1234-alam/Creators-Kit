@@ -10,6 +10,7 @@ export default function DashboardOverview() {
  customers: 0,
 });
  const [recentOrders, setRecentOrders] = useState([]);
+ const [chartData, setChartData] = useState([]);
  const [loading, setLoading] = useState(true);
 
  useEffect(() => {
@@ -40,6 +41,31 @@ export default function DashboardOverview() {
  revenue: totalRevenue,
  customers: uniqueCustomers.size || 0,
 });
+
+ const currentYear = new Date().getFullYear();
+ const monthlyStats = Array(12).fill(null).map(() => ({ revenue: 0, orders: 0 }));
+ 
+ ordersList.forEach(order => {
+   if (order.createdAt) {
+     const date = new Date(order.createdAt);
+     if (date.getFullYear() === currentYear) {
+       const monthIndex = date.getMonth();
+       const rev = (order.status === 'Delivered' || order.status === 'Shipped') ? (order.totalAmount || 0) : 0;
+       monthlyStats[monthIndex].revenue += rev;
+       monthlyStats[monthIndex].orders += 1;
+     }
+   }
+ });
+ 
+ const maxRevenue = Math.max(...monthlyStats.map(m => m.revenue), 1);
+ const maxOrders = Math.max(...monthlyStats.map(m => m.orders), 1);
+ 
+ const chart = monthlyStats.map((stat, i) => ({
+   month: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][i],
+   heightPrimary: (stat.revenue / maxRevenue) * 95 || 5,
+   heightSecondary: (stat.orders / maxOrders) * 95 || 5
+ }));
+ setChartData(chart);
  
  // Save the 5 most recent orders (assuming they are sorted by date descending)
  setRecentOrders(ordersList.slice(0, 5));
@@ -155,20 +181,16 @@ export default function DashboardOverview() {
         ))}
       </div>
 
-      {/* Bar Chart Mockup */}
-      {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((month, i) => {
-        const heightPrimary = Math.floor(Math.random() * (95 - 40 + 1) + 40);
-        const heightSecondary = Math.floor(heightPrimary * (Math.random() * 0.4 + 0.4));
-        return (
-          <div key={month} className="flex flex-col items-center gap-2 group relative z-10 w-full">
-            <div className="flex items-end justify-center w-full gap-1 h-56">
-              <div className="w-1/3 md:w-4 bg-[#900606] rounded-t-sm shadow-sm group-hover:bg-[#b00808] transition-colors" style={{ height: `${heightPrimary}%` }}></div>
-              <div className="w-1/3 md:w-4 bg-[#F87171] rounded-t-sm shadow-sm group-hover:bg-[#FCA5A5] transition-colors" style={{ height: `${heightSecondary}%` }}></div>
-            </div>
-            <span className="text-xs font-semibold text-neutral-400 mt-2">{month}</span>
+      {/* Bar Chart Real Data */}
+      {chartData.map((data, i) => (
+        <div key={data.month} className="flex flex-col items-center gap-2 group relative z-10 w-full">
+          <div className="flex items-end justify-center w-full gap-1 h-56">
+            <div className="w-1/3 md:w-4 bg-[#900606] rounded-t-sm shadow-sm group-hover:bg-[#b00808] transition-colors" style={{ height: `${data.heightPrimary}%` }}></div>
+            <div className="w-1/3 md:w-4 bg-[#F87171] rounded-t-sm shadow-sm group-hover:bg-[#FCA5A5] transition-colors" style={{ height: `${data.heightSecondary}%` }}></div>
           </div>
-        );
-      })}
+          <span className="text-xs font-semibold text-neutral-400 mt-2">{data.month}</span>
+        </div>
+      ))}
       </div>
     </div>
     
@@ -223,12 +245,16 @@ export default function DashboardOverview() {
  </td>
  <td className="py-6 pl-4 align-top text-right">
  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
- o.status === 'Pending' ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20' :
+ o.status === 'Confirmed' ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20' :
+ o.status === 'Packed' ? 'bg-purple-500/10 text-purple-500 border border-purple-500/20' :
  o.status === 'Shipped' ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20' :
+ o.status === 'Out for Delivery' ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' :
  o.status === 'Delivered' ? 'bg-[#900606]/10 text-[#900606] border border-[#900606]/20' : 'bg-red-500/10 text-red-500 border border-red-500/20'
 }`}>
- {o.status === 'Pending' && <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 mr-2"></span>}
+ {o.status === 'Confirmed' && <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 mr-2"></span>}
+ {o.status === 'Packed' && <span className="w-1.5 h-1.5 rounded-full bg-purple-500 mr-2"></span>}
  {o.status === 'Shipped' && <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mr-2"></span>}
+ {o.status === 'Out for Delivery' && <span className="w-1.5 h-1.5 rounded-full bg-orange-500 mr-2"></span>}
  {o.status === 'Delivered' && <span className="w-1.5 h-1.5 rounded-full bg-[#900606] mr-2"></span>}
  {o.status}
  </span>
