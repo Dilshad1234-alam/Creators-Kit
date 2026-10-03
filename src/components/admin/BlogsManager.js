@@ -2,6 +2,7 @@
 
 import { useState, useEffect} from 'react';
 import Image from 'next/image';
+import { getImageUrl } from '@/lib/imagekit';
 
 export default function BlogsManager() {
  const [blogs, setBlogs] = useState([]);
@@ -136,7 +137,7 @@ export default function BlogsManager() {
  <td className="px-6 py-4">
  <div className="w-16 h-12 relative rounded-md overflow-hidden bg-[#FDFBF7] border border-neutral-200">
  <img 
- src={blog.image || '/placeholder.png'} 
+ src={getImageUrl(blog.image || '/placeholder.png')} 
  alt="thumbnail" 
  className="w-full h-full object-cover"
  />

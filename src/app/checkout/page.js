@@ -1,5 +1,5 @@
 'use client';
-
+import { getImageUrl } from '@/lib/imagekit';
 import { useState} from 'react';
 import Link from 'next/link';
 import { useCart} from '@/context/CartContext';
@@ -390,12 +390,12 @@ export default function CheckoutPage() {
  {item.images && item.images.length > 0 ? (
  item.images.map((img, idx) => (
  <div key={idx} className="relative w-10 h-10 bg-[#FDFBF7] rounded-lg flex items-center justify-center border border-neutral-200 overflow-hidden shadow-inner hidden md:block">
- <Image src={img.src} alt={`${item.name} part ${idx + 1}`} fill className="object-contain p-1" />
+ <Image src={getImageUrl(img.src)} alt={`${item.name} part ${idx + 1}`} fill className="object-contain p-1" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
  </div>
  ))
  ) : item.image || item.img ? (
  <div className="relative w-16 h-16 bg-[#FDFBF7] dark:bg-[#0f172a] border border-neutral-200 dark:border-neutral-800 rounded-xl flex items-center justify-center overflow-hidden shadow-inner col-span-3">
- <Image src={item.image || item.img} alt={item.name} fill className="object-contain p-2" />
+ <Image src={getImageUrl(item.image || item.img)} alt={item.name} fill className="object-contain p-2" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
  </div>
  ) : (
  <div className="w-16 h-16 bg-[#FDFBF7] dark:bg-[#0f172a] border border-neutral-200 dark:border-neutral-800 rounded-xl flex items-center justify-center text-3xl shadow-inner col-span-3">

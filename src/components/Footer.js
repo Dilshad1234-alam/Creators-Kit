@@ -1,5 +1,5 @@
 'use client';
-
+import { getImageUrl } from '@/lib/imagekit';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname} from 'next/navigation';
@@ -16,7 +16,7 @@ export default function Footer() {
  <div className="col-span-1">
  <Link href="/" className="relative block w-[160px] h-[50px] mb-4">
  <Image
- src="/logo-kits.png"
+ src={getImageUrl("/logo-kits.png")}
  alt="Creators Kit Logo"
  fill
  sizes="(max-width: 768px) 100vw, 33vw"

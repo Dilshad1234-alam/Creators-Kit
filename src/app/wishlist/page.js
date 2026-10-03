@@ -4,6 +4,7 @@ import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
 import Image from 'next/image';
 import Link from 'next/link';
+import { getImageUrl } from '@/lib/imagekit';
 
 export default function WishlistPage() {
   const { wishlist, removeFromWishlist } = useWishlist();
@@ -40,12 +41,10 @@ export default function WishlistPage() {
               <div key={item._id || item.id} className="group flex flex-col bg-white dark:bg-[#131C2E] border border-neutral-200 dark:border-neutral-800 rounded-[2rem] p-4 shadow-lg hover:shadow-2xl transition-all duration-300">
                 
                 <div className="relative w-full aspect-[4/5] mb-4 bg-neutral-50 dark:bg-[#0f172a] rounded-[1.5rem] overflow-hidden flex items-center justify-center p-4">
-                  <Image 
-                    src={item.image || '/placeholder.png'} 
+                  <Image src={getImageUrl(item.image || '/placeholder.png')} 
                     alt={item.name} 
                     fill 
-                    className="object-contain p-4 group-hover:scale-105 transition-transform duration-500" 
-                  />
+                    className="object-contain p-4 group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                 </div>
                 
                 <div className="px-2 pb-2 flex flex-col flex-grow">

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getImageUrl } from '@/lib/imagekit';
 
 export default function UserOrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -159,7 +160,7 @@ export default function UserOrdersPage() {
                         <div key={idx} className="flex gap-4 items-center">
                           <div className="w-20 h-20 bg-neutral-100 rounded-2xl border border-neutral-200 flex items-center justify-center shrink-0 overflow-hidden relative">
                             {item.image ? (
-                              <Image src={item.image} alt={item.name} fill className="object-cover" />
+                              <Image src={getImageUrl(item.image)} alt={item.name} fill className="object-cover" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                             ) : (
                               <span className="text-3xl">📦</span>
                             )}

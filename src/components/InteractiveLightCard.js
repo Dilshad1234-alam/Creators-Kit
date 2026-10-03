@@ -1,5 +1,5 @@
 'use client';
-
+import { getImageUrl } from '@/lib/imagekit';
 import { useState } from 'react';
 import Image from 'next/image';
 
@@ -17,7 +17,7 @@ export default function InteractiveLightCard({ imageSrc, altText = "Product Imag
           : 'brightness-50 grayscale-[0.5] drop-shadow-none'
       }`}>
         <Image 
-          src={imageSrc} 
+          src={getImageUrl(imageSrc)} 
           alt={altText}
           fill
           className="object-contain transform transition-all duration-500 ease-in-out will-change-transform group-hover:scale-105 group-active:scale-105"

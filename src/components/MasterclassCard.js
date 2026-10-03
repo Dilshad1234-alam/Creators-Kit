@@ -1,5 +1,5 @@
 'use client';
-
+import { getImageUrl } from '@/lib/imagekit';
 import { useRef, useState } from 'react';
 
 export default function MasterclassCard({ course, bgClass }) {
@@ -27,7 +27,7 @@ export default function MasterclassCard({ course, bgClass }) {
       {/* Icon / Image Container */}
       <div className={`relative z-10 w-24 h-24 rounded-[2rem] flex items-center justify-center text-5xl mb-10 text-[#900606] dark:text-neutral-100 shadow-2xl ${bgClass} transform group-hover:scale-110 group-active:scale-110 group-hover:rotate-12 group-active:rotate-12 transition-all duration-500 ease-out overflow-hidden border border-white/10`}>
         {course.image ? (
-          <img src={course.image} alt={course.title} className="w-full h-full object-cover" />
+          <img src={getImageUrl(course.image)} alt={course.title} className="w-full h-full object-cover" />
         ) : (
           "🎓"
         )}

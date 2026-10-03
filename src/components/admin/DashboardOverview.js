@@ -12,6 +12,7 @@ export default function DashboardOverview() {
  const [recentOrders, setRecentOrders] = useState([]);
  const [chartData, setChartData] = useState([]);
  const [loading, setLoading] = useState(true);
+ const [chartView, setChartView] = useState('revenue');
 
  useEffect(() => {
  async function fetchStats() {
@@ -63,7 +64,9 @@ export default function DashboardOverview() {
  const chart = monthlyStats.map((stat, i) => ({
    month: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][i],
    heightPrimary: (stat.revenue / maxRevenue) * 95 || 5,
-   heightSecondary: (stat.orders / maxOrders) * 95 || 5
+   heightSecondary: (stat.orders / maxOrders) * 95 || 5,
+   revenue: stat.revenue,
+   orders: stat.orders
  }));
  setChartData(chart);
  
@@ -167,8 +170,18 @@ export default function DashboardOverview() {
         <p className="text-neutral-500 text-sm mt-1">Monthly revenue and order volume comparison.</p>
       </div>
       <div className="flex gap-2 bg-neutral-100 dark:bg-neutral-800 p-1 rounded-lg">
-        <button className="px-4 py-1.5 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white text-sm font-semibold rounded-md shadow-sm">Revenue</button>
-        <button className="px-4 py-1.5 text-neutral-500 dark:text-neutral-400 text-sm font-semibold hover:text-neutral-900 rounded-md">Orders</button>
+        <button 
+          onClick={() => setChartView('revenue')}
+          className={`px-4 py-1.5 text-sm font-semibold rounded-md transition-colors ${chartView === 'revenue' ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm' : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900'}`}
+        >
+          Revenue
+        </button>
+        <button 
+          onClick={() => setChartView('orders')}
+          className={`px-4 py-1.5 text-sm font-semibold rounded-md transition-colors ${chartView === 'orders' ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm' : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900'}`}
+        >
+          Orders
+        </button>
       </div>
     </div>
     
@@ -184,9 +197,12 @@ export default function DashboardOverview() {
       {/* Bar Chart Real Data */}
       {chartData.map((data, i) => (
         <div key={data.month} className="flex flex-col items-center gap-2 group relative z-10 w-full">
+          {/* Tooltip */}
+          <div className="absolute -top-10 bg-neutral-900 text-white text-xs font-bold px-3 py-1.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+            {chartView === 'revenue' ? `₹${data.revenue.toLocaleString()}` : `${data.orders} Orders`}
+          </div>
           <div className="flex items-end justify-center w-full gap-1 h-56">
-            <div className="w-1/3 md:w-4 bg-[#900606] rounded-t-sm shadow-sm group-hover:bg-[#b00808] transition-colors" style={{ height: `${data.heightPrimary}%` }}></div>
-            <div className="w-1/3 md:w-4 bg-[#F87171] rounded-t-sm shadow-sm group-hover:bg-[#FCA5A5] transition-colors" style={{ height: `${data.heightSecondary}%` }}></div>
+            <div className="w-1/2 md:w-8 bg-[#900606] rounded-t-sm shadow-sm group-hover:bg-[#b00808] transition-all duration-500" style={{ height: `${chartView === 'revenue' ? data.heightPrimary : data.heightSecondary}%` }}></div>
           </div>
           <span className="text-xs font-semibold text-neutral-400 mt-2">{data.month}</span>
         </div>
@@ -197,11 +213,9 @@ export default function DashboardOverview() {
     <div className="flex gap-6 mt-6 justify-center">
       <div className="flex items-center gap-2">
         <span className="w-3 h-3 rounded-full bg-[#900606]"></span>
-        <span className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">Direct Sales</span>
-      </div>
-      <div className="flex items-center gap-2">
-        <span className="w-3 h-3 rounded-full bg-[#F87171]"></span>
-        <span className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">Affiliate Sales</span>
+        <span className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">
+          {chartView === 'revenue' ? 'Total Revenue' : 'Total Orders'}
+        </span>
       </div>
     </div>
   </div>

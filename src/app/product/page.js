@@ -1,5 +1,5 @@
 'use client';
-
+import { getImageUrl } from '@/lib/imagekit';
 import { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
@@ -195,12 +195,10 @@ export default function ProductPage() {
  <div className="flex flex-col gap-4">
  {/* Main Image Viewport */}
  <div className={`w-full max-w-md mx-auto aspect-square rounded-[3rem] shadow-sm flex items-center justify-center transition-all duration-700 ease-in-out relative overflow-hidden ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-[#FDFBF7]'} p-4 md:p-6 hover:border-[#900606] active:border-[#900606] transform hover:scale-[1.02] active:scale-[1.02] will-change-transform ${currentImageData.bg}`}>
- <Image
- src={currentImageData.src || '/placeholder.png'}
+ <Image src={getImageUrl(currentImageData.src || '/placeholder.png')}
  alt="Product Image"
  fill
- className="object-contain p-1 sm:p-6 transform transition-all duration-500 ease-in-out hover:scale-110 active:scale-110 will-change-transform cursor-zoom-in"
- />
+ className="object-contain p-1 sm:p-6 transform transition-all duration-500 ease-in-out hover:scale-110 active:scale-110 will-change-transform cursor-zoom-in" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
  </div>
  
  {/* Thumbnails */}
@@ -215,7 +213,7 @@ export default function ProductPage() {
   : 'border-transparent opacity-70 hover:opacity-100 hover:scale-105 hover:border-[#900606] hover:shadow-md'
 }`}
  >
- <Image src={img.src || '/placeholder.png'} alt="Thumbnail" fill sizes="(max-width: 768px) 20vw, 10vw" className="object-contain p-2 " />
+ <Image src={getImageUrl(img.src || '/placeholder.png')} alt="Thumbnail" fill sizes="(max-width: 768px) 20vw, 10vw" className="object-contain p-2 " />
  </button>
  ))}
  </div>
@@ -311,12 +309,10 @@ export default function ProductPage() {
                 </button>
               </div>
               
-              <Image 
-                src={item.image || '/placeholder.png'} 
+              <Image src={getImageUrl(item.image || '/placeholder.png')} 
                 alt={item.name} 
                 fill 
-                className="object-contain p-4 group-hover:scale-110 transition-transform duration-500 mix-blend-multiply" 
-              />
+                className="object-contain p-4 group-hover:scale-110 transition-transform duration-500 mix-blend-multiply" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
             </div>
             
             {/* Text Content & Button */}
@@ -355,20 +351,20 @@ export default function ProductPage() {
       {/* Left: Twin Images Pair 1 */}
       <div className="grid grid-cols-2 gap-4 h-full relative">
         <div className={`relative w-full h-full min-h-[300px] md:min-h-[400px] rounded-[3rem] overflow-hidden ${isDarkMode ? 'bg-[#131C2E]' : 'bg-neutral-100'} group cursor-pointer z-10`}>
-          <Image src={individualProducts[0]?.image || '/placeholder.png'} alt="Setup Display 1" fill className="object-contain group-hover:scale-110 transition-transform duration-700" />
+          <Image src={getImageUrl(individualProducts[0]?.image || '/placeholder.png')} alt="Setup Display 1" fill className="object-contain group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
         </div>
         <div className={`relative w-full h-full min-h-[300px] md:min-h-[400px] rounded-[3rem] overflow-hidden ${isDarkMode ? 'bg-[#131C2E]' : 'bg-neutral-100'} group cursor-pointer z-0 md:mt-16`}>
-          <Image src={individualProducts[1]?.image || '/placeholder.png'} alt="Setup Display 2" fill className="object-contain group-hover:scale-110 transition-transform duration-700" />
+          <Image src={getImageUrl(individualProducts[1]?.image || '/placeholder.png')} alt="Setup Display 2" fill className="object-contain group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
         </div>
       </div>
 
       {/* Right: Twin Images Pair 2 */}
       <div className="grid grid-cols-2 gap-4 h-full relative">
         <div className={`relative w-full h-full min-h-[300px] md:min-h-[400px] rounded-[3rem] overflow-hidden ${isDarkMode ? 'bg-[#131C2E]' : 'bg-neutral-100'} group cursor-pointer z-10`}>
-          <Image src={individualProducts[2]?.image || '/placeholder.png'} alt="Setup Display 3" fill className="object-contain group-hover:scale-110 transition-transform duration-700" />
+          <Image src={getImageUrl(individualProducts[2]?.image || '/placeholder.png')} alt="Setup Display 3" fill className="object-contain group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
         </div>
         <div className={`relative w-full h-full min-h-[300px] md:min-h-[400px] rounded-[3rem] overflow-hidden ${isDarkMode ? 'bg-[#131C2E]' : 'bg-neutral-100'} group cursor-pointer z-0 md:mt-16`}>
-          <Image src={individualProducts[3]?.image || '/placeholder.png'} alt="Setup Display 4" fill className="object-contain group-hover:scale-110 transition-transform duration-700" />
+          <Image src={getImageUrl(individualProducts[3]?.image || '/placeholder.png')} alt="Setup Display 4" fill className="object-contain group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
         </div>
       </div>
       

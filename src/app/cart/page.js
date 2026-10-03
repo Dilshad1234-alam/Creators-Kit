@@ -1,5 +1,5 @@
 'use client';
-
+import { getImageUrl } from '@/lib/imagekit';
 import Link from 'next/link';
 import { useCart} from '@/context/CartContext';
 import { useRouter} from 'next/navigation';
@@ -45,12 +45,12 @@ export default function CartPage() {
  <div className="grid grid-cols-3 gap-2 shrink-0 w-full sm:w-[220px]">
  {item.img ? (
  <div className="relative w-full h-36 col-span-3 bg-neutral-50 rounded-2xl flex items-center justify-center border border-neutral-200 overflow-hidden shadow-inner">
- <Image src={item.img} alt={item.name} fill className="object-contain p-4 mix-blend-multiply group-hover:scale-105 transition-transform duration-500" />
+ <Image src={getImageUrl(item.img)} alt={item.name} fill className="object-contain p-4 mix-blend-multiply group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
  </div>
  ) : item.images && item.images.length > 0 ? (
  item.images.map((img, idx) => (
  <div key={idx} className="relative w-16 h-16 bg-neutral-50 cursor-pointer rounded-xl flex items-center justify-center border border-neutral-200 overflow-hidden shadow-inner hover:scale-110 transition-transform">
- <Image src={img.src} alt={`${item.name} part ${idx + 1}`} fill className="object-contain p-1.5 mix-blend-multiply" />
+ <Image src={getImageUrl(img.src)} alt={`${item.name} part ${idx + 1}`} fill className="object-contain p-1.5 mix-blend-multiply" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
  </div>
  ))
  ) : (

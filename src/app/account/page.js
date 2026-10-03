@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useTheme } from '@/components/ThemeProvider';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { getImageUrl } from '@/lib/imagekit';
 
 function AccountOrdersTab({ email }) {
   const [orders, setOrders] = useState([]);
@@ -122,7 +123,7 @@ function AccountOrdersTab({ email }) {
                     <div key={idx} className="flex gap-4 items-center">
                       <div className="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
                         {item.image ? (
-                          <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                          <img src={getImageUrl(item.image)} alt={item.name} className="w-full h-full object-cover" />
                         ) : (
                           <span className="text-2xl">📦</span>
                         )}
@@ -480,7 +481,7 @@ function AccountContent() {
               <div className="relative mb-4">
                 <div className="w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-[6px] border-white shadow-md bg-neutral-200">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={formData.profileImage || "/placeholder.png"} alt="Profile" className="w-full h-full object-cover" />
+                  <img src={getImageUrl(formData.profileImage || "/placeholder.png")} alt="Profile" className="w-full h-full object-cover" />
                 </div>
                 {/* Edit badge */}
                 <label className="absolute bottom-0 right-0 bg-[#900606] text-white p-2.5 rounded-full shadow-lg hover:bg-[#700505] transition-transform hover:scale-110 border-2 border-white cursor-pointer">

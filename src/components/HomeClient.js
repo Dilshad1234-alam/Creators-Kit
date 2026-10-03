@@ -1,5 +1,5 @@
 'use client';
-
+import { getImageUrl } from '@/lib/imagekit';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -96,13 +96,11 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
                   : 'drop-shadow-[0_0_60px_rgba(245,158,11,0.4)] sepia-[0.3] hue-rotate-[-10deg]'
               }`}>
                 {/* Base Fixed Asset */}
-                <Image 
-                  src={!isLightOn ? '/bulb-9.png' : lightColor === 'white' ? '/bulb-9.png' : '/bulb-11.png'}
+                <Image src={getImageUrl(!isLightOn ? '/bulb-9.png' : lightColor === 'white' ? '/bulb-9.png' : '/bulb-11.png')}
                   alt="Creators Kit Bundle"
                   fill
                   className="object-contain z-10"
-                  priority
-                />
+                  priority sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
               </div>
 
               {/* Interactive Controls */}
@@ -188,7 +186,7 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
                   <a href={`#${item._id}`} key={`${item._id}-${index}`} className="group flex flex-col items-center justify-start cursor-pointer w-[140px] sm:w-[160px] md:w-[200px] flex-shrink-0 snap-center">
                     <div className="relative w-32 h-32 sm:w-36 sm:h-36 md:w-44 md:h-44 lg:w-52 lg:h-52 rounded-full overflow-hidden bg-[#FAF7F0] flex items-center justify-center mb-4 sm:mb-6 border-2 border-transparent transition-all duration-500 group-hover:border-[#900606]/20">
                       <Image 
-                        src={item.image} 
+                        src={getImageUrl(item.image)} 
                         alt={item.name} 
                         fill 
                         sizes="(max-width: 640px) 128px, (max-width: 768px) 144px, (max-width: 1024px) 176px, 208px"
@@ -218,7 +216,7 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
                   
                   
                   <div className="z-10 w-full h-full relative transform group-hover:scale-105 transition-transform duration-700 ease-out">
-                    <Image src={item.image} alt={item.name} fill className="w-full h-full object-contain p-4 sm:p-2 md:p-4" />
+                    <Image src={getImageUrl(item.image)} alt={item.name} fill className="w-full h-full object-contain p-4 sm:p-2 md:p-4" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                   </div>
                 </div>
                 
@@ -327,7 +325,7 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
 
                     <div className={`relative z-10 w-20 h-20 md:w-24 md:h-24 rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center text-4xl md:text-5xl mb-6 md:mb-10 text-white ${bgClass} transform group-hover:rotate-12 transition-transform duration-500 overflow-hidden border border-white/10`}>
                       {course.image ? (
-                        <img src={course.image} alt={course.title} className="w-full h-full object-cover" />
+                        <img src={getImageUrl(course.image)} alt={course.title} className="w-full h-full object-cover" />
                       ) : (
                         "🎓"
                       )}

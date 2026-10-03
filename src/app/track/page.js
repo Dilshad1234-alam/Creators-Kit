@@ -1,4 +1,5 @@
 'use client';
+import { getImageUrl } from '@/lib/imagekit';
 import { useState } from 'react';
 import Link from 'next/link';
 
@@ -176,7 +177,7 @@ export default function TrackOrderPage() {
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-neutral-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
                           {item.image ? (
-                            <img src={item.image} alt={item.name} className="w-8 h-8 object-contain" />
+                            <img src={getImageUrl(item.image)} alt={item.name} className="w-8 h-8 object-contain" />
                           ) : (
                             <span className="text-xl">📦</span>
                           )}

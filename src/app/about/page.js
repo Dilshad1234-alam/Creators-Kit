@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/components/ThemeProvider';
+import { getImageUrl } from '@/lib/imagekit';
 
 export default function AboutPage() {
   const { theme, mounted: themeMounted } = useTheme();
@@ -54,7 +55,7 @@ export default function AboutPage() {
         <div className="relative w-full aspect-video md:aspect-[21/9] rounded-[2rem] overflow-hidden mb-16 lg:mb-24 shadow-xl group bg-neutral-900">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img 
-            src="/team.png" 
+            src={getImageUrl("/team.png")} 
             alt="Team Photograph" 
             className="absolute inset-0 w-full h-full object-contain object-center transition-transform duration-700 group-hover:scale-105"
           />
@@ -99,7 +100,7 @@ export default function AboutPage() {
             <div key={i} className="flex flex-col items-center w-28 md:w-40 lg:w-48">
               <div className="w-24 h-24 md:w-32 md:h-32 lg:w-48 lg:h-48 rounded-full overflow-hidden border-[4px] md:border-[6px] border-[#900606] bg-white ${isDarkMode ? 'bg-[#131C2E]' : 'bg-white'} flex-shrink-0 hover:scale-105 transition-transform duration-500 mb-6 md:mb-8">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={product.src} alt={product.name} className="w-full h-full object-contain object-center transition-all duration-500" />
+                <img src={getImageUrl(product.src)} alt={product.name} className="w-full h-full object-contain object-center transition-all duration-500" />
               </div>
               <h4 className="text-[#2D2D2D] dark:text-neutral-200 font-bold text-sm md:text-base lg:text-lg text-center leading-tight">
                 {product.name}

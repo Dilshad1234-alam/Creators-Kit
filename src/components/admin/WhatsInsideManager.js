@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect} from 'react';
 import Image from 'next/image';
+import { getImageUrl } from '@/lib/imagekit';
 
 export default function WhatsInsideManager() {
  const [items, setItems] = useState([]);
@@ -143,7 +144,7 @@ export default function WhatsInsideManager() {
  <div className="flex items-center gap-4">
  {p.image ? (
  <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-[#FDFBF7] border border-neutral-200 flex-shrink-0">
- <Image src={p.image} alt={p.name} fill sizes="48px" className="object-contain p-1" />
+ <Image src={getImageUrl(p.image)} alt={p.name} fill sizes="48px" className="object-contain p-1" />
  </div>
  ) : (
  <div className="w-12 h-12 rounded-lg bg-[#FDFBF7] border border-neutral-200 flex-shrink-0 flex items-center justify-center text-neutral-600">

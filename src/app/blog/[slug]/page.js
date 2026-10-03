@@ -1,3 +1,4 @@
+import { getImageUrl } from '@/lib/imagekit';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -87,7 +88,7 @@ export default async function BlogDetailPage({ params }) {
         <div className="relative w-full aspect-video rounded-3xl md:rounded-[2rem] overflow-hidden border border-neutral-200 dark:border-neutral-800 shadow-[0_30px_60px_rgba(0,0,0,0.5)]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img 
-            src={blog.image} 
+            src={getImageUrl(blog.image)} 
             alt={blog.title}
             className="w-full h-full object-cover"
           />

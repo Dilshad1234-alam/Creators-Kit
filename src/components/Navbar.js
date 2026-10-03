@@ -1,5 +1,5 @@
 'use client';
-
+import { getImageUrl } from '@/lib/imagekit';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -56,7 +56,7 @@ export default function Navbar() {
           <Link href="/" className="relative flex items-center">
             <div className="relative h-[70px] w-[230px] sm:w-[260px] md:h-[109px] md:w-[340px] overflow-hidden ml-2 md:ml-0">
               <Image
-                src="/logo-kits.png"
+                src={getImageUrl("/logo-kits.png")}
                 alt="Creators Kit Logo"
                 fill
                 sizes="(max-width: 768px) 260px, 340px"
@@ -98,7 +98,7 @@ export default function Navbar() {
                 <Link href="/account" className="flex items-center justify-center p-1 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer transition-all">
                   <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/profile.svg" alt="Profile" className="w-full h-full object-cover" />
+                    <img src={getImageUrl("/profile.svg")} alt="Profile" className="w-full h-full object-cover" />
                   </div>
                 </Link>
 

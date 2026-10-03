@@ -4,6 +4,7 @@ import { useEffect, useState} from 'react';
 import { useRouter} from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getImageUrl } from '@/lib/imagekit';
 
 export default function OrderSuccessClient({ orderId}) {
  const router = useRouter();
@@ -176,7 +177,7 @@ export default function OrderSuccessClient({ orderId}) {
  <div key={idx} className="flex gap-3 sm:gap-4 pb-4 border-b border-neutral-100 last:border-0 last:pb-0">
  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-neutral-100 rounded-xl border border-neutral-200 flex items-center justify-center shrink-0 overflow-hidden relative">
  {(item.image || item.img || (item.images && item.images.length > 0)) ? (
- <Image src={item.image || item.img || item.images[0].src} alt={item.name} fill className="object-contain p-2 mix-blend-multiply" />
+ <Image src={getImageUrl(item.image || item.img || item.images[0].src)} alt={item.name} fill className="object-contain p-2 mix-blend-multiply" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
  ) : (
  <span className="text-3xl">📦</span>
  )}

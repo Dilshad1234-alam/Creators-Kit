@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect} from 'react';
 import { createPortal} from 'react-dom';
+import { getImageUrl } from '@/lib/imagekit';
 
 export default function MasterclassesManager() {
  const [courses, setCourses] = useState([]);
@@ -130,7 +131,7 @@ export default function MasterclassesManager() {
  <div className="flex items-center gap-3">
  <div className="relative w-12 h-12 bg-neutral-100 rounded-lg overflow-hidden flex-shrink-0 border border-neutral-700/50">
  {item.image ? (
- <img src={item.image} alt={item.title} className="object-cover w-full h-full" />
+ <img src={getImageUrl(item.image)} alt={item.title} className="object-cover w-full h-full" />
  ) : (
  <div className="flex items-center justify-center w-full h-full text-xl">🎓</div>
  )}

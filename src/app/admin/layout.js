@@ -1,5 +1,5 @@
 'use client';
-
+import { getImageUrl } from '@/lib/imagekit';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
@@ -92,12 +92,10 @@ export default function AdminLayout({ children }) {
       <aside className={`fixed md:relative top-0 left-0 h-full w-64 bg-[#900606] text-white flex flex-col shadow-2xl z-50 transform transition-transform duration-300 ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 shrink-0`}>
         <div className="h-24 flex items-center justify-start border-b border-white/10 px-6 shrink-0 relative">
           <Link href="/" className="relative h-25 w-92 cursor-pointer">
-            <Image 
-              src="/logo-kits.png" 
+            <Image src={getImageUrl("/logo-kits.png")} 
               alt="Creators Kit Logo" 
               fill 
-              className="object-contain brightness-0 invert transition-transform" 
-            />
+              className="object-contain brightness-0 invert transition-transform" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
           </Link>
           <button 
             onClick={() => setIsMobileSidebarOpen(false)}

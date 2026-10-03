@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { getImageUrl } from '@/lib/imagekit';
 
 export const metadata = {
   title: 'Blog | Creators Kit',
@@ -95,7 +96,7 @@ export default async function BlogListingPage() {
                   <div className="absolute inset-0 bg-[#900606]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img 
-                    src={blog.image || '/placeholder.png'} 
+                    src={getImageUrl(blog.image || '/placeholder.png')} 
                     alt={blog.title}
                     className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700"
                   />
