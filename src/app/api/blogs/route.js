@@ -1,4 +1,5 @@
-import { NextResponse} from 'next/server';
+import { NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 import mongoose from 'mongoose';
 import Blog from '@/models/Blog';
 
@@ -26,7 +27,14 @@ export async function POST(req) {
  
  // Auto-generate slug from title if not provided
  if (!body.slug && body.title) {
- body.slug = body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+ let baseSlug = body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+ let slug = baseSlug;
+ let counter = 1;
+ while (await Blog.findOne({ slug })) {
+  slug = `${baseSlug}-${counter}`;
+  counter++;
+ }
+ body.slug = slug;
 }
 
  const blog = await Blog.create(body);

@@ -3,8 +3,10 @@
 import { useState, useEffect} from 'react';
 import Image from 'next/image';
 import { getImageUrl } from '@/lib/imagekit';
+import { useRouter } from 'next/navigation';
 
 export default function BlogsManager() {
+ const router = useRouter();
  const [blogs, setBlogs] = useState([]);
  const [isLoading, setIsLoading] = useState(true);
  const [isModalOpen, setIsModalOpen] = useState(false);
@@ -86,14 +88,13 @@ export default function BlogsManager() {
  
  await fetchBlogs();
  closeModal();
+ setFormData({ title: '', author: '', image: '', excerpt: '', content: '' });
 } catch (error) {
  alert(error.message);
 }
 };
 
  const handleDelete = async (slug) => {
- if (!window.confirm('Are you sure you want to delete this blog?')) return;
- 
  try {
  const res = await fetch(`/api/blogs/${slug}`, {
  method: 'DELETE'

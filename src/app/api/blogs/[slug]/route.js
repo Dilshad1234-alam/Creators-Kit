@@ -1,4 +1,5 @@
-import { NextResponse} from 'next/server';
+import { NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 import mongoose from 'mongoose';
 import Blog from '@/models/Blog';
 
