@@ -65,7 +65,7 @@ function AccountOrdersTab({ email }) {
   }
 
   return (
-    <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 md:p-12 shadow-sm border border-neutral-100 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="bg-white dark:bg-neutral-900 rounded-[2rem] p-5 sm:p-8 md:p-12 shadow-sm border border-neutral-100 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full overflow-hidden">
       <h2 className="text-2xl font-bold mb-8 text-neutral-800 dark:text-white">My Orders</h2>
       <div className="space-y-6">
         {orders.map((order) => {
@@ -278,7 +278,7 @@ function AccountNotificationsTab({ email }) {
   };
 
   return (
-    <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 md:p-12 shadow-sm border border-neutral-100 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="bg-white dark:bg-neutral-900 rounded-[2rem] p-5 sm:p-8 md:p-12 shadow-sm border border-neutral-100 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full overflow-hidden">
       <h2 className="text-2xl font-bold mb-8 text-neutral-800 dark:text-white">Notifications</h2>
       {loading ? (
         <div className="flex justify-center p-8"><div className="w-8 h-8 rounded-full border-4 border-neutral-200 border-t-[#900606] animate-spin"></div></div>
@@ -293,7 +293,7 @@ function AccountNotificationsTab({ email }) {
       ) : (
         <div className="space-y-4">
           {notifications.map((notif) => (
-            <div key={notif._id} className={`p-5 rounded-2xl border ${notif.unread ? 'border-[#900606]/30 bg-[#900606]/5' : 'border-neutral-200 dark:border-neutral-800 bg-transparent'} flex gap-4 transition-all hover:shadow-sm`}>
+            <div key={notif._id} className={`p-4 sm:p-5 rounded-2xl border ${notif.unread ? 'border-[#900606]/30 bg-[#900606]/5' : 'border-neutral-200 dark:border-neutral-800 bg-transparent'} flex gap-3 sm:gap-4 transition-all hover:shadow-sm w-full overflow-hidden`}>
               <div className="mt-1 shrink-0">
                 {notif.unread ? (
                   <div className="w-3 h-3 bg-[#900606] rounded-full shadow-sm"></div>
@@ -301,8 +301,8 @@ function AccountNotificationsTab({ email }) {
                   <div className="w-3 h-3 bg-neutral-300 dark:bg-neutral-600 rounded-full"></div>
                 )}
               </div>
-              <div>
-                <h4 className={`font-bold ${notif.unread ? 'text-[#900606] dark:text-white' : 'text-neutral-800 dark:text-neutral-200'}`}>{notif.title}</h4>
+              <div className="flex-1 min-w-0">
+                <h4 className={`font-bold ${notif.unread ? 'text-[#900606] dark:text-white' : 'text-neutral-800 dark:text-neutral-200'} truncate`}>{notif.title}</h4>
                 <p className="text-neutral-600 dark:text-neutral-400 text-sm mt-1 mb-2">{notif.desc}</p>
                 <p className="text-xs text-neutral-500 font-bold uppercase tracking-wider">{timeAgo(notif.createdAt)}</p>
               </div>
@@ -474,7 +474,7 @@ function AccountContent() {
     switch (activeTab) {
       case 'user-info':
         return (
-          <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 md:p-12 shadow-sm border border-neutral-100 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="bg-white dark:bg-neutral-900 rounded-[2rem] p-5 sm:p-8 md:p-12 shadow-sm border border-neutral-100 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full overflow-hidden">
             
             {/* Profile Header section */}
             <div className="flex flex-col items-center mb-10">
@@ -580,14 +580,14 @@ function AccountContent() {
 
   if (isInitializing) {
     return (
-      <div className="min-h-screen bg-[#FDFBF7] dark:bg-background pt-32 pb-16 md:pb-24 flex items-center justify-center">
+      <div className="min-h-[100svh] bg-[#FDFBF7] dark:bg-background pt-32 pb-16 md:pb-24 flex items-center justify-center">
         <div className="w-10 h-10 rounded-full border-4 border-neutral-200 border-t-[#900606] animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] dark:bg-background pt-32 pb-16 md:pb-24">
+    <div className="min-h-[100svh] bg-[#FDFBF7] dark:bg-background pt-32 pb-16 md:pb-24">
       <div className="w-full px-4 md:px-8 lg:px-12">
         
         <div className="mb-10">
@@ -639,7 +639,7 @@ function AccountContent() {
           </div>
 
           {/* Main Content Area */}
-          <div className="w-full lg:flex-1">
+          <div className="w-full lg:flex-1 min-w-0">
             {renderContent()}
           </div>
           
@@ -652,7 +652,7 @@ function AccountContent() {
 export default function AccountPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#FDFBF7] dark:bg-background pt-32 pb-16 md:pb-24 flex items-center justify-center">
+      <div className="min-h-[100svh] bg-[#FDFBF7] dark:bg-background pt-32 pb-16 md:pb-24 flex items-center justify-center">
         <div className="w-10 h-10 rounded-full border-4 border-neutral-200 border-t-[#900606] animate-spin"></div>
       </div>
     }>

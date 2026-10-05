@@ -74,11 +74,11 @@ export default function AdminLayout({ children }) {
   };
 
   if (!isAuthorized) {
-    return <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center text-[#900606] font-bold">Verifying Access...</div>;
+    return <div className="min-h-[100svh] bg-[#FDFBF7] flex items-center justify-center text-[#900606] font-bold">Verifying Access...</div>;
   }
 
   return (
-    <div className="flex h-screen bg-[#F4F7FE] dark:bg-[#0B0F19] overflow-hidden transition-colors duration-300">
+    <div className="flex min-h-[100svh] bg-[#F4F7FE] dark:bg-[#0B0F19] overflow-hidden transition-colors duration-300">
       
       {/* Mobile Sidebar Overlay */}
       {isMobileSidebarOpen && (

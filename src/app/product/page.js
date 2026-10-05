@@ -162,7 +162,7 @@ export default function ProductPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center relative overflow-hidden">
+      <div className="min-h-[100svh] bg-[#FDFBF7] flex items-center justify-center relative overflow-hidden">
         <div className="w-12 h-12 rounded-full border-4 border-neutral-200 border-t-[#900606] animate-spin"></div>
       </div>
     );
@@ -171,7 +171,7 @@ export default function ProductPage() {
   const currentImageData = product.images[currentImage] || product.images[0] || { src: '/placeholder.png', bg: 'bg-[#FDFBF7]', title: 'Product', description: '' };
 
  return (
- <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-[#0B0F19] text-neutral-100' : 'bg-[#FDFBF7] text-neutral-900'} font-sans w-full pb-24 md:pb-0`}>
+ <div className={`min-h-[100svh] flex flex-col ${isDarkMode ? 'bg-[#0B0F19] text-neutral-100' : 'bg-[#FDFBF7] text-neutral-900'} font-sans w-full pb-24 md:pb-0`}>
     <main className="flex-grow w-full">
  
  {/* Sticky Action Bar for Mobile (Hidden on Desktop) */}
@@ -222,10 +222,10 @@ export default function ProductPage() {
  {/* Right: Product Info & Pricing */}
  <div className="flex flex-col justify-center">
  
- <h1 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif tracking-tight mb-2 ${isDarkMode ? 'text-neutral-200' : 'text-neutral-900'} uppercase`} style={{ fontFamily: 'Georgia, serif'}}>
+ <h1 className={`text-3xl sm:text-4xl md:text-4xl lg:text-5xl xl:text-6xl font-serif tracking-tight mb-2 ${isDarkMode ? 'text-neutral-200' : 'text-neutral-900'} uppercase`} style={{ fontFamily: 'Georgia, serif'}}>
  {currentImageData.title}
  </h1>
- <h2 className={`text-sm md:text-md lg:text-lg ${isDarkMode ? 'text-neutral-200' : 'text-neutral-500'} tracking-[0.2em] md:tracking-[0.3em] uppercase mb-4`}>
+ <h2 className={`text-sm md:text-base lg:text-lg ${isDarkMode ? 'text-neutral-200' : 'text-neutral-500'} tracking-[0.2em] md:tracking-[0.3em] uppercase mb-4`}>
  {product.subheading}
  </h2>
  
@@ -241,7 +241,7 @@ export default function ProductPage() {
  </div>
  )}
  <div className="flex items-end gap-3 md:gap-4 mb-2">
- <span className="text-4xl sm:text-5xl md:text-6xl font-black text-[#900606]">₹{product.price.toLocaleString()}</span>
+ <span className="text-4xl sm:text-5xl md:text-5xl lg:text-4xl xl:text-6xl font-black text-[#900606]">₹{product.price.toLocaleString()}</span>
  <span className={`text-xl md:text-2xl font-bold ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'} line-through mb-1`}>₹{product.originalPrice.toLocaleString()}</span>
  </div>
  <p className="text-xs sm:text-sm font-bold text-[#900606] flex items-center gap-2">
@@ -254,14 +254,14 @@ export default function ProductPage() {
  <div className="flex flex-col sm:flex-row gap-4 mb-4">
  <button
  onClick={handleAddToCart}
- className={`hidden md:flex flex-1 py-5 px-8 ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-[#FDFBF7]'} border border-neutral-700 text-[#900606] rounded-full font-bold text-lg hover:border-[#900606] hover:text-[#900606] hover:${isDarkMode ? 'bg-[#0B0F19]' : 'bg-[#FDFBF7]'} transition-colors items-center justify-center gap-3`}
+ className={`hidden md:flex flex-1 py-4 xl:py-5 px-4 xl:px-8 ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-[#FDFBF7]'} border border-neutral-700 text-[#900606] rounded-full font-bold text-base xl:text-lg hover:border-[#900606] hover:text-[#900606] hover:${isDarkMode ? 'bg-[#0B0F19]' : 'bg-[#FDFBF7]'} transition-colors items-center justify-center gap-2 xl:gap-3`}
  >
  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
  Add to Cart
  </button>
  <button
  onClick={handleBuyNow}
- className="hidden md:flex flex-1 py-5 px-8 bg-[#900606] text-white rounded-full font-extrabold text-xl hover:bg-[#700505] transition-all hover:scale-105 items-center justify-center gap-2"
+ className="hidden md:flex flex-1 py-4 xl:py-5 px-4 xl:px-8 bg-[#900606] text-white rounded-full font-extrabold text-lg xl:text-xl hover:bg-[#700505] transition-all hover:scale-105 items-center justify-center gap-2"
  >
  Buy Now
  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
@@ -290,7 +290,7 @@ export default function ProductPage() {
         <p className={`text-[15px] md:text-base ${isDarkMode ? 'text-neutral-200' : 'text-neutral-600'} font-medium`}>Build your own setup by purchasing our premium gear individually.</p>
       </div>
  
-    <div className="w-full px-4 md:px-8 lg:px-24 mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
+    <div className="w-full px-4 md:px-8 lg:px-12 xl:px-24 mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
     {individualProducts.map((item) => (
           <div key={item._id || item.id} className={`group flex flex-col ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-[#FDFBF7]'} rounded-[2rem] p-3 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 cursor-pointer`}>
             {/* Image Container */}
@@ -350,20 +350,20 @@ export default function ProductPage() {
     <div className="w-full px-4 md:px-8 lg:px-24 mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-stretch">
       {/* Left: Twin Images Pair 1 */}
       <div className="grid grid-cols-2 gap-4 h-full relative">
-        <div className={`relative w-full h-full min-h-[300px] md:min-h-[400px] rounded-[3rem] overflow-hidden ${isDarkMode ? 'bg-[#131C2E]' : 'bg-neutral-100'} group cursor-pointer z-10`}>
+        <div className={`relative w-full h-full min-h-[250px] lg:min-h-[300px] xl:min-h-[400px] rounded-[3rem] overflow-hidden ${isDarkMode ? 'bg-[#131C2E]' : 'bg-neutral-100'} group cursor-pointer z-10`}>
           <Image src={getImageUrl(individualProducts[0]?.image || '/placeholder.png')} alt="Setup Display 1" fill className="object-contain group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
         </div>
-        <div className={`relative w-full h-full min-h-[300px] md:min-h-[400px] rounded-[3rem] overflow-hidden ${isDarkMode ? 'bg-[#131C2E]' : 'bg-neutral-100'} group cursor-pointer z-0 md:mt-16`}>
+        <div className={`relative w-full h-full min-h-[250px] lg:min-h-[300px] xl:min-h-[400px] rounded-[3rem] overflow-hidden ${isDarkMode ? 'bg-[#131C2E]' : 'bg-neutral-100'} group cursor-pointer z-0 md:mt-12 lg:mt-8 xl:mt-16`}>
           <Image src={getImageUrl(individualProducts[1]?.image || '/placeholder.png')} alt="Setup Display 2" fill className="object-contain group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
         </div>
       </div>
 
       {/* Right: Twin Images Pair 2 */}
       <div className="grid grid-cols-2 gap-4 h-full relative">
-        <div className={`relative w-full h-full min-h-[300px] md:min-h-[400px] rounded-[3rem] overflow-hidden ${isDarkMode ? 'bg-[#131C2E]' : 'bg-neutral-100'} group cursor-pointer z-10`}>
+        <div className={`relative w-full h-full min-h-[250px] lg:min-h-[300px] xl:min-h-[400px] rounded-[3rem] overflow-hidden ${isDarkMode ? 'bg-[#131C2E]' : 'bg-neutral-100'} group cursor-pointer z-10`}>
           <Image src={getImageUrl(individualProducts[2]?.image || '/placeholder.png')} alt="Setup Display 3" fill className="object-contain group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
         </div>
-        <div className={`relative w-full h-full min-h-[300px] md:min-h-[400px] rounded-[3rem] overflow-hidden ${isDarkMode ? 'bg-[#131C2E]' : 'bg-neutral-100'} group cursor-pointer z-0 md:mt-16`}>
+        <div className={`relative w-full h-full min-h-[250px] lg:min-h-[300px] xl:min-h-[400px] rounded-[3rem] overflow-hidden ${isDarkMode ? 'bg-[#131C2E]' : 'bg-neutral-100'} group cursor-pointer z-0 md:mt-12 lg:mt-8 xl:mt-16`}>
           <Image src={getImageUrl(individualProducts[3]?.image || '/placeholder.png')} alt="Setup Display 4" fill className="object-contain group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
         </div>
       </div>

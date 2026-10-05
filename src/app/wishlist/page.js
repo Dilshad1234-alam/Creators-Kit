@@ -15,7 +15,7 @@ export default function WishlistPage() {
     removeFromWishlist(item._id || item.id);
   };
   return (
-    <div className="min-h-screen bg-[#FDFBF7] dark:bg-[#0B0F19] text-[#900606] dark:text-neutral-100 pt-28 pb-12 md:pt-36 md:pb-24 transition-colors duration-300 animate-page-enter">
+    <div className="min-h-[100svh] bg-[#FDFBF7] dark:bg-[#0B0F19] text-[#900606] dark:text-neutral-100 pt-28 pb-12 md:pt-36 md:pb-24 transition-colors duration-300 animate-page-enter">
       <div className="w-full px-6 md:px-12 lg:px-24 mx-auto pt-5">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4 tracking-tight text-[#900606] text-center">Your Wishlist</h1>
         <p className="text-neutral-600 dark:text-neutral-400 text-center mb-12 font-medium">Saved items you want to keep an eye on.</p>
@@ -36,11 +36,11 @@ export default function WishlistPage() {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {wishlist.map((item) => (
               <div key={item._id || item.id} className="group flex flex-col bg-white dark:bg-[#131C2E] border border-neutral-200 dark:border-neutral-800 rounded-[2rem] p-4 shadow-lg hover:shadow-2xl transition-all duration-300">
                 
-                <div className="relative w-full aspect-[4/5] mb-4 bg-neutral-50 dark:bg-[#0f172a] rounded-[1.5rem] overflow-hidden flex items-center justify-center p-4">
+                <div className="relative w-full h-48 sm:h-52 mb-4 bg-neutral-50 dark:bg-[#0f172a] rounded-[1.5rem] overflow-hidden flex items-center justify-center p-4">
                   <Image src={getImageUrl(item.image || '/placeholder.png')} 
                     alt={item.name} 
                     fill 
@@ -49,12 +49,12 @@ export default function WishlistPage() {
                 
                 <div className="px-2 pb-2 flex flex-col flex-grow">
                   <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-widest mb-1.5">Gear</span>
-                  <h3 className="font-extrabold text-neutral-900 dark:text-white mb-2 text-base text-left line-clamp-2">{item.name}</h3>
+                  <h3 className="font-extrabold text-neutral-900 dark:text-white mb-2 text-base text-left line-clamp-1">{item.name}</h3>
                   <div className="font-black text-[#900606] dark:text-[#ff4d4d] text-lg mb-6">₹{item.price}</div>
                   
                   <button 
                     onClick={() => handleMoveToCart(item)}
-                    className="mt-auto w-full py-3 bg-[#900606] text-white rounded-xl font-bold hover:bg-[#700505] transition-colors shadow-md flex items-center justify-center gap-2"
+                    className="mt-auto w-full py-2.5 sm:py-3 bg-[#900606] text-white rounded-xl font-bold text-xs sm:text-sm hover:bg-[#700505] transition-colors shadow-md flex items-center justify-center gap-2"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                     Move to Cart

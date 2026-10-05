@@ -41,7 +41,7 @@ function AccordionItem({ question, answer }) {
     <div className="border border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden bg-white dark:bg-[#131C2E] transition-colors duration-300">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-5 md:p-6 text-left focus:outline-none focus:bg-neutral-50 dark:focus:bg-neutral-800/50 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+        className="w-full flex items-center justify-between p-4 sm:p-5 md:p-6 text-left focus:outline-none focus:bg-neutral-50 dark:focus:bg-neutral-800/50 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
       >
         <h3 className={`text-lg md:text-xl font-bold transition-colors ${isOpen ? 'text-[#900606]' : 'text-neutral-900 dark:text-white'}`}>
           {question}
@@ -53,7 +53,7 @@ function AccordionItem({ question, answer }) {
       <div 
         className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
       >
-        <div className="p-5 md:p-6 pt-0 text-neutral-600 dark:text-neutral-400 text-base md:text-lg leading-relaxed">
+        <div className="p-4 sm:p-5 md:p-6 pt-0 text-neutral-600 dark:text-neutral-400 text-base md:text-lg leading-relaxed">
           {answer}
         </div>
       </div>
@@ -74,8 +74,8 @@ export default function FAQPage() {
   }).filter(category => category.items.length > 0);
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] dark:bg-[#0B0F19] text-[#900606] dark:text-neutral-100 font-sans transition-colors duration-300 w-full overflow-hidden pb-16 md:pb-24 pt-32 md:pt-40">
-      <div className="max-w-[900px] mx-auto px-6 md:px-12">
+    <div className="min-h-[100svh] bg-[#FDFBF7] dark:bg-[#0B0F19] text-[#900606] dark:text-neutral-100 font-sans transition-colors duration-300 w-full overflow-hidden pb-16 md:pb-24 pt-32 md:pt-40">
+      <div className="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 md:mb-16">
           <h1 className="text-5xl md:text-7xl font-black text-[#900606] tracking-tighter uppercase mb-6 leading-none">
             FAQ.
@@ -86,7 +86,7 @@ export default function FAQPage() {
         </div>
         
         {/* Search Bar */}
-        <div className="relative mb-12 sm:mb-16 max-w-2xl mx-auto z-10">
+        <div className="relative mb-12 sm:mb-16 max-w-2xl w-full mx-auto z-10">
           <svg className="w-6 h-6 absolute left-5 top-1/2 -translate-y-1/2 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           <input 
             type="text" 

@@ -69,7 +69,7 @@ export default function TrackOrderPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] dark:bg-[#0B0F19] text-[#900606] dark:text-neutral-100 font-sans transition-colors duration-300 w-full overflow-hidden pb-16 md:pb-24 pt-32 md:pt-40">
+    <div className="min-h-[100svh] bg-[#FDFBF7] dark:bg-[#0B0F19] text-[#900606] dark:text-neutral-100 font-sans transition-colors duration-300 w-full overflow-hidden pb-16 md:pb-24 pt-32 md:pt-40">
       <div className="max-w-[1000px] mx-auto px-6 md:px-12">
         <div className="text-center mb-12">
           <h1 className="text-5xl md:text-7xl font-black text-[#900606] tracking-tighter uppercase mb-4 leading-none">

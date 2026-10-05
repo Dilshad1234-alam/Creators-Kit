@@ -1,9 +1,17 @@
 import { NextResponse} from 'next/server';
+import { z } from 'zod';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import PendingUser from '@/models/PendingUser';
 import crypto from 'crypto';
 import { sendEmail} from '@/lib/mailer';
+
+const registerSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters')
+});
+
 export async function POST(req) {
  try {
  await dbConnect();

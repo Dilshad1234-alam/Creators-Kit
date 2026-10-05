@@ -55,14 +55,14 @@ export default function UserOrdersPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center relative overflow-hidden">
+      <div className="min-h-[100svh] bg-[#FDFBF7] flex items-center justify-center relative overflow-hidden">
         <div className="w-12 h-12 rounded-full border-4 border-neutral-200 border-t-[#900606] animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] relative overflow-hidden text-[#900606] py-12 md:py-24 animate-page-enter">
+    <div className="min-h-[100svh] bg-[#FDFBF7] relative overflow-hidden text-[#900606] py-12 md:py-24 animate-page-enter">
       <div className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-16 md:pt-12">
         
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4">

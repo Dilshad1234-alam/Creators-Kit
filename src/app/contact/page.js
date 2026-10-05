@@ -36,10 +36,10 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] dark:bg-background text-[#900606] dark:text-neutral-100 pt-28 pb-16 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-[100svh] bg-[#FDFBF7] dark:bg-background text-[#900606] dark:text-neutral-100 pt-28 pb-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-10 md:mb-16">
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-3 md:mb-4 text-[#900606] dark:text-neutral-100">Contact Us</h1>
+          <h1 className="text-4xl sm:text-6xl lg:text-6xl font-extrabold tracking-tight mb-3 md:mb-4 text-[#900606] dark:text-neutral-100">Contact Us</h1>
           <p className="text-base md:text-xl text-neutral-600 dark:text-neutral-400">We're here to help you on your creator journey.</p>
         </div>
 

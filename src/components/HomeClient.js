@@ -8,18 +8,17 @@ import MasterclassCard from './MasterclassCard';
 import InteractiveLightCard from './InteractiveLightCard';
 
 export default function HomeClient({ contentMap, kitComponents, masteryCourses }) {
-  const [isLightOn, setIsLightOn] = useState(() => {
+    const [isLightOn, setIsLightOn] = useState(true);
+  const [lightColor, setLightColor] = useState('white');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('heroLightState') !== 'off';
+      setIsLightOn(localStorage.getItem('heroLightState') !== 'off');
+      setLightColor(localStorage.getItem('heroLightColor') || 'white');
     }
-    return true;
-  });
-  const [lightColor, setLightColor] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('heroLightColor') || 'white';
-    }
-    return 'white';
-  });
+  }, []);
 
   const [openFaqIndex, setOpenFaqIndex] = useState(-1);
 
@@ -43,20 +42,20 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FDFBF7] dark:bg-background text-[#900606] dark:text-white font-sans overflow-x-hidden w-full transition-colors duration-300">
+    <div className="min-h-[100svh] flex flex-col bg-[#FDFBF7] dark:bg-background text-[#900606] dark:text-white font-sans overflow-x-hidden w-full transition-colors duration-300">
       <main className="flex-grow w-full">
         {/* 1. Hero Section (7.1) */}
         <section className="relative w-full pt-16 md:pt-24 pb-24 md:pb-32 overflow-hidden bg-[#900606] dark:bg-background">
-          <div className="w-full grid grid-cols-1 lg:grid-cols-12 items-center lg:items-end gap-8 md:gap-12 px-4 md:px-6 lg:px-12 relative z-10">
+          <div className="w-full grid grid-cols-1 lg:grid-cols-12 items-center lg:items-end gap-8 md:gap-12 px-4 md:px-6 lg:px-6 xl:px-12 relative z-10">
             
             {/* Left Column (Text & CTAs) */}
-            <div className="lg:col-span-6 lg:col-start-2 flex flex-col items-start text-left transition-all lg:pb-8">
+            <div className="lg:col-span-7 lg:col-start-1 xl:col-span-6 xl:col-start-2 flex flex-col items-start text-left transition-all lg:pb-8">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#900606]/10 text-[#900606] text-sm font-bold mb-8 border border-[#900606]/20 animate-fade-in-up">
                 <span className="flex h-2 w-2 rounded-full bg-[#900606] animate-pulse"></span>
                 {contentMap['hero_badge'] || ''}
               </div>
               
-              <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold mb-4 leading-snug tracking-tight text-white drop-shadow-lg">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-extrabold mb-4 leading-snug tracking-tight text-white drop-shadow-lg">
                 {contentMap['hero_heading'] || 'Unbox your potential'} <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-200">
                   {contentMap['hero_subheading'] || 'The Complete Creator Bundle'}
@@ -67,7 +66,7 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
                 {contentMap['hero_description'] || 'Stop guessing what gear you need. We provide the professional equipment, expert courses, and tactile resources so you can focus on what matters: making great content.'}
               </p>
               
-              <div className="flex flex-col sm:flex-row items-center justify-start gap-5 w-full">
+              <div className="flex flex-col sm:flex-row items-center justify-start gap-4 sm:gap-5 w-full flex-wrap">
                 <Link
                   href="/product"
                   className="w-full sm:w-auto px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-primary to-primary-hover text-white rounded-full font-extrabold text-base sm:text-lg hover:shadow-[0_0_40px_rgba(255,110,64,0.5)] transition-all hover:-translate-y-1 text-center"
@@ -84,7 +83,7 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
             </div>
 
             {/* Right Column (Visual) */}
-          <div className="lg:col-span-5 relative w-full mt-12 lg:mt-0 flex justify-end items-center pr-0 lg:pr-12">
+          <div className="lg:col-span-5 relative w-full mt-12 lg:mt-0 flex justify-center xl:justify-end items-center pr-0 xl:pr-12">
             <div className="relative w-full max-w-md lg:max-w-lg flex flex-col items-center">
     
               {/* Ring Light Image */}
@@ -104,7 +103,7 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
               </div>
 
               {/* Interactive Controls */}
-              <div className="pointer-events-auto flex flex-wrap justify-center items-center gap-1.5 sm:gap-2 mt-6 bg-[#0f172a] p-1.5 sm:p-2 rounded-[2rem] sm:rounded-full border border-neutral-800 shadow-2xl relative z-50 w-[95%] sm:w-auto">
+              <div className="pointer-events-auto flex flex-wrap sm:flex-nowrap justify-center items-center gap-1.5 sm:gap-2 mt-6 bg-[#0f172a] p-1.5 sm:p-2 rounded-[2rem] sm:rounded-full border border-neutral-800 shadow-2xl relative z-50 w-[95%] sm:w-auto">
       
                 {/* White Light Button */}
                 <button 
@@ -181,16 +180,16 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
             
             <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 relative pb-2 md:pb-8">
               
-              <div className="flex flex-nowrap justify-between items-start gap-4 sm:gap-6 overflow-x-auto w-full pb-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <div className="flex flex-nowrap justify-start items-start gap-4 sm:gap-6 md:gap-8 lg:gap-12 overflow-x-auto w-full pb-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 {kitComponents.map((item, index) => (
-                  <a href={`#${item._id}`} key={`${item._id}-${index}`} className="group flex flex-col items-center justify-start cursor-pointer w-[140px] sm:w-[160px] md:w-[200px] flex-shrink-0 snap-center">
-                    <div className="relative w-32 h-32 sm:w-36 sm:h-36 md:w-44 md:h-44 lg:w-52 lg:h-52 rounded-full overflow-hidden bg-[#FAF7F0] flex items-center justify-center mb-4 sm:mb-6 border-2 border-transparent transition-all duration-500 group-hover:border-[#900606]/20">
+                  <a href={`#${item._id}`} key={`${item._id}-${index}`} className="group flex flex-col items-center justify-start cursor-pointer w-[140px] sm:w-[160px] md:w-[200px] lg:w-[240px] flex-shrink-0 snap-center">
+                    <div className="relative w-32 h-32 sm:w-36 sm:h-36 md:w-48 md:h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden bg-[#FAF7F0] flex items-center justify-center mb-4 sm:mb-6 border-2 border-transparent transition-all duration-500 group-hover:border-[#900606]/20">
                       <Image 
                         src={getImageUrl(item.image)} 
                         alt={item.name} 
                         fill 
-                        sizes="(max-width: 640px) 128px, (max-width: 768px) 144px, (max-width: 1024px) 176px, 208px"
-                        className="w-full h-full object-contain p-3 sm:p-5 md:p-8 transition-transform duration-700 ease-out group-hover:scale-110" 
+                        sizes="(max-width: 640px) 128px, (max-width: 768px) 144px, (max-width: 1024px) 192px, 224px"
+                        className="w-full h-full object-contain p-3 sm:p-4 md:p-5 lg:p-6 transition-transform duration-700 ease-out group-hover:scale-110" 
                       />
                     </div>
                     
@@ -211,12 +210,12 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
             
             {kitComponents.map((item, idx) => (
               <div id={item._id} key={item._id} className={`flex flex-col lg:flex-row items-center gap-0 bg-[#FDFBF7] dark:bg-background rounded-[2rem] sm:rounded-[3rem] overflow-hidden group transition-colors duration-500 ${idx % 2 !== 0 ? 'lg:flex-row-reverse' : ''}`}>
-                <div className="w-full lg:w-1/2 aspect-square lg:aspect-video bg-[#FDFBF7] dark:bg-background flex items-center justify-center text-9xl relative overflow-hidden p-4 sm:p-6 lg:p-8">
+                <div className="w-full lg:w-1/2 aspect-square bg-[#FDFBF7] dark:bg-background flex items-center justify-center text-9xl relative overflow-hidden p-4 sm:p-6 lg:p-8">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-zinc-800/30 via-background to-background z-0"></div>
                   
                   
                   <div className="z-10 w-full h-full relative transform group-hover:scale-105 transition-transform duration-700 ease-out">
-                    <Image src={getImageUrl(item.image)} alt={item.name} fill className="w-full h-full object-contain p-4 sm:p-2 md:p-4" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                    <Image src={getImageUrl(item.image)} alt={item.name} fill className="w-full h-full object-contain p-2" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                   </div>
                 </div>
                 
@@ -424,7 +423,7 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
                   <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> In Stock & Ready to Ship
                 </span>
                 
-                <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black mb-3 md:mb-8 tracking-tight drop-">The Ultimate<br className="hidden lg:block"/> Creators Kit</h2>
+                <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-5xl xl:text-7xl font-black mb-3 md:mb-8 tracking-tight drop-">The Ultimate<br className="hidden lg:block"/> Creators Kit</h2>
                 <p className="text-base md:text-2xl text-neutral-600 dark:text-zinc-400 mb-6 lg:mb-16 max-w-2xl px-2 md:px-0 font-medium leading-relaxed">
                   Hardware + Education + Physical Resources. Get everything you need to start producing professional content today.
                 </p>
@@ -442,14 +441,14 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
                   
                   <div className="relative z-10 w-full flex flex-col items-center">
                     <p className="text-sm sm:text-base md:text-xl font-bold text-zinc-500 line-through mb-2 md:mb-4 tracking-wide decoration-[#FF3B14] decoration-2">Total Value: ₹4,999</p>
-                    <p className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-[#900606] dark:text-white mb-4 md:mb-8 drop-shadow-lg">₹3,999</p>
+                    <p className="text-4xl sm:text-5xl md:text-7xl lg:text-6xl xl:text-8xl font-black text-[#900606] dark:text-white mb-4 md:mb-8 drop-shadow-lg">₹3,999</p>
                     <div className="inline-block bg-[#FDFBF7] dark:bg-[#0f172a] text-[#900606] px-4 md:px-6 py-2 md:py-2.5 rounded-full font-bold text-xs md:text-base mb-6 md:mb-12">
                       Includes Free Nationwide Shipping 🚚
                     </div>
                     
                     <Link
                       href="/product"
-                      className="inline-flex w-full justify-center items-center gap-2 sm:gap-4 px-4 py-3 md:px-10 md:py-6 bg-[#900606] text-white rounded-full font-black text-base md:text-xl hover:bg-[#700505] transition-colors group/btn"
+                      className="inline-flex w-full justify-center items-center gap-2 sm:gap-4 px-4 py-3 md:px-10 md:py-6 lg:px-6 lg:py-4 xl:px-10 xl:py-6 bg-[#900606] text-white rounded-full font-black text-base md:text-xl hover:bg-[#700505] transition-colors group/btn"
                     >
                       Order Your Kit Now
                       <svg className="w-5 h-5 md:w-8 md:h-8 text-white transform group-hover/btn:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>

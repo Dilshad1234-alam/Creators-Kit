@@ -222,7 +222,7 @@ export default function CheckoutPage() {
 
  if (!cart || cart.length === 0) {
  return (
- <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7] text-[#900606]">
+ <div className="min-h-[100svh] flex items-center justify-center bg-[#FDFBF7] text-[#900606]">
  <div className="text-center">
  <h1 className="text-2xl font-bold mb-4">No items in checkout.</h1>
  <Link href="/product" className="text-[#900606] hover:underline font-medium">Return to store</Link>
@@ -233,15 +233,15 @@ export default function CheckoutPage() {
 
  return (
  <>
-  <div className="min-h-screen bg-[#FDFBF7] dark:bg-[#0B0F19] pt-32 pb-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden transition-colors duration-300">
+  <div className="min-h-[100svh] bg-[#FDFBF7] dark:bg-[#0B0F19] pt-32 pb-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden transition-colors duration-300">
   {/* Background Glow */}
   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-[#900606]/10 blur-[120px] rounded-full pointer-events-none"></div>
 
-  <div className="max-w-7xl mx-auto relative z-10">
-  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+  <div className="max-w-[1400px] w-full mx-auto relative z-10">
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start w-full">
   
   {/* Left side: Checkout Form */}
-  <div className="lg:col-span-2 w-full bg-white dark:bg-[#131C2E] backdrop-blur-xl border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 shadow-2xl transition-colors duration-300">
+  <div className="lg:col-span-1 w-full bg-white dark:bg-[#131C2E] backdrop-blur-xl border border-neutral-200 dark:border-neutral-800 rounded-[2rem] p-5 sm:p-6 lg:p-8 shadow-2xl transition-colors duration-300">
  <form onSubmit={handleSubmit} className="space-y-6">
  {/* Contact */}
  <section>
@@ -379,31 +379,23 @@ export default function CheckoutPage() {
 
  {/* Right side: Order Summary */}
  <div className="lg:col-span-1 w-full lg:sticky lg:top-32">
- <div className="bg-white dark:bg-[#131C2E] backdrop-blur-xl border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 sm:p-8 shadow-2xl transition-colors duration-300">
+ <div className="bg-white dark:bg-[#131C2E] border border-neutral-200 dark:border-neutral-800 rounded-[2rem] p-5 sm:p-6 lg:p-8 shadow-xl transition-colors duration-300 w-full">
  <h2 className="text-xl font-bold mb-6 text-[#900606]">Order Summary</h2>
  
  <div className="space-y-4 mb-8">
  {cart.map((item) => (
  <div key={item.id} className="flex gap-4 items-center mb-6">
  <div className="relative shrink-0">
- <div className="grid grid-cols-1 md:grid-cols-3 gap-1.5 w-[60px] md:w-[140px]">
- {item.images && item.images.length > 0 ? (
- item.images.map((img, idx) => (
- <div key={idx} className="relative w-10 h-10 bg-[#FDFBF7] rounded-lg flex items-center justify-center border border-neutral-200 overflow-hidden shadow-inner hidden md:block">
- <Image src={getImageUrl(img.src)} alt={`${item.name} part ${idx + 1}`} fill className="object-contain p-1" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+ <div className="relative w-12 h-12 bg-[#FDFBF7] dark:bg-[#0f172a] border border-neutral-200 dark:border-neutral-800 rounded-xl flex items-center justify-center overflow-hidden shadow-inner">
+ <Image 
+   src={getImageUrl(item.img || item.image || (item.images && item.images.length > 0 ? (item.images[0].src || item.images[0]) : '/placeholder.png'))} 
+   alt={item.name} 
+   fill 
+   className="object-contain p-1.5" 
+   sizes="48px" 
+ />
  </div>
- ))
- ) : item.image || item.img ? (
- <div className="relative w-16 h-16 bg-[#FDFBF7] dark:bg-[#0f172a] border border-neutral-200 dark:border-neutral-800 rounded-xl flex items-center justify-center overflow-hidden shadow-inner col-span-3">
- <Image src={getImageUrl(item.image || item.img)} alt={item.name} fill className="object-contain p-2" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
- </div>
- ) : (
- <div className="w-16 h-16 bg-[#FDFBF7] dark:bg-[#0f172a] border border-neutral-200 dark:border-neutral-800 rounded-xl flex items-center justify-center text-3xl shadow-inner col-span-3">
- 📦
- </div>
- )}
- </div>
- <span className="absolute -top-2 -right-2 bg-[#900606] text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-lg shadow-primary/50 z-10 ring-2 ring-neutral-900">
+ <span className="absolute -top-2 -right-2 bg-[#900606] text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-lg shadow-primary/50 z-10 ring-2 ring-white">
  {item.quantity}
  </span>
  </div>
@@ -420,7 +412,7 @@ export default function CheckoutPage() {
 
  {/* Coupon Section */}
  <div className="mb-6 bg-neutral-50 dark:bg-neutral-800/50 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 transition-colors duration-300">
- <div className="flex gap-2">
+ <div className="flex flex-col sm:flex-row gap-2 w-full">
  <input
  type="text"
  placeholder="Discount code"

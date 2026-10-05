@@ -17,8 +17,34 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
- title:"Creators Kit",
- description:"The complete toolkit for modern creators.",
+  title: "Creators Kit",
+  description: "The complete toolkit for modern creators. Equip yourself with premium gear, courses, and resources.",
+  keywords: ["creators kit", "creator gear", "youtube setup", "streaming gear", "masterclass", "content creation"],
+  authors: [{ name: "Zinmatt" }],
+  creator: "Zinmatt",
+  openGraph: {
+    title: "Creators Kit",
+    description: "The complete toolkit for modern creators. Equip yourself with premium gear, courses, and resources.",
+    url: "https://creatorskit.com",
+    siteName: "Creators Kit",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Creators Kit - The complete toolkit for modern creators",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Creators Kit",
+    description: "The complete toolkit for modern creators. Equip yourself with premium gear, courses, and resources.",
+    creator: "@zinmatt",
+    images: ["/og-image.jpg"],
+  },
 };
 
 export default function RootLayout({ children}) {

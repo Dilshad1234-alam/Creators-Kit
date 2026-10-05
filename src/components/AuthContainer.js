@@ -90,18 +90,25 @@ export default function AuthContainer({ initialMode = 'login' }) {
   const isLogin = mode === 'login';
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center p-4 sm:p-8 font-sans">
+    <div className="min-h-[100svh] bg-[#FDFBF7] flex items-center justify-center py-2 sm:py-4 px-4 sm:px-8 font-sans">
       {/* Main Container */}
-      <div className="relative w-full max-w-[1200px] h-[750px] bg-[#FDFBF7] rounded-[3rem] shadow-2xl overflow-hidden flex flex-col md:flex-row border border-neutral-100">
+      <div className="relative w-full max-w-[1200px] h-auto md:h-[480px] lg:h-[580px] xl:h-[650px] max-h-[calc(100svh-1rem)] md:max-h-[calc(100svh-2rem)] bg-[#FDFBF7] rounded-[2.5rem] md:rounded-[3rem] shadow-2xl overflow-hidden grid grid-cols-1 md:flex md:flex-row border border-neutral-100">
         
         {/* Sign In Form Panel */}
         <div 
-          className={`absolute top-0 left-0 h-full w-full md:w-1/2 flex items-center justify-center p-12 lg:p-16 transition-all duration-1000 ease-in-out transform
-            ${isLogin ? 'translate-x-0 opacity-100 z-20' : 'translate-x-[100%] md:translate-x-[20%] opacity-0 z-0 pointer-events-none'}`}
+          className={`col-start-1 row-start-1 flex md:absolute top-0 left-0 h-auto md:h-full w-full md:w-1/2 items-center justify-center py-6 sm:py-10 px-4 sm:px-8 md:p-6 lg:p-12 transition-all duration-1000 ease-in-out transform overflow-y-auto
+            ${isLogin ? 'translate-x-0 opacity-100 z-20' : '-translate-x-[100%] md:translate-x-[20%] opacity-0 z-0 pointer-events-none'}`}
         >
           <div className="w-full max-w-md">
-            <h2 className="text-4xl font-bold text-[#900606] mb-3">Sign in</h2>
-            <p className="text-lg text-neutral-500 mb-10">Use your account to continue</p>
+            <div className="md:hidden mb-4 sm:mb-8">
+              <Link href="/" className="inline-block cursor-pointer">
+                <span className="text-2xl sm:text-3xl font-black text-[#900606] tracking-tight">
+                  Creators kit
+                </span>
+              </Link>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#900606] mb-2 sm:mb-3">Sign in</h2>
+            <p className="text-sm sm:text-base md:text-lg text-neutral-500 mb-6 sm:mb-8 md:mb-10">Use your account to continue</p>
             
             {loginError && (
               <div className="mb-6 bg-red-50 text-red-600 p-4 rounded-xl text-base border border-red-100">
@@ -109,7 +116,7 @@ export default function AuthContainer({ initialMode = 'login' }) {
               </div>
             )}
 
-            <form className="space-y-6" onSubmit={handleLoginSubmit}>
+            <form className="space-y-4 md:space-y-6" onSubmit={handleLoginSubmit}>
               <div>
                 <input
                   name="email"
@@ -117,7 +124,7 @@ export default function AuthContainer({ initialMode = 'login' }) {
                   required
                   value={loginData.email}
                   onChange={(e) => setLoginData({...loginData, email: e.target.value})}
-                  className="w-full px-6 py-5 text-lg bg-[#F9F6EE] border border-neutral-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#900606]/20 focus:border-[#900606] transition-all"
+                  className="w-full px-4 py-3 sm:py-4 md:px-6 md:py-5 text-sm sm:text-base md:text-lg bg-[#F9F6EE] border border-neutral-200 rounded-2xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#900606]/20 focus:border-[#900606] transition-all"
                   placeholder="Email Address"
                 />
               </div>
@@ -128,7 +135,7 @@ export default function AuthContainer({ initialMode = 'login' }) {
                   required
                   value={loginData.password}
                   onChange={(e) => setLoginData({...loginData, password: e.target.value})}
-                  className="w-full px-6 py-5 text-lg bg-[#F9F6EE] border border-neutral-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#900606]/20 focus:border-[#900606] transition-all"
+                  className="w-full px-4 py-3 sm:py-4 md:px-6 md:py-5 text-sm sm:text-base md:text-lg bg-[#F9F6EE] border border-neutral-200 rounded-2xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#900606]/20 focus:border-[#900606] transition-all"
                   placeholder="Password"
                 />
                 <button 
@@ -145,26 +152,26 @@ export default function AuthContainer({ initialMode = 'login' }) {
                   </svg>
                 </button>
               </div>
-              <div className="flex items-center justify-between text-base">
-                <label className="flex items-center gap-3 cursor-pointer group">
-                  <input type="checkbox" className="w-5 h-5 rounded border-neutral-300 text-[#900606] focus:ring-[#900606]" />
-                  <span className="text-neutral-600 group-hover:text-[#900606] transition-colors">Remember me</span>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-sm sm:text-base gap-3 sm:gap-0">
+                <label className="flex items-center gap-2 sm:gap-3 cursor-pointer group">
+                  <input type="checkbox" className="w-4 h-4 sm:w-5 sm:h-5 rounded border-neutral-300 text-[#900606] focus:ring-[#900606]" />
+                  <span className="text-neutral-600 group-hover:text-[#900606] transition-colors whitespace-nowrap">Remember me</span>
                 </label>
-                <Link href="/forgot-password" className="font-semibold text-[#900606] hover:text-[#900606] transition-colors">
+                <Link href="/forgot-password" className="font-semibold text-[#900606] hover:text-[#900606] transition-colors whitespace-nowrap">
                   Forgot password?
                 </Link>
               </div>
               <button 
                 type="submit" 
                 disabled={loginLoading}
-                className="w-full py-5 mt-4 bg-[#900606] text-white rounded-2xl font-bold text-xl hover:bg-[#900606] shadow-lg shadow-[#900606]/20 hover:shadow-[#900606]/40 hover:-translate-y-0.5 transition-all disabled:opacity-50"
+                className="w-full py-3 sm:py-4 md:py-5 mt-2 sm:mt-4 bg-[#900606] text-white rounded-2xl font-bold text-base sm:text-lg md:text-xl hover:bg-[#900606] shadow-lg shadow-[#900606]/20 hover:shadow-[#900606]/40 hover:-translate-y-0.5 transition-all disabled:opacity-50"
               >
                 {loginLoading ? 'Signing in...' : 'Sign In'}
               </button>
             </form>
             
             {/* Mobile Toggle Button */}
-            <div className="mt-10 text-center md:hidden text-lg">
+            <div className="mt-6 md:mt-10 text-center md:hidden text-base md:text-lg">
               <p className="text-neutral-600">
                 Don't have an account?{' '}
                 <button onClick={() => toggleMode('register')} className="font-bold text-[#900606] hover:text-[#900606]">Sign Up</button>
@@ -175,12 +182,19 @@ export default function AuthContainer({ initialMode = 'login' }) {
 
         {/* Sign Up Form Panel */}
         <div 
-          className={`absolute top-0 right-0 h-full w-full md:w-1/2 flex items-center justify-center p-12 lg:p-16 transition-all duration-1000 ease-in-out transform
+          className={`col-start-1 row-start-1 flex md:absolute top-0 right-0 h-auto md:h-full w-full md:w-1/2 items-center justify-center py-6 sm:py-10 px-4 sm:px-8 md:p-6 lg:p-12 transition-all duration-1000 ease-in-out transform overflow-y-auto
             ${!isLogin ? 'translate-x-0 opacity-100 z-20' : 'translate-x-[100%] md:translate-x-[20%] opacity-0 z-0 pointer-events-none'}`}
         >
           <div className="w-full max-w-md">
-            <h2 className="text-4xl font-bold text-[#900606] mb-3">Create Account</h2>
-            <p className="text-lg text-neutral-500 mb-10">Join us and start your journey</p>
+            <div className="md:hidden mb-4 sm:mb-8">
+              <Link href="/" className="inline-block cursor-pointer">
+                <span className="text-2xl sm:text-3xl font-black text-[#900606] tracking-tight">
+                  Creators kit
+                </span>
+              </Link>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#900606] mb-2 sm:mb-3">Create Account</h2>
+            <p className="text-sm sm:text-base md:text-lg text-neutral-500 mb-6 sm:mb-8 md:mb-10">Join us and start your journey</p>
             
             {registerError && (
               <div className="mb-6 bg-red-50 text-red-600 p-4 rounded-xl text-base border border-red-100">
@@ -188,7 +202,7 @@ export default function AuthContainer({ initialMode = 'login' }) {
               </div>
             )}
 
-            <form className="space-y-6" onSubmit={handleRegisterSubmit}>
+            <form className="space-y-4 md:space-y-6" onSubmit={handleRegisterSubmit}>
               <div>
                 <input
                   name="name"
@@ -196,7 +210,7 @@ export default function AuthContainer({ initialMode = 'login' }) {
                   required
                   value={registerData.name}
                   onChange={(e) => setRegisterData({...registerData, name: e.target.value})}
-                  className="w-full px-6 py-5 text-lg bg-[#F9F6EE] border border-neutral-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#900606]/20 focus:border-[#900606] transition-all"
+                  className="w-full px-4 py-3 sm:py-4 md:px-6 md:py-5 text-sm sm:text-base md:text-lg bg-[#F9F6EE] border border-neutral-200 rounded-2xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#900606]/20 focus:border-[#900606] transition-all"
                   placeholder="Full Name"
                 />
               </div>
@@ -207,7 +221,7 @@ export default function AuthContainer({ initialMode = 'login' }) {
                   required
                   value={registerData.email}
                   onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
-                  className="w-full px-6 py-5 text-lg bg-[#F9F6EE] border border-neutral-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#900606]/20 focus:border-[#900606] transition-all"
+                  className="w-full px-4 py-3 sm:py-4 md:px-6 md:py-5 text-sm sm:text-base md:text-lg bg-[#F9F6EE] border border-neutral-200 rounded-2xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#900606]/20 focus:border-[#900606] transition-all"
                   placeholder="Email Address"
                 />
               </div>
@@ -218,21 +232,21 @@ export default function AuthContainer({ initialMode = 'login' }) {
                   required
                   value={registerData.password}
                   onChange={(e) => setRegisterData({...registerData, password: e.target.value})}
-                  className="w-full px-6 py-5 text-lg bg-[#F9F6EE] border border-neutral-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#900606]/20 focus:border-[#900606] transition-all"
+                  className="w-full px-4 py-3 sm:py-4 md:px-6 md:py-5 text-sm sm:text-base md:text-lg bg-[#F9F6EE] border border-neutral-200 rounded-2xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#900606]/20 focus:border-[#900606] transition-all"
                   placeholder="Password"
                 />
               </div>
               <button 
                 type="submit" 
                 disabled={registerLoading}
-                className="w-full py-5 mt-4 bg-[#900606] text-white rounded-2xl font-bold text-xl hover:bg-[#900606] shadow-lg shadow-[#900606]/20 hover:shadow-[#900606]/40 hover:-translate-y-0.5 transition-all disabled:opacity-50"
+                className="w-full py-3 sm:py-4 md:py-5 mt-2 sm:mt-4 bg-[#900606] text-white rounded-2xl font-bold text-base sm:text-lg md:text-xl hover:bg-[#900606] shadow-lg shadow-[#900606]/20 hover:shadow-[#900606]/40 hover:-translate-y-0.5 transition-all disabled:opacity-50"
               >
                 {registerLoading ? 'Signing up...' : 'Sign Up'}
               </button>
             </form>
             
             {/* Mobile Toggle Button */}
-            <div className="mt-10 text-center md:hidden text-lg">
+            <div className="mt-6 md:mt-10 text-center md:hidden text-base md:text-lg">
               <p className="text-neutral-600">
                 Already have an account?{' '}
                 <button onClick={() => toggleMode('login')} className="font-bold text-[#900606] hover:text-[#900606]">Sign In</button>
@@ -243,14 +257,14 @@ export default function AuthContainer({ initialMode = 'login' }) {
 
         {/* Sliding Overlay Panel (Desktop Only) */}
         <div 
-          className={`hidden md:flex absolute top-0 left-1/2 w-1/2 h-full bg-[#900606] text-white transition-transform duration-1000 ease-in-out z-30 flex-col items-center justify-center p-16 text-center overflow-hidden
+          className={`hidden md:flex absolute top-0 left-1/2 w-1/2 h-full bg-[#900606] text-white transition-transform duration-1000 ease-in-out z-30 flex-col items-center justify-center text-center overflow-hidden
             ${isLogin ? 'translate-x-0 rounded-l-[3rem]' : '-translate-x-full rounded-r-[3rem]'}`}
         >
           {/* Decorative Background Elements */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-[#900606] rounded-full mix-blend-multiply filter blur-3xl opacity-50 translate-x-1/2 -translate-y-1/2"></div>
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#900606] rounded-full mix-blend-multiply filter blur-3xl opacity-20 -translate-x-1/2 translate-y-1/2"></div>
           
-          <div className={`transition-all duration-1000 ease-in-out absolute flex flex-col items-center justify-center w-full px-16 ${isLogin ? 'opacity-100 translate-x-0 delay-300' : 'opacity-0 translate-x-[20%] pointer-events-none'}`}>
+          <div className={`transition-all duration-1000 ease-in-out absolute top-0 left-0 h-full w-full flex flex-col items-center justify-center px-4 lg:px-16 overflow-y-auto ${isLogin ? 'opacity-100 translate-x-0 delay-300 z-10' : 'opacity-0 translate-x-[20%] pointer-events-none z-0'}`}>
             <Link href="/" className="inline-block mb-12 cursor-pointer group hover:scale-105 transition-transform">
               <span className="text-3xl lg:text-5xl font-black text-white tracking-tight drop-shadow-md">
                 Creators kit
@@ -268,7 +282,7 @@ export default function AuthContainer({ initialMode = 'login' }) {
             </button>
           </div>
 
-          <div className={`transition-all duration-1000 ease-in-out absolute flex flex-col items-center justify-center w-full px-16 ${!isLogin ? 'opacity-100 translate-x-0 delay-300' : 'opacity-0 -translate-x-[20%] pointer-events-none'}`}>
+          <div className={`transition-all duration-1000 ease-in-out absolute top-0 left-0 h-full w-full flex flex-col items-center justify-center px-4 lg:px-16 overflow-y-auto ${!isLogin ? 'opacity-100 translate-x-0 delay-300 z-10' : 'opacity-0 -translate-x-[20%] pointer-events-none z-0'}`}>
             <Link href="/" className="inline-block mb-12 cursor-pointer group hover:scale-105 transition-transform">
               <span className="text-3xl lg:text-5xl font-black text-white tracking-tight drop-shadow-md">
                 Creators kit

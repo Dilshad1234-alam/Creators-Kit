@@ -56,7 +56,7 @@ export default async function BlogDetailPage({ params }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] dark:bg-background pt-32 md:pt-40 lg:pt-44 pb-16 md:pb-24">
+    <div className="min-h-[100svh] bg-[#FDFBF7] dark:bg-background pt-32 md:pt-40 lg:pt-44 pb-16 md:pb-24">
       {/* Article Header */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 md:mb-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
         <div className="flex items-center gap-3 text-sm font-bold text-[#900606] tracking-widest uppercase mb-6">

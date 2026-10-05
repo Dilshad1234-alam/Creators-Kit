@@ -53,17 +53,17 @@ export default function OrderSuccessClient({ orderId}) {
 
  if (error) {
  return (
- <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
- <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mb-6 border border-red-500/20">
- <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 max-w-xl mx-auto">
+ <div className="w-16 h-16 sm:w-20 sm:h-20 bg-red-500/10 rounded-full flex items-center justify-center mb-6 border border-red-500/20">
+ <svg className="w-8 h-8 sm:w-10 sm:h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
  </svg>
  </div>
- <h2 className="text-3xl font-extrabold text-[#900606] mb-3">Oops! Something went wrong.</h2>
+ <h2 className="text-2xl sm:text-3xl font-black text-[#900606] mb-3">Oops! Something went wrong.</h2>
  <p className="text-neutral-600 mb-8 max-w-md mx-auto text-lg leading-relaxed">{error}</p>
  <button
  onClick={() => router.push('/')}
- className="bg-neutral-100 text-[#900606] px-8 py-3.5 rounded-xl font-bold hover:bg-neutral-200 transition-all"
+ className="bg-neutral-100 text-[#900606] px-8 py-3.5 rounded-xl font-bold hover:bg-neutral-200 transition-all w-full sm:w-auto"
  >
  Return Home
  </button>
@@ -92,12 +92,12 @@ export default function OrderSuccessClient({ orderId}) {
  {/* Top Banner */}
  <div className="bg-[#FDFBF7] rounded-2xl shadow-sm border border-neutral-200 overflow-hidden mb-4">
  <div className="p-4 sm:p-6 text-center bg-green-50 border-b border-green-100">
- <div className="w-16 h-16 bg-[#900606] rounded-full flex items-center justify-center mx-auto mb-3 shadow-md shadow-[#900606]/30">
- <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#900606] rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-md shadow-[#900606]/30">
+ <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
  </svg>
  </div>
- <h1 className="text-2xl font-bold text-[#900606] mb-1">Order placed, thank you!</h1>
+ <h1 className="text-2xl sm:text-3xl font-black text-[#900606] mb-1 sm:mb-2">Order placed, thank you!</h1>
  <p className="text-neutral-600 text-sm">
  Confirmation will be sent to <span className="font-semibold text-[#900606]">{order.customerEmail}</span>
  </p>

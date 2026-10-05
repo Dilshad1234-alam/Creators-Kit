@@ -30,12 +30,12 @@ export default function BlogListingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] dark:bg-background pt-32 md:pt-40 pb-12 md:pb-24">
+    <div className="min-h-[100svh] bg-[#FDFBF7] dark:bg-background pt-20 sm:pt-24 md:pt-28 pb-12 md:pb-24">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-10 md:mb-16 animate-in fade-in slide-in-from-bottom-8 duration-700">
-          <h1 className="text-4xl md:text-6xl font-black text-[#900606] dark:text-white mb-4 md:mb-6 tracking-tight">
+          <h1 className="text-2xl md:text-4xl  lg:text-[5rem] font-black text-[#900606] dark:text-white tracking-tighter uppercase mb-4 md:mb-6 whitespace-nowrap">
             Creators Journal
           </h1>
           <p className="text-neutral-600 dark:text-neutral-400 text-lg md:text-xl px-2 md:px-0">
