@@ -103,40 +103,40 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
               </div>
 
               {/* Interactive Controls */}
-              <div className="pointer-events-auto flex flex-wrap sm:flex-nowrap justify-center items-center gap-1.5 sm:gap-2 mt-6 bg-[#0f172a] p-1.5 sm:p-2 rounded-[2rem] sm:rounded-full border border-neutral-800 shadow-2xl relative z-50 w-[95%] sm:w-auto">
-      
+              <div className="pointer-events-auto flex flex-nowrap items-center justify-center gap-1 sm:gap-2 mt-6 bg-[#0f172a] p-1.5 sm:p-2 rounded-full border border-neutral-800 shadow-2xl relative z-50 w-[95%] max-w-sm sm:max-w-none sm:w-auto mx-auto overflow-hidden">
+                
                 {/* White Light Button */}
                 <button 
                   onClick={() => handleColorChange('white')}
-                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full text-[10px] sm:text-xs font-bold transition-all duration-300 border whitespace-nowrap ${
+                  className={`flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2.5 rounded-full text-[9px] sm:text-xs font-bold transition-all duration-300 border whitespace-nowrap flex-1 sm:flex-none ${
                     lightColor === 'white' 
                       ? 'bg-white/10 text-neutral-100 border-white/20' 
                       : 'bg-transparent text-neutral-400 hover:text-neutral-100 border-transparent'
                   }`}
                 >
-                  <div className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${lightColor === 'white' ? 'bg-white' : 'bg-neutral-600'}`}></div>
-                  White Light
+                  <div className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shrink-0 transition-all duration-300 ${lightColor === 'white' ? 'bg-white' : 'bg-neutral-600'}`}></div>
+                  <span>White Light</span>
                 </button>
       
                 {/* Warm Light Button */}
                 <button 
                   onClick={() => handleColorChange('warm')}
-                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full text-[10px] sm:text-xs font-bold transition-all duration-300 border whitespace-nowrap ${
+                  className={`flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2.5 rounded-full text-[9px] sm:text-xs font-bold transition-all duration-300 border whitespace-nowrap flex-1 sm:flex-none ${
                     lightColor === 'warm' 
                       ? 'bg-[#900606]/40 text-neutral-100 border-[#900606]/50' 
                       : 'bg-transparent text-neutral-400 hover:text-neutral-100 border-transparent'
                   }`}
                 >
-                  <div className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${lightColor === 'warm' ? 'bg-orange-500' : 'bg-neutral-600'}`}></div>
-                  Warm Light
+                  <div className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shrink-0 transition-all duration-300 ${lightColor === 'warm' ? 'bg-orange-500' : 'bg-neutral-600'}`}></div>
+                  <span>Warm Light</span>
                 </button>
       
-                <div className="w-[1px] h-6 bg-neutral-700 mx-2"></div>
+                <div className="w-[1px] h-5 sm:h-6 bg-neutral-700 mx-0.5 sm:mx-2 shrink-0"></div>
       
                 {/* ON Button */}
                 <button 
                   onClick={() => handlePowerChange(true)}
-                  className={`flex items-center justify-center px-3 sm:px-4 h-8 sm:h-9 rounded-full text-[10px] sm:text-xs font-bold transition-all duration-300 border flex-shrink-0 ${
+                  className={`flex items-center justify-center px-2.5 sm:px-4 h-7 sm:h-9 rounded-full text-[9px] sm:text-xs font-bold transition-all duration-300 border shrink-0 ${
                     isLightOn
                       ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
                       : 'bg-transparent text-neutral-500 border-transparent hover:text-neutral-300'
@@ -145,11 +145,11 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
                 >
                   ON
                 </button>
- 
+
                 {/* OFF Button */}
                 <button 
                   onClick={() => handlePowerChange(false)}
-                  className={`flex items-center justify-center px-3 sm:px-4 h-8 sm:h-9 rounded-full text-[10px] sm:text-xs font-bold transition-all duration-300 border flex-shrink-0 ${
+                  className={`flex items-center justify-center px-2.5 sm:px-4 h-7 sm:h-9 rounded-full text-[9px] sm:text-xs font-bold transition-all duration-300 border shrink-0 ${
                     !isLightOn
                       ? 'bg-red-500/20 text-red-400 border-red-500/30'
                       : 'bg-transparent text-neutral-500 border-transparent hover:text-neutral-300'
@@ -161,8 +161,9 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
               </div>
             </div>
           </div>
-
           </div>
+
+          {/* </div> */}
           
           {/* Main Background Blur */}
           <div className="absolute top-1/4 right-0 w-1/2 h-[800px] bg-gradient-to-l from-primary/10 to-transparent rounded-full blur-[150px] -z-10 pointer-events-none"></div>
