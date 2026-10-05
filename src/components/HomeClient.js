@@ -161,11 +161,9 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
               </div>
             </div>
           </div>
-          </div>
+        </div>
 
-          {/* </div> */}
-          
-          {/* Main Background Blur */}
+        {/* Main Background Blur */}
           <div className="absolute top-1/4 right-0 w-1/2 h-[800px] bg-gradient-to-l from-primary/10 to-transparent rounded-full blur-[150px] -z-10 pointer-events-none"></div>
         </section>        
 
@@ -297,7 +295,7 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
                   Included Free with the Creator Kit
                 </div>
                 <h2 className="text-3xl sm:text-4xl md:text-7xl font-black mb-3 md:mb-6 tracking-tight text-[#900606] dark:text-white drop-">Master your craft.</h2>
-                <p className="text-base sm:text-lg md:text-2xl text-neutral-600 dark:text-zinc-400 font-medium leading-relaxed max-w-4xl mx-auto lg:mx-0">Don't just buy the gear—learn exactly how to use it to grow. Our expert-led masterclasses cover everything from shooting to going viral.</p>
+                <p className="text-base sm:text-lg md:text-2xl text-neutral-600 dark:text-zinc-400 font-medium leading-relaxed max-w-4xl mx-auto lg:mx-0">Don&apos;t just buy the gear—learn exactly how to use it to grow. Our expert-led masterclasses cover everything from shooting to going viral.</p>
               </div>
             </div>
 
