@@ -316,14 +316,17 @@ export default function ContactPage() {
                   ></textarea>
                 </div>
 
-                {/* Submit Button: Pill-shaped Solid Red button matching prompt */}
+                {/* Submit Button */}
                 <div className="pt-2">
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-4 bg-[#900606] hover:bg-[#700505] text-white rounded-xl font-bold text-sm tracking-wide transition-all shadow-[0_8px_20px_rgba(144,6,6,0.3)] disabled:opacity-60 cursor-pointer flex items-center justify-center gap-2"
+                    className="relative w-full py-4 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm tracking-wide overflow-hidden group/btn transition-all duration-300 shadow-sm disabled:opacity-60 cursor-pointer flex items-center justify-center gap-2"
                   >
-                    <span>{isSubmitting ? 'Sending...' : 'Send Message ➔'}</span>
+                    <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                    <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                      <span>{isSubmitting ? 'Sending...' : 'Send Message ➔'}</span>
+                    </span>
                   </button>
                 </div>
               </form>

@@ -50,10 +50,13 @@ export default function CartPage() {
 
           <Link
             href="/product"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-[#900606] hover:bg-[#7a0505] text-white rounded-full font-bold text-sm shadow-[0_4px_16px_rgba(144,6,6,0.3)] hover:scale-105 transition-all duration-300"
+            className="relative w-full sm:w-auto px-8 py-3.5 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm inline-flex items-center justify-center gap-2.5"
           >
-            <span>Explore Studio Gear</span>
-            <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+            <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+            <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2.5">
+              <span>Explore Studio Gear</span>
+              <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+            </span>
           </Link>
         </div>
       </div>
@@ -335,10 +338,13 @@ export default function CartPage() {
               {/* Checkout CTA */}
               <button 
                 onClick={() => router.push('/checkout')}
-                className="w-full py-4 bg-[#900606] hover:bg-[#7a0505] text-white rounded-2xl font-bold text-base transition-all duration-300 shadow-[0_4px_16px_rgba(144,6,6,0.3)] hover:shadow-[0_8px_24px_rgba(144,6,6,0.4)] hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2.5 cursor-pointer"
+                className="relative w-full py-3.5 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-base overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer"
               >
-                <span>Proceed to Checkout</span>
-                <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2.5">
+                  <span>Proceed to Checkout</span>
+                  <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                </span>
               </button>
 
               {/* Trust Badges Inside Summary */}

@@ -247,17 +247,23 @@ export default function OrderSuccessClient({ orderId}) {
  {/* Action Buttons */}
  <div className="flex flex-col gap-2.5">
  <Link
- href="/dashboard/orders"
- className="w-full py-2.5 sm:py-3 bg-[#900606] text-white rounded-xl font-bold text-sm sm:text-base text-center hover:bg-neutral-800 transition-colors shadow-md"
- >
- View All Orders
- </Link>
- <Link
- href="/product"
- className="w-full py-2.5 sm:py-3 bg-[#FDFBF7] border border-neutral-200 text-[#900606] rounded-xl font-bold text-sm sm:text-base text-center hover:bg-[#F9F6EE] transition-colors"
- >
- Continue Shopping
- </Link>
+  href="/account?tab=orders"
+  className="relative w-full py-3 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center"
+  >
+  <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+  <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+    View All Orders
+  </span>
+  </Link>
+  <Link
+  href="/product"
+  className="relative w-full py-3 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center"
+  >
+  <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+  <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+    Continue Shopping
+  </span>
+  </Link>
  </div>
 
  </div>

@@ -72,10 +72,13 @@ export default function AboutPage() {
               <div>
                 <Link 
                   href="/product" 
-                  className="inline-flex items-center gap-2.5 bg-[#900606] hover:bg-[#7a0505] text-white font-bold text-sm px-8 py-3.5 rounded-xl shadow-[0_4px_16px_rgba(144,6,6,0.35)] transition-all duration-300 hover:scale-[1.02]"
+                  className="relative inline-flex items-center justify-center gap-2.5 bg-white text-[#111827] border-2 border-neutral-200 font-bold text-sm px-8 py-3.5 rounded-xl overflow-hidden group/btn transition-all duration-300 shadow-sm"
                 >
-                  <span>Shop Our Kits</span>
-                  <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                  <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                  <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                    <span>Shop Our Kits</span>
+                    <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                  </span>
                 </Link>
               </div>
             </div>
@@ -228,10 +231,13 @@ export default function AboutPage() {
               <div>
                 <Link
                   href="/contact"
-                  className="inline-flex items-center gap-2.5 bg-[#900606] hover:bg-[#7a0505] text-white font-bold text-sm px-8 py-3.5 rounded-xl shadow-[0_4px_16px_rgba(144,6,6,0.35)] hover:shadow-[0_6px_22px_rgba(144,6,6,0.5)] transition-all duration-300 hover:scale-[1.02]"
+                  className="relative inline-flex items-center justify-center gap-2.5 bg-white text-[#111827] border-2 border-neutral-200 font-bold text-sm px-8 py-3.5 rounded-xl overflow-hidden group/btn transition-all duration-300 shadow-sm"
                 >
-                  <span>Know Our Journey</span>
-                  <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                  <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                  <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                    <span>Know Our Journey</span>
+                    <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                  </span>
                 </Link>
               </div>
             </div>
@@ -330,10 +336,13 @@ export default function AboutPage() {
 
                 <Link
                   href="/contact"
-                  className="inline-flex items-center gap-2.5 bg-[#900606] hover:bg-[#7a0505] text-white font-bold text-sm px-8 py-3.5 rounded-xl shadow-[0_4px_16px_rgba(144,6,6,0.35)] hover:shadow-[0_6px_22px_rgba(144,6,6,0.5)] transition-all duration-300 hover:scale-[1.02]"
+                  className="relative inline-flex items-center justify-center gap-2.5 bg-white text-[#111827] border-2 border-neutral-200 font-bold text-sm px-8 py-3.5 rounded-xl overflow-hidden group/btn transition-all duration-300 shadow-sm"
                 >
-                  <span>Read More</span>
-                  <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                  <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                  <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                    <span>Read More</span>
+                    <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                  </span>
                 </Link>
               </div>
 
@@ -538,10 +547,13 @@ export default function AboutPage() {
             <div className="flex items-center gap-6 sm:gap-8 shrink-0">
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2.5 bg-[#900606] hover:bg-[#7a0505] text-white font-bold text-sm px-8 py-3.5 rounded-xl shadow-[0_4px_16px_rgba(144,6,6,0.4)] hover:shadow-[0_6px_22px_rgba(144,6,6,0.6)] transition-all duration-300 hover:scale-[1.02]"
+                className="relative inline-flex items-center justify-center gap-2.5 bg-white text-[#111827] border-2 border-neutral-200 font-bold text-sm px-8 py-3.5 rounded-xl overflow-hidden group/btn transition-all duration-300 shadow-sm"
               >
-                <span>Join Now</span>
-                <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                  <span>Join Now</span>
+                  <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                </span>
               </Link>
             </div>
 

@@ -177,9 +177,12 @@ export default function Navbar() {
                 </Link>
                 <Link
                   href="/register"
-                  className="text-xs xl:text-sm font-bold bg-[#900606] text-white px-4 xl:px-5 py-2 rounded-full hover:bg-[#700505] transition-all duration-300 shadow-sm whitespace-nowrap"
+                  className="relative px-4 xl:px-5 py-2 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-xs xl:text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center whitespace-nowrap"
                 >
-                  Get Started
+                  <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                  <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-1.5">
+                    Get Started
+                  </span>
                 </Link>
               </div>
             )}

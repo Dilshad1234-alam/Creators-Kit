@@ -430,9 +430,12 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
                         });
                         router.push('/cart');
                       }}
-                      className="w-full py-3.5 bg-[#900606] hover:bg-[#a50707] text-white rounded-xl font-bold text-xs sm:text-sm transition-all text-center block cursor-pointer shadow-sm hover:shadow"
+                      className="relative w-full py-3 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer"
                     >
-                      Add to Cart
+                      <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                      <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                        Add to Cart
+                      </span>
                     </button>
                   </div>
         
@@ -505,52 +508,52 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
 
         {/* 3. CUSTOMER SUCCESS STORIES / BLOG */}
         <section className="w-full pt-3 pb-6 bg-[#FBFBF7] overflow-hidden">
-  <div className="w-full max-w-[1800px] mx-auto px-4 md:px-6 lg:px-12 mb-8 text-center ">
-    <h2 className="text-4xl pb-3 md:text-5xl lg:text-6xl font-medium text-[#111827] dark:text-white tracking-tight">
-      Review of <span className="text-[#900606] whitespace-nowrap">Creators</span>
-    </h2>
-    <p className="text-neutral-600 mt-4 font-medium text-lg">Discover how our gear is helping creators build better content every day.</p>
-  </div>
-  
-  <div className="w-full relative overflow-hidden flex pause-marquee">
-    <div className="flex gap-6 animate-marquee shrink-0 w-max">
-      {[...customerStories, ...customerStories, ...customerStories].map((item, idx) => (
-        <Link 
-          key={`${item.id}-${idx}`} 
-          href={`/blog/${item.id}?title=${encodeURIComponent(item.name)}&product=${encodeURIComponent(item.product)}&description=${encodeURIComponent(item.description)}&image=${encodeURIComponent(item.image)}`}
-          className={`group flex flex-col ${isDarkMode ? 'bg-[#131C2E]' : 'bg-white'} rounded-[1.5rem] p-4 shadow-sm hover:shadow-xl transition-all duration-300 relative border border-neutral-200 dark:border-neutral-800 w-[300px] md:w-[350px] shrink-0 cursor-pointer`}
-        >
-          {/* Image Container - Thoda chota height taaki compact lage */}
-          <div className="relative w-full h-[280px] md:h-[310px] mb-4 rounded-xl overflow-hidden bg-neutral-100 dark:bg-neutral-900">
-            <Image src={getImageUrl(item.image)} 
-            alt={item.name} 
-            fill 
-            sizes="(max-width: 768px) 100vw, 25vw" 
-            className="object-cover object-center group-hover:scale-105 transition-transform duration-500" />
+          <div className="w-full max-w-[1800px] mx-auto px-4 md:px-6 lg:px-12 mb-8 text-center ">
+            <h2 className="text-4xl pb-3 md:text-5xl lg:text-6xl font-medium text-[#111827] dark:text-white tracking-tight">
+              Review of <span className="text-[#900606] whitespace-nowrap">Creators</span>
+            </h2>
+            <p className="text-neutral-600 mt-4 font-medium text-lg">Discover how our gear is helping creators build better content every day.</p>
           </div>
+  
+          <div className="w-full relative overflow-hidden flex pause-marquee">
+            <div className="flex gap-6 animate-marquee shrink-0 w-max">
+              {[...customerStories, ...customerStories, ...customerStories].map((item, idx) => (
+                <Link 
+                  key={`${item.id}-${idx}`} 
+                  href={`/blog/${item.id}?title=${encodeURIComponent(item.name)}&product=${encodeURIComponent(item.product)}&description=${encodeURIComponent(item.description)}&image=${encodeURIComponent(item.image)}`}
+                  className={`group flex flex-col ${isDarkMode ? 'bg-[#131C2E]' : 'bg-white'} rounded-[1.5rem] p-4 shadow-sm hover:shadow-xl transition-all duration-300 relative border border-neutral-200 dark:border-neutral-800 w-[300px] md:w-[350px] shrink-0 cursor-pointer`}
+                >
+                  {/* Image Container - Thoda chota height taaki compact lage */}
+                  <div className="relative w-full h-[280px] md:h-[310px] mb-4 rounded-xl overflow-hidden bg-neutral-100 dark:bg-neutral-900">
+                    <Image src={getImageUrl(item.image)} 
+                    alt={item.name} 
+                    fill 
+                    sizes="(max-width: 768px) 100vw, 25vw" 
+                    className="object-cover object-center group-hover:scale-105 transition-transform duration-500" />
+                  </div>
 
-          {/* User Name & Description */}
-          <div className="flex flex-col flex-grow font-sans mb-4 px-1">
-            <h3 className="font-medium text-neutral-800 dark:text-neutral-200 mb-2 text-[14px] leading-snug line-clamp-2 font-sans">{item.description}</h3>
-            <div className="flex items-baseline gap-2 mt-auto font-sans w-full overflow-hidden">
-              <span className="font-semibold text-neutral-900 dark:text-white text-[1rem] shrink-0 whitespace-nowrap">{item.name}</span>
-              <span className="text-[12px] text-neutral-500 font-medium truncate">{item.product}</span>
+                  {/* User Name & Description */}
+                  <div className="flex flex-col flex-grow font-sans mb-4 px-1">
+                    <h3 className="font-medium text-neutral-800 dark:text-neutral-200 mb-2 text-[14px] leading-snug line-clamp-2 font-sans">{item.description}</h3>
+                    <div className="flex items-baseline gap-2 mt-auto font-sans w-full overflow-hidden">
+                      <span className="font-semibold text-neutral-900 dark:text-white text-[1rem] shrink-0 whitespace-nowrap">{item.name}</span>
+                      <span className="text-[12px] text-neutral-500 font-medium truncate">{item.product}</span>
+                    </div>
+                  </div>
+
+                  {/* Button */}
+                  <div className="relative w-full py-3 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center mt-auto">
+                    <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                    <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                      Read Story
+                    </span>
+                  </div>
+
+                </Link>
+              ))}
             </div>
           </div>
-
-          {/* Button */}
-          <div className="relative w-full py-3 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center mt-auto">
-            <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
-            <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
-              Read Story
-            </span>
-          </div>
-
-        </Link>
-      ))}
-    </div>
-  </div>
-</section>
+        </section>
 
          {/* BONUS: FREE RECORDED MASTERCLASS & PERKS WITH EVERY PURCHASE */}
         <section className="w-full pt-8 pb-10 bg-[#FBFBF7]">
@@ -572,9 +575,12 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
                 {/* Explore Bundles Button */}
                 <Link 
                   href="/product" 
-                  className="relative px-9 py-4 bg-[#900606] text-white rounded-xl font-bold text-base overflow-hidden group transition-all duration-300 shadow-[0_8px_20px_rgba(144,6,6,0.4)] inline-flex items-center gap-2 hover:bg-[#a50707]"
+                  className="relative px-9 py-3.5 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-base overflow-hidden group/btn transition-all duration-300 shadow-sm inline-flex items-center justify-center gap-2"
                 >
-                  <span>Explore Bundles ➔</span>
+                  <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                  <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                    Explore Bundles ➔
+                  </span>
                 </Link>
               </div>
 
@@ -946,9 +952,12 @@ export default function HomeClient({ contentMap, kitComponents, masteryCourses }
                     </div>
                     <button
                       type="submit"
-                      className="w-full sm:w-auto px-7 py-3.5 bg-[#900606] hover:bg-[#7a0505] text-white rounded-full font-bold text-xs sm:text-sm shadow-[0_4px_16px_rgba(144,6,6,0.25)] hover:shadow-[0_6px_20px_rgba(144,6,6,0.35)] transition-all duration-300 hover:scale-105 active:scale-95 shrink-0 cursor-pointer"
+                      className="relative w-full sm:w-auto px-7 py-3 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-xs sm:text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center shrink-0 cursor-pointer"
                     >
-                      Subscribe
+                      <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                      <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                        Subscribe
+                      </span>
                     </button>
                   </div>
                 )}

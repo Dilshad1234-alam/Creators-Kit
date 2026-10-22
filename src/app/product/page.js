@@ -440,20 +440,26 @@ export default function ProductPage() {
                   {/* Add to Cart CTA */}
                   <button
                     onClick={handleAddToCart}
-                    className="w-full py-3 px-4 bg-[#900606] hover:bg-[#a50707] text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all"
+                    className="relative w-full py-3 px-4 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer"
                   >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                    Add to Cart
+                    <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                    <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                      Add to Cart
+                    </span>
                   </button>
 
                   {/* Buy Now CTA */}
                   <button
                     onClick={handleBuyNow}
-                    className="w-full py-3 px-4 bg-white border border-[#900606] text-[#900606] hover:bg-[#900606] hover:text-white rounded-xl font-bold text-sm transition-all flex items-center justify-center shadow-sm"
+                    className="relative w-full py-3 px-4 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer"
                   >
-                    Buy Now
+                    <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                    <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                      Buy Now
+                    </span>
                   </button>
                 </div>
 
@@ -727,9 +733,12 @@ export default function ProductPage() {
                           });
                           router.push('/checkout');
                         }}
-                        className="w-full py-3.5 px-5 bg-[#900606] hover:bg-[#a50707] text-white rounded-xl font-bold text-sm sm:text-base transition-all shadow-md text-center block mt-auto"
+                        className="relative w-full py-3.5 px-5 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm sm:text-base overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer mt-auto"
                       >
-                        View Details
+                        <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                        <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                          View Details
+                        </span>
                       </button>
                     </div>
                   </div>
@@ -934,9 +943,12 @@ export default function ProductPage() {
                         });
                         router.push('/cart');
                       }}
-                      className="w-full py-3.5 bg-[#900606] hover:bg-[#a50707] text-white rounded-xl font-bold text-xs sm:text-sm transition-all text-center block cursor-pointer shadow-sm hover:shadow"
+                      className="relative w-full py-3 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer"
                     >
-                      Add to Cart
+                      <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                      <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                        Add to Cart
+                      </span>
                     </button>
                   </div>
 

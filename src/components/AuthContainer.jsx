@@ -612,9 +612,12 @@ export default function AuthContainer({ initialMode = 'login', initialEmail = ''
                 <button
                   type="submit"
                   disabled={loginLoading}
-                  className="w-full py-4 mt-2 bg-[#FF1F2D] hover:bg-[#E01623] text-white rounded-2xl font-black text-sm tracking-wide shadow-lg shadow-red-500/25 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                  className="relative w-full py-3.5 mt-2 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer disabled:opacity-60"
                 >
-                  {loginLoading ? 'Signing In...' : 'Sign In to Creator Dashboard ➔'}
+                  <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                  <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                    {loginLoading ? 'Signing In...' : 'Sign In to Creator Dashboard ➔'}
+                  </span>
                 </button>
               </form>
             ) : isRegister ? (
@@ -710,9 +713,12 @@ export default function AuthContainer({ initialMode = 'login', initialEmail = ''
                 <button
                   type="submit"
                   disabled={registerLoading}
-                  className="w-full py-3.5 mt-2 bg-[#FF1F2D] hover:bg-[#E01623] text-white rounded-2xl font-black text-sm tracking-wide shadow-lg shadow-red-500/25 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                  className="relative w-full py-3.5 mt-2 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer disabled:opacity-60"
                 >
-                  {registerLoading ? 'Sending Verification Code...' : 'Create Account & Verify ➔'}
+                  <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                  <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                    {registerLoading ? 'Sending Verification Code...' : 'Create Account & Verify ➔'}
+                  </span>
                 </button>
               </form>
             ) : (
@@ -762,16 +768,19 @@ export default function AuthContainer({ initialMode = 'login', initialEmail = ''
                 <button
                   type="submit"
                   disabled={otpLoading || otp.length !== 6}
-                  className="w-full py-4 mt-2 bg-[#FF1F2D] hover:bg-[#E01623] text-white rounded-2xl font-black text-sm tracking-wide shadow-lg shadow-red-500/25 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="relative w-full py-3.5 mt-2 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {otpLoading ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Verifying & Saving...
-                    </>
-                  ) : (
-                    'Confirm Code & Finalize Account ➔'
-                  )}
+                  <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                  <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                    {otpLoading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+                        Verifying & Saving...
+                      </>
+                    ) : (
+                      'Confirm Code & Finalize Account ➔'
+                    )}
+                  </span>
                 </button>
 
                 {/* Resend Code Section */}

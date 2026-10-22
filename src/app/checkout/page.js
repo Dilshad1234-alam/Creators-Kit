@@ -475,22 +475,25 @@ export default function CheckoutPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 bg-[#900606] hover:bg-[#7a0505] text-white rounded-2xl font-bold text-base transition-all duration-300 shadow-[0_4px_16px_rgba(144,6,6,0.3)] hover:shadow-[0_8px_24px_rgba(144,6,6,0.4)] hover:scale-[1.01] active:scale-[0.99] flex justify-center items-center gap-2.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="relative w-full py-4 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-base overflow-hidden group/btn transition-all duration-300 shadow-sm flex justify-center items-center gap-2.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? (
-                  <div className="flex items-center gap-2">
-                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span>Processing Secure Payment...</span>
-                  </div>
-                ) : (
-                  <>
-                    <span>Pay ₹{finalTotal.toLocaleString()} with Razorpay</span>
-                    <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-                  </>
-                )}
+                <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2.5">
+                  {loading ? (
+                    <div className="flex items-center gap-2">
+                      <svg className="animate-spin h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span>Processing Secure Payment...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <span>Pay ₹{finalTotal.toLocaleString()} with Razorpay</span>
+                      <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                    </>
+                  )}
+                </span>
               </button>
 
               <div className="flex items-center justify-between text-xs text-neutral-500 pt-1">
@@ -632,9 +635,12 @@ export default function CheckoutPage() {
                       type="button"
                       onClick={handleApplyCoupon}
                       disabled={!couponCode.trim() || couponLoading}
-                      className="px-5 py-2.5 bg-[#900606] hover:bg-[#7a0505] text-white rounded-xl text-xs sm:text-sm font-bold transition-all shadow-2xs hover:shadow-sm disabled:opacity-50 cursor-pointer"
+                      className="relative px-5 py-2.5 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl text-xs sm:text-sm font-bold overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center disabled:opacity-50 cursor-pointer"
                     >
-                      {couponLoading ? '...' : 'Apply'}
+                      <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                      <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-1.5">
+                        {couponLoading ? '...' : 'Apply'}
+                      </span>
                     </button>
                   )}
                 </div>

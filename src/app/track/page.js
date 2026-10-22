@@ -97,16 +97,19 @@ export default function TrackOrderPage() {
             <button 
               type="submit" 
               disabled={isSearching}
-              className="bg-[#900606] text-white font-bold text-lg rounded-2xl px-8 py-4 hover:bg-[#700505] transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 flex-shrink-0"
+              className="relative bg-white text-[#111827] border-2 border-neutral-200 font-bold text-base rounded-2xl px-8 py-4 overflow-hidden group/btn transition-all duration-300 shadow-sm disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 flex-shrink-0 cursor-pointer"
             >
-              {isSearching ? (
-                <>
-                  <div className="w-5 h-5 rounded-full border-2 border-white/30 border-t-white animate-spin"></div>
-                  Tracking...
-                </>
-              ) : (
-                'Track Package'
-              )}
+              <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+              <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                {isSearching ? (
+                  <>
+                    <div className="w-5 h-5 rounded-full border-2 border-current/30 border-t-current animate-spin"></div>
+                    Tracking...
+                  </>
+                ) : (
+                  'Track Package'
+                )}
+              </span>
             </button>
           </form>
         </div>

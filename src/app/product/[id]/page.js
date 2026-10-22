@@ -262,16 +262,22 @@ export default function ProductDetailPage() {
             <div className="flex flex-col sm:flex-row gap-4 font-sans mb-8">
               <button
                 onClick={handleAddToCart}
-                className="flex-1 py-4 bg-[#900606] hover:bg-[#700505] text-white rounded-2xl font-black text-base transition-all duration-300 shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                className="relative flex-1 py-4 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-base overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer"
               >
-                🛒 Add to Cart
+                <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                  🛒 Add to Cart
+                </span>
               </button>
 
               <button
                 onClick={handleBuyNow}
-                className="flex-1 py-4 bg-white dark:bg-[#131C2E] hover:bg-neutral-50 text-[#900606] border-2 border-[#900606] rounded-2xl font-black text-base transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer"
+                className="relative flex-1 py-4 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-base overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer"
               >
-                Buy Now
+                <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                  Buy Now
+                </span>
               </button>
             </div>
 

@@ -154,7 +154,7 @@ export default function ProductsManager() {
  <h2 className="text-xl sm:text-2xl font-bold text-[#900606]">{title}</h2>
  <button 
  onClick={() => handleAddNewClick(defaultCategory)}
- className="px-6 py-2 bg-[#900606] hover:bg-[#900606]/80 text-white font-bold rounded-full transition-all duration-300 text-sm shadow-[0_0_15px_rgba(245,158,11,0.4)]"
+ className="relative px-6 py-2 bg-white text-[#111827] border-2 border-neutral-200 font-bold rounded-full text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm inline-flex items-center justify-center cursor-pointer"
  >
  + Add New Product
  </button>
@@ -412,10 +412,13 @@ export default function ProductsManager() {
  <button 
  type="submit"
  disabled={isSaving}
- className="px-8 py-3 bg-[#900606] hover:bg-[#900606]/80 text-white font-medium rounded-xl transition-all shadow-[0_0_15px_rgba(245,158,11,0.4)] disabled:opacity-50"
+ className="relative px-8 py-3 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer disabled:opacity-50"
  >
- {isSaving ? 'Saving...' : editingProduct ? 'Save Changes' : 'Add Product'}
- </button>
+  <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0 pointer-events-none"></span>
+  <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+    {isSaving ? 'Saving...' : editingProduct ? 'Save Changes' : 'Add Product'}
+  </span>
+</button>
  </div>
  </form>
  </div>
