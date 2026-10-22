@@ -1198,7 +1198,7 @@ function AccountContent() {
     try {
       import('next-auth/react').then(({ signOut }) => signOut({ redirect: false }));
     } catch (e) {}
-    window.location.href = '/login';
+    router.push('/login');
   };
 
   // Exact tabs as specified
