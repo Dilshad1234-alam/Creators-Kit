@@ -27,7 +27,7 @@ export default function TermsPage() {
             <ul className="list-disc pl-6 space-y-2">
               <li><strong className="text-neutral-900 dark:text-white">Account Details:</strong> You agree to provide accurate and complete information when registering an account.</li>
               <li><strong className="text-neutral-900 dark:text-white">Security:</strong> You are solely responsible for protecting your account credentials and password.</li>
-              <li><strong className="text-neutral-900 dark:text-white">Data Persistence:</strong> Certain non-sensitive preferences (like dark mode toggles and wishlist items) are stored locally in your browser to enhance your experience.</li>
+              <li><strong className="text-neutral-900 dark:text-white">Data Persistence:</strong> Certain non-sensitive preferences (like dark mode toggles) are stored locally in your browser to enhance your experience.</li>
             </ul>
           </section>
 

@@ -1,22 +1,23 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
 import { CartProvider } from "@/context/CartContext";
-import { WishlistProvider } from "@/context/WishlistContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import AuthProvider from "@/components/AuthProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import "./globals.css";
 
-const geistSans = Geist({
- variable:"--font-geist-sans",
+const plusJakartaSans = Plus_Jakarta_Sans({
+ variable: "--font-plus-jakarta",
  subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
- variable:"--font-geist-mono",
+ variable: "--font-geist-mono",
  subsets: ["latin"],
 });
 
 export const metadata = {
+  metadataBase: new URL('https://creatorskit.com'),
   title: "Creators Kit",
   description: "The complete toolkit for modern creators. Equip yourself with premium gear, courses, and resources.",
   keywords: ["creators kit", "creator gear", "youtube setup", "streaming gear", "masterclass", "content creation"],
@@ -47,23 +48,23 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children}) {
- return (
- <html
- lang="en"
- className={`${geistSans.variable} ${geistMono.variable} h-full antialiased overflow-x-hidden w-full max-w-[100vw]`}
- suppressHydrationWarning
- >
-      <body className="min-h-full flex flex-col bg-[#FDFBF7] dark:bg-[#0f172a] text-[#900606] dark:text-neutral-200 transition-colors duration-300 overflow-x-hidden w-full max-w-[100vw]" suppressHydrationWarning={true}>
-        <ThemeProvider>
-          <CartProvider>
-            <WishlistProvider>
+export default function RootLayout({ children }) {
+  return (
+    <html
+      lang="en"
+      className={`${plusJakartaSans.variable} ${geistMono.variable} h-full antialiased overflow-x-hidden w-full max-w-[100vw] font-sans`}
+      suppressHydrationWarning
+    >
+      <body className="font-sans min-h-full flex flex-col bg-[#FBFBF7] text-[#111827] transition-colors duration-300 overflow-x-hidden w-full max-w-[100vw]" suppressHydrationWarning={true}>
+        <AuthProvider>
+          <ThemeProvider>
+            <CartProvider>
               <Navbar />
               {children}
               <Footer />
-            </WishlistProvider>
-          </CartProvider>
-        </ThemeProvider>
+            </CartProvider>
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

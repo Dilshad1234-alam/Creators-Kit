@@ -25,7 +25,12 @@ const Product = mongoose.models.Product || mongoose.model('Product', ProductSche
 
 async function fix() {
   try {
-    await mongoose.connect('mongodb+srv://dmd68699_db_user:dilshad9523@cluster0.yxpgsw3.mongodb.net/creators-kit');
+    const mongoUri = process.env.MONGODB_URI;
+    if (!mongoUri) {
+      console.error('MONGODB_URI is not set');
+      return;
+    }
+    await mongoose.connect(mongoUri);
     console.log('Connected to DB');
     
     const orders = await Order.find({});

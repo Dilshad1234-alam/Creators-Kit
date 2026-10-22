@@ -56,20 +56,32 @@ export default function AdminLayout({ children }) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
-    const role = sessionStorage.getItem('userRole');
+    const role = sessionStorage.getItem('userRole') || localStorage.getItem('userRole');
     if (role !== 'admin') {
       router.push('/');
     } else {
       setIsAuthorized(true);
-      const name = sessionStorage.getItem('userName') || 'Admin User';
+      const name = sessionStorage.getItem('userName') || localStorage.getItem('userName') || 'Admin User';
       setAdminName(name);
     }
   }, [router]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     sessionStorage.removeItem('userName');
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('userRole');
+    sessionStorage.removeItem('userEmail');
+    localStorage.removeItem('creatorsKitUserInfo');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('token');
+    try {
+      const { signOut } = await import('next-auth/react');
+      await signOut({ redirect: false });
+    } catch (e) {
+      // ignore
+    }
     router.push('/login');
   };
 

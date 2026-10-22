@@ -3,8 +3,8 @@ import dbConnect from '@/lib/mongodb';
 import Contact from '@/models/Contact';
 
 export async function GET() {
-  await dbConnect();
   try {
+    await dbConnect();
     const messages = await Contact.find({}).sort({ createdAt: -1 });
     return NextResponse.json({ success: true, data: messages }, { status: 200 });
   } catch (error) {
@@ -14,8 +14,8 @@ export async function GET() {
 }
 
 export async function POST(req) {
-  await dbConnect();
   try {
+    await dbConnect();
     const body = await req.json();
     const message = await Contact.create(body);
     return NextResponse.json({ success: true, data: message }, { status: 201 });

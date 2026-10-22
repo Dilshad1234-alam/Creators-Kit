@@ -31,7 +31,7 @@
   --color-neutral-950: #0B0F19; /* Background color */
 
   /* Typography */
-  --font-sans: 'Inter', var(--font-geist-sans), system-ui, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', var(--font-plus-jakarta), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
 
   /* Generous Spacing for Modern Layouts */
@@ -94,4 +94,23 @@ body {
 }
 .animate-page-enter {
   animation: pageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@layer base {
+  *, ::before, ::after {
+    font-family: var(--font-sans), sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6, .heading-primary {
+    @apply font-sans tracking-tight;
+    font-family: var(--font-sans), sans-serif !important;
+  }
+  
+  p, span, a, div, button, input, textarea, select {
+    font-family: var(--font-sans), sans-serif;
+  }
+  
+  .card-title, .product-name, .label-secondary {
+    @apply font-sans font-medium text-neutral-800;
+  }
 }

@@ -1,73 +1,83 @@
-import { NextResponse} from 'next/server';
+import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import PendingUser from '@/models/PendingUser';
 
 export async function POST(req) {
- try {
- await dbConnect();
+  try {
+    await dbConnect();
 
- const body = await req.json();
- const { email, password} = body;
+    const body = await req.json();
+    const { email, password } = body;
 
- if (!email || !password) {
- return NextResponse.json(
- { error: 'Please provide email and password'},
- { status: 400}
- );
-}
+    if (!email || !password) {
+      return NextResponse.json(
+        { error: 'Please provide email and password' },
+        { status: 400 }
+      );
+    }
 
- // Check for user
- const user = await User.findOne({ email}).select('+password');
+    const cleanEmail = email.trim().toLowerCase();
 
- if (!user) {
- // Check if they are in the pending collection (unverified)
- const pendingUser = await PendingUser.findOne({ email});
- if (pendingUser) {
- return NextResponse.json(
- { error: 'Please verify your email address before logging in.', email: pendingUser.email},
- { status: 403}
- );
-}
+    // Check for user
+    const user = await User.findOne({ email: cleanEmail }).select('+password');
 
- return NextResponse.json(
- { error: 'Invalid credentials'},
- { status: 401}
- );
-}
+    if (!user) {
+      // Check if they are in the pending collection (unverified registration)
+      const pendingUser = await PendingUser.findOne({ email: cleanEmail });
+      if (pendingUser) {
+        return NextResponse.json(
+          {
+            error: 'Please verify your email address before logging in.',
+            email: pendingUser.email,
+            isPending: true,
+          },
+          { status: 403 }
+        );
+      }
 
- // Block login if user has not verified their OTP (for legacy users still in the main collection)
- if (!user.isVerified) {
- return NextResponse.json(
- { error: 'Please verify your email address before logging in.', email: user.email},
- { status: 403}
- );
-}
+      return NextResponse.json(
+        { error: 'Invalid email or password' },
+        { status: 401 }
+      );
+    }
 
- // Check if password matches
- const isMatch = await user.matchPassword(password);
+    // Block login if user has not verified their OTP
+    if (!user.isVerified) {
+      return NextResponse.json(
+        {
+          error: 'Please verify your email address before logging in.',
+          email: user.email,
+          isPending: true,
+        },
+        { status: 403 }
+      );
+    }
 
- if (!isMatch) {
- return NextResponse.json(
- { error: 'Invalid credentials'},
- { status: 401}
- );
-}
+    // Check if password matches
+    const isMatch = await user.matchPassword(password);
 
- return NextResponse.json(
- {
- _id: user._id,
- name: user.name,
- email: user.email,
- role: user.role,
-},
- { status: 200}
- );
-} catch (error) {
- console.error('Login Error:', error);
- return NextResponse.json(
- { error: 'Failed to login user', details: error.message},
- { status: 500}
- );
-}
+    if (!isMatch) {
+      return NextResponse.json(
+        { error: 'Invalid email or password' },
+        { status: 401 }
+      );
+    }
+
+    return NextResponse.json(
+      {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role || 'user',
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Login Error:', error);
+    return NextResponse.json(
+      { error: 'Failed to login user', details: error.message },
+      { status: 500 }
+    );
+  }
 }

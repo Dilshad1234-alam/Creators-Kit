@@ -14,6 +14,15 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/masterclass',
+        destination: '/account?tab=masterclass',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

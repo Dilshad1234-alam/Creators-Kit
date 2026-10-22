@@ -5,10 +5,15 @@ import Masterclass from '@/models/Masterclass';
 import HomeClient from '@/components/HomeClient';
 
 export default async function Home() {
- await dbConnect();
- 
- // 1. Fetch Content
- let content = await Content.find({}).lean();
+  const contentMap = {};
+  let kitComponents = [];
+  let masteryCourses = [];
+
+  try {
+    await dbConnect();
+    
+    // 1. Fetch Content
+    let content = await Content.find({}).lean();
  if (content.length === 0) {
  const seedData = [
  { key: 'hero_badge', value: '🔥 All-in-One Creator Bundle'},
@@ -27,25 +32,26 @@ export default async function Home() {
  await Content.insertMany(seedData);
  content = await Content.find({}).lean();
 }
- 
- const contentMap = {};
- content.forEach(item => {
- contentMap[item.key] = item.value;
-});
+  content.forEach(item => {
+    contentMap[item.key] = item.value;
+  });
 
- // 2. Fetch Features
- let kitComponents = await HomepageFeature.find({}).sort({ order: 1}).lean();
- kitComponents = kitComponents.map(doc => ({
- ...doc,
- _id: doc._id.toString()
-}));
+  // 2. Fetch Features
+  kitComponents = await HomepageFeature.find({}).sort({ order: 1 }).lean();
+  kitComponents = kitComponents.map(doc => ({
+    ...doc,
+    _id: doc._id.toString()
+  }));
 
- // 3. Fetch Masterclasses
- let masteryCourses = await Masterclass.find({}).sort({ order: 1}).lean();
- masteryCourses = masteryCourses.map(doc => ({
- ...doc,
- _id: doc._id.toString()
-}));
+  // 3. Fetch Masterclasses
+  masteryCourses = await Masterclass.find({}).sort({ order: 1 }).lean();
+  masteryCourses = masteryCourses.map(doc => ({
+    ...doc,
+    _id: doc._id.toString()
+  }));
+ } catch (error) {
+  console.warn('MongoDB connection or query skipped on homepage:', error.message);
+ }
 
  return (
  <HomeClient 

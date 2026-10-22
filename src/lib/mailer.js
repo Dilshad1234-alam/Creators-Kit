@@ -12,13 +12,6 @@ export const sendEmail = async ({ to, subject, html}) => {
 
     // Use actual SMTP if configured
     if (process.env.SMTP_HOST && process.env.SMTP_PORT) {
-        console.log("SMTP Config loading:");
-        console.log("SMTP_HOST:", process.env.SMTP_HOST);
-        console.log("SMTP_PORT:", process.env.SMTP_PORT);
-        console.log("SMTP_USER:", process.env.SMTP_USER);
-        console.log("SMTP_EMAIL:", process.env.SMTP_EMAIL);
-        console.log("SMTP_PASS:", process.env.SMTP_PASS ? "*** (set)" : "undefined");
-        
         transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: parseInt(process.env.SMTP_PORT, 10),
