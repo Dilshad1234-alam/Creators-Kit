@@ -22,6 +22,7 @@ const X = ({ className }) => (
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [userName, setUserName] = useState(null);
+  const [userRole, setUserRole] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
   const { cartCount } = useCart();
   const pathname = usePathname();
@@ -29,15 +30,46 @@ export default function Navbar() {
   const { data: session } = useSession();
 
   useEffect(() => {
+    // Navbar is completely hidden and inactive on /admin routes.
+    // Never run auth redirects when already in /admin to avoid reload loops.
+    if (pathname?.startsWith('/admin')) {
+      return;
+    }
+
     const updateAuth = () => {
-      const stored =
-        sessionStorage.getItem('userName') ||
-        localStorage.getItem('userName') ||
-        session?.user?.name;
-      if (stored) {
-        setUserName(stored);
+      // Check for user account info in creatorsKitUserInfo
+      // Prioritize session-only storage so closing the browser/tab resets to unauthenticated Navbar
+      const userInfoStr = sessionStorage.getItem('creatorsKitUserInfo');
+      let customerName = null;
+      let role = 'user';
+
+      if (userInfoStr) {
+        try {
+          const parsed = JSON.parse(userInfoStr);
+          if (parsed && parsed.name) {
+            customerName = parsed.name;
+            if (parsed.role) role = parsed.role;
+          }
+        } catch (e) {}
+      }
+
+      // Fallback to storage/session
+      if (!customerName) {
+        customerName =
+          sessionStorage.getItem('userName') ||
+          session?.user?.name;
+        const storedRole =
+          sessionStorage.getItem('userRole') ||
+          session?.user?.role;
+        if (storedRole) role = storedRole;
+      }
+
+      if (customerName) {
+        setUserName(customerName);
+        setUserRole(role);
       } else {
         setUserName(null);
+        setUserRole(null);
       }
     };
 
@@ -51,19 +83,26 @@ export default function Navbar() {
       window.removeEventListener('storage', updateAuth);
       window.removeEventListener('creatorskit-auth-change', updateAuth);
     };
-  }, [session]);
+  }, [session, pathname, router]);
 
   const handleLogout = async () => {
-    sessionStorage.removeItem('userName');
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('userEmail');
-    sessionStorage.removeItem('userRole');
+    sessionStorage.clear();
     localStorage.removeItem('creatorsKitUserInfo');
     localStorage.removeItem('userName');
     localStorage.removeItem('userEmail');
     localStorage.removeItem('userRole');
     localStorage.removeItem('token');
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('admin_role');
+    
+    // Clear cookies
+    const cookieNames = ['user_role', 'user_email', 'user_name', 'auth_token', 'admin_role', 'admin_email', 'admin_name', 'admin_token'];
+    cookieNames.forEach((c) => {
+      document.cookie = `${c}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+    });
+
     setUserName(null);
+    setUserRole(null);
     try {
       await signOut({ redirect: false });
     } catch (e) {
@@ -139,7 +178,7 @@ export default function Navbar() {
               </div>
             ) : userName ? (
               <div className="relative group mr-4 md:mr-6">
-                <Link href="/account" className="flex items-center justify-center p-1 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer transition-all">
+                <Link href="/account" className="flex items-center justify-center p-1 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer transition-all" title="My Account">
                   <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={getImageUrl("/profile.svg")} alt="Profile" className="w-full h-full object-cover" />
@@ -154,8 +193,8 @@ export default function Navbar() {
                     <Link href="/account?tab=orders" className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:text-[#900606] font-semibold transition-colors">
                       My Orders
                     </Link>
-                    <Link href="/account?tab=masterclass" className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:text-[#900606] font-semibold transition-colors">
-                      Masterclass
+                    <Link href="/account?tab=courses" className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:text-[#900606] font-semibold transition-colors">
+                      Courses
                     </Link>
                     <Link href="/account?tab=setting" className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:text-[#900606] font-semibold transition-colors">
                       Setting
@@ -164,7 +203,7 @@ export default function Navbar() {
                       Notifications
                     </Link>
                     <div className="my-1 border-t border-neutral-200 dark:border-neutral-800" />
-                    <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 font-bold transition-colors w-full text-left">
+                    <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 font-bold transition-colors w-full text-left cursor-pointer">
                       Log out
                     </button>
                   </div>
@@ -242,6 +281,74 @@ export default function Navbar() {
                   {link.name}
                 </Link>
               ))}
+
+              <div className="pt-4 mt-2 border-t border-neutral-200 dark:border-neutral-800 flex flex-col gap-2">
+                {userName ? (
+                  <>
+                    <Link
+                      href="/account"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block px-3 py-2 rounded-lg text-sm font-semibold text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                    >
+                      My Profile ({userName})
+                    </Link>
+                    <Link
+                      href="/account?tab=orders"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block px-3 py-2 rounded-lg text-sm font-semibold text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                    >
+                      My Orders
+                    </Link>
+                    <Link
+                      href="/account?tab=courses"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block px-3 py-2 rounded-lg text-sm font-semibold text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                    >
+                      Courses
+                    </Link>
+                    <Link
+                      href="/account?tab=setting"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block px-3 py-2 rounded-lg text-sm font-semibold text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                    >
+                      Setting
+                    </Link>
+                    <Link
+                      href="/account?tab=notifications"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block px-3 py-2 rounded-lg text-sm font-semibold text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                    >
+                      Notifications
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        handleLogout();
+                      }}
+                      className="block w-full text-left px-3 py-2 rounded-lg text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer"
+                    >
+                      Log out
+                    </button>
+                  </>
+                ) : (
+                  <div className="flex flex-col gap-2 pt-1">
+                    <Link
+                      href="/login"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block w-full py-2.5 px-4 text-center rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-200 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200"
+                    >
+                      Log in
+                    </Link>
+                    <Link
+                      href="/register"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block w-full py-2.5 px-4 text-center rounded-xl text-sm font-bold bg-[#900606] text-white hover:bg-[#7a0505] shadow-sm"
+                    >
+                      Get Started
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>

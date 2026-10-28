@@ -24,9 +24,17 @@ export default function BlogListingPage() {
 
   useEffect(() => {
     fetchBlogs();
-    // Optional: Har 5 seconds mein background mein check karega agar koi naya blog aaya ho
-    const interval = setInterval(fetchBlogs, 5000);
-    return () => clearInterval(interval);
+    const handleSync = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        fetchBlogs();
+      }
+    };
+    window.addEventListener('visibilitychange', handleSync);
+    window.addEventListener('focus', handleSync);
+    return () => {
+      window.removeEventListener('visibilitychange', handleSync);
+      window.removeEventListener('focus', handleSync);
+    };
   }, []);
 
   return (

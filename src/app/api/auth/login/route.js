@@ -64,15 +64,60 @@ export async function POST(req) {
       );
     }
 
-    return NextResponse.json(
+    const userRole = user.role || 'user';
+    const isAdmin = userRole === 'admin';
+    const redirectTo = isAdmin ? '/admin' : '/account';
+
+    const response = NextResponse.json(
       {
         _id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role || 'user',
+        role: userRole,
+        redirectTo,
       },
       { status: 200 }
     );
+
+    // Session-only cookies: omitting maxAge and expires ensures the browser
+    // terminates the session when the browser tab/window is closed.
+    const sessionCookieOptions = {
+      path: '/',
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    };
+
+    const clearCookieOptions = {
+      path: '/',
+      maxAge: 0,
+      expires: new Date(0),
+    };
+
+    if (isAdmin) {
+      // Dedicated admin session cookies (isolated from storefront visitor session)
+      response.cookies.set('admin_role', 'admin', sessionCookieOptions);
+      response.cookies.set('admin_email', user.email, sessionCookieOptions);
+      response.cookies.set('admin_name', user.name, sessionCookieOptions);
+      response.cookies.set('admin_token', 'admin_active', sessionCookieOptions);
+      response.cookies.set('user_role', 'admin', sessionCookieOptions);
+
+      // Purge any lingering customer cookies to prevent session conflict
+      response.cookies.set('auth_token', '', clearCookieOptions);
+    } else {
+      // Dedicated customer session cookies
+      response.cookies.set('user_role', 'user', sessionCookieOptions);
+      response.cookies.set('user_email', user.email, sessionCookieOptions);
+      response.cookies.set('user_name', user.name, sessionCookieOptions);
+      response.cookies.set('auth_token', 'session_active', sessionCookieOptions);
+
+      // Purge any lingering admin cookies to prevent session conflict
+      response.cookies.set('admin_role', '', clearCookieOptions);
+      response.cookies.set('admin_email', '', clearCookieOptions);
+      response.cookies.set('admin_name', '', clearCookieOptions);
+      response.cookies.set('admin_token', '', clearCookieOptions);
+    }
+
+    return response;
   } catch (error) {
     console.error('Login Error:', error);
     return NextResponse.json(

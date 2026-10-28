@@ -1,62 +1,70 @@
 import mongoose from 'mongoose';
 
 const OrderItemSchema = new mongoose.Schema({
- productId: { 
- type: String, required: true 
-},
- name: { 
- type: String, required: true 
-},
- price: { 
- type: Number, required: true 
-},
- quantity: { 
- type: Number, required: true, min: 1 
-},
- image: {
- type: String
-}
+    productId: { 
+        type: String, required: true 
+    },
+    name: { 
+        type: String, required: true 
+    },
+    price: { 
+        type: Number, required: true 
+    },
+    quantity: { 
+        type: Number, required: true, min: 1 
+    },
+    image: {
+        type: String
+    }
 });
 
 const OrderSchema = new mongoose.Schema({
- orderId: { 
- type: String 
-}, // To store Razorpay or Mock Order ID
- customerName: { 
- type: String, required: true 
-},
- customerEmail: { 
- type: String, required: true 
-},
- shippingAddress: {
- street: String,
- city: String,
- state: String,
- zipCode: String,
- country: String,
-},
- items: [OrderItemSchema],
- totalAmount: { 
- type: Number, required: true 
-},
- status: {
- type: String,
- enum: ['Pending', 'Confirmed', 'Processing', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'],
- default: 'Confirmed',
-},
- paymentStatus: {
- type: String,
- enum: ['Pending', 'Paid', 'Failed', 'COD'],
- default: 'Pending',
-},
- paymentMode: {
- type: String,
- enum: ['Online', 'Cash on Delivery'],
- default: 'Online',
-},
- deliveryOtp: {
- type: String,
-}
+    orderId: { 
+        type: String 
+    }, // To store Razorpay or Mock Order ID
+    customerName: { 
+        type: String, required: true 
+    },
+    customerEmail: { 
+        type: String, required: true 
+    },
+    shippingAddress: {
+        street: String,
+        city: String,
+        state: String,
+        zipCode: String,
+        country: String,
+    },
+    items: [OrderItemSchema],
+        totalAmount: { 
+        type: Number, required: true 
+    },
+    status: {
+        type: String,
+        enum: ['Pending', 'Confirmed', 'Processing', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'],
+        default: 'Confirmed',
+    },
+    paymentStatus: {
+        type: String,
+        enum: ['Pending', 'Paid', 'Failed', 'COD'],
+        default: 'Pending',
+    },
+    paymentMode: {
+        type: String,
+        enum: ['Online', 'Cash on Delivery'],
+        default: 'Online',
+    },
+    deliveryOtp: {
+        type: String,
+    },
+    bundledCourses: [
+        {
+            id: String,
+            title: String,
+            status: { type: String, default: 'Granted' },
+            unlockedAt: { type: Date, default: Date.now },
+        }
+    ],
 }, { timestamps: true});
 
 // Clear Mongoose cache for HMR

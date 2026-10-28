@@ -1,12 +1,18 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Mail, Phone, MapPin, Clock } from 'lucide-react';
 
 export default function Footer() {
+  const pathname = usePathname();
+  if (pathname?.startsWith('/admin')) return null;
+
   const quickLinks = [
     { name: 'Home', href: '/' },
     { name: 'Shop', href: '/product' },
     { name: 'Bundles', href: '/product#bundles' },
-    { name: 'Courses', href: '/account?tab=masterclass' },
+    { name: 'Courses', href: '/account?tab=courses' },
     { name: 'About Us', href: '/about' },
     { name: 'Contact Us', href: '/contact' },
   ];

@@ -37,9 +37,14 @@ export default function OrderSuccessClient({ orderId}) {
 }
 };
 
- fetchOrder();
- const intervalId = setInterval(fetchOrder, 3000);
- return () => clearInterval(intervalId);
+  fetchOrder();
+  // Poll for tracking updates gently (every 15s when tab is active)
+  const intervalId = setInterval(() => {
+    if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+      fetchOrder();
+    }
+  }, 15000);
+  return () => clearInterval(intervalId);
 }, [orderId]);
 
  if (loading) {
@@ -99,14 +104,14 @@ export default function OrderSuccessClient({ orderId}) {
  </div>
  <h1 className="text-2xl sm:text-3xl font-black text-[#900606] mb-1 sm:mb-2">Order placed, thank you!</h1>
  <p className="text-neutral-600 text-sm">
- Confirmation will be sent to <span className="font-semibold text-[#900606]">{order.customerEmail}</span>
+ Confirmation will be sent to <span className="font-semibold text-[#900606] break-all">{order.customerEmail}</span>
  </p>
  </div>
  
  <div className="flex flex-col sm:flex-row justify-between p-4 sm:p-5 gap-3 border-b border-neutral-200 bg-[#FDFBF7]">
  <div>
  <p className="text-sm text-neutral-500 mb-1">Order Number</p>
- <p className="font-mono font-bold text-lg text-[#900606]">{displayOrderId}</p>
+ <p className="font-mono font-bold text-base sm:text-lg text-[#900606] break-all select-all">{displayOrderId}</p>
  </div>
  <div className="sm:text-right">
  <p className="text-sm text-neutral-500 mb-1">Estimated Delivery</p>
@@ -121,37 +126,55 @@ export default function OrderSuccessClient({ orderId}) {
  
  {/* Order Tracking Progress */}
  <div className="bg-[#FDFBF7] rounded-2xl shadow-sm border border-neutral-200 p-4 sm:p-5">
- <h2 className="text-lg font-bold text-[#900606] mb-5">Track Shipment</h2>
+ <div className="flex items-center justify-between mb-4">
+   <h2 className="text-base sm:text-lg font-bold text-[#900606]">Track Shipment</h2>
+   <span className="text-[11px] sm:text-xs font-semibold px-2.5 py-1 rounded-full bg-red-50 text-[#900606] border border-red-100">
+     {order.status || 'Confirmed'}
+   </span>
+ </div>
  
- <div className="relative">
- {/* Progress Line */}
- <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-neutral-200 rounded-full"></div>
-  {/* Active Progress Line */}
-  <div className={`absolute left-0 top-1/2 -translate-y-1/2 h-1 rounded-full ${order.status === 'Cancelled' ? 'bg-red-500' : 'bg-[#900606]'} transition-all duration-700`} style={{ width: `${progressPercentage}%` }}></div>
-  
-  <div className="relative flex justify-between">
-  {uiLabels.map((label, index) => {
-    const isCompleted = order.status !== 'Cancelled' && index <= currentStepIndex;
-    const isCurrent = order.status !== 'Cancelled' && index === currentStepIndex;
+   {/* Stepper Container: Zero-overlap layout on all mobile viewports */}
+  <div className="w-full relative py-2">
+    {/* Background Progress Line connecting center of 1st to 5th node (10% to 90%) */}
+    <div className="absolute left-[10%] right-[10%] top-[20px] sm:top-[22px] -translate-y-1/2 h-1 bg-neutral-200 rounded-full -z-0"></div>
+    {/* Active Progress Line */}
+    <div 
+      className={`absolute left-[10%] top-[20px] sm:top-[22px] -translate-y-1/2 h-1 rounded-full ${order.status === 'Cancelled' ? 'bg-red-500' : 'bg-[#900606]'} transition-all duration-700 -z-0`} 
+      style={{ width: `calc(${progressPercentage}% * 0.8)` }}
+    ></div>
     
-    return (
-      <div key={label} className="flex flex-col items-center">
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center border-4 z-10 transition-colors duration-500 ${isCompleted ? 'bg-[#900606] border-white' : 'bg-[#FDFBF7] border-neutral-200'}`}>
-          {isCompleted ? (
-            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-            </svg>
-          ) : (
-            <div className="w-2.5 h-2.5 rounded-full bg-neutral-300"></div>
-          )}
-        </div>
-        <p className={`text-xs sm:text-sm mt-3 text-center transition-colors duration-500 ${isCurrent ? 'font-bold text-[#900606]' : isCompleted ? 'font-semibold text-[#900606]' : 'font-medium text-neutral-500'}`}>
-          {label}
-        </p>
-      </div>
-    );
-  })}
-  </div>
+    <div className="relative flex justify-between z-10 w-full">
+      {uiLabels.map((label, index) => {
+        const isCompleted = order.status !== 'Cancelled' && index <= currentStepIndex;
+        const isCurrent = order.status !== 'Cancelled' && index === currentStepIndex;
+        
+        return (
+          <div key={label} className="flex flex-col items-center flex-1 min-w-0 px-0.5">
+            <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border-2 sm:border-4 transition-colors duration-500 shrink-0 ${isCompleted ? 'bg-[#900606] border-white ring-2 ring-[#900606]/20' : 'bg-[#FDFBF7] border-neutral-200'}`}>
+              {isCompleted ? (
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-neutral-300"></div>
+              )}
+            </div>
+            <div className={`w-full text-center mt-2 leading-[1.15] transition-colors duration-500 ${isCurrent ? 'font-bold text-[#900606]' : isCompleted ? 'font-semibold text-[#900606]' : 'font-medium text-neutral-500'}`}>
+              <span className="block text-[9px] min-[360px]:text-[10px] sm:text-xs md:text-sm break-words">
+                {label === 'Out for Delivery' ? (
+                  <>
+                    <span className="block min-[480px]:inline">Out for </span>
+                    <span className="block min-[480px]:inline">Delivery</span>
+                  </>
+                ) : (
+                  label
+                )}
+              </span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
   </div>
 
   {order.deliveryOtp && (

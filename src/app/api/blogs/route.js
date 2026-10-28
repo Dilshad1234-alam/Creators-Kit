@@ -1,46 +1,105 @@
 import { NextResponse } from 'next/server';
-export const dynamic = 'force-dynamic';
-import mongoose from 'mongoose';
+import dbConnect from '@/lib/mongodb';
 import Blog from '@/models/Blog';
 
-// Utility to connect to DB
-const connectDB = async () => {
- if (mongoose.connections[0].readyState) return;
- await mongoose.connect(process.env.MONGODB_URI);
-};
+export const dynamic = 'force-dynamic';
+
+export const initialBlogs = [
+  {
+    title: 'How Rohan Transformed a Tiny Bedroom into a Cinematic Studio',
+    slug: 'rohan-bedroom-studio-transformation',
+    author: 'Rohan Sharma',
+    product: 'AuraRing 10" Pro RGB',
+    excerpt: 'See how Rohan transformed a tiny bedroom into a cinematic studio with pro lighting and acoustic treatment.',
+    content: 'Full studio breakdown of the lighting, audio placement, and acoustic treatment used to transform a small 10x10 bedroom into a broadcast-ready YouTube space. Using the Creators Studio Gear bundle, Rohan achieved studio-grade production without expensive renovations.',
+    image: '/blog.jpg',
+  },
+  {
+    title: 'Priya shares how dual-channel wireless mic systems eliminate city noise and fan hums effortlessly',
+    slug: 'priya-wireless-mic-audio-guide',
+    author: 'Priya Verma',
+    product: 'VoiceForge Wireless Mic',
+    excerpt: 'Priya shares how dual-channel wireless mic systems eliminate city noise and fan hums effortlessly.',
+    content: 'Audio quality makes or breaks viewer retention. In this detailed case study, lifestyle creator Priya Verma demonstrates how proper gain staging and dual-channel wireless mic placement completely removed street noise and background fan hums from outdoor and indoor vlogs. With zero latency and instant pairing, production quality scaled immediately.',
+    image: '/blog1.jpg',
+  },
+  {
+    title: 'Tired of shaky footage, Kunal upgraded to carbon fiber for rock-solid stability',
+    slug: 'kunal-carbon-fiber-tripod-upgrade',
+    author: 'Kunal Singh',
+    product: 'ApexPro Heavy-Duty Tripod',
+    excerpt: 'Tired of shaky footage during long outdoor streams? Here is why a heavy-duty tripod is essential.',
+    content: 'Eliminating micro-shakes and achieving smooth, cinematic pans during product review shoots requires a rock-solid foundation. Kunal reviews the heavy-duty tripod setup across 30+ shoots in high-wind outdoor environments, ensuring zero jitter and reliable framing.',
+    image: '/blog2.jpg',
+  },
+  {
+    title: 'Ananya reached 100k subscribers in 3 months using the complete bundle',
+    slug: 'ananya-100k-subscribers-case-study',
+    author: 'Ananya Desai',
+    product: 'Complete Creator Bundle',
+    excerpt: 'How consistency, the complete creator bundle, and expert courses helped Ananya hit six figures.',
+    content: 'Ananya reached 100k subscribers in just 3 months. In this post, she shares her weekly production workflow, thumbnail testing strategies, and all-in-one studio equipment checklist that unlocked consistent viral growth.',
+    image: '/blog3.jpg',
+  },
+  {
+    title: 'Vikram fixed dull lighting and achieved professional studio quality',
+    slug: 'vikram-studio-lighting-secrets',
+    author: 'Vikram Mehta',
+    product: 'Pro Studio Lighting Setup',
+    excerpt: 'How bi-color 18-inch ring lights bring out natural skin glow and eliminate dark eye bags.',
+    content: 'Lighting is the single most important factor in looking professional on camera. Vikram explains the 3-point lighting setup, high-CRI color temperature adjustments, and shadow diffusion techniques that brought out natural skin tones.',
+    image: '/blog4.jpg',
+  },
+];
 
 export async function GET() {
- try {
- await connectDB();
- const blogs = await Blog.find({}).sort({ createdAt: -1});
- return NextResponse.json(blogs);
-} catch (error) {
- console.error('Error fetching blogs:', error);
- return NextResponse.json({ error: 'Failed to fetch blogs'}, { status: 500});
-}
+  try {
+    await dbConnect();
+    let blogs = await Blog.find({}).sort({ createdAt: -1 });
+
+    if (blogs.length === 0) {
+      await Blog.insertMany(initialBlogs);
+      blogs = await Blog.find({}).sort({ createdAt: -1 });
+    }
+
+    return NextResponse.json(blogs);
+  } catch (error) {
+    console.error('Error fetching blogs:', error);
+    return NextResponse.json({ error: 'Failed to fetch blogs' }, { status: 500 });
+  }
 }
 
 export async function POST(req) {
- try {
- await connectDB();
- const body = await req.json();
- 
- // Auto-generate slug from title if not provided
- if (!body.slug && body.title) {
- let baseSlug = body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
- let slug = baseSlug;
- let counter = 1;
- while (await Blog.findOne({ slug })) {
-  slug = `${baseSlug}-${counter}`;
-  counter++;
- }
- body.slug = slug;
-}
+  try {
+    await dbConnect();
+    const body = await req.json();
 
- const blog = await Blog.create(body);
- return NextResponse.json(blog, { status: 201});
-} catch (error) {
- console.error('Error creating blog:', error);
- return NextResponse.json({ error: error.message || 'Failed to create blog'}, { status: 500});
-}
+    if (!body.title || !body.content) {
+      return NextResponse.json({ error: 'Title and content are required' }, { status: 400 });
+    }
+
+    if (!body.slug && body.title) {
+      let baseSlug = body.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '');
+      let slug = baseSlug;
+      let counter = 1;
+      while (await Blog.findOne({ slug })) {
+        slug = `${baseSlug}-${counter}`;
+        counter++;
+      }
+      body.slug = slug;
+    }
+
+    if (!body.excerpt && body.content) {
+      body.excerpt = body.content.slice(0, 160) + '...';
+    }
+
+    const blog = await Blog.create(body);
+    return NextResponse.json(blog, { status: 201 });
+  } catch (error) {
+    console.error('Error creating blog:', error);
+    return NextResponse.json({ error: error.message || 'Failed to create blog' }, { status: 500 });
+  }
 }

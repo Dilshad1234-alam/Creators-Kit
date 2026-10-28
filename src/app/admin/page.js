@@ -1,51 +1,152 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { Suspense, useState, useEffect } from 'react';
 import DashboardOverview from '@/components/admin/DashboardOverview';
 import ProductsManager from '@/components/admin/ProductsManager';
 import OrdersManager from '@/components/admin/OrdersManager';
-import ContentManager from '@/components/admin/ContentManager';
-import CouponsManager from '@/components/admin/CouponsManager';
 import BlogsManager from '@/components/admin/BlogsManager';
 import MessagesManager from '@/components/admin/MessagesManager';
+import MasterclassesManager from '@/components/admin/MasterclassesManager';
+import CustomersManager from '@/components/admin/CustomersManager';
+import HomepageFeaturesManager from '@/components/admin/HomepageFeaturesManager';
 
-const navItems = [
-  { id: 'dashboard', label: 'Dashboard' },
-  { id: 'products', label: 'Products' },
-  { id: 'orders', label: 'Orders' },
-  { id: 'content', label: 'Content' },
-  { id: 'coupons', label: 'Coupons' },
-  { id: 'blogs', label: 'Blogs' },
-  { id: 'messages', label: 'Messages' },
-  { id: 'legal', label: 'Legal Pages' }
+const validTabs = [
+  'overview',
+  'dashboard',
+  'analytics',
+  'orders',
+  'products',
+  'bundles',
+  'customers',
+  'courses',
+  'settings',
+  'blogs',
+  'messages',
+  'contacts',
+  'contact',
+  'features',
+  'homepagefeatures',
+  'home',
 ];
 
+const navLabels = {
+  overview: 'Overview',
+  dashboard: 'Overview',
+  orders: 'Orders',
+  products: 'Products',
+  bundles: 'Products',
+  customers: 'Customers',
+  courses: 'Courses',
+  analytics: 'Analytics',
+  settings: 'Settings',
+  blogs: 'Blogs',
+  messages: 'Contacts',
+  contacts: 'Contacts',
+  contact: 'Contacts',
+  features: 'Home',
+  home: 'Home',
+};
+
+function SettingsManager() {
+  return (
+    <div className="bg-white border border-neutral-200/80 rounded-2xl p-6 shadow-2xs max-w-3xl space-y-6">
+      <div>
+        <h2 className="text-xl font-bold text-neutral-900">Workspace settings</h2>
+        <p className="text-xs text-neutral-400 mt-1">Configure your store identity and currency preferences.</p>
+      </div>
+
+      <div className="space-y-4 text-xs font-semibold">
+        <div>
+          <label className="block text-neutral-700 mb-1">Store Name</label>
+          <input
+            type="text"
+            defaultValue="CreatorsKit Store"
+            className="w-full border border-neutral-200 rounded-xl px-3.5 py-2.5 outline-none focus:border-[#900606] text-neutral-800 font-normal"
+          />
+        </div>
+
+        <div>
+          <label className="block text-neutral-700 mb-1">Support Email</label>
+          <input
+            type="email"
+            defaultValue="support@creatorskit.com"
+            className="w-full border border-neutral-200 rounded-xl px-3.5 py-2.5 outline-none focus:border-[#900606] text-neutral-800 font-normal"
+          />
+        </div>
+
+        <div>
+          <label className="block text-neutral-700 mb-1">Currency</label>
+          <select className="w-full border border-neutral-200 rounded-xl px-3.5 py-2.5 outline-none focus:border-[#900606] text-neutral-800 font-normal bg-white">
+            <option>INR (₹) - Indian Rupee</option>
+            <option>USD ($) - US Dollar</option>
+          </select>
+        </div>
+
+        <div className="pt-2">
+          <button className="bg-[#900606] hover:bg-[#720404] text-white font-bold px-5 py-2.5 rounded-xl shadow-2xs transition-all cursor-pointer">
+            Save Preferences
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AdminContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const tab = searchParams.get('tab') || 'dashboard';
-  const currentTabName = navItems.find(t => t.id === tab)?.label || tab;
+  const rawTab = (searchParams.get('tab') || 'overview').toLowerCase();
+  const isValid = validTabs.includes(rawTab);
+  const tab = isValid ? rawTab : 'overview';
+
+  useEffect(() => {
+    if (!isValid) {
+      router.replace('/admin?tab=overview');
+    }
+  }, [isValid, router]);
+
+  const isOverview = tab === 'overview' || tab === 'dashboard' || tab === 'analytics';
+  const isCustomHeader =
+    isOverview ||
+    tab === 'orders' ||
+    tab === 'products' ||
+    tab === 'bundles' ||
+    tab === 'blogs' ||
+    tab === 'messages' ||
+    tab === 'contacts' ||
+    tab === 'contact' ||
+    tab === 'features' ||
+    tab === 'homepagefeatures' ||
+    tab === 'home' ||
+    tab === 'courses';
+  const currentTabName = navLabels[tab] || (tab.charAt(0).toUpperCase() + tab.slice(1));
 
   return (
     <div className="w-full">
-      <header className="mb-8">
-        <h1 className="text-3xl font-black tracking-tight text-neutral-900 dark:text-white mb-2 capitalize">
-          {currentTabName} Overview
-        </h1>
-        <p className="text-neutral-500 dark:text-neutral-400 text-sm font-semibold">
-          Manage, monitor and control your Creator's Kit store analytics.
-        </p>
-      </header>
+      {/* If not custom header, render standard section heading */}
+      {!isCustomHeader && (
+        <header className="mb-6">
+          <h1 className="text-2xl font-bold tracking-tight text-neutral-900 mb-1 capitalize">
+            {currentTabName}
+          </h1>
+          <p className="text-neutral-500 text-xs font-medium">
+            Manage and monitor your store {currentTabName.toLowerCase()} settings and resources.
+          </p>
+        </header>
+      )}
 
+      {/* Main Tab Routing */}
       <div className="w-full">
-        {tab === 'dashboard' && <DashboardOverview />}
-        {tab === 'content' && <ContentManager tab="content" />}
-        {tab === 'products' && <ProductsManager />}
+        {isOverview && <DashboardOverview />}
+        {(tab === 'products' || tab === 'bundles') && <ProductsManager />}
         {tab === 'orders' && <OrdersManager />}
-        {tab === 'coupons' && <CouponsManager />}
+        {tab === 'customers' && <CustomersManager />}
+        {tab === 'courses' && <MasterclassesManager />}
+        {tab === 'settings' && <SettingsManager />}
         {tab === 'blogs' && <BlogsManager />}
-        {tab === 'messages' && <MessagesManager />}
-        {tab === 'legal' && <ContentManager tab="legal" />}
+        {(tab === 'messages' || tab === 'contacts' || tab === 'contact') && <MessagesManager />}
+        {(tab === 'features' || tab === 'homepagefeatures' || tab === 'home') && <HomepageFeaturesManager />}
       </div>
     </div>
   );
@@ -53,7 +154,7 @@ function AdminContent() {
 
 export default function AdminPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-[#900606] font-bold">Loading Panel...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-[#900606] font-bold text-xs">Loading Workspace...</div>}>
       <AdminContent />
     </Suspense>
   );

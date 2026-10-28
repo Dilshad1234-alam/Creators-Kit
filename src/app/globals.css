@@ -66,14 +66,30 @@ body {
     padding-top: var(--spacing-22);
     padding-bottom: var(--spacing-22);
   }
-  
-  .animate-marquee {
-    animation: marquee 30s linear infinite;
+
+  /* Utility to hide scrollbars while maintaining scroll functionality */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
-  
-  .pause-marquee:hover .animate-marquee {
-    animation-play-state: paused;
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
+}
+
+/* Review of Creators Continuous Infinite Marquee */
+.animate-marquee {
+  animation: marquee 65s linear infinite;
+  will-change: transform;
+}
+
+.pause-marquee:hover .animate-marquee,
+.pause-marquee:active .animate-marquee,
+.pause-marquee:focus-within .animate-marquee,
+.animate-marquee:hover,
+.animate-marquee:active,
+.animate-marquee-paused {
+  animation-play-state: paused !important;
 }
 
 @keyframes marquee {
@@ -114,3 +130,18 @@ body {
     @apply font-sans font-medium text-neutral-800;
   }
 }
+
+/* Secure Course Video Player Anti-Download & Anti-Inspection */
+video::-internal-media-controls-download-button {
+  display: none !important;
+}
+video::-webkit-media-controls-download-button {
+  display: none !important;
+}
+video::-webkit-media-controls-fullscreen-button {
+  display: none !important;
+}
+video::-webkit-media-controls-enclosure {
+  overflow: hidden;
+}
+

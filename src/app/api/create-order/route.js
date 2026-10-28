@@ -5,6 +5,11 @@ export async function POST(req) {
  try {
  const { items, customer, discountAmount = 0} = await req.json();
 
+ const customerEmail = customer?.email?.trim();
+ if (!customerEmail) {
+   return NextResponse.json({ error: 'Authentication required. Please sign in to place an order.' }, { status: 401 });
+ }
+
 
  // Calculate total amount in paise (1 INR = 100 paise)
  const cartTotal = items.reduce((total, item) => total + item.price * item.quantity, 0);

@@ -120,64 +120,64 @@ export default function CartPage() {
               return (
                 <div 
                   key={item.id} 
-                  className="bg-white rounded-2xl sm:rounded-[1rem] border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:border-neutral-300 transition-all duration-300 p-5 sm:p-7 flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8 group overflow-hidden"
+                  className="bg-white rounded-2xl sm:rounded-[1.25rem] border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:border-neutral-300 transition-all duration-300 p-3.5 sm:p-6 md:p-7 flex flex-row items-center gap-3.5 sm:gap-6 md:gap-8 group overflow-hidden"
                 >
-                  {/* IMAGES DISPLAY CONTAINER */}
-                  <div className="shrink-0 w-full md:w-44 lg:w-48">
+                  {/* IMAGES DISPLAY CONTAINER (Compact square on mobile, spacious on tablet/desktop) */}
+                  <div className="shrink-0 w-22 h-22 sm:w-36 sm:h-36 md:w-44 md:h-44 lg:w-48 lg:h-48">
                     {allImages && allImages.length > 1 ? (
-                      <div className="relative w-full aspect-square md:w-44 lg:w-48 md:h-44 lg:h-48 bg-neutral-50 rounded-xl p-2 border border-neutral-200/80 overflow-hidden shadow-inner mx-auto grid grid-cols-2 gap-2">
+                      <div className="relative w-full h-full bg-neutral-50 rounded-xl p-1 sm:p-2 border border-neutral-200/80 overflow-hidden shadow-inner mx-auto grid grid-cols-2 gap-1 sm:gap-2">
                         {allImages.slice(0, 4).map((img, idx) => {
                           const imgSrc = typeof img === 'string' ? img : (img.src || img.image);
                           const imgTitle = typeof img === 'object' ? (img.title || img.name) : `Item ${idx + 1}`;
                           return (
                             <div
                               key={idx}
-                              className="relative w-full h-full bg-white rounded-xl flex items-center justify-center border border-neutral-100 overflow-hidden shadow-2xs hover:scale-105 transition-transform"
+                              className="relative w-full h-full bg-white rounded-lg sm:rounded-xl flex items-center justify-center border border-neutral-100 overflow-hidden shadow-2xs hover:scale-105 transition-transform"
                               title={imgTitle}
                             >
                               <Image
                                 src={getImageUrl(imgSrc)}
                                 alt={imgTitle}
                                 fill
-                                className="object-contain p-1.5 mix-blend-multiply"
-                                sizes="90px"
+                                className="object-contain p-1 sm:p-1.5 mix-blend-multiply"
+                                sizes="(max-width: 640px) 45px, 90px"
                               />
                             </div>
                           );
                         })}
                       </div>
                     ) : item.img || item.image ? (
-                      <div className="relative w-full aspect-square md:w-44 lg:w-48 md:h-44 lg:h-48 bg-neutral-50 rounded-xl p-4 border border-neutral-200/80 overflow-hidden shadow-inner mx-auto flex items-center justify-center">
+                      <div className="relative w-full h-full bg-neutral-50 rounded-xl p-2 sm:p-4 border border-neutral-200/80 overflow-hidden shadow-inner mx-auto flex items-center justify-center">
                         <Image 
                           src={getImageUrl(item.img || item.image)} 
                           alt={item.name} 
                           fill 
-                          className="object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-300" 
-                          sizes="192px" 
+                          className="object-contain p-1.5 sm:p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-300" 
+                          sizes="(max-width: 640px) 96px, 192px" 
                         />
                       </div>
                     ) : (
-                      <div className="relative w-full aspect-square md:w-44 lg:w-48 md:h-44 lg:h-48 bg-neutral-50 rounded-xl flex items-center justify-center border border-neutral-200/80 overflow-hidden shadow-inner mx-auto">
-                        <span className="text-4xl">📦</span>
+                      <div className="relative w-full h-full bg-neutral-50 rounded-xl flex items-center justify-center border border-neutral-200/80 overflow-hidden shadow-inner mx-auto">
+                        <span className="text-2xl sm:text-4xl">📦</span>
                       </div>
                     )}
                   </div>
 
                   {/* ITEM DETAILS & QUANTITY ACTIONS */}
-                  <div className="flex-1 w-full flex flex-col justify-between min-w-0">
+                  <div className="flex-1 w-full min-w-0 flex flex-col justify-between py-0.5 self-stretch">
                     <div>
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <h3 className="text-xl sm:text-2xl font-bold text-[#111827] group-hover:text-[#900606] transition-colors leading-snug">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-sm sm:text-xl md:text-2xl font-bold text-[#111827] group-hover:text-[#900606] transition-colors leading-snug line-clamp-1 sm:line-clamp-2">
                             {item.name}
                           </h3>
-                          <p className="text-neutral-600 text-xs sm:text-sm font-medium mt-1 leading-relaxed">
+                          <p className="text-neutral-500 text-[11px] sm:text-xs md:text-sm font-medium mt-0.5 line-clamp-1 leading-tight">
                             {item.subtitle || 'Complete creator setup with hardware gear & masterclasses.'}
                           </p>
                         </div>
 
                         {/* Price Display on Desktop Top Right */}
-                        <div className="hidden sm:flex flex-col items-end shrink-0">
+                        <div className="hidden sm:flex flex-col items-end shrink-0 pl-2">
                           <span className="text-2xl sm:text-3xl font-black text-[#900606] tracking-tight">
                             ₹{itemTotal.toLocaleString()}
                           </span>
@@ -187,9 +187,9 @@ export default function CartPage() {
                         </div>
                       </div>
 
-                      {/* Included Items Badges */}
+                      {/* Included Items Badges (Desktop) */}
                       {allImages && allImages.length > 1 && (
-                        <div className="flex flex-wrap items-center gap-1.5 mt-3.5 mb-2">
+                        <div className="hidden sm:flex flex-wrap items-center gap-1.5 mt-3 mb-1">
                           <span className="text-[11px] font-bold text-neutral-500 mr-1 uppercase tracking-wider">
                             Kit includes:
                           </span>
@@ -217,49 +217,53 @@ export default function CartPage() {
                           })}
                         </div>
                       )}
-                    </div>
 
-                    {/* Price on Mobile View */}
-                    <div className="flex sm:hidden items-baseline justify-between w-full pt-3 mt-3 border-t border-neutral-100">
-                      <span className="text-xs font-semibold text-neutral-500">Item Total:</span>
-                      <span className="text-2xl font-black text-[#900606] tracking-tight">
-                        ₹{itemTotal.toLocaleString()}
-                      </span>
+                      {/* Price on Mobile View (Inline with title/details) */}
+                      <div className="flex sm:hidden items-baseline gap-1.5 mt-1.5">
+                        <span className="text-base font-black text-[#900606] tracking-tight">
+                          ₹{itemTotal.toLocaleString()}
+                        </span>
+                        {(Number(item.quantity) || 1) > 1 && (
+                          <span className="text-[10px] text-neutral-400 font-medium">
+                            (₹{(Number(item.price) || 0).toLocaleString()} each)
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     {/* Quantity Selector & Remove Button */}
-                    <div className="flex items-center justify-between gap-4 pt-4 mt-3 border-t border-neutral-100">
+                    <div className="flex items-center justify-between gap-2 mt-2 pt-2 sm:pt-4 sm:mt-3 border-t border-neutral-100">
                       
                       {/* Quantity Controller Pill */}
-                      <div className="flex items-center gap-1 bg-[#F9F9F5] border border-neutral-200/90 rounded-xl p-1 shadow-2xs">
+                      <div className="flex items-center gap-0.5 sm:gap-1 bg-[#F9F9F5] border border-neutral-200/90 rounded-lg sm:rounded-xl p-0.5 sm:p-1 shadow-2xs">
                         <button 
                           onClick={() => updateQuantity(item.id, Math.max(1, (Number(item.quantity) || 1) - 1))}
-                          className="w-8 h-8 rounded-lg bg-white border border-neutral-200 text-neutral-700 hover:text-[#900606] hover:border-[#900606] font-bold text-sm transition-all flex items-center justify-center shadow-2xs disabled:opacity-50"
+                          className="w-7 h-7 sm:w-8 sm:h-8 rounded-md sm:rounded-lg bg-white border border-neutral-200 text-neutral-700 hover:text-[#900606] hover:border-[#900606] font-bold text-xs sm:text-sm transition-all flex items-center justify-center shadow-2xs disabled:opacity-50 cursor-pointer active:scale-95"
                           aria-label="Decrease quantity"
                         >
-                          <Minus className="w-3.5 h-3.5 stroke-[2.5]" />
+                          <Minus className="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-[2.5]" />
                         </button>
 
-                        <span className="w-8 text-center font-bold text-sm text-[#111827]">
+                        <span className="w-6 sm:w-8 text-center font-bold text-xs sm:text-sm text-[#111827]">
                           {item.quantity}
                         </span>
 
                         <button 
                           onClick={() => updateQuantity(item.id, (Number(item.quantity) || 1) + 1)}
-                          className="w-8 h-8 rounded-lg bg-white border border-neutral-200 text-neutral-700 hover:text-[#900606] hover:border-[#900606] font-bold text-sm transition-all flex items-center justify-center shadow-2xs"
+                          className="w-7 h-7 sm:w-8 sm:h-8 rounded-md sm:rounded-lg bg-white border border-neutral-200 text-neutral-700 hover:text-[#900606] hover:border-[#900606] font-bold text-xs sm:text-sm transition-all flex items-center justify-center shadow-2xs cursor-pointer active:scale-95"
                           aria-label="Increase quantity"
                         >
-                          <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                          <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-[2.5]" />
                         </button>
                       </div>
 
                       {/* Remove Button */}
                       <button 
                         onClick={() => removeFromCart(item.id)} 
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-neutral-900 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all group/btn border border-transparent hover:border-red-200 text-xs font-semibold" 
+                        className="inline-flex items-center gap-1 px-2.5 py-1 text-neutral-500 hover:text-red-600 hover:bg-red-50 rounded-lg sm:rounded-xl transition-all group/btn border border-transparent hover:border-red-200 text-xs font-semibold cursor-pointer" 
                         title="Remove item"
                       >
-                        <Trash2 className="w-4 h-4 transition-transform group-hover/btn:scale-110" />
+                        <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover/btn:scale-110" />
                         <span className="hidden sm:inline">Remove</span>
                       </button>
 
@@ -289,20 +293,20 @@ export default function CartPage() {
 
           {/* RIGHT: ORDER SUMMARY (4 Columns) */}
           <div className="lg:col-span-4 w-full">
-            <div className="bg-white rounded-xl sm:rounded-[1rem] border border-neutral-200/90 shadow-[0_4px_24px_rgba(0,0,0,0.04)] p-6 sm:p-8 xl:sticky xl:top-32 space-y-6">
+            <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-[0_4px_24px_rgba(0,0,0,0.04)] p-4 sm:p-6 md:p-8 xl:sticky xl:top-32 space-y-4 sm:space-y-6">
               
               {/* Summary Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-neutral-100">
-                <h2 className="text-xl sm:text-2xl font-semibold text-[#111827] tracking-tight">
+              <div className="flex items-center justify-between pb-3.5 sm:pb-4 border-b border-neutral-100">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-[#111827] tracking-tight">
                   Order Summary
                 </h2>
-                <span className="bg-red-50 text-[#900606] text-xs font-bold px-3 py-1 rounded-full border border-red-100">
+                <span className="bg-red-50 text-[#900606] text-xs font-bold px-2.5 py-1 rounded-full border border-red-100">
                   {cartCount} {cartCount === 1 ? 'Item' : 'Items'}
                 </span>
               </div>
 
               {/* Price Breakdown */}
-              <div className="space-y-3.5 text-xs sm:text-sm text-neutral-600">
+              <div className="space-y-3 text-xs sm:text-sm text-neutral-600">
                 <div className="flex justify-between items-center">
                   <span className="text-neutral-500 font-medium">Subtotal</span>
                   <span className="font-bold text-[#111827]">₹{cartTotal.toLocaleString()}</span>
@@ -323,45 +327,62 @@ export default function CartPage() {
               </div>
 
               {/* Total Row */}
-              <div className="pt-4 border-t border-neutral-200/80">
+              <div className="pt-3.5 sm:pt-4 border-t border-neutral-200/80">
                 <div className="flex justify-between items-baseline mb-1">
-                  <span className="text-base font-bold text-[#111827]">Estimated Total</span>
-                  <span className="text-3xl sm:text-4xl font-black text-[#900606] tracking-tight">
+                  <span className="text-sm sm:text-base font-bold text-[#111827]">Estimated Total</span>
+                  <span className="text-2xl sm:text-3xl md:text-4xl font-black text-[#900606] tracking-tight">
                     ₹{cartTotal.toLocaleString()}
                   </span>
                 </div>
-                <p className="text-[11px] text-neutral-400 font-normal text-right">
+                <p className="text-[10px] sm:text-[11px] text-neutral-400 font-normal text-right">
                   Inclusive of all applicable GST taxes
                 </p>
               </div>
 
               {/* Checkout CTA */}
               <button 
-                onClick={() => router.push('/checkout')}
-                className="relative w-full py-3.5 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-base overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer"
+                onClick={() => {
+                  const rawUser = typeof window !== 'undefined' ? (sessionStorage.getItem('creatorsKitUserInfo') || localStorage.getItem('creatorsKitUserInfo')) : null;
+                  const sessionEmail = typeof window !== 'undefined' ? (sessionStorage.getItem('userEmail') || localStorage.getItem('userEmail')) : null;
+                  const userRole = typeof window !== 'undefined' ? (sessionStorage.getItem('userRole') || localStorage.getItem('userRole')) : null;
+                  let user = null;
+                  if (rawUser) {
+                    try {
+                      user = JSON.parse(rawUser);
+                    } catch (e) {}
+                  }
+                  const isLoggedIn = (user?.email || sessionEmail) && userRole !== 'admin' && user?.role !== 'admin';
+
+                  if (!isLoggedIn) {
+                    router.push('/login?redirect=/checkout');
+                  } else {
+                    router.push('/checkout');
+                  }
+                }}
+                className="relative w-full min-h-[48px] py-3.5 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm sm:text-base overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer active:scale-[0.99]"
               >
                 <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
-                <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2.5">
+                <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
                   <span>Proceed to Checkout</span>
                   <ArrowRight className="w-4 h-4 stroke-[2.5]" />
                 </span>
               </button>
 
               {/* Trust Badges Inside Summary */}
-              <div className="pt-4 border-t border-neutral-100 space-y-2.5 text-xs text-neutral-500 font-medium">
-                <div className="flex items-center gap-2.5 text-emerald-700 bg-emerald-50/70 border border-emerald-100/80 rounded-xl px-3 py-2">
+              <div className="pt-3.5 sm:pt-4 border-t border-neutral-100 space-y-2 text-xs text-neutral-500 font-medium">
+                <div className="flex items-center gap-2 text-emerald-700 bg-emerald-50/70 border border-emerald-100/80 rounded-xl px-2.5 sm:px-3 py-2">
                   <Lock className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span className="text-[11px] font-semibold">256-bit SSL Encrypted Checkout</span>
+                  <span className="text-[10px] sm:text-[11px] font-semibold">256-bit SSL Encrypted Checkout</span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-[11px] text-neutral-600 pt-1">
+                <div className="grid grid-cols-2 gap-2 text-[10px] sm:text-[11px] text-neutral-600 pt-0.5">
                   <div className="flex items-center gap-1.5">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span>7-Day Replacement</span>
+                    <span className="truncate">7-Day Replacement</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Award className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                    <span>Official Warranty</span>
+                    <span className="truncate">Official Warranty</span>
                   </div>
                 </div>
               </div>
@@ -371,47 +392,47 @@ export default function CartPage() {
 
         </div>
 
-        {/* 3. BOTTOM TRUST & GUARANTEES ROW (Matching Product & About Pages) */}
-        <div className="mt-10 sm:mt-15 pt-5 border-t border-neutral-200/80">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+        {/* 3. BOTTOM TRUST & GUARANTEES ROW */}
+        <div className="mt-8 sm:mt-12 pt-5 border-t border-neutral-200/80">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6">
             
-            <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.05)] hover:border-neutral-300 transition-all duration-300 flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-full bg-red-50 text-[#900606] flex items-center justify-center shrink-0">
-                <Truck className="w-5 h-5 stroke-[2]" />
+            <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-5 border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.05)] hover:border-neutral-300 transition-all duration-300 flex items-center gap-2.5 sm:gap-3.5">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-50 text-[#900606] flex items-center justify-center shrink-0">
+                <Truck className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2]" />
               </div>
-              <div>
-                <h4 className="text-xs sm:text-sm font-bold text-[#111827]">Free Delivery</h4>
-                <p className="text-[11px] text-neutral-600 font-medium">Nationwide 3-5 days</p>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.05)] hover:border-neutral-300 transition-all duration-300 flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-full bg-red-50 text-[#900606] flex items-center justify-center shrink-0">
-                <RotateCcw className="w-5 h-5 stroke-[2]" />
-              </div>
-              <div>
-                <h4 className="text-xs sm:text-sm font-bold text-[#111827]">7 Days Replacement</h4>
-                <p className="text-[11px] text-neutral-600 font-medium">Hassle-free doorstep pickup</p>
+              <div className="min-w-0">
+                <h4 className="text-[11px] sm:text-xs md:text-sm font-bold text-[#111827] truncate">Free Delivery</h4>
+                <p className="text-[10px] sm:text-[11px] text-neutral-500 font-medium truncate">Nationwide 3-5 days</p>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.05)] hover:border-neutral-300 transition-all duration-300 flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-full bg-red-50 text-[#900606] flex items-center justify-center shrink-0">
-                <ShieldCheck className="w-5 h-5 stroke-[2]" />
+            <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-5 border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.05)] hover:border-neutral-300 transition-all duration-300 flex items-center gap-2.5 sm:gap-3.5">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-50 text-[#900606] flex items-center justify-center shrink-0">
+                <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2]" />
               </div>
-              <div>
-                <h4 className="text-xs sm:text-sm font-bold text-[#111827]">Secure Payments</h4>
-                <p className="text-[11px] text-neutral-600 font-medium">100% verified gateway</p>
+              <div className="min-w-0">
+                <h4 className="text-[11px] sm:text-xs md:text-sm font-bold text-[#111827] truncate">7 Days Replacement</h4>
+                <p className="text-[10px] sm:text-[11px] text-neutral-500 font-medium truncate">Hassle-free pickup</p>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.05)] hover:border-neutral-300 transition-all duration-300 flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-full bg-red-50 text-[#900606] flex items-center justify-center shrink-0">
-                <Sparkles className="w-5 h-5 stroke-[2]" />
+            <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-5 border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.05)] hover:border-neutral-300 transition-all duration-300 flex items-center gap-2.5 sm:gap-3.5">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-50 text-[#900606] flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2]" />
               </div>
-              <div>
-                <h4 className="text-xs sm:text-sm font-bold text-[#111827]">Genuine Products</h4>
-                <p className="text-[11px] text-neutral-600 font-medium">Official brand warranty</p>
+              <div className="min-w-0">
+                <h4 className="text-[11px] sm:text-xs md:text-sm font-bold text-[#111827] truncate">Secure Payments</h4>
+                <p className="text-[10px] sm:text-[11px] text-neutral-500 font-medium truncate">100% verified gateway</p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-5 border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.05)] hover:border-neutral-300 transition-all duration-300 flex items-center gap-2.5 sm:gap-3.5">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-50 text-[#900606] flex items-center justify-center shrink-0">
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2]" />
+              </div>
+              <div className="min-w-0">
+                <h4 className="text-[11px] sm:text-xs md:text-sm font-bold text-[#111827] truncate">Genuine Products</h4>
+                <p className="text-[10px] sm:text-[11px] text-neutral-500 font-medium truncate">Official brand warranty</p>
               </div>
             </div>
 

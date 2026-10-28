@@ -1,7 +1,7 @@
 'use client';
 
 import { getImageUrl } from '@/lib/imagekit';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useRouter } from 'next/navigation';
@@ -53,6 +53,39 @@ export default function CheckoutPage() {
     zip: '',
     country: 'IN',
   });
+
+  // Verify that customer is logged in before allowing checkout
+  useEffect(() => {
+    const userInfoStr = typeof window !== 'undefined' ? localStorage.getItem('creatorsKitUserInfo') : null;
+    const storedRole = typeof window !== 'undefined' ? (sessionStorage.getItem('userRole') || localStorage.getItem('userRole')) : null;
+    const sessionEmail = typeof window !== 'undefined' ? (sessionStorage.getItem('userEmail') || localStorage.getItem('userEmail')) : null;
+    let user = null;
+    if (userInfoStr) {
+      try {
+        user = JSON.parse(userInfoStr);
+      } catch (e) {}
+    }
+
+    const isLoggedIn = (user?.email || sessionEmail) && storedRole !== 'admin' && user?.role !== 'admin';
+
+    if (!isLoggedIn) {
+      router.replace('/login?redirect=/checkout');
+      return;
+    }
+
+    const email = user?.email || sessionEmail || '';
+    const name = user?.name || (sessionStorage.getItem('userName') || localStorage.getItem('userName')) || '';
+    const nameParts = name.trim().split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    setFormData((prev) => ({
+      ...prev,
+      email: prev.email || email,
+      firstName: prev.firstName || firstName,
+      lastName: prev.lastName || lastName,
+    }));
+  }, [router]);
 
   const finalTotal = Math.max(0, cartTotal - (appliedCoupon?.discountAmount || 0));
   const cartItemCount = cart ? cart.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0) : 0;
@@ -106,6 +139,11 @@ export default function CheckoutPage() {
         quantity: item.quantity,
         image: item.img || ((item.images && item.images.length > 0) ? (item.images[0].src || item.images[0]) : null)
       })),
+      bundledCourses: [
+        { id: 'instagram-mastery', title: 'Instagram Mastery', status: 'Granted' },
+        { id: 'youtube-mastery', title: 'YouTube Mastery', status: 'Granted' },
+        { id: 'filmora-mastery', title: 'Filmora Mastery', status: 'Granted' },
+      ],
       totalAmount: finalTotal,
       status: 'Processing' 
     };
@@ -197,6 +235,15 @@ export default function CheckoutPage() {
             
             if (verifyData.success) {
               clearCart();
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('creatorskit_courses_unlocked', 'true');
+                try {
+                  const bc = new BroadcastChannel('creatorskit_masterclasses_channel');
+                  bc.postMessage({ type: 'updated' });
+                  bc.close();
+                } catch (e) {}
+                window.dispatchEvent(new Event('masterclasses-updated'));
+              }
               const savedOrderId = verifyData.order?.orderId || verifyData.order?._id;
               router.push(`/order-success?orderId=${savedOrderId}`);
             } else {

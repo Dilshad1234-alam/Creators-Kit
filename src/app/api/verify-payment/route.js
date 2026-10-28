@@ -2,6 +2,7 @@ import { NextResponse} from 'next/server';
 import crypto from 'crypto';
 import connectDB from '@/lib/mongodb';
 import Order from '@/models/Order';
+import User from '@/models/User';
 import { sendEmail } from '@/lib/mailer';
 
 export async function POST(req) {
@@ -34,15 +35,43 @@ export async function POST(req) {
  // Generate 6-digit delivery OTP
  const deliveryOtp = Math.floor(100000 + Math.random() * 900000).toString();
 
+ // Automatically grant the 3 Free Masterclasses to the verified order
+ const freeMasterclassesBundle = [
+   { id: 'instagram-mastery', title: 'Instagram Mastery', status: 'Granted', unlockedAt: new Date() },
+   { id: 'youtube-mastery', title: 'YouTube Mastery', status: 'Granted', unlockedAt: new Date() },
+   { id: 'filmora-mastery', title: 'Filmora Mastery', status: 'Granted', unlockedAt: new Date() },
+ ];
+
  // Securely save the order with 'Processing' status now that payment is verified
  const newOrder = await Order.create({
  ...orderData,
+ bundledCourses: orderData.bundledCourses || freeMasterclassesBundle,
  orderId: razorpay_payment_id, // Store the payment ID for reference
  status: 'Confirmed',
  paymentStatus: 'Paid',
  paymentMode: 'Online',
  deliveryOtp: deliveryOtp,
 });
+
+ // Automatically grant lifetime masterclass access to the registered user account
+ const customerEmail = (orderData.customerEmail || orderData.email || '').trim();
+ if (customerEmail) {
+   try {
+     await User.findOneAndUpdate(
+       { email: customerEmail.toLowerCase() },
+       {
+         $set: { hasPurchased: true },
+         $addToSet: {
+           unlockedMasterclasses: {
+             $each: ['instagram-mastery', 'youtube-mastery', 'filmora-mastery']
+           }
+         }
+       }
+     );
+   } catch (e) {
+     console.warn('Could not update user masterclass access:', e);
+   }
+ }
 
   // Calculate estimated delivery date
   const deliveryDate = new Date();
@@ -78,6 +107,16 @@ export async function POST(req) {
             <p style="margin: 0 0 5px 0; color: #1e3a8a; font-weight: bold;">Delivery PIN: <span style="font-size: 18px; letter-spacing: 2px;">${deliveryOtp}</span></p>
             <small style="color: #3b82f6;">(Please share this PIN with the delivery executive)</small>
           </div>
+        <!-- FREE MASTERCLASSES BONUS INCLUDED -->
+        <div style="background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%); border: 1.5px solid #900606; border-radius: 12px; padding: 18px; margin: 25px 0; text-align: left;">
+          <h4 style="margin: 0 0 8px 0; color: #900606; font-size: 16px; font-weight: 800;">🎁 Free Creator Masterclasses Unlocked!</h4>
+          <p style="margin: 0 0 10px 0; font-size: 13px; color: #555;">Your kit purchase includes full lifetime access to all 3 courses directly in your account:</p>
+          <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #333; line-height: 1.6;">
+            <li><strong>Instagram Mastery</strong> — Algorithm & viral growth</li>
+            <li><strong>YouTube Mastery</strong> — SEO, thumbnails & monetization</li>
+            <li><strong>Filmora Mastery</strong> — Cinematic video editing</li>
+          </ul>
+          <p style="margin: 12px 0 0 0; font-size: 12px; color: #777;">Access them anytime by logging in and navigating to the <strong>Courses</strong> tab.</p>
         </div>
 
         <h3 style="margin-bottom: 15px; border-bottom: 2px solid #900606; padding-bottom: 8px; color: #900606;">Order Summary</h3>

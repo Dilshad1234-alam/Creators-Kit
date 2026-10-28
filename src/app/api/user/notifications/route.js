@@ -64,3 +64,26 @@ export async function GET(req) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
+
+export async function PUT(req) {
+  try {
+    await dbConnect();
+    const body = await req.json();
+    const { email, id } = body;
+
+    if (id) {
+      const updated = await Notification.findByIdAndUpdate(id, { unread: false }, { new: true });
+      return NextResponse.json({ success: true, data: updated });
+    }
+
+    if (email) {
+      await Notification.updateMany({ email, unread: true }, { $set: { unread: false } });
+      return NextResponse.json({ success: true, message: 'All notifications marked as read' });
+    }
+
+    return NextResponse.json({ success: false, error: 'Email or ID is required' }, { status: 400 });
+  } catch (error) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+

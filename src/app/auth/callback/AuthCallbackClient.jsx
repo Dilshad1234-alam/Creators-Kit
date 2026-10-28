@@ -26,37 +26,61 @@ export default function AuthCallbackClient({ initialUser, redirectParam }) {
     if (user) {
       handledRef.current = true;
       try {
+        const isAdmin = user.role === 'admin';
         sessionStorage.setItem('userName', user.name || '');
         sessionStorage.setItem('userEmail', user.email || '');
-        sessionStorage.setItem('userRole', user.role || 'user');
+        sessionStorage.setItem('userRole', isAdmin ? 'admin' : 'user');
         sessionStorage.setItem('token', 'session_active');
+
+        document.cookie = `user_role=${isAdmin ? 'admin' : 'user'}; path=/; max-age=2592000; SameSite=Lax`;
+        document.cookie = `user_email=${encodeURIComponent(user.email || '')}; path=/; max-age=2592000; SameSite=Lax`;
+        document.cookie = `user_name=${encodeURIComponent(user.name || '')}; path=/; max-age=2592000; SameSite=Lax`;
+        document.cookie = 'auth_token=session_active; path=/; max-age=2592000; SameSite=Lax';
+
+        if (isAdmin) {
+          sessionStorage.setItem('adminName', user.name || '');
+          sessionStorage.setItem('adminEmail', user.email || '');
+          sessionStorage.setItem('adminRole', 'admin');
+          sessionStorage.setItem('adminToken', 'admin_active');
+          localStorage.setItem('adminName', user.name || '');
+          localStorage.setItem('adminEmail', user.email || '');
+          localStorage.setItem('adminRole', 'admin');
+          localStorage.setItem('adminToken', 'admin_active');
+
+          document.cookie = `admin_role=admin; path=/; max-age=2592000; SameSite=Lax`;
+          document.cookie = `admin_email=${encodeURIComponent(user.email || '')}; path=/; max-age=2592000; SameSite=Lax`;
+          document.cookie = `admin_name=${encodeURIComponent(user.name || '')}; path=/; max-age=2592000; SameSite=Lax`;
+          document.cookie = `admin_token=admin_active; path=/; max-age=2592000; SameSite=Lax`;
+          document.cookie = `user_role=admin; path=/; max-age=2592000; SameSite=Lax`;
+
+          window.location.replace('/admin');
+          return;
+        }
 
         const userInfo = {
           id: user.id || user._id,
           name: user.name,
           email: user.email,
-          role: user.role || 'user',
+          role: 'user',
           profileImage: user.image || user.profileImage || '',
           authProvider: 'google',
         };
         localStorage.setItem('creatorsKitUserInfo', JSON.stringify(userInfo));
         localStorage.setItem('userName', user.name || '');
         localStorage.setItem('userEmail', user.email || '');
-        localStorage.setItem('userRole', user.role || 'user');
+        localStorage.setItem('userRole', 'user');
         localStorage.setItem('token', 'session_active');
 
         window.dispatchEvent(new Event('storage'));
         window.dispatchEvent(new CustomEvent('creatorskit-auth-change', { detail: userInfo }));
 
         const target =
-          user.role === 'admin'
-            ? '/admin'
-            : redirectParam &&
-              !redirectParam.startsWith('/login') &&
-              !redirectParam.startsWith('/register') &&
-              !redirectParam.startsWith('/auth')
+          redirectParam &&
+          !redirectParam.startsWith('/login') &&
+          !redirectParam.startsWith('/register') &&
+          !redirectParam.startsWith('/auth')
             ? redirectParam
-            : '/';
+            : '/account';
 
         window.location.replace(target);
       } catch (err) {
@@ -122,16 +146,30 @@ export default function AuthCallbackClient({ initialUser, redirectParam }) {
                   profileImage: initialUser.image || '',
                   authProvider: 'google',
                 })};
+                var isAdmin = u.role === 'admin';
                 sessionStorage.setItem('userName', u.name || '');
                 sessionStorage.setItem('userEmail', u.email || '');
-                sessionStorage.setItem('userRole', u.role || 'user');
+                sessionStorage.setItem('userRole', isAdmin ? 'admin' : 'user');
                 sessionStorage.setItem('token', 'session_active');
-                localStorage.setItem('creatorsKitUserInfo', JSON.stringify(u));
-                localStorage.setItem('userName', u.name || '');
-                localStorage.setItem('userEmail', u.email || '');
-                localStorage.setItem('userRole', u.role || 'user');
-                localStorage.setItem('token', 'session_active');
-                window.location.replace(${JSON.stringify(destination)});
+                document.cookie = 'user_role=' + (isAdmin ? 'admin' : 'user') + '; path=/; max-age=2592000; SameSite=Lax';
+                document.cookie = 'user_email=' + encodeURIComponent(u.email || '') + '; path=/; max-age=2592000; SameSite=Lax';
+                document.cookie = 'user_name=' + encodeURIComponent(u.name || '') + '; path=/; max-age=2592000; SameSite=Lax';
+                document.cookie = 'auth_token=session_active; path=/; max-age=2592000; SameSite=Lax';
+                if (isAdmin) {
+                  localStorage.removeItem('creatorsKitUserInfo');
+                  localStorage.setItem('userName', u.name || '');
+                  localStorage.setItem('userEmail', u.email || '');
+                  localStorage.setItem('userRole', 'admin');
+                  localStorage.setItem('token', 'session_active');
+                  window.location.replace('/admin');
+                } else {
+                  localStorage.setItem('creatorsKitUserInfo', JSON.stringify(u));
+                  localStorage.setItem('userName', u.name || '');
+                  localStorage.setItem('userEmail', u.email || '');
+                  localStorage.setItem('userRole', 'user');
+                  localStorage.setItem('token', 'session_active');
+                  window.location.replace(${JSON.stringify(destination)});
+                }
               } catch(e) {}
             `,
           }}

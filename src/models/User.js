@@ -54,6 +54,14 @@ const UserSchema = new mongoose.Schema(
     location: String,
     postalCode: String,
     profileImage: String,
+    hasPurchased: {
+      type: Boolean,
+      default: false,
+    },
+    unlockedMasterclasses: {
+      type: [String],
+      default: [],
+    },
   },
   { timestamps: true, collection: 'users' }
 );

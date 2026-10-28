@@ -142,7 +142,7 @@ export default function AuthContainer({ initialMode = 'login', initialEmail = ''
   };
 
   // -------------------------------------------------------------
-  // 1. CREDENTIALS LOGIN SUBMIT HANDLER
+  // 1. CREDENTIALS LOGIN SUBMIT HANDLER (UNIFIED LOGIN)
   // -------------------------------------------------------------
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -174,6 +174,7 @@ export default function AuthContainer({ initialMode = 'login', initialEmail = ''
           router.push(`/register?step=otp&email=${encodeURIComponent(target)}`);
           return;
         }
+
         throw new Error(data.error || 'Invalid email or password');
       }
 
@@ -183,23 +184,67 @@ export default function AuthContainer({ initialMode = 'login', initialEmail = ''
         role: data.role || 'user',
       };
 
+      const isAdmin = userData.role === 'admin';
+
+      // Always clear persistent localStorage auth keys to enforce session-only lifetime
+      ['creatorsKitUserInfo', 'userName', 'userEmail', 'userRole', 'token', 'adminName', 'adminEmail', 'adminRole', 'adminToken'].forEach(k => {
+        try { localStorage.removeItem(k); } catch (e) {}
+      });
+
+      if (isAdmin) {
+        // Clear conflicting user session data
+        ['userName', 'userEmail', 'userRole', 'token', 'creatorsKitUserInfo'].forEach(k => {
+          try { sessionStorage.removeItem(k); } catch (e) {}
+        });
+        ['user_role', 'user_email', 'user_name', 'auth_token'].forEach(c => {
+          document.cookie = `${c}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+        });
+
+        // Dedicated admin session in sessionStorage
+        sessionStorage.setItem('adminName', userData.name);
+        sessionStorage.setItem('adminEmail', userData.email);
+        sessionStorage.setItem('adminRole', 'admin');
+        sessionStorage.setItem('adminToken', 'admin_active');
+
+        // Session-only cookies (omitting max-age/expires so closing the browser/tab ends session)
+        document.cookie = `admin_role=admin; path=/; SameSite=Lax`;
+        document.cookie = `admin_email=${encodeURIComponent(userData.email)}; path=/; SameSite=Lax`;
+        document.cookie = `admin_name=${encodeURIComponent(userData.name)}; path=/; SameSite=Lax`;
+        document.cookie = `admin_token=admin_active; path=/; SameSite=Lax`;
+        document.cookie = `user_role=admin; path=/; SameSite=Lax`;
+
+        window.location.href = '/admin';
+        return;
+      }
+
+      // Customer session:
+      // Clear conflicting admin session data
+      ['adminName', 'adminEmail', 'adminRole', 'adminToken'].forEach(k => {
+        try { sessionStorage.removeItem(k); } catch (e) {}
+      });
+      ['admin_role', 'admin_email', 'admin_name', 'admin_token'].forEach(c => {
+        document.cookie = `${c}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+      });
+
+      // Save customer session exclusively to sessionStorage
       sessionStorage.setItem('userName', userData.name);
       sessionStorage.setItem('userEmail', userData.email);
-      sessionStorage.setItem('userRole', userData.role);
+      sessionStorage.setItem('userRole', 'user');
       sessionStorage.setItem('token', 'session_active');
+      sessionStorage.setItem('creatorsKitUserInfo', JSON.stringify(userData));
 
-      localStorage.setItem('creatorsKitUserInfo', JSON.stringify(userData));
-      localStorage.setItem('userName', userData.name);
-      localStorage.setItem('userEmail', userData.email);
-      localStorage.setItem('userRole', userData.role);
-      localStorage.setItem('token', 'session_active');
+      // Session-only customer cookies (omitting max-age/expires)
+      document.cookie = `user_role=user; path=/; SameSite=Lax`;
+      document.cookie = `user_email=${encodeURIComponent(userData.email)}; path=/; SameSite=Lax`;
+      document.cookie = `user_name=${encodeURIComponent(userData.name)}; path=/; SameSite=Lax`;
+      document.cookie = 'auth_token=session_active; path=/; SameSite=Lax';
 
       window.dispatchEvent(new Event('storage'));
       window.dispatchEvent(new CustomEvent('creatorskit-auth-change', { detail: userData }));
 
-      const redirectUrl = searchParams?.get('redirect') || (userData.role === 'admin' ? '/admin' : '/');
-      router.push(redirectUrl);
-      router.refresh();
+      const redirectParam = searchParams?.get('redirect');
+      const target = redirectParam && !redirectParam.startsWith('/admin') ? redirectParam : '/account';
+      window.location.href = target;
     } catch (err) {
       setLoginError(err.message || 'Something went wrong. Please check your credentials.');
     } finally {
@@ -411,6 +456,7 @@ export default function AuthContainer({ initialMode = 'login', initialEmail = ''
                 src="/creator-studio.jpg"
                 alt="Creator Studio Setup"
                 fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover object-center group-hover:scale-105 transition-transform duration-700 brightness-95"
                 priority
               />

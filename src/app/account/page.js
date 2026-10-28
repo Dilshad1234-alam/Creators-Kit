@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense, useMemo } from 'react';
+import { useState, useEffect, Suspense, useMemo, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
@@ -28,6 +28,8 @@ import {
   Camera, 
   Check, 
   ChevronRight, 
+  ChevronDown,
+  ChevronUp,
   Volume2, 
   Maximize
 } from 'lucide-react';
@@ -35,146 +37,393 @@ import {
 /* =========================================================================
    1. MASTERCLASS / LEARNING PORTAL TAB COMPONENT
    ========================================================================= */
-function AccountMasterclassTab() {
-  // Course curriculum data
-  const courses = useMemo(() => [
-    {
-      id: 'instagram',
-      title: 'Instagram Mastery',
-      badge: 'Worth ₹1,999',
-      image: '/banner 5.png',
-      duration: '2h 15m',
-      totalLessons: 12,
-      progress: 75,
-      description: 'Master the 2026 Instagram algorithm, viral reel hooks, bio setup and brand collaborations.',
-      modules: [
-        {
-          moduleTitle: 'Module 1: Foundations & High-Growth Setup',
-          lessons: [
-            { id: 'ig-1', title: 'Profile Architecture & High-Converting Bio', duration: '08:24', completed: true, locked: false },
-            { id: 'ig-2', title: 'Defining Your Creator Niche & Target Audience', duration: '11:05', completed: true, locked: false },
-            { id: 'ig-3', title: '2026 Instagram Algorithm & Reach Metrics', duration: '14:32', completed: true, locked: false },
-          ]
-        },
-        {
-          moduleTitle: 'Module 2: Viral Reels Production & Retention',
-          lessons: [
-            { id: 'ig-4', title: 'The 3-Second Visual Hook Formula', duration: '12:40', completed: true, locked: false },
-            { id: 'ig-5', title: 'Pacing, Micro-Cuts & Audio Sync Mastery', duration: '15:10', completed: true, locked: false },
-            { id: 'ig-6', title: 'Trending Audio Selection & Timing Secrets', duration: '09:18', completed: false, locked: false },
-            { id: 'ig-7', title: 'Auto-Captions, Kinetic Text & Retention Triggers', duration: '13:50', completed: false, locked: false },
-          ]
-        },
-        {
-          moduleTitle: 'Module 3: Audience Monetisation & Brand Deals',
-          lessons: [
-            { id: 'ig-8', title: 'DM Funnels & Converting Views to Buyers', duration: '16:04', completed: false, locked: false },
-            { id: 'ig-9', title: 'Media Kit Creation & Pitching Top Brands', duration: '18:22', completed: false, locked: true },
-            { id: 'ig-10', title: 'Negotiating Pricing & Deliverables', duration: '14:15', completed: false, locked: true },
-            { id: 'ig-11', title: 'Broadcast Channels & Superfans Community', duration: '10:45', completed: false, locked: true },
-            { id: 'ig-12', title: 'Scaling from 10k to 100k Followers Sustainably', duration: '21:10', completed: false, locked: true },
-          ]
-        }
-      ]
-    },
-    {
-      id: 'youtube',
-      title: 'YouTube Mastery',
-      badge: 'Worth ₹1,999',
-      image: '/banner 6.png',
-      duration: '3h 40m',
-      totalLessons: 14,
-      progress: 20,
-      description: 'The end-to-end blueprint to launch, optimize, rank, and monetize your YouTube channel.',
-      modules: [
-        {
-          moduleTitle: 'Module 1: Channel Kickstart & Gear Setup',
-          lessons: [
-            { id: 'yt-1', title: 'YouTube Channel Architecture & Brand Identity', duration: '10:15', completed: true, locked: false },
-            { id: 'yt-2', title: 'Budget Gear: Audio, Camera & 3-Point Lighting', duration: '14:20', completed: true, locked: false },
-            { id: 'yt-3', title: 'High-CTR Thumbnail Secrets in Photoshop', duration: '18:45', completed: false, locked: false },
-          ]
-        },
-        {
-          moduleTitle: 'Module 2: Search SEO & Video Packaging',
-          lessons: [
-            { id: 'yt-4', title: 'YouTube Search SEO & Tag Strategies', duration: '16:30', completed: false, locked: false },
-            { id: 'yt-5', title: 'Video Scripting Framework for High Retention', duration: '22:10', completed: false, locked: true },
-            { id: 'yt-6', title: 'Shorts vs Long-Form Growth Symbiosis', duration: '12:05', completed: false, locked: true },
-          ]
-        },
-        {
-          moduleTitle: 'Module 3: AdSense, Sponsorships & Affiliate Income',
-          lessons: [
-            { id: 'yt-7', title: 'Unlocking YPP Monetization Fast Track', duration: '15:40', completed: false, locked: true },
-            { id: 'yt-8', title: 'Affiliate Marketing & Dedicated Sponsorships', duration: '19:50', completed: false, locked: true },
-          ]
-        }
-      ]
-    },
-    {
-      id: 'filmora',
-      title: 'Filmora Video Editing Mastery',
-      badge: 'Worth ₹999',
-      image: '/banner 8.png',
-      duration: '1h 50m',
-      totalLessons: 8,
-      progress: 0,
-      description: 'Master fast, cinematic video editing with Filmora from initial cuts to 4K color grading.',
-      modules: [
-        {
-          moduleTitle: 'Module 1: Interface & Essential Cuts',
-          lessons: [
-            { id: 'fl-1', title: 'Filmora Interface Tour & Project Settings', duration: '11:20', completed: false, locked: false },
-            { id: 'fl-2', title: 'Smart Cuts, J-Cuts, L-Cuts & Speed Ramping', duration: '14:40', completed: false, locked: false },
-            { id: 'fl-3', title: 'Cinematic Color Grading & LUT Presets', duration: '17:15', completed: false, locked: true },
-            { id: 'fl-4', title: 'Keyframing, Dynamic Motion & Sound FX', duration: '16:30', completed: false, locked: true },
-            { id: 'fl-5', title: 'Export Presets for Crisp 4K Reels & Shorts', duration: '13:55', completed: false, locked: true },
-          ]
-        }
-      ]
-    }
-  ], []);
+function getEmbedUrl(rawUrl) {
+  if (!rawUrl) return '';
+  const url = rawUrl.trim();
+  const ytParams = 'autoplay=1&controls=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1';
 
-  const [activeCourseId, setActiveCourseId] = useState('instagram');
-  const [completedLessonIds, setCompletedLessonIds] = useState(
-    new Set(['ig-1', 'ig-2', 'ig-3', 'ig-4', 'ig-5', 'yt-1', 'yt-2', 'yt-3', 'fl-1', 'fl-2', 'fl-3', 'fl-4'])
+  if (url.includes('youtube.com/watch')) {
+    try {
+      const u = new URL(url);
+      const v = u.searchParams.get('v');
+      return v ? `https://www.youtube.com/embed/${v}?${ytParams}` : url.replace('watch?v=', 'embed/') + `?${ytParams}`;
+    } catch (e) {
+      return url.replace('watch?v=', 'embed/').split('&')[0] + `?${ytParams}`;
+    }
+  }
+  if (url.includes('youtu.be/')) {
+    const parts = url.split('youtu.be/');
+    const id = parts[1]?.split('?')[0]?.split('&')[0];
+    return id ? `https://www.youtube.com/embed/${id}?${ytParams}` : url;
+  }
+  if (url.includes('youtube.com/embed/') || url.includes('youtube-nocookie.com/embed/')) {
+    const baseUrl = url.split('?')[0];
+    return `${baseUrl}?${ytParams}`;
+  }
+  if (url.includes('vimeo.com/')) {
+    const parts = url.split('vimeo.com/');
+    const id = parts[1]?.split('?')[0]?.replace('video/', '');
+    return id ? `https://player.vimeo.com/video/${id}?autoplay=1&title=0&byline=0&portrait=0` : url;
+  }
+  return '';
+}
+
+const DEFAULT_BUNDLE_MASTERCLASSES = [
+  {
+    id: 'instagram-mastery',
+    title: 'Instagram Mastery',
+    description: 'Learn the algorithm secrets, how to go viral with Reels, and build a dedicated following fast.',
+    badge: '100% Free Included',
+    image: '/video 2.webp',
+    duration: '2h 15m',
+    progress: 0,
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+    totalLessons: 4,
+    modules: [
+      {
+        moduleTitle: 'Module 1: High-Growth Foundations & Reels Secrets',
+        lessons: [
+          { id: 'ig-1', title: 'Profile Architecture & High-Converting Bio', duration: '08:24', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', locked: false, completed: false, overview: 'Learn to craft an irresistible bio and visual profile architecture that converts visitors into followers.' },
+          { id: 'ig-2', title: 'Defining Your Creator Niche & Target Audience', duration: '11:05', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', locked: false, completed: false, overview: 'Find your content moat and zero in on high-engagement demographics.' },
+          { id: 'ig-3', title: '2026 Instagram Algorithm & Reach Multipliers', duration: '14:32', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', locked: false, completed: false, overview: 'Deep dive into save/share ratios and algorithmic ranking triggers.' },
+          { id: 'ig-4', title: 'The 3-Second Visual Hook Formula for Viral Reels', duration: '12:40', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', locked: false, completed: false, overview: 'Hook viewers in under 3 seconds using audio and motion contrast.' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'youtube-mastery',
+    title: 'YouTube Mastery',
+    description: 'Master SEO, thumbnail creation, and viewer retention to monetize your channel efficiently.',
+    badge: '100% Free Included',
+    image: '/video 1.webp',
+    duration: '3h 10m',
+    progress: 0,
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+    totalLessons: 3,
+    modules: [
+      {
+        moduleTitle: 'Module 1: Channel Architecture & Monetization',
+        lessons: [
+          { id: 'yt-1', title: 'Channel Branding, High-CTR Thumbnail Design & SEO', duration: '12:20', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', locked: false, completed: false, overview: 'Setting up your YouTube channel with proper metadata, tags, and click-worthy thumbnails.' },
+          { id: 'yt-2', title: 'Scripting for Maximum Watch Time & Retention', duration: '16:30', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', locked: false, completed: false, overview: 'Storyboarding and pacing secrets that keep audiences glued to the end.' },
+          { id: 'yt-3', title: 'Lighting & Studio Mic Setup for Crisp Audio/Video', duration: '14:15', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', locked: false, completed: false, overview: 'How to use your Creators Kit ring light and microphone for studio-grade production.' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'filmora-mastery',
+    title: 'Filmora Mastery',
+    description: 'Professional video editing made simple. Learn cuts, transitions, effects, and color grading.',
+    badge: '100% Free Included',
+    image: '/video.webp',
+    duration: '2h 45m',
+    progress: 0,
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+    totalLessons: 3,
+    modules: [
+      {
+        moduleTitle: 'Module 1: Professional Video Editing with Filmora',
+        lessons: [
+          { id: 'fl-1', title: 'Interface Setup & Timeline Speed Shortcuts', duration: '10:50', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', locked: false, completed: false, overview: 'Essential hotkeys and project configuration for seamless editing.' },
+          { id: 'fl-2', title: 'Smart Cuts, J-Cuts, L-Cuts & Speed Ramping', duration: '14:40', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', locked: false, completed: false, overview: 'Seamless audio-visual transitions used by top creators.' },
+          { id: 'fl-3', title: 'Cinematic Color Grading, LUT Presets & Export', duration: '17:15', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', locked: false, completed: false, overview: 'Color correct footage, apply cinematic tones, and export in 4K.' }
+        ]
+      }
+    ]
+  }
+];
+
+function LockedCoursesView() {
+  return (
+    <div className="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-8 md:p-12 text-center shadow-sm border border-neutral-100 dark:border-neutral-800 flex flex-col items-center animate-in fade-in slide-in-from-bottom-3 duration-500">
+      <div className="w-18 h-18 rounded-3xl bg-red-50 dark:bg-red-950/40 text-[#900606] dark:text-red-400 flex items-center justify-center mb-6 shadow-sm border border-red-100 dark:border-red-900/60">
+        <Lock className="w-8 h-8" />
+      </div>
+
+      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#900606]/10 text-[#900606] text-xs font-black uppercase tracking-wider mb-3">
+        🔒 Bundle Exclusive Masterclasses
+      </span>
+
+      <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight mb-3">
+        Masterclasses Locked
+      </h2>
+
+      <p className="text-neutral-600 dark:text-neutral-400 max-w-lg mx-auto text-sm sm:text-base leading-relaxed mb-8">
+        Access to <strong className="text-neutral-800 dark:text-neutral-200">Instagram Mastery</strong>, <strong className="text-neutral-800 dark:text-neutral-200">YouTube Mastery</strong>, and <strong className="text-neutral-800 dark:text-neutral-200">Filmora Mastery</strong> is exclusively unlocked when you purchase any Creators Kit studio bundle.
+      </p>
+
+      {/* 3 Locked Course Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-2xl mb-8">
+        {[
+          { title: 'Instagram Mastery', image: '/video 2.webp', tag: 'Reels Algorithm & Growth' },
+          { title: 'YouTube Mastery', image: '/video 1.webp', tag: 'Thumbnails, SEO & Monetization' },
+          { title: 'Filmora Mastery', image: '/video.webp', tag: 'Cinematic Video Editing' },
+        ].map((course, idx) => (
+          <div
+            key={idx}
+            className="relative rounded-2xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-700/80 p-3.5 flex flex-col items-center text-center overflow-hidden group"
+          >
+            <div className="w-full h-28 rounded-xl overflow-hidden relative mb-2.5 flex items-center justify-center bg-black/5 dark:bg-black/30">
+              <Image
+                src={course.image}
+                alt={course.title}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 250px"
+                className="object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
+              />
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center">
+                <span className="w-9 h-9 rounded-full bg-black/75 backdrop-blur-md text-amber-300 flex items-center justify-center shadow-md">
+                  <Lock className="w-4 h-4" />
+                </span>
+              </div>
+            </div>
+            <h4 className="font-bold text-xs sm:text-[13px] text-neutral-800 dark:text-neutral-200 mb-0.5">
+              {course.title}
+            </h4>
+            <span className="text-[10px] text-neutral-400 font-medium line-clamp-1">{course.tag}</span>
+          </div>
+        ))}
+      </div>
+
+      <Link
+        href="/product"
+        className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-[#900606] hover:bg-[#7a0505] text-white rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm shadow-[0_4px_16px_rgba(144,6,6,0.35)] hover:shadow-[0_6px_20px_rgba(144,6,6,0.45)] transition-all flex items-center justify-center gap-2"
+      >
+        <span>Explore Studio Bundles & Unlock Free</span>
+        <ChevronRight className="w-4 h-4" />
+      </Link>
+    </div>
   );
-  const [activeLessonId, setActiveLessonId] = useState('ig-6');
+}
+
+function AccountMasterclassTab({ hasAccess = true }) {
+  if (hasAccess === false) {
+    return <LockedCoursesView />;
+  }
+
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [activeCourseId, setActiveCourseId] = useState('');
+  const [activeLessonId, setActiveLessonId] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState('1.0x');
-  const [activeResourceTab, setActiveResourceTab] = useState('overview');
+
+  const [completedLessonIds, setCompletedLessonIds] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('creatorskit_completed_lessons');
+        if (saved) return new Set(JSON.parse(saved));
+      } catch (e) {}
+    }
+    return new Set(['ig-1', 'ig-2', 'ig-3', 'yt-1', 'fl-1']);
+  });
+
+  const fetchMasterclasses = useCallback(async (isManual = false) => {
+    try {
+      if (isManual) setIsRefreshing(true);
+      const res = await fetch(`/api/homepage-masterclasses?t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data)) {
+        // Filter out courses set to hidden (active === false)
+        const visibleCourses = json.data.filter((c) => c.active !== false);
+        const mapped = visibleCourses.map((c) => {
+          const directVideo = c.videoLink || c.videoUrl || '';
+          const courseModules =
+            c.modules && Array.isArray(c.modules) && c.modules.length > 0
+              ? c.modules
+              : [
+                  {
+                    moduleTitle: 'Module 1: Complete Masterclass',
+                    lessons: [
+                      {
+                        id: `${c._id || c.id}-lesson-1`,
+                        title: c.title,
+                        duration: 'Full Masterclass',
+                        videoUrl: directVideo,
+                        videoLink: directVideo,
+                        locked: false,
+                        completed: false,
+                      },
+                    ],
+                  },
+                ];
+
+          return {
+            ...c,
+            id: c._id ? c._id.toString() : c.id,
+            duration: c.duration || 'Full Masterclass',
+            progress: typeof c.progress === 'number' ? c.progress : 0,
+            badge: c.badge || '100% Free',
+            image: c.image || '/banner 5.png',
+            videoUrl: directVideo || courseModules[0]?.lessons?.[0]?.videoLink || courseModules[0]?.lessons?.[0]?.videoUrl || '',
+            videoLink: directVideo || courseModules[0]?.lessons?.[0]?.videoLink || courseModules[0]?.lessons?.[0]?.videoUrl || '',
+            totalLessons:
+              courseModules.reduce((acc, m) => acc + (m.lessons?.length || 0), 0) || 1,
+            modules: courseModules,
+          };
+        });
+
+        // If no custom courses are present, default to the 3 guaranteed bundle masterclasses
+        const finalCourses = mapped.length > 0 ? mapped : DEFAULT_BUNDLE_MASTERCLASSES;
+        setCourses(finalCourses);
+
+        // Auto-select course if activeCourseId is not set or not in current list
+        setActiveCourseId((prevId) => {
+          const exists = finalCourses.some((c) => c.id === prevId || (c._id && c._id === prevId));
+          if (exists) return prevId;
+          const firstCourse = finalCourses[0];
+          const firstLesson = (firstCourse?.modules || []).flatMap((m) => m.lessons || [])[0];
+          if (firstLesson) setActiveLessonId(firstLesson.id);
+          return firstCourse ? firstCourse.id : '';
+        });
+      } else {
+        setCourses(DEFAULT_BUNDLE_MASTERCLASSES);
+      }
+    } catch (err) {
+      console.error('Failed to sync masterclasses from MongoDB', err);
+      setCourses(DEFAULT_BUNDLE_MASTERCLASSES);
+    } finally {
+      setLoading(false);
+      if (isManual) setIsRefreshing(false);
+    }
+  }, []);
+
+  // Initial load and live synchronization listeners
+  useEffect(() => {
+    fetchMasterclasses();
+
+    const handleSync = () => fetchMasterclasses();
+    const handleStorage = (e) => {
+      if (e.key === 'creatorskit_masterclasses_updated') {
+        fetchMasterclasses();
+      }
+    };
+
+    let bc = null;
+    try {
+      bc = new BroadcastChannel('creatorskit_masterclasses_channel');
+      bc.onmessage = (msg) => {
+        if (msg.data?.type === 'updated') {
+          fetchMasterclasses();
+        }
+      };
+    } catch (e) {}
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        fetchMasterclasses();
+      }
+    };
+
+    window.addEventListener('focus', handleSync);
+    window.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('masterclasses-updated', handleSync);
+    window.addEventListener('storage', handleStorage);
+
+    // Background polling fallback for live admin reflection (active tab only, every 30s)
+    const pollInterval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        fetchMasterclasses();
+      }
+    }, 30000);
+
+    return () => {
+      clearInterval(pollInterval);
+      if (bc) {
+        try { bc.close(); } catch (e) {}
+      }
+      window.removeEventListener('focus', handleSync);
+      window.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('masterclasses-updated', handleSync);
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, [fetchMasterclasses]);
 
   const activeCourse = useMemo(() => {
-    return courses.find(c => c.id === activeCourseId) || courses[0];
+    return (
+      courses.find((c) => c.id === activeCourseId || (c._id && c._id === activeCourseId)) ||
+      courses[0] || { modules: [] }
+    );
   }, [courses, activeCourseId]);
+
+  // Keep activeLesson valid if modules or courses change
+  useEffect(() => {
+    if (activeCourse?.modules?.length > 0) {
+      const flat = activeCourse.modules.flatMap((m) => m.lessons || []);
+      if (!flat.some((l) => l.id === activeLessonId) && flat[0]) {
+        setActiveLessonId(flat[0].id);
+      }
+    }
+  }, [activeCourse, activeLessonId]);
 
   // Find active lesson object
   const activeLesson = useMemo(() => {
+    if (!activeCourse?.modules) return null;
     for (const mod of activeCourse.modules) {
-      const found = mod.lessons.find(l => l.id === activeLessonId);
+      const found = (mod.lessons || []).find((l) => l.id === activeLessonId);
       if (found) return found;
     }
-    return activeCourse.modules[0]?.lessons[0] || null;
+    return activeCourse.modules[0]?.lessons?.[0] || null;
   }, [activeCourse, activeLessonId]);
 
-  // Calculate overall stats across all courses
-  const allLessons = useMemo(() => {
-    return courses.flatMap(c => c.modules.flatMap(m => m.lessons));
+  // Calculate course stats
+  const activeCourseLessons = useMemo(() => {
+    return (activeCourse?.modules || []).flatMap((m) => m.lessons || []);
+  }, [activeCourse]);
+
+  const activeCourseTotalLessons = activeCourseLessons.length;
+  const activeCourseCompletedCount = activeCourseLessons.filter((l) => completedLessonIds.has(l.id)).length;
+  const activeCoursePct = activeCourseTotalLessons > 0 ? Math.round((activeCourseCompletedCount / activeCourseTotalLessons) * 100) : 0;
+
+  // Display all courses synchronized directly from MongoDB
+  const displayCourses = useMemo(() => {
+    return courses || [];
   }, [courses]);
 
-  const totalLessonsCount = allLessons.length;
-  const completedCount = allLessons.filter(l => completedLessonIds.has(l.id)).length;
-  const overallPercentage = Math.round((completedCount / totalLessonsCount) * 100);
+  // Direct Click-to-Play Course Action
+  const handlePlayCourse = (course, e) => {
+    if (e) e.stopPropagation();
+    const courseId = course._id ? course._id.toString() : course.id;
+    setActiveCourseId(courseId);
+
+    const flatLessons = (course.modules || []).flatMap((m) => m.lessons || []);
+    const firstPlayable = flatLessons.find((l) => !l.locked) || flatLessons[0];
+    if (firstPlayable) {
+      setActiveLessonId(firstPlayable.id);
+    }
+    setIsPlaying(true);
+
+    // Smoothly scroll down to the video player workspace directly below
+    setTimeout(() => {
+      const el = document.getElementById('masterclass-player-workspace');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }, 50);
+  };
 
   // Toggle lesson completed
   const toggleLessonCompleted = (lessonId) => {
-    setCompletedLessonIds(prev => {
+    setCompletedLessonIds((prev) => {
       const next = new Set(prev);
       if (next.has(lessonId)) {
         next.delete(lessonId);
       } else {
         next.add(lessonId);
+      }
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('creatorskit_completed_lessons', JSON.stringify([...next]));
+        } catch (e) {}
       }
       return next;
     });
@@ -182,10 +431,9 @@ function AccountMasterclassTab() {
 
   // Find next lesson
   const handleNextLesson = () => {
-    const flatLessons = activeCourse.modules.flatMap(m => m.lessons);
-    const currentIndex = flatLessons.findIndex(l => l.id === activeLessonId);
-    if (currentIndex >= 0 && currentIndex < flatLessons.length - 1) {
-      const next = flatLessons[currentIndex + 1];
+    const currentIndex = activeCourseLessons.findIndex((l) => l.id === activeLessonId);
+    if (currentIndex >= 0 && currentIndex < activeCourseLessons.length - 1) {
+      const next = activeCourseLessons[currentIndex + 1];
       if (!next.locked) {
         setActiveLessonId(next.id);
         setIsPlaying(true);
@@ -195,268 +443,296 @@ function AccountMasterclassTab() {
 
   // Find previous lesson
   const handlePrevLesson = () => {
-    const flatLessons = activeCourse.modules.flatMap(m => m.lessons);
-    const currentIndex = flatLessons.findIndex(l => l.id === activeLessonId);
+    const currentIndex = activeCourseLessons.findIndex((l) => l.id === activeLessonId);
     if (currentIndex > 0) {
-      const prev = flatLessons[currentIndex - 1];
+      const prev = activeCourseLessons[currentIndex - 1];
       setActiveLessonId(prev.id);
       setIsPlaying(true);
     }
   };
 
   return (
-    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full overflow-hidden">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full overflow-hidden">
       
-      {/* 1. HERO LEARNING PORTAL BANNER */}
-      <div className="relative w-full bg-[#0c0e14] text-white p-12 sm:p-15 md:p-25 border border-neutral-800 shadow-2xl overflow-hidden">
-  
-        {/* Background Image & Gradient Overlay */}
-        <div className="absolute inset-0 w-full h-full z-0">
-          <Image 
-            src={getImageUrl('/about5.png')} 
-            alt="Masterclass Portal Banner" 
-            fill 
-            sizes="100vw" 
-            className="object-cover object-center opacity-40" 
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0c0e14] via-[#0c0e14]/80 to-transparent"></div>
-        </div>
-
-        {/* Glow & subtle grid effect */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#900606]/25 rounded-full blur-3xl pointer-events-none z-0"></div>
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-[#e50914]/10 rounded-full blur-3xl pointer-events-none z-0"></div>
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-          <div className="max-w-xl space-y-3">
-      
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight leading-tight">
-              Learn. Create. <span className="text-[#900606] drop-shadow-[0_2px_12px_rgba(144,6,6,0.8)]">Grow.</span>
-            </h2>
-      
-            <p className="text-neutral-300 text-sm sm:text-base leading-relaxed font-normal">
-              Your unlimited lifetime creator bundle access. Learn step-by-step from industry experts, apply templates, and scale your audience.
-            </p>
-          </div>
-
-        </div>
-      </div>
-
-      {/* 2. COURSE PROGRESS SELECTOR CARDS */}
-      <div className="max-w-[1750px] mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-            <span>Your Enrolled Courses</span>
-            <span className="text-xs font-bold bg-[#900606]/10 text-[#900606] px-2.5 py-0.5 rounded-full">
-              3 Included
+      {/* 1. CLEAN TOP HEADER */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-neutral-200 dark:border-neutral-800">
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight flex items-center gap-2.5">
+            <span>Enrolled Masterclasses</span>
+            <span className="text-xs font-bold bg-[#900606]/10 text-[#900606] px-3 py-1 rounded-full">
+              3 Courses Included
             </span>
-          </h3>
-          <span className="text-xs font-semibold text-neutral-500">Click a card to switch curriculum</span>
+          </h2>
+          <p className="text-xs sm:text-sm text-neutral-500 font-medium mt-1">
+            Click on any course card below to instantly stream its lessons directly underneath.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {courses.map((course) => {
-            const isSelected = course.id === activeCourseId;
-            const courseLessons = course.modules.flatMap(m => m.lessons);
-            const courseCompleted = courseLessons.filter(l => completedLessonIds.has(l.id)).length;
-            const coursePct = Math.round((courseCompleted / courseLessons.length) * 100);
-
-            return (
-              <div
-                key={course.id}
-                onClick={() => {
-                  setActiveCourseId(course.id);
-                  const firstLesson = course.modules[0]?.lessons[0];
-                  if (firstLesson) setActiveLessonId(firstLesson.id);
-                }}
-                className={`group cursor-pointer rounded-xl overflow-hidden transition-all duration-300 border bg-white dark:bg-neutral-900 flex flex-col justify-between ${
-                  isSelected 
-                    ? 'border-[#900606] shadow-lg ring-2 ring-[#900606]/20 bg-rose-50/20 dark:bg-[#900606]/5' 
-                    : 'border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 hover:shadow-md'
-                }`}
-              >
-                <div>
-                  {/* Flush Edge-to-Edge Larger Image Container */}
-                  <div className="relative w-full h-44 sm:h-48 bg-neutral-100">
-                    <Image
-                      src={getImageUrl(course.image)}
-                      alt={course.title}
-                      fill
-                      className="object-cover "
-                    />
-                    <span className="absolute top-3 right-3 bg-[#900606] text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-md z-10">
-                      {course.badge}
-                    </span>
-                    {isSelected && (
-                      <span className="absolute bottom-3 left-3 bg-black/80 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-md flex items-center gap-1 border border-white/20 z-10">
-                        <Play className="w-2.5 h-2.5 fill-white" /> Currently Playing
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Content Padding Section */}
-                  <div className="p-5 sm:p-6 pb-3">
-                    <h4 className="font-bold text-neutral-900 dark:text-white text-base sm:text-lg group-hover:text-[#900606] transition-colors mb-1.5">
-                      {course.title}
-                    </h4>
-                    <p className="text-neutral-500 text-xs sm:text-sm leading-relaxed line-clamp-2">
-                      {course.description}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Progress Section */}
-                <div className="p-5 sm:p-6 pt-3 border-t border-neutral-100 dark:border-neutral-800">
-                  <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
-                    <span className="text-neutral-500">{courseCompleted} of {course.totalLessons} Lessons</span>
-                    <span className="text-[#900606] font-bold">{coursePct}%</span>
-                  </div>
-                  <div className="w-full h-2 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-[#900606] rounded-full transition-all duration-300"
-                      style={{ width: `${coursePct}%` }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
       </div>
 
-      {/* 3. INTERACTIVE PLAYER & CURRICULUM PLAYLIST WORKSPACE */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
-        {/* Left Column: Interactive Video Player & Lesson Notes */}
-        <div className="lg:col-span-7 xl:col-span-8 space-y-6">
-          <div className="bg-white dark:bg-neutral-900 rounded-xl p-5 sm:p-7 md:p-8 border border-neutral-200 dark:border-neutral-800 shadow-sm">
-            
-            {/* Player Container */}
-            <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-black shadow-2xl border border-neutral-800 flex items-center justify-center group">
-              {/* Video Backdrop Mockup */}
-              <div className="absolute inset-0 z-0">
-                <Image
-                  src={getImageUrl(activeCourse.image)}
-                  alt={activeLesson?.title || 'Lesson Video'}
-                  fill
-                  className={`object-cover transition-opacity duration-500 ${isPlaying ? 'opacity-40 blur-[1px]' : 'opacity-65'}`}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/70"></div>
-              </div>
+      {/* 2. CLEAN 3-CARD DISPLAY (Instagram Mastery, YouTube Mastery, Filmora Mastery) */}
+      <div className="space-y-4">
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-80 rounded-xl bg-neutral-200 dark:bg-neutral-800"></div>
+            ))}
+          </div>
+        ) : displayCourses.length === 0 ? (
+          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-10 text-center">
+            <GraduationCap className="w-12 h-12 text-[#900606] mx-auto mb-3 opacity-80" />
+            <h4 className="font-bold text-lg text-neutral-800 dark:text-neutral-200">No Masterclasses Found</h4>
+            <p className="text-sm text-neutral-900 mt-1">Courses created in the Admin Panel will appear here automatically.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+            {displayCourses.map((course) => {
+              const courseId = course._id ? course._id.toString() : course.id;
+              const isSelected = courseId === activeCourseId || course.id === activeCourseId;
 
-              {/* Watermark / Logo in Video Corner */}
-              <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-                <span className="px-2.5 py-1 rounded-md bg-black/70 text-white font-black text-xs tracking-wider border border-white/20">
-                  CREATORS<span className="text-[#900606]">KIT</span>
-                </span>
-                <span className="text-xs font-medium text-neutral-300 bg-black/50 px-2 py-0.5 rounded backdrop-blur-xs">
-                  {activeCourse.title}
-                </span>
-              </div>
-
-              {/* Center Play/Pause Overlay */}
-              <div className="relative z-10 text-center">
-                <button
-                  onClick={() => setIsPlaying(!isPlaying)}
-                  className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-[#900606] hover:bg-[#a60808] text-white flex items-center justify-center shadow-[0_0_35px_rgba(144,6,6,0.7)] hover:scale-110 active:scale-95 transition-all duration-300 group-hover:shadow-[0_0_45px_rgba(144,6,6,0.9)] cursor-pointer"
+              return (
+                <div
+                  key={courseId}
+                  onClick={(e) => handlePlayCourse(course, e)}
+                  className={`group cursor-pointer rounded-2xl overflow-hidden transition-all duration-300 border flex flex-col justify-between ${
+                    isSelected 
+                      ? 'border-[#900606] shadow-xl ring-2 ring-[#900606]/30 bg-rose-50/20 dark:bg-[#900606]/10 scale-[1.01]' 
+                      : 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 hover:shadow-lg'
+                  }`}
                 >
-                  {isPlaying ? (
-                    <Pause className="w-8 h-8 fill-white" />
-                  ) : (
-                    <Play className="w-8 h-8 fill-white ml-1" />
-                  )}
-                </button>
-                <p className="text-white text-xs sm:text-sm font-semibold mt-3 tracking-wide drop-shadow-md">
-                  {isPlaying ? 'Video Playing • Click to Pause' : 'Click to Play Lesson'}
-                </p>
-              </div>
+                  <div>
+                    {/* Course Banner Image */}
+                    <div className="relative w-full aspect-video bg-neutral-900 overflow-hidden">
+                      <Image
+                        src={getImageUrl(course.image || '/banner 5.png')}
+                        alt={course.title}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
 
-              {/* Bottom Video Controls Bar */}
-              <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/80 to-transparent p-4 sm:p-5 z-20 space-y-2">
-                {/* Scrubber timeline */}
-                <div className="w-full h-1.5 hover:h-2.5 bg-white/25 rounded-full cursor-pointer relative transition-all group/scrubber">
-                  <div 
-                    className="h-full bg-[#900606] rounded-full relative"
-                    style={{ width: isPlaying ? '64%' : '38%' }}
-                  >
-                    <span className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow opacity-0 group-hover/scrubber:opacity-100 transition-opacity"></span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between text-white text-xs pt-1">
-                  <div className="flex items-center gap-3">
-                    <button 
-                      onClick={() => setIsPlaying(!isPlaying)} 
-                      className="hover:text-[#ff6b6b] transition-colors"
-                      title={isPlaying ? "Pause" : "Play"}
-                    >
-                      {isPlaying ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current" />}
-                    </button>
-                    <button onClick={handlePrevLesson} className="hover:text-[#ff6b6b] transition-colors" title="Previous Lesson">
-                      <SkipBack className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleNextLesson} className="hover:text-[#ff6b6b] transition-colors" title="Next Lesson">
-                      <SkipForward className="w-4 h-4" />
-                    </button>
-                    <div className="flex items-center gap-1.5 text-neutral-300 font-mono text-[11px] sm:text-xs">
-                      <Volume2 className="w-4 h-4" />
-                      <span>{isPlaying ? '05:42' : '03:15'}</span> / <span>{activeLesson?.duration || '12:00'}</span>
+                    {/* Content Section */}
+                    <div className="p-5 sm:p-6 pb-4">
+                      <h4 className="font-extrabold text-neutral-900 dark:text-white text-base sm:text-lg group-hover:text-[#900606] transition-colors line-clamp-1 mb-1">
+                        {course.title}
+                      </h4>
+                      <p className="text-neutral-900 text-xs sm:text-sm leading-relaxed line-clamp-2">
+                        {course.description}
+                      </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  {/* Direct Play Action Section */}
+                  <div className="p-5 sm:p-6 pt-0">
                     <button
-                      onClick={() => {
-                        const speeds = ['1.0x', '1.25x', '1.5x', '2.0x'];
-                        const nextIdx = (speeds.indexOf(playbackSpeed) + 1) % speeds.length;
-                        setPlaybackSpeed(speeds[nextIdx]);
-                      }}
-                      className="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[11px] font-bold font-mono transition-colors"
+                      type="button"
+                      onClick={(e) => handlePlayCourse(course, e)}
+                      className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#900606] text-white shadow-md hover:bg-[#7a0505]'
+                          : 'bg-neutral-50 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 hover:bg-[#900606] hover:text-white hover:border-[#900606]'
+                      }`}
                     >
-                      {playbackSpeed}
-                    </button>
-                    <button className="hover:text-[#ff6b6b] transition-colors" title="Fullscreen">
-                      <Maximize className="w-4 h-4" />
+                      <Play className="w-3.5 h-3.5 fill-current" />
+                      <span>{isSelected && isPlaying ? 'Currently Playing • Watch Now' : 'Start Watching'}</span>
                     </button>
                   </div>
                 </div>
-              </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* 3. INTERACTIVE VIDEO PLAYER WORKSPACE */}
+      <div
+        id="masterclass-player-workspace"
+        className="pt-2 select-none"
+        onContextMenu={(e) => e.preventDefault()}
+        style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+      >
+        <div className="w-full space-y-6">
+          <div className="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 md:p-8 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+            
+            {/* Player Container Wrapper with Context Menu & Selection Disabled */}
+            <div
+              onContextMenu={(e) => e.preventDefault()}
+              style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+              className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black shadow-2xl border border-neutral-800 flex items-center justify-center group select-none"
+            >
+              {isPlaying ? (
+                (() => {
+                  const playableVideoUrl =
+                    activeLesson?.videoLink ||
+                    activeLesson?.videoUrl ||
+                    activeCourse?.videoLink ||
+                    activeCourse?.videoUrl ||
+                    'https://www.w3schools.com/html/mov_bbb.mp4';
+                  const embedUrl = getEmbedUrl(playableVideoUrl);
+
+                  return embedUrl ? (
+                    <div
+                      className="relative w-full h-full overflow-hidden select-none"
+                      onContextMenu={(e) => e.preventDefault()}
+                      style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+                    >
+                      {/* Responsive 16:9 Video Player (Zero Letterboxing/Pillarboxing) */}
+                      <iframe
+                        key={`${activeCourseId}-${activeLesson?.id}`}
+                        src={embedUrl}
+                        title={activeLesson?.title || 'Lesson Video'}
+                        className="absolute inset-0 w-full h-full z-10 border-0 pointer-events-auto"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      />
+
+                      {/* Transparent Top-Header Security Shield */}
+                      <div
+                        className="absolute top-0 left-0 right-0 h-16 z-20 select-none bg-transparent pointer-events-auto"
+                        onContextMenu={(e) => e.preventDefault()}
+                        onClick={(e) => e.stopPropagation()}
+                        aria-hidden="true"
+                      />
+
+                      {/* Transparent Bottom Corner Click Shields (No Black Boxes) */}
+                      <div className="absolute bottom-0 left-0 right-0 h-12 z-20 pointer-events-none flex items-end justify-between select-none">
+                        <div
+                          className="w-16 h-12 bg-transparent pointer-events-auto cursor-default"
+                          onContextMenu={(e) => e.preventDefault()}
+                          onClick={(e) => e.stopPropagation()}
+                          aria-hidden="true"
+                        />
+                        <div className="flex-1 h-full pointer-events-none" />
+                        <div
+                          className="w-56 h-12 bg-transparent pointer-events-auto cursor-default"
+                          onContextMenu={(e) => e.preventDefault()}
+                          onClick={(e) => e.stopPropagation()}
+                          aria-hidden="true"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      className="relative w-full h-full overflow-hidden select-none"
+                      onContextMenu={(e) => e.preventDefault()}
+                      style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+                    >
+                      {/* Native HTML5 Video Player with Anti-Copy & Anti-Download */}
+                      <video
+                        key={`${activeCourseId}-${activeLesson?.id}`}
+                        src={playableVideoUrl}
+                        controls
+                        controlsList="nodownload nofullscreen noremoteplayback"
+                        disablePictureInPicture
+                        autoPlay
+                        playsInline
+                        onContextMenu={(e) => e.preventDefault()}
+                        onEnded={handleNextLesson}
+                        className="absolute inset-0 w-full h-full object-contain z-10 bg-black select-none pointer-events-auto"
+                        style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+                      />
+
+                      {/* Targeted Top-Header Security Shield */}
+                      <div
+                        className="absolute top-0 left-0 right-0 h-16 z-20 select-none bg-transparent pointer-events-auto"
+                        onContextMenu={(e) => e.preventDefault()}
+                        onClick={(e) => e.stopPropagation()}
+                        aria-hidden="true"
+                      />
+                    </div>
+                  );
+                })()
+              ) : (
+                <>
+                  {/* Video Backdrop Mockup */}
+                  <div className="absolute inset-0 z-0 select-none" onContextMenu={(e) => e.preventDefault()}>
+                    <Image
+                      src={getImageUrl(activeCourse.image || '/video 2.webp')}
+                      alt={activeLesson?.title || 'Lesson Video'}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 75vw, 1200px"
+                      className="object-cover opacity-60 pointer-events-none"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/75"></div>
+                  </div>
+
+                  {/* Center Play Overlay */}
+                  <div className="relative z-10 text-center px-4 select-none">
+                    <button
+                      onClick={() => setIsPlaying(true)}
+                      className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-[#900606] hover:bg-[#a60808] text-white flex items-center justify-center shadow-[0_0_35px_rgba(144,6,6,0.7)] hover:scale-110 active:scale-95 transition-all duration-300 group-hover:shadow-[0_0_45px_rgba(144,6,6,0.9)] cursor-pointer mx-auto"
+                    >
+                      <Play className="w-8 h-8 fill-white ml-1" />
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
 
-            {/* Lesson Title & Primary Action Controls */}
-            <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-neutral-100 dark:border-neutral-800">
-              <div>
+            {/* Lesson Title & Action Navigation Controls */}
+            <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="min-w-0">
                 <span className="text-xs font-bold uppercase tracking-wider text-[#900606] mb-1 block">
                   {activeCourse.title} • Current Lesson
                 </span>
-                <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white">
-                  {activeLesson?.title}
+                <h3 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white truncate">
+                  {activeLesson?.title || 'Course Lesson'}
                 </h3>
                 <p className="text-xs text-neutral-500 mt-1 flex items-center gap-2">
                   <Clock className="w-3.5 h-3.5" />
-                  <span>Duration: {activeLesson?.duration}</span>
+                  <span>Duration: {activeLesson?.duration || '10:00'}</span>
                   <span>•</span>
                   <span>Full HD 1080p Stream</span>
                 </p>
               </div>
 
               {/* Complete & Next Navigation */}
-              <div className="flex items-center gap-3 shrink-0">
+              <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                {/* Lesson Switcher Dropdown */}
+                {activeCourseLessons.length > 1 && (
+                  <select
+                    value={activeLessonId}
+                    onChange={(e) => {
+                      setActiveLessonId(e.target.value);
+                      setIsPlaying(true);
+                    }}
+                    className="px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-[#900606] cursor-pointer"
+                  >
+                    {(activeCourse?.modules || []).map((mod, mIdx) => (
+                      <optgroup key={mIdx} label={mod.moduleTitle}>
+                        {(mod.lessons || []).map((lesson) => (
+                          <option key={lesson.id} value={lesson.id}>
+                            {lesson.title} ({lesson.duration})
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                )}
+
+                <button
+                  onClick={handlePrevLesson}
+                  className="p-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer"
+                  title="Previous Lesson"
+                >
+                  <SkipBack className="w-4 h-4" />
+                </button>
+
                 <button
                   onClick={() => activeLesson && toggleLessonCompleted(activeLesson.id)}
-                  className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 ${
+                  className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 cursor-pointer ${
                     activeLesson && completedLessonIds.has(activeLesson.id)
                       ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
                       : 'bg-neutral-100 dark:bg-neutral-800 hover:bg-[#900606] hover:text-white text-neutral-700 dark:text-neutral-300'
                   }`}
                 >
                   <Check className="w-4 h-4" />
-                  <span>{activeLesson && completedLessonIds.has(activeLesson.id) ? 'Completed' : 'Mark as Done'}</span>
+                  <span>{activeLesson && completedLessonIds.has(activeLesson.id) ? 'Completed' : 'Mark Done'}</span>
                 </button>
 
                 <button
                   onClick={handleNextLesson}
-                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-[#900606] hover:bg-[#7a0505] text-white shadow-md hover:shadow-lg transition-all"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-[#900606] hover:bg-[#7a0505] text-white shadow-md hover:shadow-lg transition-all cursor-pointer"
                 >
                   <span>Next</span>
                   <ChevronRight className="w-4 h-4" />
@@ -464,159 +740,8 @@ function AccountMasterclassTab() {
               </div>
             </div>
 
-            {/* Lesson Resources & Notes Tabs */}
-            <div className="pt-6">
-              <div className="flex items-center gap-3 border-b border-neutral-200 dark:border-neutral-800 pb-3">
-                <button
-                  onClick={() => setActiveResourceTab('overview')}
-                  className={`text-xs sm:text-sm font-bold pb-2 transition-all relative ${
-                    activeResourceTab === 'overview'
-                      ? 'text-[#900606] border-b-2 border-[#900606]'
-                      : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'
-                  }`}
-                >
-                  Lesson Overview
-                </button>
-                <button
-                  onClick={() => setActiveResourceTab('resources')}
-                  className={`text-xs sm:text-sm font-bold pb-2 transition-all relative flex items-center gap-1.5 ${
-                    activeResourceTab === 'resources'
-                      ? 'text-[#900606] border-b-2 border-[#900606]'
-                      : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'
-                  }`}
-                >
-                  <span>Downloads & Resources</span>
-                  <span className="text-[10px] bg-[#900606]/10 text-[#900606] px-1.5 py-0.2 rounded-full font-extrabold">3</span>
-                </button>
-              </div>
-
-              <div className="mt-4">
-                {activeResourceTab === 'overview' ? (
-                  <div className="space-y-3 text-neutral-600 dark:text-neutral-300 text-sm leading-relaxed">
-                    <p>
-                      In this module session, you will learn the exact retention framework used to hook viewers within the first 3 seconds and sustain a 70%+ average percentage viewed on vertical short-form platforms.
-                    </p>
-                    <div className="bg-neutral-50 dark:bg-neutral-800/50 p-4 rounded-xl border border-neutral-100 dark:border-neutral-800 space-y-2">
-                      <h5 className="font-bold text-neutral-900 dark:text-white text-xs uppercase tracking-wider text-[#900606]">
-                        Key Takeaways:
-                      </h5>
-                      <ul className="list-disc pl-5 space-y-1 text-xs">
-                        <li>The 3-point visual hook: text contrast, motion anchor, and tonal curiosity.</li>
-                        <li>How to analyze the audio waveform to identify high-velocity viral drops.</li>
-                        <li>Structuring your call to action without killing the reel retention tail.</li>
-                      </ul>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/30 hover:border-neutral-300 transition-all">
-                      <div className="flex items-center gap-3">
-                        <FileText className="w-5 h-5 text-[#900606]" />
-                        <div>
-                          <p className="font-bold text-neutral-900 dark:text-white text-xs sm:text-sm">Viral Hook Blueprint 2026.pdf</p>
-                          <p className="text-[11px] text-neutral-500">PDF Document • 1.4 MB</p>
-                        </div>
-                      </div>
-                      <button className="px-3 py-1.5 bg-neutral-200 dark:bg-neutral-700 hover:bg-[#900606] hover:text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5">
-                        <Download className="w-3.5 h-3.5" />
-                        <span>Download</span>
-                      </button>
-                    </div>
-
-                    <div className="flex items-center justify-between p-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/30 hover:border-neutral-300 transition-all">
-                      <div className="flex items-center gap-3">
-                        <FileText className="w-5 h-5 text-[#900606]" />
-                        <div>
-                          <p className="font-bold text-neutral-900 dark:text-white text-xs sm:text-sm">Filmora & Premiere LUT Pack.zip</p>
-                          <p className="text-[11px] text-neutral-500">Archive • 18.2 MB</p>
-                        </div>
-                      </div>
-                      <button className="px-3 py-1.5 bg-neutral-200 dark:bg-neutral-700 hover:bg-[#900606] hover:text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5">
-                        <Download className="w-3.5 h-3.5" />
-                        <span>Download</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
           </div>
         </div>
-
-        {/* Right Column: Curriculum Playlist Sidebar */}
-        <div className="lg:col-span-5 xl:col-span-4 space-y-4">
-          <div className="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-5 sm:p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm">
-            
-            <div className="pb-4 border-b border-neutral-100 dark:border-neutral-800 mb-4 flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-[#900606] uppercase tracking-wider block">Course Playlist</span>
-                <h4 className="text-lg font-bold text-neutral-900 dark:text-white">{activeCourse.title}</h4>
-              </div>
-              <span className="text-xs font-bold bg-[#900606]/10 text-[#900606] px-2.5 py-1 rounded-full">
-                {activeCourse.totalLessons} Lessons
-              </span>
-            </div>
-
-            {/* Scrollable Lesson Modules */}
-            <div className="space-y-5 max-h-[640px] overflow-y-auto pr-1">
-              {activeCourse.modules.map((mod, modIdx) => (
-                <div key={modIdx} className="space-y-2">
-                  <div className="bg-neutral-100 dark:bg-neutral-800/70 px-3.5 py-2 rounded-xl text-xs font-bold text-neutral-700 dark:text-neutral-300">
-                    {mod.moduleTitle}
-                  </div>
-
-                  <div className="space-y-1.5">
-                    {mod.lessons.map((lesson) => {
-                      const isCompleted = completedLessonIds.has(lesson.id);
-                      const isCurrent = lesson.id === activeLessonId;
-
-                      return (
-                        <div
-                          key={lesson.id}
-                          onClick={() => {
-                            if (!lesson.locked) {
-                              setActiveLessonId(lesson.id);
-                              setIsPlaying(true);
-                            }
-                          }}
-                          className={`flex items-center justify-between p-3 rounded-xl transition-all cursor-pointer select-none ${
-                            isCurrent
-                              ? 'bg-[#900606] text-white shadow-md font-bold'
-                              : lesson.locked
-                              ? 'opacity-50 cursor-not-allowed bg-neutral-50/50 dark:bg-neutral-800/20 text-neutral-400'
-                              : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 font-medium'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3 min-w-0 pr-2">
-                            <div className="shrink-0">
-                              {isCompleted ? (
-                                <CheckCircle2 className={`w-4 h-4 ${isCurrent ? 'text-white' : 'text-emerald-500'}`} />
-                              ) : lesson.locked ? (
-                                <Lock className="w-4 h-4 text-neutral-400" />
-                              ) : (
-                                <Play className={`w-3.5 h-3.5 ${isCurrent ? 'fill-white text-white' : 'text-neutral-500'}`} />
-                              )}
-                            </div>
-                            <span className="text-xs truncate leading-snug">
-                              {lesson.title}
-                            </span>
-                          </div>
-
-                          <span className={`text-[11px] font-mono shrink-0 ${isCurrent ? 'text-white/90' : 'text-neutral-400'}`}>
-                            {lesson.duration}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-          </div>
-        </div>
-
       </div>
 
     </div>
@@ -628,7 +753,7 @@ function AccountMasterclassTab() {
    ========================================================================= */
 function AccountUserTab({ formData, setFormData, handleSave, handleImageUpload, saveSuccess }) {
   return (
-    <div className="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-6 sm:p-8 md:p-12 shadow-sm border border-neutral-100 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full overflow-hidden">
+    <div className="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-6 md:p-10 shadow-sm border border-neutral-100 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full overflow-hidden">
       
       {/* Profile Header section */}
       <div className="flex flex-col items-center mb-8">
@@ -935,7 +1060,7 @@ function AccountSettingsTab({ email, theme, toggleTheme }) {
   };
 
   return (
-    <div className="bg-white dark:bg-neutral-900 rounded-[1rem] p-8 sm:p-12 md:p-16 shadow-sm border border-neutral-200/90 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500 relative min-h-[550px] flex flex-col justify-center">
+    <div className="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-6 md:p-10 shadow-sm border border-neutral-200/90 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500 relative min-h-0 sm:min-h-[500px] flex flex-col justify-center">
       <h2 className="text-3xl font-bold mb-8 text-neutral-800 dark:text-white">Settings</h2>
       
       {showPasswordModal && (
@@ -1045,7 +1170,7 @@ function AccountNotificationsTab({ email }) {
     {
       _id: 'notif-2',
       title: 'Welcome to CreatorsKit',
-      desc: 'Check your profile and start learning your first video lesson in the Masterclass tab.',
+      desc: 'Check your profile and start learning your first video lesson in the Courses tab.',
       unread: false,
       createdAt: '2026-10-21T10:00:00.000Z'
     }
@@ -1054,7 +1179,7 @@ function AccountNotificationsTab({ email }) {
   const displayNotifs = notifications.length > 0 ? notifications : defaultNotifications;
 
   return (
-    <div className="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 sm:p-12 md:p-16 shadow-sm border border-neutral-200/90 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full overflow-hidden min-h-[550px] flex flex-col justify-center">
+    <div className="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-6 md:p-10 shadow-sm border border-neutral-200/90 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full overflow-hidden min-h-0 sm:min-h-[500px] flex flex-col justify-center">
       <h2 className="text-3xl font-bold mb-8 text-neutral-800 dark:text-white">Notifications</h2>
       
       {loading ? (
@@ -1109,18 +1234,32 @@ function AccountContent() {
     'user-info': 'user',
     'settings': 'setting',
     'my-orders': 'orders',
+    'masterclass': 'courses',
+    'course': 'courses',
+    'courses': 'courses',
   };
   const activeTab = tabAliases[rawTab] || rawTab;
 
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [formData, setFormData] = useState({
-    name: 'Rajat',
-    email: 'rjsrivastava1999@gmail.com',
-    phone: '+91 98765 43210',
-    location: 'New Delhi, India',
-    postalCode: '110001',
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
+    postalCode: '',
     profileImage: ''
   });
+
+  // Redirect unauthenticated visitors to login
+  useEffect(() => {
+    const rawUser = localStorage.getItem('creatorsKitUserInfo');
+    const sessionEmail = sessionStorage.getItem('userEmail') || localStorage.getItem('userEmail');
+
+    if (!rawUser && !sessionEmail) {
+      router.replace('/login?redirect=/account');
+      return;
+    }
+  }, [router]);
 
   // Load existing user details if available
   useEffect(() => {
@@ -1164,6 +1303,36 @@ function AccountContent() {
         .catch(() => {});
     }
   }, []);
+
+  const [hasBundleAccess, setHasBundleAccess] = useState(null);
+
+  // Verify user's bundle purchase access from database
+  useEffect(() => {
+    const userEmail = formData.email || sessionStorage.getItem('userEmail') || localStorage.getItem('userEmail');
+    if (!userEmail) return;
+
+    let isMounted = true;
+    async function verifyCourseAccess() {
+      try {
+        const res = await fetch(`/api/user/access?email=${encodeURIComponent(userEmail)}`);
+        const json = await res.json();
+        if (isMounted) {
+          if (json.success && json.hasBundleAccess) {
+            setHasBundleAccess(true);
+          } else {
+            setHasBundleAccess(false);
+          }
+        }
+      } catch (err) {
+        if (isMounted) {
+          setHasBundleAccess(false);
+        }
+      }
+    }
+
+    verifyCourseAccess();
+    return () => { isMounted = false; };
+  }, [formData.email]);
 
   // Update tab in URL without page reload
   const handleTabChange = (tabId) => {
@@ -1234,9 +1403,10 @@ function AccountContent() {
       icon: <ShoppingBag className="w-5 h-5" />
     },
     {
-      id: 'masterclass',
-      label: 'Masterclass',
-      icon: <GraduationCap className="w-5 h-5" />
+      id: 'courses',
+      label: 'Courses',
+      icon: <GraduationCap className="w-5 h-5" />,
+      isLocked: hasBundleAccess === false,
     },
     { 
       id: 'setting', 
@@ -1264,8 +1434,20 @@ function AccountContent() {
         );
       case 'orders':
         return <AccountOrdersTab email={formData.email} />;
+      case 'courses':
       case 'masterclass':
-        return <AccountMasterclassTab />;
+      case 'course':
+        if (hasBundleAccess === false) {
+          return <LockedCoursesView />;
+        }
+        if (hasBundleAccess === null) {
+          return (
+            <div className="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-12 flex justify-center items-center min-h-[400px]">
+              <div className="w-10 h-10 rounded-full border-4 border-neutral-200 border-t-[#900606] animate-spin"></div>
+            </div>
+          );
+        }
+        return <AccountMasterclassTab hasAccess={hasBundleAccess} />;
       case 'setting':
         return <AccountSettingsTab email={formData.email} theme={theme} toggleTheme={toggleTheme} />;
       case 'notifications':
@@ -1284,53 +1466,70 @@ function AccountContent() {
   };
 
   return (
-    <div className="bg-[#FDFBF7] dark:bg-background pt-24 md:pt-28 pb-8 md:pb-12">
+    <div className="bg-[#FDFBF7] dark:bg-background pt-20 md:pt-28 pb-8 md:pb-12">
       <div className="w-full px-4 md:px-8 lg:px-12">
         
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 items-start">
           
-          {/* Left Sidebar Navigation */}
+          
+
           <div className="w-full lg:w-72 xl:w-80 shrink-0">
-            <div className="mb-6">
-              <h1 className="text-3xl font-black text-[#900606] dark:text-white tracking-tight">
-                Account Details
-              </h1>
-              <p className="text-xs text-neutral-500 font-medium mt-1">Manage profile, orders & courses</p>
-            </div>
+  <div className="mb-6">
+    <h1 className="text-3xl font-black text-[#900606] dark:text-white tracking-tight">
+      Account Details
+    </h1>
+    <p className="text-xs text-neutral-500 font-medium mt-1">Manage profile, orders & courses</p>
+  </div>
 
-            <div className="flex flex-col gap-1.5 bg-white/60 dark:bg-neutral-900/60 p-2.5 rounded-3xl border border-neutral-200/80 dark:border-neutral-800 shadow-sm backdrop-blur-sm">
-              {navItems.map((item) => {
-                const isActive = activeTab === item.id;
+  <div className="flex flex-col gap-1.5 bg-white/60 dark:bg-neutral-900/60 p-2 sm:p-2.5 rounded-2xl sm:rounded-3xl border border-neutral-200/80 dark:border-neutral-800 shadow-sm backdrop-blur-sm">
+    {navItems.map((item) => {
+      const isActive = activeTab === item.id;
 
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => handleTabChange(item.id)}
-                    className={`flex items-center gap-3.5 px-5 py-3.5 rounded-2xl font-bold text-sm transition-all text-left duration-200 cursor-pointer ${
-                      isActive 
-                        ? 'bg-[#900606] text-white shadow-[0_4px_14px_rgba(144,6,6,0.35)] translate-x-1' 
-                        : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100/80 dark:hover:bg-neutral-800 hover:text-neutral-900'
-                    }`}
-                  >
-                    <span className={`${isActive ? 'text-white' : 'text-neutral-500 dark:text-neutral-400'}`}>
-                      {item.icon}
-                    </span>
-                    <span>{item.label}</span>
-                  </button>
-                );
-              })}
-              
-              <div className="my-2 border-t border-neutral-200/80 dark:border-neutral-800 mx-2"></div>
-              
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-3.5 px-5 py-3.5 rounded-2xl font-bold text-sm transition-all text-left text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 cursor-pointer"
-              >
-                <LogOut className="w-5 h-5 text-red-500" />
-                <span>Log out</span>
-              </button>
-            </div>
+      return (
+        <button
+          key={item.id}
+          onClick={() => handleTabChange(item.id)}
+          className={`relative flex items-center justify-between px-5 py-3.5 rounded-2xl font-bold text-sm transition-all text-left duration-200 cursor-pointer ${
+            isActive 
+              ? 'bg-[#900606] text-white shadow-[0_4px_14px_rgba(144,6,6,0.35)] translate-x-1' 
+              : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100/80 dark:hover:bg-neutral-800 hover:text-neutral-900'
+          }`}
+        >
+          <div className="flex items-center gap-3.5">
+            <span className={`${isActive ? 'text-white' : 'text-neutral-500 dark:text-neutral-400'}`}>
+              {item.icon}
+            </span>
+            <span>{item.label}</span>
           </div>
+
+          {/* Locked Badge or Active indicator dot */}
+          {item.isLocked ? (
+            <span className={`inline-flex items-center gap-1 text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+              isActive 
+                ? 'bg-white/20 text-white' 
+                : 'bg-red-50 dark:bg-red-950/40 text-[#900606] dark:text-red-400 border border-red-200 dark:border-red-900/60'
+            }`}>
+              <Lock className="w-2.5 h-2.5" />
+              <span>Locked</span>
+            </span>
+          ) : (
+            isActive && <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+          )}
+        </button>
+      );
+    })}
+    
+    <div className="my-2 border-t border-neutral-200/80 dark:border-neutral-800 mx-2"></div>
+    
+    <button
+      onClick={handleLogout}
+      className="flex items-center gap-3.5 px-5 py-3.5 rounded-2xl font-bold text-sm transition-all text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 cursor-pointer group"
+    >
+      <LogOut className="w-5 h-5 text-red-500 group-hover:scale-110 transition-transform" />
+      <span>Log out</span>
+    </button>
+  </div>
+</div>
 
           {/* Main Content Workspace */}
           <div className="w-full lg:flex-1 min-w-0">

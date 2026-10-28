@@ -1,17 +1,59 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useParams } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getImageUrl } from '@/lib/imagekit';
-import { Suspense } from 'react';
 
 function BlogDetailContent() {
+  const params = useParams();
   const searchParams = useSearchParams();
-  const title = searchParams.get('title') || 'Creator Story';
-  const product = searchParams.get('product') || 'Our Gear';
-  const description = searchParams.get('description') || 'Discover how this creator upgraded their setup and enhanced their production quality.';
-  const image = searchParams.get('image') || '/blog.jpg';
+  const id = params?.id;
+
+  const [blog, setBlog] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Read search params as immediate fallback
+  const queryTitle = searchParams.get('title');
+  const queryProduct = searchParams.get('product');
+  const queryDescription = searchParams.get('description');
+  const queryImage = searchParams.get('image');
+
+  useEffect(() => {
+    async function fetchBlog() {
+      if (!id) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const res = await fetch(`/api/blogs/${id}`);
+        if (res.ok) {
+          const data = await res.json();
+          // API returns the blog object directly or { success, data }
+          const blogData = data?.data || (data?._id ? data : null);
+          if (blogData) {
+            setBlog(blogData);
+          }
+        }
+      } catch (err) {
+        console.warn('Could not fetch blog by ID/slug, falling back to query parameters:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchBlog();
+  }, [id]);
+
+  const title = blog?.title || queryTitle || 'Creator Success Story';
+  const author = blog?.author || queryTitle || 'Verified Creator';
+  const product = blog?.product || queryProduct || 'Creator Studio Setup';
+  const description = blog?.content || blog?.excerpt || queryDescription || 'Discover how this creator upgraded their setup and enhanced their production quality.';
+  const image = blog?.image || queryImage || '/blog.jpg';
+  const formattedDate = blog?.createdAt 
+    ? new Date(blog.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    : null;
 
   return (
     <div className="min-h-screen bg-[#FBFBF7] text-[#111827] font-sans pt-28 pb-20">
@@ -34,16 +76,28 @@ function BlogDetailContent() {
           
           {/* Right: Content */}
           <div className="flex flex-col justify-center">
-            <p className="text-sm font-black tracking-widest text-[#900606] uppercase mb-4">Customer Success Story</p>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-[#111827] leading-tight mb-6">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-sm font-black tracking-widest text-[#900606] uppercase">Customer Success Story</span>
+              {formattedDate && (
+                <span className="text-xs font-semibold text-neutral-400">• {formattedDate}</span>
+              )}
+            </div>
+            
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-[#111827] leading-tight mb-4">
               {title}
             </h1>
-            <div className="inline-block bg-[#900606]/10 text-[#900606] font-bold px-4 py-2 rounded-full mb-8 w-fit text-sm">
-              Product: {product}
+
+            <div className="flex flex-wrap items-center gap-3 mb-8">
+              <span className="bg-[#900606]/10 text-[#900606] font-bold px-4 py-1.5 rounded-full text-xs">
+                Author: {author}
+              </span>
+              <span className="bg-neutral-100 text-neutral-700 font-bold px-4 py-1.5 rounded-full text-xs">
+                Featured: {product}
+              </span>
             </div>
             
             <div className="prose prose-lg prose-neutral mb-10">
-              <p className="text-neutral-600 font-medium leading-relaxed text-lg md:text-xl">
+              <p className="text-neutral-600 font-medium leading-relaxed text-base md:text-lg whitespace-pre-line">
                 {description}
               </p>
             </div>

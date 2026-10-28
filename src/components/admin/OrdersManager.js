@@ -1,252 +1,415 @@
 'use client';
 
-import { useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
+import DeleteConfirmModal from './DeleteConfirmModal';
 
 export default function OrdersManager() {
- const [orders, setOrders] = useState([]);
- const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [dateRange, setDateRange] = useState('Oct 1 – Oct 23, 2026');
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [statusMenuOpenId, setStatusMenuOpenId] = useState(null);
 
- useEffect(() => {
- fetchOrders();
-}, []);
+  const [orders, setOrders] = useState([]);
 
-  async function fetchOrders() {
- try {
- const res = await fetch('/api/orders');
- const data = await res.json();
- if (data.success) {
- setOrders(data.data);
-}
-} catch (err) {
- console.error(err);
-} finally {
- setLoading(false);
-}
-};
+  // Delete Confirmation Modal State
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    orderId: null,
+    orderName: '',
+    isDeleting: false,
+  });
 
- const updateStatus = async (id, status, otp = null) => {
- try {
- const res = await fetch(`/api/orders/${id}`, {
- method: 'PUT',
- headers: { 'Content-Type': 'application/json'},
- body: JSON.stringify({ status, otp}),
-});
- const data = await res.json();
- if (data.success) {
- setOrders(orders.map(o => o._id === id ? data.data : o));
-} else {
- alert(data.error || 'Failed to update status');
-}
-} catch (err) {
- console.error('Failed to update order', err);
- alert('Failed to update order');
-}
-};
+  // Fetch real database orders from MongoDB
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/orders');
+      if (res.ok) {
+        const data = await res.json();
+        const dbOrders = data.data || [];
+        const mappedDbOrders = dbOrders.map((o) => {
+          const addressStr = o.shippingAddress
+            ? typeof o.shippingAddress === 'string'
+              ? o.shippingAddress
+              : `${o.shippingAddress.street || ''}, ${o.shippingAddress.city || ''} ${o.shippingAddress.state || ''} ${o.shippingAddress.zipCode || ''}`.trim()
+            : 'Online Order';
 
- const updatePaymentStatus = async (id, paymentStatus) => {
- try {
- const res = await fetch(`/api/orders/${id}`, {
- method: 'PUT',
- headers: { 'Content-Type': 'application/json'},
- body: JSON.stringify({ paymentStatus}),
-});
- const data = await res.json();
- if (data.success) {
- setOrders(orders.map(o => o._id === id ? data.data : o));
-}
-} catch (err) {
- console.error('Failed to update payment status', err);
-}
-};
+          return {
+            _id: o._id,
+            orderId: o.orderId || `#CK-${o._id.toString().slice(-6).toUpperCase()}`,
+            customerName: o.customerName || 'Customer',
+            customerEmail: o.customerEmail || 'customer@email.com',
+            shippingAddress: addressStr || 'Digital Delivery',
+            totalAmount: o.totalAmount || 0,
+            formattedAmount: `₹${(o.totalAmount || 0).toLocaleString('en-IN')}`,
+            status: o.status || 'Confirmed',
+            paymentMode: o.paymentMode || 'Online',
+            deliveryOtp: o.deliveryOtp || '',
+            items: o.items || [],
+            createdAt: o.createdAt || new Date().toISOString(),
+          };
+        });
+        setOrders(mappedDbOrders);
+      }
+    } catch (err) {
+      console.error('Failed to load orders from MongoDB', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
- const getStatusColor = (status) => {
- switch(status) {
- case 'Confirmed': return 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20';
- case 'Packed': return 'text-purple-500 bg-purple-500/10 border-purple-500/20';
- case 'Shipped': return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
- case 'Out for Delivery': return 'text-orange-500 bg-orange-500/10 border-orange-500/20';
- case 'Delivered': return 'text-[#900606] bg-[#900606]/10 border-[#900606]/20';
- case 'Cancelled': return 'text-rose-500 bg-rose-500/10 border-rose-500/20';
- default: return 'text-neutral-500 bg-neutral-500/10 border-neutral-500/20';
-}
-};
+  useEffect(() => {
+    fetchOrders();
+  }, []);
 
- const getInitials = (name) => {
- if (!name) return 'U';
- return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-};
+  // Update Status handler
+  const handleStatusChange = async (orderId, newStatus) => {
+    setStatusMenuOpenId(null);
+    setOrders((prev) =>
+      prev.map((o) => (o._id === orderId ? { ...o, status: newStatus } : o))
+    );
 
- if (loading) return (
- <div className="flex justify-center items-center h-64">
- <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#900606]"></div>
- </div>
- );
+    try {
+      await fetch(`/api/orders/${orderId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      fetchOrders();
+    } catch (err) {
+      console.error('Failed to persist status change', err);
+    }
+  };
 
- return (
- <div className="bg-[#FDFBF7] border border-neutral-200 rounded-3xl p-8 shadow-sm">
+  // Delete Order handler with in-app confirmation
+  const requestDeleteOrder = (order) => {
+    setDeleteModal({
+      isOpen: true,
+      orderId: order._id,
+      orderName: order.name || 'Order',
+      isDeleting: false,
+    });
+  };
 
- <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 md:mb-8 relative z-10">
- <div>
- <h2 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-br from-neutral-900 to-neutral-500 tracking-tight mb-1">Orders Management</h2>
- <p className="text-sm text-neutral-600">Track and manage your storefront orders.</p>
- </div>
- <div className="bg-[#FDFBF7] border border-neutral-200 rounded-full px-4 py-2 flex items-center gap-2">
- <div className="w-2 h-2 rounded-full bg-[#900606] animate-pulse"></div>
- <span className="text-xs font-bold text-neutral-700">{orders.length} Total Orders</span>
- </div>
- </div>
+  const handleConfirmDeleteOrder = async () => {
+    if (!deleteModal.orderId) return;
+    setDeleteModal((prev) => ({ ...prev, isDeleting: true }));
+    const orderId = deleteModal.orderId;
+    try {
+      const res = await fetch(`/api/orders/${orderId}`, { method: 'DELETE' });
+      if (res.ok) {
+        setOrders((prev) => prev.filter((o) => o._id !== orderId));
+        setDeleteModal({ isOpen: false, orderId: null, orderName: '', isDeleting: false });
+      } else {
+        setDeleteModal((prev) => ({ ...prev, isDeleting: false }));
+      }
+    } catch (err) {
+      console.error('Failed to delete order', err);
+      setDeleteModal((prev) => ({ ...prev, isDeleting: false }));
+    }
+  };
 
- <div className="overflow-x-auto relative z-10">
- <table className="w-full text-left border-collapse min-w-max md:min-w-full">
- <thead>
- <tr className="text-neutral-600 uppercase text-[10px] font-black tracking-widest border-b border-neutral-200">
- <th className="pb-4 pr-4 w-[12%]">Order Info</th>
- <th className="pb-4 px-4 w-[12%]">Customer</th>
- <th className="pb-4 px-4 w-[15%]">Email</th>
- <th className="pb-4 px-4 w-[18%]">Address</th>
- <th className="pb-4 px-4 w-[18%]">Items</th>
- <th className="pb-4 px-4 w-[10%]">Amount</th>
- <th className="pb-4 px-4 w-[11%]">Status</th>
- </tr>
- </thead>
- <tbody className="divide-y divide-zinc-800/30">
- {orders.map((o) => (
- <tr key={o._id} className="hover:bg-white/[0.02] transition-colors group">
- <td className="py-4 pr-4 align-middle">
- <div className="font-bold text-[#900606] text-sm mb-1">{o.orderId ||`ORD-${o._id.substring(o._id.length - 6).toUpperCase()}`}</div>
- <div className="text-[10px] font-mono text-neutral-500 mb-2 truncate max-w-[100px]">{o._id}</div>
- <div className="text-xs text-neutral-600 flex items-center gap-1 mb-2">
- <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
- {new Date(o.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric'})}
- </div>
- {o.deliveryOtp && (
- <div className="inline-flex items-center gap-1.5 bg-[#900606]/10 border border-[#900606]/20 text-[#900606] text-[10px] font-bold px-2 py-1 rounded">
- <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
- OTP: {o.deliveryOtp}
- </div>
- )}
- </td>
- 
- {/* Customer Name only */}
- <td className="py-4 px-4 align-middle">
- <div className="flex items-center gap-3">
- <div className="w-8 h-8 rounded-full bg-gradient-to-br from-neutral-700 to-neutral-900 flex items-center justify-center text-xs font-bold text-[#900606] border border-neutral-700 shadow-inner flex-shrink-0">
- {getInitials(o.customerName)}
- </div>
- <div className="font-bold text-neutral-800 text-sm truncate max-w-[120px]" title={o.customerName}>{o.customerName}</div>
- </div>
- </td>
+  // Export Orders Report to CSV
+  const handleExportReport = () => {
+    const csvContent =
+      'data:text/csv;charset=utf-8,' +
+      'Order ID,Customer Name,Customer Email,Address,Amount,Status\n' +
+      orders
+        .map(
+          (o) =>
+            `"${o.orderId}","${o.customerName}","${o.customerEmail}","${(o.shippingAddress || '').replace(/"/g, '""')}","${(o.formattedAmount || '').replace('₹', '')}","${o.status}"`
+        )
+        .join('\n');
 
- {/* Email Column */}
- <td className="py-4 px-4 align-middle">
- <a href={`mailto:${o.customerEmail}`} className="text-sm text-neutral-700 hover:text-[#900606] transition-colors inline-block max-w-[150px] truncate" title={o.customerEmail}>{o.customerEmail}</a>
- </td>
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `CreatorsKit_Orders_${dateRange.replace(/\s+/g, '_')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
- {/* Address Column */}
- <td className="py-4 px-4 align-middle">
- {o.shippingAddress ? (
- <div className="text-sm text-neutral-600 leading-relaxed max-w-[200px] break-words">
- <span className="text-neutral-800 block">{o.shippingAddress.street}</span>
- {o.shippingAddress.city}{o.shippingAddress.state ?`, ${o.shippingAddress.state}` : ''} {o.shippingAddress.zipCode}<br/>
- {o.shippingAddress.country}
- </div>
- ) : (
- <span className="text-neutral-600 text-xs italic">No Address Provided</span>
- )}
- </td>
+  // Filtered orders by search query
+  const filteredOrders = orders.filter((o) => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      o.orderId?.toLowerCase().includes(query) ||
+      o.customerName?.toLowerCase().includes(query) ||
+      o.customerEmail?.toLowerCase().includes(query) ||
+      o.shippingAddress?.toLowerCase().includes(query) ||
+      o.status?.toLowerCase().includes(query) ||
+      o.formattedAmount?.toLowerCase().includes(query)
+    );
+  });
 
- <td className="py-4 px-4 align-middle">
- <div className="space-y-1.5">
- {o.items?.map((item, idx) => (
- <div key={idx} className="flex justify-between items-center bg-[#FDFBF7] p-2 rounded-md border border-neutral-200 group-hover:border-neutral-700/50 transition-colors">
- <div className="flex items-center gap-2 overflow-hidden">
- <div className="w-1 h-4 bg-neutral-700 rounded-full"></div>
- <span className="text-xs text-neutral-700 truncate font-medium" title={item.name}>{item.name}</span>
- </div>
- <div className="flex items-center gap-2 pl-2">
- <span className="text-[10px] text-neutral-500 bg-neutral-100 px-1.5 py-0.5 rounded">x{item.quantity}</span>
- </div>
- </div>
- ))}
- </div>
- </td>
- <td className="py-4 px-4 align-middle">
- <div className="font-black text-[#900606] text-lg tracking-tight mb-2">₹{o.totalAmount?.toLocaleString()}</div>
- <div className="flex flex-col gap-1.5">
- <button 
- onClick={() => {
- const newStatus = o.paymentStatus === 'Paid' ? (o.paymentMode === 'Cash on Delivery' ? 'COD' : 'Pending') : 'Paid';
- updatePaymentStatus(o._id, newStatus);
-}}
- className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded w-fit text-left flex items-center gap-1 transition-colors ${
- o.paymentStatus === 'Paid' ? 'bg-[#900606]/10 text-[#900606] border border-[#900606]/20 hover:bg-[#900606]/20' : 
- o.paymentStatus === 'COD' ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20 hover:bg-orange-500/20' :
- 'bg-neutral-100 text-neutral-600 border border-neutral-700 hover:bg-neutral-700'
-}`}
- title="Click to toggle payment status"
- >
- {o.paymentStatus || 'Pending'} {o.paymentMode === 'Cash on Delivery' ? '(COD)' : ''}
- <svg className="w-3 h-3 ml-1 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
- </button>
- </div>
- </td>
- <td className="py-4 px-4 align-middle">
- <div className={`relative inline-block border rounded-full overflow-hidden transition-all duration-300 ${getStatusColor(o.status)}`}>
- <select 
- value={o.status}
- onChange={(e) => {
- const newStatus = e.target.value;
- if (newStatus === 'Delivered') {
- if (o.paymentMode === 'Cash on Delivery' && o.paymentStatus !== 'Paid') {
- alert('Cannot mark COD order as delivered without updating payment status to Paid.');
- e.target.value = o.status;
- return;
-}
- const otp = prompt('Please enter the 6-digit Delivery OTP provided by the customer:');
- if (otp) {
- if (otp !== o.deliveryOtp) {
- alert('Incorrect OTP entered.');
- e.target.value = o.status;
- return;
-}
- updateStatus(o._id, newStatus, otp);
-} else {
- e.target.value = o.status;
-}
-} else {
- updateStatus(o._id, newStatus);
-}
-}}
- className="appearance-none bg-transparent pl-3 pr-8 py-1.5 text-xs font-bold w-full outline-none cursor-pointer z-10 relative"
- >
- <option value="Confirmed" className="bg-[#FDFBF7] text-yellow-500">Confirmed</option>
- <option value="Packed" className="bg-[#FDFBF7] text-purple-500">Packed</option>
- <option value="Shipped" className="bg-[#FDFBF7] text-blue-500">Shipped</option>
- <option value="Out for Delivery" className="bg-[#FDFBF7] text-orange-500">Out for Delivery</option>
- <option value="Delivered" className="bg-[#FDFBF7] text-[#900606]">Delivered</option>
- <option value="Cancelled" className="bg-[#FDFBF7] text-rose-500">Cancelled</option>
- </select>
- <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-70">
- <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7"></path></svg>
- </div>
- </div>
- </td>
- </tr>
- ))}
- {orders.length === 0 && (
- <tr>
- <td colSpan="7" className="py-16 text-center">
- <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#FDFBF7] border border-neutral-200 mb-4">
- <svg className="w-8 h-8 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
- </div>
- <h3 className="text-neutral-700 font-bold mb-1">No orders yet</h3>
- <p className="text-sm text-neutral-500">When customers place orders, they will appear here.</p>
- </td>
- </tr>
- )}
- </tbody>
- </table>
- </div>
- </div>
- );
+  // Status Badge Styling Helper
+  const getBadgeStyle = (status) => {
+    switch (status) {
+      case 'Delivered':
+        return 'bg-[#EAFBF3] text-[#129A64] hover:bg-[#D5F7E7]';
+      case 'Processing':
+      case 'Confirmed':
+        return 'bg-[#FEF7E7] text-[#D97706] hover:bg-[#FEEFCB]';
+      case 'Shipped':
+      case 'Out for Delivery':
+        return 'bg-[#EDF5FF] text-[#2563EB] hover:bg-[#D9EBFF]';
+      case 'Cancelled':
+        return 'bg-[#FEE2E2] text-[#DC2626] hover:bg-[#FED1D1]';
+      default:
+        return 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200';
+    }
+  };
+
+  return (
+    <div className="space-y-6 sm:space-y-7 pb-8 text-[#111827]">
+      
+      {/* 1. TOP HEADER & CONTROLS */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-[28px] font-extrabold text-[#111827] tracking-tight leading-tight">
+            Orders
+          </h1>
+          <p className="text-xs sm:text-[13px] text-neutral-500 font-normal mt-1">
+            Manage your store&apos;s orders in one place.
+          </p>
+        </div>
+
+        {/* Right Controls: Date Picker & Export Report */}
+        <div className="flex items-center gap-3 relative">
+          
+          {/* Date Picker Button */}
+          <div className="relative">
+            <button
+              onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
+              className="bg-white hover:bg-neutral-50 border border-neutral-200/90 text-neutral-800 text-xs font-semibold px-3.5 py-2.5 rounded-xl flex items-center gap-2.5 shadow-2xs transition-colors cursor-pointer"
+            >
+              <svg className="w-4 h-4 text-neutral-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+              <span>{dateRange}</span>
+            </button>
+
+            {/* Date Picker Dropdown Popover */}
+            {isDatePickerOpen && (
+              <div className="absolute right-0 mt-2 w-56 bg-white border border-neutral-200 rounded-xl shadow-xl py-2 z-50 text-xs">
+                <p className="px-3.5 py-1.5 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
+                  Select Range
+                </p>
+                {['Oct 1 – Oct 23, 2026', 'Last 7 Days', 'Last 30 Days', 'This Quarter', 'Year to Date'].map((range) => (
+                  <button
+                    key={range}
+                    onClick={() => {
+                      setDateRange(range);
+                      setIsDatePickerOpen(false);
+                    }}
+                    className={`w-full text-left px-3.5 py-2 hover:bg-neutral-50 transition-colors font-medium ${
+                      dateRange === range ? 'text-[#DC2626] font-bold bg-red-50/50' : 'text-neutral-700'
+                    }`}
+                  >
+                    {range}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Export Report Action Button */}
+          <button
+            onClick={handleExportReport}
+            className="bg-[#DC2626] hover:bg-[#C81E1E] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-2xs hover:shadow-xs flex items-center gap-1.5 transition-all cursor-pointer active:scale-98"
+          >
+            <svg className="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+            <span>Export report</span>
+          </button>
+
+        </div>
+      </div>
+
+      {/* 2. MAIN ORDERS CARD CONTAINER */}
+      <div className="bg-white border border-neutral-200/80 rounded-2xl p-5 sm:p-6 shadow-2xs space-y-6">
+        
+        {/* Full-width Search Bar */}
+        <div className="w-full relative">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search orders..."
+            className="w-full bg-white border border-neutral-200/90 rounded-xl px-4 py-3 text-xs sm:text-sm text-neutral-800 placeholder-neutral-400 outline-none focus:border-[#900606] transition-colors shadow-2xs"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 text-xs font-bold p-1"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
+        {/* Orders Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b border-neutral-100 text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
+                <th className="py-3.5 px-3 font-bold w-[14%]">ORDER ID</th>
+                <th className="py-3.5 px-3 font-bold w-[18%]">CUSTOMER</th>
+                <th className="py-3.5 px-3 font-bold w-[18%]">EMAIL</th>
+                <th className="py-3.5 px-3 font-bold w-[26%]">ADDRESS</th>
+                <th className="py-3.5 px-3 font-bold w-[12%]">AMOUNT</th>
+                <th className="py-3.5 px-3 text-right font-bold w-[12%]">STATUS</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-neutral-100 font-medium text-neutral-700">
+              {filteredOrders.map((order) => (
+                <tr key={order._id || order.orderId} className="hover:bg-neutral-50/70 transition-colors group">
+                  
+                  {/* Order ID */}
+                  <td className="py-4 px-3 font-bold text-neutral-900 align-middle">
+                    {order.orderId}
+                  </td>
+
+                  {/* Customer (Name + small email) */}
+                  <td className="py-4 px-3 align-middle">
+                    <div className="font-bold text-neutral-900">{order.customerName}</div>
+                    <div className="text-[11px] text-neutral-400 font-normal">{order.customerEmail}</div>
+                  </td>
+
+                  {/* Email */}
+                  <td className="py-4 px-3 align-middle text-neutral-600">
+                    <a
+                      href={`mailto:${order.customerEmail}`}
+                      className="hover:text-[#900606] hover:underline transition-colors"
+                    >
+                      {order.customerEmail}
+                    </a>
+                  </td>
+
+                  {/* Address */}
+                  <td className="py-4 px-3 align-middle text-neutral-600 max-w-xs truncate" title={order.shippingAddress}>
+                    {order.shippingAddress}
+                  </td>
+
+                  {/* Amount */}
+                  <td className="py-4 px-3 font-bold text-neutral-900 align-middle">
+                    {order.formattedAmount}
+                  </td>
+
+                  {/* Status Badge with Interactive Dropdown */}
+                  <td className="py-4 px-3 text-right align-middle relative">
+                    <div className="inline-block relative">
+                      <button
+                        onClick={() =>
+                          setStatusMenuOpenId(statusMenuOpenId === order._id ? null : order._id)
+                        }
+                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-md text-[11px] font-bold cursor-pointer transition-colors ${getBadgeStyle(
+                          order.status
+                        )}`}
+                        title="Click to update status"
+                      >
+                        <span>{order.status}</span>
+                        <svg className="w-2.5 h-2.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+
+                      {/* Status Change Popover */}
+                      {statusMenuOpenId === order._id && (
+                        <div className="absolute right-0 mt-1.5 w-36 bg-white border border-neutral-200 rounded-xl shadow-xl py-1.5 z-40 text-left">
+                          <p className="px-3 py-1 text-[9px] font-bold text-neutral-400 uppercase tracking-wider">
+                            Update Status
+                          </p>
+                          {['Confirmed', 'Processing', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'].map((st) => (
+                            <button
+                              key={st}
+                              onClick={() => handleStatusChange(order._id, st)}
+                              className={`w-full text-left px-3 py-1.5 text-xs font-semibold hover:bg-neutral-50 transition-colors ${
+                                order.status === st ? 'text-[#900606] font-bold bg-red-50/50' : 'text-neutral-700'
+                              }`}
+                            >
+                              {st}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Delete Order Button */}
+                      <button
+                        onClick={() => requestDeleteOrder(order)}
+                        className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors ml-1 cursor-pointer"
+                        title="Delete Order"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+
+                </tr>
+              ))}
+
+              {/* Empty Search State */}
+              {filteredOrders.length === 0 && (
+                <tr>
+                  <td colSpan="6" className="py-12 text-center text-neutral-400">
+                    <p className="text-sm font-semibold text-neutral-600 mb-1">No orders found</p>
+                    <p className="text-xs">
+                      {searchQuery ? `No orders match your search criteria "${searchQuery}"` : 'No orders in MongoDB yet. Orders placed on the frontend will appear here instantly.'}
+                    </p>
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery('')}
+                        className="mt-3 text-xs font-bold text-[#900606] hover:underline"
+                      >
+                        Clear search
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      {/* 3. FOOTER */}
+      <div className="pt-4 border-t border-neutral-200/60 flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-400 gap-2">
+        <p>© 2026 CreatorsKit. Live connected to MongoDB.</p>
+        <div className="flex items-center gap-4">
+          <span className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            MongoDB Live Sync
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            All systems operational
+          </span>
+        </div>
+      </div>
+
+      {/* Custom In-App Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={() =>
+          !deleteModal.isDeleting &&
+          setDeleteModal({ isOpen: false, orderId: null, orderName: '', isDeleting: false })
+        }
+        onConfirm={handleConfirmDeleteOrder}
+        title="Delete Order Permanently?"
+        message={`Are you sure you want to permanently delete order for ${deleteModal.orderName}? This action cannot be undone.`}
+        isDeleting={deleteModal.isDeleting}
+      />
+
+    </div>
+  );
 }
