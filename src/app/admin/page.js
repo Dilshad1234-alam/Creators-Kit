@@ -97,14 +97,14 @@ function AdminContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const rawTab = (searchParams.get('tab') || 'overview').toLowerCase();
-  const isValid = validTabs.includes(rawTab);
-  const tab = isValid ? rawTab : 'overview';
+  const isInvalid = !validTabs.includes(rawTab);
+  const tab = isInvalid ? 'overview' : rawTab;
 
   useEffect(() => {
-    if (!isValid) {
+    if (isInvalid) {
       router.replace('/admin?tab=overview');
     }
-  }, [isValid, router]);
+  }, [isInvalid, router]);
 
   const isOverview = tab === 'overview' || tab === 'dashboard' || tab === 'analytics';
   const isCustomHeader =
