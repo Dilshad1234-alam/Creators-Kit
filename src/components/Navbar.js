@@ -24,7 +24,7 @@ export default function Navbar() {
   const [userName, setUserName] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
-  const { cartCount } = useCart();
+  const { cartCount, clearCart } = useCart();
   const pathname = usePathname();
   const router = useRouter();
   const { data: session } = useSession();
@@ -103,6 +103,13 @@ export default function Navbar() {
 
     setUserName(null);
     setUserRole(null);
+    if (typeof clearCart === 'function') {
+      clearCart();
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new CustomEvent('creatorskit-auth-change', { detail: null }));
+    }
     try {
       await signOut({ redirect: false });
     } catch (e) {

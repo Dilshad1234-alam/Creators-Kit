@@ -26,12 +26,11 @@ export default function BlogsManager() {
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   
   const [formData, setFormData] = useState({
-    title: '',
     author: '',
     product: '',
     image: '',
-    excerpt: '',
-    content: ''
+    videoUrl: '',
+    rating: 5,
   });
 
   useEffect(() => {
@@ -55,22 +54,20 @@ export default function BlogsManager() {
     if (blog) {
       setEditingBlog(blog);
       setFormData({
-        title: blog.title || '',
         author: blog.author || '',
         product: blog.product || '',
         image: blog.image || '',
-        excerpt: blog.excerpt || '',
-        content: blog.content || ''
+        videoUrl: blog.videoUrl || blog.video || '',
+        rating: blog.rating !== undefined ? Number(blog.rating) : 5,
       });
     } else {
       setEditingBlog(null);
       setFormData({
-        title: '',
         author: '',
         product: '',
         image: '/blog.jpg',
-        excerpt: '',
-        content: ''
+        videoUrl: '',
+        rating: 5,
       });
     }
     setIsModalOpen(true);
@@ -97,21 +94,30 @@ export default function BlogsManager() {
       const url = isEdit ? `/api/blogs/${targetId}` : '/api/blogs';
       const method = isEdit ? 'PUT' : 'POST';
 
+      const payload = {
+        author: formData.author,
+        product: formData.product,
+        image: formData.image,
+        videoUrl: formData.videoUrl,
+        rating: Number(formData.rating) || 5,
+        title: editingBlog?.title || (formData.product ? `${formData.author} - ${formData.product}` : `${formData.author}'s Review`),
+      };
+
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || 'Failed to save blog');
+        throw new Error(errData.error || 'Failed to save review');
       }
       
       await fetchBlogs();
       router.refresh();
       closeModal();
-      setFormData({ title: '', author: '', product: '', image: '', excerpt: '', content: '' });
+      setFormData({ author: '', product: '', image: '', videoUrl: '', rating: 5 });
     } catch (error) {
       alert(error.message);
     } finally {
@@ -147,22 +153,22 @@ export default function BlogsManager() {
     }
   };
 
-  // Export Blogs Report to CSV matching Orders page pattern
+  // Export Reviews Report to CSV matching Orders page pattern
   const handleExportReport = () => {
     const csvContent =
       'data:text/csv;charset=utf-8,' +
-      'Title,Author,Featured Gear,Published Date,Slug,Excerpt\n' +
+      'Author,Featured Gear,Rating,Image,Video URL,Published Date\n' +
       blogs
         .map(
           (b) =>
-            `"${(b.title || '').replace(/"/g, '""')}","${(b.author || '').replace(/"/g, '""')}","${(b.product || '').replace(/"/g, '""')}","${new Date(b.createdAt || Date.now()).toLocaleDateString('en-US')}","${b.slug || b._id}","${(b.excerpt || '').replace(/"/g, '""')}"`
+            `"${(b.author || '').replace(/"/g, '""')}","${(b.product || '').replace(/"/g, '""')}","${b.rating || 5}","${(b.image || '').replace(/"/g, '""')}","${(b.videoUrl || '').replace(/"/g, '""')}","${new Date(b.createdAt || Date.now()).toLocaleDateString('en-US')}"`
         )
         .join('\n');
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `CreatorsKit_Blogs_${dateRange.replace(/\s+/g, '_')}.csv`);
+    link.setAttribute('download', `CreatorsKit_Reviews_${dateRange.replace(/\s+/g, '_')}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -173,10 +179,9 @@ export default function BlogsManager() {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     return (
-      blog.title?.toLowerCase().includes(q) ||
       blog.author?.toLowerCase().includes(q) ||
       blog.product?.toLowerCase().includes(q) ||
-      blog.excerpt?.toLowerCase().includes(q)
+      blog.title?.toLowerCase().includes(q)
     );
   });
 
@@ -300,10 +305,11 @@ export default function BlogsManager() {
             <thead>
               <tr className="border-b border-neutral-100 text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
                 <th className="py-3.5 px-3 font-bold w-[12%]">IMAGE</th>
-                <th className="py-3.5 px-3 font-bold w-[36%]">TITLE</th>
-                <th className="py-3.5 px-3 font-bold w-[22%]">AUTHOR &amp; GEAR</th>
-                <th className="py-3.5 px-3 font-bold w-[16%]">DATE</th>
-                <th className="py-3.5 px-3 text-right font-bold w-[14%]">ACTIONS</th>
+                <th className="py-3.5 px-3 font-bold w-[25%]">CREATOR / AUTHOR</th>
+                <th className="py-3.5 px-3 font-bold w-[25%]">FEATURED GEAR</th>
+                <th className="py-3.5 px-3 font-bold w-[15%]">RATING</th>
+                <th className="py-3.5 px-3 font-bold w-[11%]">DATE</th>
+                <th className="py-3.5 px-3 text-right font-bold w-[12%]">ACTIONS</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100 font-medium text-neutral-700">
@@ -314,15 +320,16 @@ export default function BlogsManager() {
                       <div className="w-14 h-11 bg-neutral-100 rounded-lg"></div>
                     </td>
                     <td className="py-4 px-3">
-                      <div className="w-48 h-4 bg-neutral-100 rounded mb-2"></div>
-                      <div className="w-32 h-3 bg-neutral-100 rounded"></div>
+                      <div className="w-32 h-4 bg-neutral-100 rounded"></div>
                     </td>
                     <td className="py-4 px-3">
-                      <div className="w-24 h-4 bg-neutral-100 rounded mb-1"></div>
-                      <div className="w-20 h-3 bg-neutral-100 rounded"></div>
+                      <div className="w-28 h-4 bg-neutral-100 rounded"></div>
                     </td>
                     <td className="py-4 px-3">
                       <div className="w-20 h-4 bg-neutral-100 rounded"></div>
+                    </td>
+                    <td className="py-4 px-3">
+                      <div className="w-16 h-4 bg-neutral-100 rounded"></div>
                     </td>
                     <td className="py-4 px-3 text-right">
                       <div className="w-16 h-7 bg-neutral-100 rounded-lg ml-auto"></div>
@@ -337,33 +344,55 @@ export default function BlogsManager() {
                       <div className="w-14 h-11 relative rounded-lg overflow-hidden bg-neutral-100 border border-neutral-200/80 shadow-2xs flex-shrink-0">
                         <img 
                           src={getImageUrl(blog.image || '/blog.jpg')} 
-                          alt={blog.title || 'thumbnail'} 
+                          alt={blog.author || 'thumbnail'} 
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
-                      </div>
-                    </td>
-
-                    {/* Blog Title & Excerpt */}
-                    <td className="py-4 px-3 align-middle max-w-sm">
-                      <div className="font-bold text-neutral-900 group-hover:text-[#900606] transition-colors line-clamp-1" title={blog.title}>
-                        {blog.title}
-                      </div>
-                      <div className="text-[11px] text-neutral-400 font-normal line-clamp-1 mt-0.5" title={blog.excerpt}>
-                        {blog.excerpt || 'No excerpt provided'}
-                      </div>
-                    </td>
-
-                    {/* Author & Gear */}
-                    <td className="py-4 px-3 align-middle">
-                      <div className="font-bold text-neutral-900">{blog.author || 'Anonymous'}</div>
-                      <div className="text-[11px] text-neutral-400 font-normal mt-0.5">
-                        {blog.product ? (
-                          <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-neutral-100 text-neutral-700 text-[10px] font-semibold border border-neutral-200/60 truncate max-w-[170px]">
-                            {blog.product}
+                        {blog.videoUrl && (
+                          <span className="absolute bottom-1 right-1 bg-black/75 text-white rounded p-0.5" title="Video Review Available">
+                            <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 20 20">
+                              <polygon points="5 3 19 10 5 17 5 3" />
+                            </svg>
                           </span>
-                        ) : (
-                          <span className="text-neutral-400">Creator Story</span>
                         )}
+                      </div>
+                    </td>
+
+                    {/* Creator / Author */}
+                    <td className="py-4 px-3 align-middle">
+                      <div className="font-bold text-neutral-900 group-hover:text-[#900606] transition-colors">
+                        {blog.author || 'Anonymous Creator'}
+                      </div>
+                    </td>
+
+                    {/* Featured Gear */}
+                    <td className="py-4 px-3 align-middle">
+                      {blog.product ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-neutral-100 text-neutral-800 text-[11px] font-semibold border border-neutral-200/60 truncate max-w-[200px]">
+                          {blog.product}
+                        </span>
+                      ) : (
+                        <span className="text-neutral-400 font-normal">—</span>
+                      )}
+                    </td>
+
+                    {/* Rating */}
+                    <td className="py-4 px-3 align-middle">
+                      <div className="flex items-center gap-1.5">
+                        <div className="flex items-center">
+                          {[1, 2, 3, 4, 5].map((s) => (
+                            <svg
+                              key={s}
+                              className={`w-3.5 h-3.5 ${s <= Math.round(Number(blog.rating) || 5) ? 'text-amber-400 fill-amber-400' : 'text-neutral-200 fill-neutral-200'}`}
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                          ))}
+                        </div>
+                        <span className="font-bold text-neutral-800 text-xs">
+                          {(Number(blog.rating) || 5).toFixed(1)}
+                        </span>
                       </div>
                     </td>
 
@@ -385,7 +414,7 @@ export default function BlogsManager() {
                           type="button"
                           onClick={() => openModal(blog)}
                           className="px-2.5 py-1.5 text-xs font-semibold text-neutral-700 hover:text-[#900606] hover:bg-neutral-100 rounded-lg transition-colors cursor-pointer inline-flex items-center gap-1"
-                          title="Edit Blog"
+                          title="Edit Review"
                         >
                           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -397,7 +426,7 @@ export default function BlogsManager() {
                           type="button"
                           onClick={() => requestDelete(blog)}
                           className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                          title="Delete Blog"
+                          title="Delete Review"
                         >
                           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -412,12 +441,12 @@ export default function BlogsManager() {
               {/* Empty Search State */}
               {!isLoading && filteredBlogs.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="py-12 text-center text-neutral-400">
-                    <p className="text-sm font-semibold text-neutral-600 mb-1">No blogs found</p>
+                  <td colSpan="6" className="py-12 text-center text-neutral-400">
+                    <p className="text-sm font-semibold text-neutral-600 mb-1">No reviews found</p>
                     <p className="text-xs">
                       {searchQuery
-                        ? `No blogs match your search criteria "${searchQuery}"`
-                        : 'No blogs in MongoDB yet. Create your first post!'}
+                        ? `No creator reviews match your search criteria "${searchQuery}"`
+                        : 'No creator reviews in MongoDB yet. Create your first review!'}
                     </p>
                     {searchQuery && (
                       <button
@@ -449,6 +478,7 @@ export default function BlogsManager() {
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
             All systems operational
           </span>
+
         </div>
       </div>
 
@@ -459,12 +489,12 @@ export default function BlogsManager() {
             <div className="flex items-center justify-between mb-6 pb-3 border-b border-neutral-100">
               <div>
                 <h3 className="text-xl sm:text-2xl font-extrabold text-[#111827] tracking-tight">
-                  {editingBlog ? 'Edit Blog Post' : 'Add New Blog Post'}
+                  {editingBlog ? 'Edit Creator Review' : 'Add New Creator Review'}
                 </h3>
                 <p className="text-xs text-neutral-500 mt-1">
                   {editingBlog
-                    ? 'Update the article content, author, or featured gear.'
-                    : 'Create and publish a new creator story to your blog.'}
+                    ? 'Update the author, featured gear, media, or star rating.'
+                    : 'Create and publish a verified creator review to showcase on your storefront.'}
                 </p>
               </div>
               <button
@@ -479,25 +509,10 @@ export default function BlogsManager() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  required
-                  value={formData.title}
-                  onChange={handleChange}
-                  className="w-full bg-white border border-neutral-200/90 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-neutral-900 placeholder-neutral-400 outline-none focus:border-[#900606] transition-colors shadow-2xs"
-                  placeholder="The Exact Lighting & Audio Setup..."
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2">
-                    Author
+                    Author / Creator Name
                   </label>
                   <input
                     type="text"
@@ -522,49 +537,95 @@ export default function BlogsManager() {
                     placeholder="e.g. VoiceForge Wireless Mic"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2">
-                    Image URL / Path
-                  </label>
+              </div>
+
+              {/* Star Rating Control */}
+              <div>
+                <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2">
+                  Star Rating
+                </label>
+                <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap">
+                  <div className="flex items-center gap-1.5 bg-neutral-50 px-3.5 py-2 rounded-xl border border-neutral-200/90">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setFormData((prev) => ({ ...prev, rating: star }))}
+                        className="focus:outline-none cursor-pointer transition-transform hover:scale-110"
+                        title={`${star} Star`}
+                      >
+                        <svg
+                          className={`w-5 h-5 ${
+                            star <= (Number(formData.rating) || 5)
+                              ? 'text-amber-400 fill-amber-400'
+                              : 'text-neutral-300 fill-neutral-200'
+                          }`}
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      </button>
+                    ))}
+                    <span className="ml-2 text-xs font-bold text-neutral-800">
+                      {Number(formData.rating || 5).toFixed(1)} / 5.0
+                    </span>
+                  </div>
+                  <select
+                    name="rating"
+                    value={formData.rating || 5}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, rating: Number(e.target.value) }))}
+                    className="bg-white border border-neutral-200/90 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-neutral-800 outline-none focus:border-[#900606] transition-colors shadow-2xs cursor-pointer"
+                  >
+                    <option value={5}>⭐⭐⭐⭐⭐ 5 Stars (Excellent)</option>
+                    <option value={4}>⭐⭐⭐⭐ 4 Stars (Very Good)</option>
+                    <option value={3}>⭐⭐⭐ 3 Stars (Good)</option>
+                    <option value={2}>⭐⭐ 2 Stars (Fair)</option>
+                    <option value={1}>⭐ 1 Star (Poor)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Image URL / Path with Live Preview Thumbnail */}
+              <div>
+                <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2">
+                  Image URL / Path
+                </label>
+                <div className="flex items-center gap-3">
                   <input
                     type="text"
                     name="image"
                     required
                     value={formData.image}
                     onChange={handleChange}
-                    className="w-full bg-white border border-neutral-200/90 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-neutral-900 placeholder-neutral-400 outline-none focus:border-[#900606] transition-colors shadow-2xs"
+                    className="flex-1 bg-white border border-neutral-200/90 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-neutral-900 placeholder-neutral-400 outline-none focus:border-[#900606] transition-colors shadow-2xs"
                     placeholder="/blog1.jpg"
                   />
+                  {formData.image && (
+                    <div className="w-10 h-10 rounded-xl overflow-hidden border border-neutral-200 bg-neutral-100 flex-shrink-0 shadow-2xs">
+                      <img
+                        src={getImageUrl(formData.image)}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
+              {/* Video URL / Path (Optional) */}
               <div>
                 <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2">
-                  Excerpt (Short Summary)
+                  Video URL / Path (Optional)
                 </label>
-                <textarea
-                  name="excerpt"
-                  required
-                  value={formData.excerpt}
+                <input
+                  type="text"
+                  name="videoUrl"
+                  value={formData.videoUrl}
                   onChange={handleChange}
-                  rows={2}
-                  className="w-full bg-white border border-neutral-200/90 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-neutral-900 placeholder-neutral-400 outline-none focus:border-[#900606] transition-colors shadow-2xs resize-none"
-                  placeholder="A short summary of the blog post..."
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2">
-                  Full Article Content
-                </label>
-                <textarea
-                  name="content"
-                  required
-                  value={formData.content}
-                  onChange={handleChange}
-                  rows={6}
                   className="w-full bg-white border border-neutral-200/90 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-neutral-900 placeholder-neutral-400 outline-none focus:border-[#900606] transition-colors shadow-2xs"
-                  placeholder="Write your rich blog content here..."
+                  placeholder="https://example.com/video.mp4 or YouTube link"
                 />
               </div>
 
@@ -584,8 +645,8 @@ export default function BlogsManager() {
                   {isSubmitting
                     ? 'Saving...'
                     : editingBlog
-                    ? 'Update Blog'
-                    : 'Publish Blog'}
+                    ? 'Update Review'
+                    : 'Publish Review'}
                 </button>
               </div>
             </form>
@@ -601,11 +662,11 @@ export default function BlogsManager() {
           setDeleteModal({ isOpen: false, blog: null, isDeleting: false })
         }
         onConfirm={handleConfirmDelete}
-        title="Delete Blog Post?"
+        title="Delete Review?"
         message={
           deleteModal.blog
-            ? `Are you sure you want to delete "${deleteModal.blog.title}"? This action cannot be undone.`
-            : 'Are you sure you want to delete this blog post?'
+            ? `Are you sure you want to delete ${deleteModal.blog.author ? `"${deleteModal.blog.author}'s review"` : 'this review'}? This action cannot be undone.`
+            : 'Are you sure you want to delete this review?'
         }
         isDeleting={deleteModal.isDeleting}
       />

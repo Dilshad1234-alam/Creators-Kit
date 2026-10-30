@@ -72,6 +72,11 @@ const ProductSchema = new mongoose.Schema(
       required: false,
       index: true,
     },
+    slug: {
+      type: String,
+      required: false,
+      index: true,
+    },
     name: {
       type: String,
       required: true,
@@ -102,6 +107,14 @@ const ProductSchema = new mongoose.Schema(
     image: {
       type: String,
       default: '/pro1.png',
+    },
+    video: {
+      type: String,
+      default: '',
+    },
+    videoUrl: {
+      type: String,
+      default: '',
     },
     images: {
       type: [VariantImageSchema],
@@ -215,6 +228,12 @@ ProductSchema.pre('save', function () {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)+/g, '');
+  }
+  if (!this.slug && this.id) {
+    this.slug = this.id;
+  }
+  if (!this.id && this.slug) {
+    this.id = this.slug;
   }
 
   // Determine or synchronize productType and isBundle

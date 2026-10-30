@@ -56,6 +56,11 @@ export async function POST(req) {
   try {
     await dbConnect();
     const body = await req.json();
+    if (body.video || body.videoUrl) {
+      const vid = (body.video || body.videoUrl || '').trim();
+      body.video = vid;
+      body.videoUrl = vid;
+    }
     const category = await Category.create(body);
     return NextResponse.json({ success: true, data: category });
   } catch (error) {

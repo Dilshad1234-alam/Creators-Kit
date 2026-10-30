@@ -32,6 +32,11 @@ const nextConfig = {
         destination: '/account?tab=masterclass',
         permanent: true,
       },
+      {
+        source: '/blog/:path*',
+        destination: '/',
+        permanent: false,
+      },
     ];
   },
 };

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { getImageUrl } from '@/lib/imagekit';
 import Link from 'next/link';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Star } from 'lucide-react';
 
 const fallbackBundles = [
   {
@@ -133,7 +133,7 @@ export default function PopularBundlesSection() {
     : [];
 
   return (
-    <section className="w-full pt-3 pb-2 sm:pt-6 sm:pb-5 bg-[#FBFBF7] overflow-hidden">
+    <section className="w-full pt-3 pb-1 sm:pt-5 sm:pb-2 bg-[#FBFBF7] overflow-hidden">
       <div className="w-full max-w-[1750px] mx-auto px-4 md:px-6 lg:px-10">
         
         {/* Section Header */}
@@ -201,12 +201,28 @@ export default function PopularBundlesSection() {
 
                         {/* Content */}
                         <div className="p-4 sm:p-5 flex flex-col">
-                          <h3 className="font-bold text-[#111827] text-lg mb-2">
+                          <h3 className="font-bold text-[#111827] text-lg mb-1">
                             {bundle.name}
                           </h3>
 
+                          {/* Rating Stars Row */}
+                          <div className="flex items-center gap-1.5 mb-2">
+                            <div className="flex items-center">
+                              {[...Array(5)].map((_, starIdx) => (
+                                <Star
+                                  key={starIdx}
+                                  className="w-3.5 h-3.5 fill-amber-400 text-amber-400"
+                                />
+                              ))}
+                            </div>
+                            <span className="text-xs font-bold text-neutral-800 ml-0.5">5.0</span>
+                            <span className="text-[11px] text-neutral-400 font-medium">
+                              (2,800)
+                            </span>
+                          </div>
+
                           {/* Pricing & Discount */}
-                          <div className="flex items-baseline gap-2 mb-3">
+                          <div className="flex items-baseline gap-2 mb-2.5">
                             <span className="font-bold text-2xl text-[#111827]">{bundle.formattedPrice}</span>
                             {bundle.oldPrice && (
                               <span className="text-xs text-neutral-400 font-medium line-through">MRP {bundle.oldPrice}</span>
@@ -214,9 +230,9 @@ export default function PopularBundlesSection() {
                           </div>
 
                           {/* Features List */}
-                          <ul className="space-y-2 mb-4">
+                          <ul className="space-y-1.5 mb-3">
                             {bundle.features.slice(0, 5).map((feature, index) => (
-                              <li key={index} className="flex items-start gap-2.5 text-neutral-600 text-xs font-medium">
+                              <li key={index} className="flex items-start gap-2 text-neutral-600 text-xs font-medium">
                                 <span className="text-[#900606] font-bold">✓</span>
                                 <span className="line-clamp-1">{feature}</span>
                               </li>
@@ -246,69 +262,88 @@ export default function PopularBundlesSection() {
           </div>
         </div>
 
-        {/* DESKTOP VIEW (hidden md:grid) - EXACTLY AS BEFORE */}
-        <div className="hidden md:grid md:grid-cols-3 gap-8 w-full">
+        {/* DESKTOP VIEW (hidden md:grid) */}
+        <div className="hidden md:grid md:grid-cols-3 gap-6 lg:gap-8 w-full">
           {bundles.map((bundle) => {
             const targetId = bundle.id || bundle._id;
             return (
               <div
                 key={targetId}
-                className="group bg-white border border-neutral-200 shadow-sm hover:shadow-md rounded-[1rem] overflow-hidden flex flex-col transition-shadow duration-300"
+                className="group bg-white border border-neutral-200 shadow-sm hover:shadow-md rounded-2xl overflow-hidden flex flex-col transition-shadow duration-300 justify-between"
               >
-                {/* Image Container edge-to-edge at the top */}
-                <div className="relative w-full h-62 sm:h-70 md:h-84 lg:h-88 bg-neutral-100 overflow-hidden">
-                  {bundle.tag && (
-                    <div className="absolute top-4 left-4 z-20">
-                      <span className="bg-[#900606] text-white text-xs font-extrabold tracking-wider px-3.5 py-1.5 rounded-full uppercase shadow-md">
-                        {bundle.tag}
-                      </span>
-                    </div>
-                  )}
-
-                  <Image
-                    src={getImageUrl(bundle.image)}
-                    alt={bundle.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-
-                {/* Bundle Content with padding */}
-                <div className="p-8 flex flex-col flex-grow">
-                  <h3 className="font-bold text-[#111827] text-xl mb-3">
-                    {bundle.name}
-                  </h3>
-
-                  {/* Pricing & Discount */}
-                  <div className="flex items-baseline gap-2 mb-6">
-                    <span className="font-bold text-3xl text-[#111827]">{bundle.formattedPrice}</span>
-                    {bundle.oldPrice && (
-                      <span className="text-sm text-neutral-400 font-medium line-through">MRP {bundle.oldPrice}</span>
+                <div>
+                  {/* Image Container edge-to-edge at the top */}
+                  <div className="relative w-full h-56 sm:h-64 md:h-72 lg:h-76 bg-neutral-100 overflow-hidden">
+                    {bundle.tag && (
+                      <div className="absolute top-4 left-4 z-20">
+                        <span className="bg-[#900606] text-white text-xs font-extrabold tracking-wider px-3.5 py-1.5 rounded-full uppercase shadow-md">
+                          {bundle.tag}
+                        </span>
+                      </div>
                     )}
+
+                    <Image
+                      src={getImageUrl(bundle.image)}
+                      alt={bundle.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                    />
                   </div>
 
-                  {/* Features List (Checkmarks) */}
-                  <ul className="space-y-3 mb-10 flex-grow">
-                    {bundle.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-3 text-neutral-600 text-sm font-medium">
-                        <span className="text-[#900606] mt-0.5">✓</span>
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  {/* Bundle Content with tight padding */}
+                  <div className="p-6 pb-2 flex flex-col">
+                    <h3 className="font-bold text-[#111827] text-xl mb-1.5">
+                      {bundle.name}
+                    </h3>
 
-                  {/* View Details Button with Slide-Up Hover Effect */}
+                    {/* Rating Stars Row */}
+                    <div className="flex items-center gap-1.5 mb-2.5">
+                      <div className="flex items-center">
+                        {[...Array(5)].map((_, starIdx) => (
+                          <Star
+                            key={starIdx}
+                            className="w-3.5 h-3.5 fill-amber-400 text-amber-400"
+                          />
+                        ))}
+                      </div>
+                      <span className="text-xs font-bold text-neutral-800 ml-0.5">5.0</span>
+                      <span className="text-[11px] text-neutral-400 font-medium">
+                        (2,800 reviews)
+                      </span>
+                    </div>
+
+                    {/* Pricing & Discount */}
+                    <div className="flex items-baseline gap-2 mb-3.5">
+                      <span className="font-bold text-2xl lg:text-3xl text-[#111827]">{bundle.formattedPrice}</span>
+                      {bundle.oldPrice && (
+                        <span className="text-sm text-neutral-400 font-medium line-through">MRP {bundle.oldPrice}</span>
+                      )}
+                    </div>
+
+                    {/* Features List (Checkmarks) */}
+                    <ul className="space-y-2 mb-4">
+                      {bundle.features.map((feature, index) => (
+                        <li key={index} className="flex items-start gap-2.5 text-neutral-600 text-sm font-medium">
+                          <span className="text-[#900606] font-bold mt-0.5">✓</span>
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* View Details Button with Slide-Up Hover Effect */}
+                <div className="px-6 pb-6 pt-1 mt-auto">
                   <Link 
                     href={`/bundle/${targetId}`}
-                    className="relative isolate w-full py-3.5 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer hover:shadow-md"
+                    className="relative isolate w-full py-3 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer hover:shadow-md"
                   >
                     <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0 pointer-events-none"></span>
                     <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
                       View Details
                     </span>
                   </Link>
-
                 </div>
 
               </div>

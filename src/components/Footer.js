@@ -6,7 +6,16 @@ import { Mail, Phone, MapPin, Clock } from 'lucide-react';
 
 export default function Footer() {
   const pathname = usePathname();
-  if (pathname?.startsWith('/admin')) return null;
+  if (
+    pathname?.startsWith('/admin') ||
+    pathname === '/login' ||
+    pathname === '/register' ||
+    pathname === '/verify-otp' ||
+    pathname === '/forgot-password' ||
+    pathname === '/reset-password'
+  ) {
+    return null;
+  }
 
   const quickLinks = [
     { name: 'Home', href: '/' },

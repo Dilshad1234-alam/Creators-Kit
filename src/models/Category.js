@@ -10,6 +10,14 @@ const CategorySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    video: {
+      type: String,
+      default: '',
+    },
+    videoUrl: {
+      type: String,
+      default: '',
+    },
     link: {
       type: String,
       default: '/product',

@@ -162,14 +162,30 @@ export default function BundleDetailPage() {
               discountStr = `${Math.round(((origVal - priceVal) / origVal) * 100)}% OFF`;
             }
 
-            const imgList = b.images && b.images.length > 0
-              ? b.images.map((im) => (typeof im === 'string' ? im : im.src || b.image))
-              : [b.image || '/pro1.png'];
+            let imgList = [];
+            if (Array.isArray(b.images) && b.images.length > 0) {
+              imgList = b.images
+                .map((im) => (typeof im === 'string' ? im : im?.src || b.image))
+                .filter(Boolean);
+            }
+            if (b.image && !imgList.includes(b.image)) {
+              imgList = [b.image, ...imgList];
+            }
+            if (imgList.length === 0) {
+              imgList = [b.image || '/pro1.png'];
+            }
+
+            const rawItems = (Array.isArray(b.items) && b.items.length > 0)
+              ? b.items
+              : ((Array.isArray(b.whatsInTheBox) && b.whatsInTheBox.length > 0)
+                  ? b.whatsInTheBox.map((w) => typeof w === 'string' ? w : w.name).filter(Boolean)
+                  : (Array.isArray(b.features) && b.features.length > 0 ? b.features : []));
 
             setBundle({
               id: b.id || b._id,
               _id: b._id,
               name: b.name,
+              subheading: b.subheading || '',
               category: b.category || 'Creator bundles',
               tag: b.tag || 'Popular Bundle',
               price: priceVal,
@@ -178,11 +194,11 @@ export default function BundleDetailPage() {
               rating: 5.0,
               reviews: '2,500+ Creator Reviews',
               stock: b.stock || 20,
-              image: b.image || '/pro1.png',
+              image: b.image || imgList[0] || '/pro1.png',
               images: imgList,
               description: b.description || 'All-in-one complete creator studio kit for YouTube and podcasts.',
-              features: Array.isArray(b.features) && b.features.length > 0 ? b.features : defaultBundle.features,
-              items: Array.isArray(b.items) && b.items.length > 0 ? b.items : (b.features || defaultBundle.items),
+              features: Array.isArray(b.features) && b.features.length > 0 ? b.features : [],
+              items: rawItems,
               includeBonusCourses: b.includeBonusCourses !== undefined ? b.includeBonusCourses : true,
               bonusMasterclasses: Array.isArray(b.bonusMasterclasses) && b.bonusMasterclasses.length > 0
                 ? b.bonusMasterclasses
@@ -348,7 +364,7 @@ export default function BundleDetailPage() {
             
             <div>
               <span className="text-xs font-extrabold uppercase tracking-wider text-[#900606]">
-                All-In-One Studio Kit
+                {bundle.subheading || 'All-In-One Studio Kit'}
               </span>
               <h1 className="text-3xl sm:text-4xl font-black text-neutral-900 tracking-tight mt-1">
                 {bundle.name}

@@ -23,6 +23,11 @@ export async function PUT(req, { params }) {
     await dbConnect();
     const { id } = await params;
     const body = await req.json();
+    if (body.video !== undefined || body.videoUrl !== undefined) {
+      const vid = (body.video || body.videoUrl || '').trim();
+      body.video = vid;
+      body.videoUrl = vid;
+    }
     const category = await Category.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,

@@ -4,75 +4,6 @@ import Product from '@/models/Product';
 
 export const dynamic = 'force-dynamic';
 
-const initialBundles = [
-  {
-    id: 'pro-creator-kit',
-    name: 'Pro Creator Kit',
-    category: 'Creator bundles',
-    isBundle: true,
-    price: 9999,
-    originalPrice: 14999,
-    stock: 42,
-    image: '/pro1.png',
-    images: [{ src: '/pro1.png' }, { src: '/pro.png' }, { src: '/pro2.png' }],
-    description: 'The all-in-one studio bundle engineered for professional YouTubers, streamers, and podcast hosts. Includes high-performance lighting, crystal-clear dual wireless audio, stable tripod support, and chroma key backdrop.',
-    features: [
-      'Creators Kit Studio Condenser Mic',
-      '18-inch High-CRI LED Ring Light',
-      'Heavy-Duty Aluminum Camera & Phone Tripod',
-      'Wrinkle-Resistant Green Screen Backdrop with Stand',
-      'All-Weather Reinforced Equipment Travel Bag',
-    ],
-    items: ['Creators Kit Studio Condenser Mic', 'Ring Light with Stand', 'Tripod Stand', 'Green Screen Backdrop', 'Carry Bag'],
-    tag: 'Most Popular',
-    discount: '33% OFF',
-  },
-  {
-    id: 'basic-creator-kit',
-    name: 'Basic Creator Kit',
-    category: 'Creator bundles',
-    isBundle: true,
-    price: 4999,
-    originalPrice: 6999,
-    stock: 35,
-    image: '/pro.png',
-    images: [{ src: '/pro.png' }, { src: '/ring.jpg' }, { src: '/tripod.jpg' }],
-    description: 'The foundational setup every aspiring creator needs. Clean lighting, directional audio, and solid tripod mounting to produce crisp videos right out of the box.',
-    features: [
-      'Ring Light 18" with Phone Mount',
-      'Adjustable Aluminum Tripod Stand',
-      'Wireless Lapel Microphone',
-      'Universal Smartphone Grip',
-      'Zippered Gear Carry Pouch',
-    ],
-    items: ['Ring Light 18"', 'Tripod Stand', 'Wireless Mic', 'Phone Mount', 'Carry Bag'],
-    tag: 'Best Seller',
-    discount: '28% OFF',
-  },
-  {
-    id: 'ultimate-creator-kit',
-    name: 'Ultimate Creator Kit',
-    category: 'Creator bundles',
-    isBundle: true,
-    price: 14999,
-    originalPrice: 24999,
-    stock: 20,
-    image: '/pro2.png',
-    images: [{ src: '/pro2.png' }, { src: '/pro1.png' }],
-    description: 'Our flagship commercial creation kit with dual RGB lighting panels, boom arm, broadcast microphones, and premium motorized slider.',
-    features: [
-      'Dual Bi-Color LED RGB Light Panels',
-      'Broadcast Boom Arm & Condenser Mic',
-      'Professional Carbon Fiber Tripod',
-      'Ultra-Wide Studio Chroma Key Curtain',
-      'Hard Shell Travel Equipment Case',
-    ],
-    items: ['Dual RGB Panels', 'Boom Mic System', 'Carbon Fiber Tripod', 'Chroma Key Curtain', 'Hard Case'],
-    tag: 'New Arrival',
-    discount: '40% OFF',
-  },
-];
-
 export async function GET(req) {
   try {
     await dbConnect();
@@ -83,22 +14,11 @@ export async function GET(req) {
     let bundles = await Product.find({
       $or: [
         { isBundle: true },
+        { productType: 'bundle' },
         { category: { $regex: /bundle/i } },
         { category: 'Creator bundles' },
       ],
     }).sort({ createdAt: -1 });
-
-    // Auto-seed default bundles if missing
-    if (bundles.length === 0) {
-      await Product.insertMany(initialBundles);
-      bundles = await Product.find({
-        $or: [
-          { isBundle: true },
-          { category: { $regex: /bundle/i } },
-          { category: 'Creator bundles' },
-        ],
-      }).sort({ createdAt: -1 });
-    }
 
     if (searchParam) {
       const q = searchParam.toLowerCase();
@@ -207,7 +127,9 @@ export async function POST(req) {
       originalPrice: body.originalPrice ? Number(body.originalPrice) : undefined,
       stock: body.stock !== undefined ? Number(body.stock) : 20,
       image: body.image || '/pro1.png',
-      images: body.images && body.images.length > 0 ? body.images : [{ src: body.image || '/pro1.png' }],
+      images: Array.isArray(body.images) && body.images.length > 0
+        ? body.images.map((im) => (typeof im === 'string' ? { src: im } : im))
+        : [{ src: body.image || '/pro1.png' }],
       features: Array.isArray(body.features)
         ? body.features
         : typeof body.features === 'string'
@@ -218,6 +140,11 @@ export async function POST(req) {
         : typeof body.items === 'string'
         ? body.items.split(',').map((f) => f.trim()).filter(Boolean)
         : [],
+      whatsInTheBox: (Array.isArray(body.items)
+        ? body.items
+        : typeof body.items === 'string'
+        ? body.items.split(',').map((f) => f.trim()).filter(Boolean)
+        : []).map((name) => ({ name })),
     };
 
     const newBundle = await Product.create(bundleData);

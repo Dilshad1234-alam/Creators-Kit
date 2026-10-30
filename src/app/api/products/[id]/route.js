@@ -4,10 +4,30 @@ import dbConnect from '@/lib/mongodb';
 import Product from '@/models/Product';
 
 function getFilter(id) {
-  if (mongoose.Types.ObjectId.isValid(id)) {
-    return { $or: [{ _id: id }, { id: id }] };
+  if (!id) return { id: '__none__' };
+  const raw = String(id).trim();
+  let decoded = raw;
+  try {
+    decoded = decodeURIComponent(raw).trim();
+  } catch (e) {}
+
+  const conditions = [
+    { id: decoded },
+    { id: raw },
+    { slug: decoded },
+    { slug: raw },
+    { id: decoded.toLowerCase() },
+    { slug: decoded.toLowerCase() },
+  ];
+
+  if (mongoose.Types.ObjectId.isValid(raw)) {
+    conditions.unshift({ _id: raw });
   }
-  return { id: id };
+  if (decoded !== raw && mongoose.Types.ObjectId.isValid(decoded)) {
+    conditions.unshift({ _id: decoded });
+  }
+
+  return { $or: conditions };
 }
 
 export async function GET(req, { params }) {
@@ -134,7 +154,7 @@ export async function PUT(req, { params }) {
       updateData.images = updateData.images.map((im) => {
         if (typeof im === 'string') return { src: im, title: '', subtitle: '', description: '' };
         return {
-          src: im.src || '/pro1.png',
+          src: im.src || updateData.image || '/ring.jpg',
           title: im.title || '',
           subtitle: im.subtitle || '',
           description: im.description || '',
@@ -143,8 +163,15 @@ export async function PUT(req, { params }) {
         };
       });
       if (updateData.images.length > 0 && updateData.images[0].src) {
-        updateData.image = updateData.images[0].src;
+        updateData.image = updateData.image || updateData.images[0].src;
       }
+    } else if (updateData.image) {
+      updateData.image = updateData.image.trim();
+    }
+
+    if (updateData.video !== undefined) {
+      updateData.video = (updateData.video || '').trim();
+      updateData.videoUrl = updateData.video;
     }
 
     const product = await Product.findOneAndUpdate(filter, updateData, {

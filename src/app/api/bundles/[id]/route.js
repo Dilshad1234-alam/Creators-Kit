@@ -4,10 +4,30 @@ import dbConnect from '@/lib/mongodb';
 import Product from '@/models/Product';
 
 function getFilter(id) {
-  if (mongoose.Types.ObjectId.isValid(id)) {
-    return { $or: [{ _id: id }, { id: id }] };
+  if (!id) return { id: '__none__' };
+  const raw = String(id).trim();
+  let decoded = raw;
+  try {
+    decoded = decodeURIComponent(raw).trim();
+  } catch (e) {}
+
+  const conditions = [
+    { id: decoded },
+    { id: raw },
+    { slug: decoded },
+    { slug: raw },
+    { id: decoded.toLowerCase() },
+    { slug: decoded.toLowerCase() },
+  ];
+
+  if (mongoose.Types.ObjectId.isValid(raw)) {
+    conditions.unshift({ _id: raw });
   }
-  return { id: id };
+  if (decoded !== raw && mongoose.Types.ObjectId.isValid(decoded)) {
+    conditions.unshift({ _id: decoded });
+  }
+
+  return { $or: conditions };
 }
 
 export async function GET(req, { params }) {
@@ -90,6 +110,13 @@ export async function PUT(req, { params }) {
     }
     if (typeof updateData.items === 'string') {
       updateData.items = updateData.items.split(',').map((f) => f.trim()).filter(Boolean);
+      updateData.whatsInTheBox = updateData.items.map((name) => ({ name }));
+    } else if (Array.isArray(updateData.items)) {
+      updateData.whatsInTheBox = updateData.items.map((name) => ({ name }));
+    }
+
+    if (Array.isArray(updateData.images)) {
+      updateData.images = updateData.images.map((im) => (typeof im === 'string' ? { src: im } : im));
     }
 
     if (updateData.includeBonusCourses !== undefined) {

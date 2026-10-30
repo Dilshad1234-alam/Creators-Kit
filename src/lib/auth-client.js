@@ -7,9 +7,15 @@
 export function getStoredCustomer() {
   if (typeof window === 'undefined') return null;
 
-  const rawUser = localStorage.getItem('creatorsKitUserInfo');
-  const sessionEmail = sessionStorage.getItem('userEmail') || localStorage.getItem('userEmail');
-  const userRole = sessionStorage.getItem('userRole') || localStorage.getItem('userRole');
+  const rawUser =
+    sessionStorage.getItem('creatorsKitUserInfo') ||
+    localStorage.getItem('creatorsKitUserInfo');
+  const sessionEmail =
+    sessionStorage.getItem('userEmail') ||
+    localStorage.getItem('userEmail');
+  const userRole =
+    sessionStorage.getItem('userRole') ||
+    localStorage.getItem('userRole');
 
   // Strictly exclude admin sessions from customer context
   if (userRole === 'admin') return null;

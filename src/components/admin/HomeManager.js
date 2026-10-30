@@ -46,6 +46,7 @@ export default function HomeManager() {
   const [categoryForm, setCategoryForm] = useState({
     name: '',
     image: '',
+    video: '',
     link: '/product',
     itemCount: '',
     order: 1,
@@ -112,6 +113,7 @@ export default function HomeManager() {
       setCategoryForm({
         name: '',
         image: '',
+        video: '',
         link: '/product',
         itemCount: '',
         order: categories.length + 1,
@@ -149,6 +151,7 @@ export default function HomeManager() {
       setCategoryForm({
         name: item.name || '',
         image: item.image || '',
+        video: item.video || item.videoUrl || '',
         link: item.link || '/product',
         itemCount: item.itemCount || '',
         order: item.order || 0,
@@ -689,12 +692,17 @@ export default function HomeManager() {
                         </span>
                       </td>
                       <td className="py-4 px-3 align-middle">
-                        <div className="w-14 h-14 rounded-lg bg-neutral-100 border border-neutral-200/80 overflow-hidden flex-shrink-0">
+                        <div className="w-14 h-14 rounded-lg bg-neutral-100 border border-neutral-200/80 overflow-hidden flex-shrink-0 relative">
                           <img
                             src={getImageUrl(c.image)}
                             alt={c.name}
                             className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
                           />
+                          {(c.video || c.videoUrl) && (
+                            <span className="absolute bottom-1 right-1 bg-black/80 text-white text-[9px] px-1 py-0.2 rounded font-bold shadow-sm">
+                              ▶ Video
+                            </span>
+                          )}
                         </div>
                       </td>
                       <td className="py-4 px-3 align-middle font-bold text-neutral-900 group-hover:text-[#900606] transition-colors">
@@ -1081,6 +1089,25 @@ export default function HomeManager() {
                         setCategoryForm({ ...categoryForm, image: e.target.value })
                       }
                       placeholder="e.g. /wireless-mic.jpg"
+                      className="w-full bg-white border border-neutral-200/90 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-neutral-900 placeholder-neutral-400 outline-none focus:border-[#900606] transition-colors shadow-2xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <span>🎬</span>
+                        <span>Category Video URL / Path (Optional)</span>
+                      </span>
+                      <span className="text-[10px] text-neutral-400 font-normal normal-case">MP4, WebM, or video link</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={categoryForm.video || ''}
+                      onChange={(e) =>
+                        setCategoryForm({ ...categoryForm, video: e.target.value })
+                      }
+                      placeholder="e.g. /category-video.mp4, https://example.com/video.mp4"
                       className="w-full bg-white border border-neutral-200/90 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-neutral-900 placeholder-neutral-400 outline-none focus:border-[#900606] transition-colors shadow-2xs"
                     />
                   </div>

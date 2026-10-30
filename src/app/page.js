@@ -5,6 +5,7 @@ import Masterclass from '@/models/Masterclass';
 import Blog from '@/models/Blog';
 import HeroBanner from '@/models/HeroBanner';
 import Category from '@/models/Category';
+import Product from '@/models/Product';
 import HomeClient from '@/components/HomeClient';
 
 export const dynamic = 'force-dynamic';
@@ -16,6 +17,7 @@ export default async function Home() {
   let kitComponents = [];
   let masteryCourses = [];
   let blogs = [];
+  let featuredProducts = [];
 
   try {
     await dbConnect();
@@ -133,6 +135,31 @@ export default async function Home() {
       id: doc.slug || doc._id.toString()
     }));
 
+    // 7. Fetch Individual Products for Features Products section
+    const rawProducts = await Product.find({
+      $or: [
+        { productType: 'individual' },
+        { productType: { $exists: false }, isBundle: false }
+      ]
+    }).sort({ createdAt: -1 }).lean();
+
+    featuredProducts = rawProducts.map((p) => {
+      const priceVal = typeof p.price === 'number' ? p.price : Number(p.price) || 0;
+      const origVal = p.originalPrice ? Number(p.originalPrice) : Math.round(priceVal * 1.3);
+      const discountVal = p.discount || (origVal > priceVal ? `${Math.round(((origVal - priceVal) / origVal) * 100)}% OFF` : '');
+      return {
+        id: p.id || p._id.toString(),
+        _id: p._id.toString(),
+        name: p.name,
+        price: priceVal,
+        mrp: origVal,
+        discount: discountVal,
+        image: p.image || (Array.isArray(p.images) && p.images[0]?.src) || '/ring.jpg',
+        rating: p.rating || 4.8,
+        reviewsCount: p.reviewsCount || 120,
+      };
+    });
+
   } catch (error) {
     console.warn('MongoDB connection or query skipped on homepage:', error.message);
   }
@@ -145,6 +172,7 @@ export default async function Home() {
       kitComponents={kitComponents} 
       masteryCourses={masteryCourses} 
       blogs={blogs}
+      featuredProducts={featuredProducts}
     />
   );
 }

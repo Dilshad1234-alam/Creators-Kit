@@ -74,15 +74,30 @@ export async function POST(req) {
     await dbConnect();
     const body = await req.json();
 
-    if (!body.title || !body.content) {
-      return NextResponse.json({ error: 'Title and content are required' }, { status: 400 });
+    if (!body.author) {
+      body.author = 'Creator';
     }
 
-    if (!body.slug && body.title) {
-      let baseSlug = body.title
+    if (!body.title) {
+      body.title = body.product
+        ? `${body.author} - ${body.product}`
+        : `${body.author}'s Review`;
+    }
+
+    if (!body.content) {
+      body.content = body.excerpt || `${body.author}'s creator review for ${body.product || 'Creators Kit'}.`;
+    }
+
+    if (!body.excerpt) {
+      body.excerpt = body.content ? body.content.slice(0, 160) : `${body.author}'s review`;
+    }
+
+    if (!body.slug) {
+      let baseSlug = (body.author || body.title || 'creator-review')
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/(^-|-$)+/g, '');
+      if (!baseSlug) baseSlug = `story-${Date.now()}`;
       let slug = baseSlug;
       let counter = 1;
       while (await Blog.findOne({ slug })) {
@@ -92,8 +107,8 @@ export async function POST(req) {
       body.slug = slug;
     }
 
-    if (!body.excerpt && body.content) {
-      body.excerpt = body.content.slice(0, 160) + '...';
+    if (body.rating !== undefined) {
+      body.rating = Number(body.rating) || 5;
     }
 
     const blog = await Blog.create(body);

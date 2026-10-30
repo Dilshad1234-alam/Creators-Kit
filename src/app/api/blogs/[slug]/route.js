@@ -35,6 +35,14 @@ export async function PUT(req, { params }) {
     await dbConnect();
     const body = await req.json();
 
+    if (body.rating !== undefined) {
+      body.rating = Number(body.rating) || 5;
+    }
+
+    if (!body.title && body.author) {
+      body.title = body.product ? `${body.author} - ${body.product}` : `${body.author}'s Review`;
+    }
+
     const blog = await Blog.findOneAndUpdate(getFilter(slug), body, {
       new: true,
       runValidators: true,

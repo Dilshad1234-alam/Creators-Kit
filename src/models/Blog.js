@@ -3,25 +3,25 @@ import mongoose from 'mongoose';
 const blogSchema = new mongoose.Schema({
     title: {
         type: String,
-        required: [true, 'Please provide a blog title'],
+        default: '',
     },
     slug: {
         type: String,
         required: [true, 'Please provide a unique slug'],
         unique: true,
-    index: true,
+        index: true,
     },
     content: {
         type: String,
-        required: [true, 'Please provide the blog content'],
+        default: '',
     },
     excerpt: {
         type: String,
-        required: [true, 'Please provide a short excerpt'],
+        default: '',
     },
     author: {
         type: String,
-        default: 'Admin',
+        default: 'Creator',
     },
     product: {
         type: String,
@@ -31,6 +31,17 @@ const blogSchema = new mongoose.Schema({
         type: String,
         default: 'https://via.placeholder.com/800x400?text=Blog+Cover',
     },
-}, { timestamps: true});
+    videoUrl: {
+        type: String,
+        default: '',
+    },
+    rating: {
+        type: Number,
+        default: 5,
+        min: 1,
+        max: 5,
+    },
+}, { timestamps: true });
 
 export default mongoose.models.Blog || mongoose.model('Blog', blogSchema);
+

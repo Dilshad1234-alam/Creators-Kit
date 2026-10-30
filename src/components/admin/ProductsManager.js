@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
+import { getImageUrl } from '@/lib/imagekit';
 import DeleteConfirmModal from './DeleteConfirmModal';
 
 export default function ProductsManager() {
@@ -63,12 +64,14 @@ export default function ProductsManager() {
 
   const initialFormState = {
     name: '',
+    subheading: '',
     category: 'Lighting',
     tag: 'Most Popular',
     price: '',
     originalPrice: '',
     stock: '10',
     image: '/ring.jpg',
+    video: '',
     description: '',
     features: '',
     items: '',
@@ -87,180 +90,7 @@ export default function ProductsManager() {
   };
   const [formData, setFormData] = useState(initialFormState);
 
-  // Fallback initial products
-  const defaultProducts = [
-    {
-      _id: 'prod_1',
-      id: 'pro-creator-kit',
-      name: 'Pro Creator Kit',
-      category: 'Creator bundles',
-      productType: 'bundle',
-      price: 9999,
-      originalPrice: 14999,
-      formattedPrice: '₹9,999',
-      stock: 42,
-      image: '/pro1.png',
-      fallbackImage: '/pro.png',
-      description: 'The all-in-one studio bundle engineered for professional YouTubers and streamers.',
-      features: 'Studio Condenser Mic, 18-inch Ring Light, Heavy Tripod, Green Screen, Carry Bag',
-      items: 'Studio Condenser Mic, Ring Light with Stand, Tripod Stand, Green Screen Backdrop, Carry Bag',
-      tag: 'Most Popular',
-      isBundle: true,
-      images: [
-        { src: '/pro1.png', title: 'Pro Creator Kit', subtitle: 'Flagship All-in-One Studio Bundle', price: 9999, originalPrice: 14999, description: 'Engineered for professional YouTubers and streamers.' },
-        { src: '/pro.png', title: 'Studio Overview', subtitle: 'Complete Setup with Lights and Audio', price: 9999, originalPrice: 14999, description: 'Everything packed into a premium studio carrying case.' }
-      ],
-    },
-    {
-      _id: 'prod_2',
-      id: 'basic-creator-kit',
-      name: 'Basic Creator Kit',
-      category: 'Creator bundles',
-      productType: 'bundle',
-      price: 4999,
-      originalPrice: 6999,
-      formattedPrice: '₹4,999',
-      stock: 35,
-      image: '/pro.png',
-      fallbackImage: '/ring.jpg',
-      description: 'The foundational setup every aspiring creator needs.',
-      features: 'Ring Light 18", Tripod Stand, Wireless Mic, Phone Mount, Carry Pouch',
-      items: 'Ring Light 18", Tripod Stand, Wireless Mic, Phone Mount, Carry Bag',
-      tag: 'Best Seller',
-      isBundle: true,
-      images: [
-        { src: '/pro.png', title: 'Basic Creator Kit', subtitle: 'Essential Starter Kit for Creators', price: 4999, originalPrice: 6999, description: 'The foundational setup every aspiring creator needs.' }
-      ],
-    },
-    {
-      _id: 'prod_3',
-      id: 'ultimate-creator-kit',
-      name: 'Ultimate Creator Kit',
-      category: 'Creator bundles',
-      productType: 'bundle',
-      price: 14999,
-      originalPrice: 24999,
-      formattedPrice: '₹14,999',
-      stock: 20,
-      image: '/pro2.png',
-      fallbackImage: '/pro1.png',
-      description: 'Our flagship commercial creation kit with dual RGB lighting panels.',
-      features: 'Dual RGB Panels, Boom Mic, Carbon Fiber Tripod, Green Screen, Hard Case',
-      items: 'Dual RGB Panels, Boom Mic System, Carbon Fiber Tripod, Chroma Key Curtain, Hard Case',
-      tag: 'New Arrival',
-      isBundle: true,
-      images: [
-        { src: '/pro2.png', title: 'Ultimate Creator Kit', subtitle: 'Commercial Production Studio Suite', price: 14999, originalPrice: 24999, description: 'Dual RGB lighting panels and precision boom audio.' }
-      ],
-    },
-    {
-      _id: 'prod_4',
-      id: 'digitek-ring-light-18',
-      name: 'Digitek Ring Light 18"',
-      category: 'Lighting',
-      productType: 'individual',
-      price: 2499,
-      originalPrice: 3499,
-      formattedPrice: '₹2,499',
-      stock: 8,
-      image: '/ring.jpg',
-      fallbackImage: '/ring1.png',
-      description: 'Professional 18-inch dimmable LED ring light with adjustable color temperatures.',
-      features: 'Bi-Color 3200K - 5600K, Dimmable 1% - 100%, 6ft Stand',
-      items: '',
-      isBundle: false,
-      images: [
-        { src: '/ring.jpg', title: 'Ring Light', subtitle: 'Professional 18-inch Studio Light', price: 2499, originalPrice: 3499, description: 'Flawless shadowless lighting for video production.' },
-        { src: '/ring1.png', title: 'Light Stand', subtitle: '6ft Heavy Duty Light Stand', price: 2499, originalPrice: 3499, description: 'Adjustable height aluminum tripod stand.' }
-      ],
-    },
-    {
-      _id: 'prod_5',
-      id: 'rode-wireless-go-ii',
-      name: 'Creators Kit Wireless Studio Mic',
-      category: 'Audio',
-      productType: 'individual',
-      price: 24999,
-      originalPrice: 29999,
-      formattedPrice: '₹24,999',
-      stock: 6,
-      image: '/wireless-mic.jpg',
-      fallbackImage: '/wireless-mic1.png',
-      description: 'Dual channel wireless microphone system.',
-      features: 'Dual Channel, 2.4GHz Digital, 40h Recording, USB-C',
-      items: '',
-      isBundle: false,
-      images: [
-        { src: '/wireless-mic.jpg', title: 'Wireless Mic System', subtitle: 'Dual Channel Transmitters & Receiver', price: 24999, originalPrice: 29999, description: 'Series IV 2.4GHz crystal clear digital audio.' }
-      ],
-    },
-    {
-      _id: 'prod_6',
-      id: 'digitek-dtr-550-tripod',
-      name: 'Digitek DTR 550 LW Tripod',
-      category: 'Accessories',
-      productType: 'individual',
-      price: 1999,
-      originalPrice: 2499,
-      formattedPrice: '₹1,999',
-      stock: 4,
-      image: '/tripod.jpg',
-      fallbackImage: '/tripod1.png',
-      description: 'Heavy-duty lightweight aluminum tripod.',
-      features: '3-Way Pan Head, Quick Release, Bubble Level',
-      items: '',
-      isBundle: false,
-      images: [
-        { src: '/tripod.jpg', title: 'DTR 550 LW Tripod', subtitle: '3-Way Smooth Pan Head Tripod', price: 1999, originalPrice: 2499, description: 'Solid aluminum build with quick release plate.' }
-      ],
-    },
-    {
-      _id: 'prod_7',
-      id: 'green-screen-backdrop',
-      name: 'Green Screen Backdrop',
-      category: 'Accessories',
-      productType: 'individual',
-      price: 799,
-      originalPrice: 1299,
-      formattedPrice: '₹799',
-      stock: 64,
-      image: '/chorma.jpg',
-      fallbackImage: '/chorma1.png',
-      description: 'High-density chroma key green screen cloth.',
-      features: 'Non-Reflective, Muslin Fabric, 9x6ft, Clamps Included',
-      items: '',
-      isBundle: false,
-      images: [
-        { src: '/chorma.jpg', title: 'Green Screen Backdrop', subtitle: 'High-Density Chroma Key Fabric', price: 799, originalPrice: 1299, description: 'Wrinkle-resistant non-reflective backdrop.' }
-      ],
-    },
-    {
-      _id: 'prod_8',
-      id: 'rode-wireless-go-2',
-      name: 'Creators Studio Gear',
-      category: 'Lighting',
-      productType: 'thumbnail-bundle',
-      price: 3999,
-      originalPrice: 4999,
-      formattedPrice: '₹3,999',
-      stock: 50,
-      image: '/ring5.png',
-      fallbackImage: '/ring.jpg',
-      description: 'Interactive flagship creators equipment suite with dynamic thumbnail switcher.',
-      features: 'Bi-Color Ring Light, 3-Way Panhead Tripod, Chroma Green Screen, Dual-Channel Wireless Audio',
-      items: 'Ring Light, Tripod, Chroma Screen, Wireless Mic',
-      tag: 'Featured Gear',
-      isBundle: false,
-      images: [
-        { src: '/ring5.png', title: 'Ring Light', subtitle: 'Professional 18 inch Ring Light with Desk Mount & Stand', price: 2499, originalPrice: 3499, description: 'Achieve flawless, studio-quality illumination with adjustable brightness and color temperature.' },
-        { src: '/tripod6.png', title: 'Tripod', subtitle: 'Professional Aluminum Tripod Stand for Cameras & Mobiles', price: 1999, originalPrice: 2499, description: 'Engineered for ultimate stability. Keep your shots rock-solid and level.' },
-        { src: '/chorma2.png', title: 'Chroma Green', subtitle: 'Portable Wrinkle-Resistant Green Screen Backdrop', price: 799, originalPrice: 1299, description: 'Instant background removal and replacement with high-grade matte fabric.' },
-        { src: '/wireless-mic4.png', title: 'Wireless Mic', subtitle: 'Dual Channel Wireless Microphone System for Creators', price: 24999, originalPrice: 29999, description: 'Capture professional, studio-quality audio with the Creators Kit wireless condenser microphone.' },
-      ],
-    },
-  ];
-
-  const [products, setProducts] = useState(defaultProducts);
+  const [products, setProducts] = useState([]);
 
   // Fetch real products from live MongoDB API
   const fetchProducts = useCallback(async () => {
@@ -270,67 +100,66 @@ export default function ProductsManager() {
       if (res.ok) {
         const data = await res.json();
         const dbProducts = data.data || [];
-        if (dbProducts.length > 0) {
-          const formatted = dbProducts.map((p) => {
-            let pType = p.productType;
-            if (!pType || !['individual', 'bundle', 'thumbnail-bundle'].includes(pType)) {
-              if (p.id === 'rode-wireless-go-2' || (Array.isArray(p.images) && p.images.length > 1 && p.images.some((v) => v.title && v.title !== p.name))) {
-                pType = 'thumbnail-bundle';
-              } else if (p.isBundle || (p.category && p.category.toLowerCase().includes('bundle'))) {
-                pType = 'bundle';
-              } else {
-                pType = 'individual';
-              }
+        const formatted = dbProducts.map((p) => {
+          let pType = p.productType;
+          if (!pType || !['individual', 'bundle', 'thumbnail-bundle'].includes(pType)) {
+            if (p.id === 'rode-wireless-go-2' || (Array.isArray(p.images) && p.images.length > 1 && p.images.some((v) => v.title && v.title !== p.name))) {
+              pType = 'thumbnail-bundle';
+            } else if (p.isBundle || (p.category && p.category.toLowerCase().includes('bundle'))) {
+              pType = 'bundle';
+            } else {
+              pType = 'individual';
             }
-            const isBun = pType === 'bundle';
-            let cat = p.category || (isBun ? 'Creator bundles' : 'Accessories');
-            const rawCat = (p.category || '').toLowerCase();
-            if (rawCat.includes('bundle')) cat = 'Creator bundles';
-            else if (rawCat.includes('light')) cat = 'Lighting';
-            else if (rawCat.includes('audio') || rawCat.includes('mic')) cat = 'Audio';
+          }
+          const isBun = pType === 'bundle';
+          let cat = p.category || (isBun ? 'Creator bundles' : 'Accessories');
+          const rawCat = (p.category || '').toLowerCase();
+          if (rawCat.includes('bundle')) cat = 'Creator bundles';
+          else if (rawCat.includes('light')) cat = 'Lighting';
+          else if (rawCat.includes('audio') || rawCat.includes('mic')) cat = 'Audio';
 
-            const productImages = Array.isArray(p.images) && p.images.length > 0
-              ? p.images.map((im) => ({
-                  src: typeof im === 'string' ? im : (im.src || p.image || '/pro1.png'),
-                  title: im.title || p.name || '',
-                  subtitle: im.subtitle || '',
-                  description: im.description || '',
-                  price: im.price !== undefined ? im.price : p.price,
-                  originalPrice: im.originalPrice !== undefined ? im.originalPrice : p.originalPrice,
-                }))
-              : [
-                  {
-                    src: p.image || '/pro1.png',
-                    title: p.name || '',
-                    subtitle: '',
-                    description: p.description || '',
-                    price: p.price,
-                    originalPrice: p.originalPrice,
-                  },
-                ];
+          const productImages = Array.isArray(p.images) && p.images.length > 0
+            ? p.images.map((im) => ({
+                src: typeof im === 'string' ? im : (im.src || p.image || '/pro1.png'),
+                title: im.title || p.name || '',
+                subtitle: im.subtitle || '',
+                description: im.description || '',
+                price: im.price !== undefined ? im.price : p.price,
+                originalPrice: im.originalPrice !== undefined ? im.originalPrice : p.originalPrice,
+              }))
+            : [
+                {
+                  src: p.image || '/pro1.png',
+                  title: p.name || '',
+                  subtitle: '',
+                  description: p.description || '',
+                  price: p.price,
+                  originalPrice: p.originalPrice,
+                },
+              ];
 
-            return {
-              _id: p._id || p.id,
-              id: p.id || p._id,
-              name: p.name || 'Unnamed Product',
-              category: cat,
-              productType: pType,
-              tag: p.tag || (isBun ? 'Most Popular' : (pType === 'thumbnail-bundle' ? 'Featured Gear' : '')),
-              price: p.price || 0,
-              originalPrice: p.originalPrice || undefined,
-              formattedPrice: `₹${(p.price || 0).toLocaleString('en-IN')}`,
-              stock: typeof p.stock === 'number' ? p.stock : 10,
-              image: p.image || productImages[0]?.src || '/pro1.png',
-              images: productImages,
-              fallbackImage: '/pro1.png',
-              description: p.description || '',
-              features: Array.isArray(p.features) ? p.features.join(', ') : (p.features || ''),
-              items: Array.isArray(p.items) ? p.items.join(', ') : (p.items || ''),
-              isBundle: isBun,
-            };
-          });
-          setProducts(formatted);
-        }
+          return {
+            _id: p._id || p.id,
+            id: p.id || p._id,
+            name: p.name || 'Unnamed Product',
+            category: cat,
+            productType: pType,
+            tag: p.tag || (isBun ? 'Most Popular' : (pType === 'thumbnail-bundle' ? 'Featured Gear' : '')),
+            price: p.price || 0,
+            originalPrice: p.originalPrice || undefined,
+            formattedPrice: `₹${(p.price || 0).toLocaleString('en-IN')}`,
+            stock: typeof p.stock === 'number' ? p.stock : 10,
+            image: p.image || productImages[0]?.src || '/pro1.png',
+            video: p.video || p.videoUrl || '',
+            images: productImages,
+            fallbackImage: '/pro1.png',
+            description: p.description || '',
+            features: Array.isArray(p.features) ? p.features.join(', ') : (p.features || ''),
+            items: Array.isArray(p.items) ? p.items.join(', ') : (p.items || ''),
+            isBundle: isBun,
+          };
+        });
+        setProducts(formatted);
       }
     } catch (err) {
       console.error('Failed to fetch live products', err);
@@ -395,27 +224,62 @@ export default function ProductsManager() {
     const defaultImg = defaultType === 'bundle' ? '/pro1.png' : (defaultType === 'thumbnail-bundle' ? '/ring5.png' : '/ring.jpg');
     setFormData({
       ...initialFormState,
+      name: defaultType === 'thumbnail-bundle' ? 'Creators Studio Gear' : '',
+      subheading: defaultType === 'bundle' ? 'All-In-One Studio Kit' : '',
       category: defaultType === 'bundle' ? 'Creator bundles' : 'Lighting',
+      tag: defaultType === 'bundle' ? 'Most Popular' : (defaultType === 'thumbnail-bundle' ? 'Featured Gear' : ''),
+      price: defaultType === 'thumbnail-bundle' ? '3999' : '',
+      originalPrice: defaultType === 'thumbnail-bundle' ? '4995' : '',
+      stock: '10',
       image: defaultImg,
-      includeBonusCourses: true,
-      bonusMasterclasses: DEFAULT_BONUS_MASTERCLASSES,
+      includeBonusCourses: defaultType === 'bundle' || defaultType === 'thumbnail-bundle',
+      bonusMasterclasses: (defaultType === 'bundle' || defaultType === 'thumbnail-bundle') ? DEFAULT_BONUS_MASTERCLASSES : [],
       images: defaultType === 'thumbnail-bundle'
         ? [
             {
               src: '/ring5.png',
               title: 'Ring Light',
               subtitle: 'Professional 18 inch Ring Light with Desk Mount & Stand',
-              description: 'Achieve flawless, studio-quality illumination with adjustable brightness and color temperature.',
-              price: '2499',
-              originalPrice: '3499',
+              description: 'Achieve flawless, studio-quality illumination with adjustable brightness and color temperature. Perfect for eliminating shadows and glowing on camera.',
             },
             {
               src: '/tripod6.png',
               title: 'Tripod',
               subtitle: 'Professional Aluminum Tripod Stand for Cameras & Mobiles',
-              description: 'Engineered for ultimate stability. Keep your shots rock-solid and level.',
-              price: '1999',
-              originalPrice: '2499',
+              description: 'Engineered for ultimate stability. Keep your shots rock-solid and level during long streams, outdoor vlogging, and cinematic pans.',
+            },
+            {
+              src: '/chorma2.png',
+              title: 'Chroma Green',
+              subtitle: 'Portable Wrinkle-Resistant Green Screen Backdrop',
+              description: 'Instant background removal and replacement. Set up your virtual studio anywhere in seconds with this high-grade matte green fabric.',
+            },
+            {
+              src: '/wireless-mic4.png',
+              title: 'Wireless Mic',
+              subtitle: 'Dual Channel Wireless Microphone System for Creators, Vloggers & Filmmakers',
+              description: 'Capture professional, studio-quality audio with the Creators Kit wireless condenser microphone. Perfect for YouTubers, podcasters, and mobile creators.',
+            },
+          ]
+        : defaultType === 'bundle'
+        ? [
+            {
+              src: '/pro1.png',
+              title: 'Main Showcase',
+              subtitle: '',
+              description: '',
+            },
+            {
+              src: '/pro.png',
+              title: 'Kit Angle View 2',
+              subtitle: '',
+              description: '',
+            },
+            {
+              src: '/pro2.png',
+              title: 'Kit Angle View 3',
+              subtitle: '',
+              description: '',
             },
           ]
         : [
@@ -440,9 +304,10 @@ export default function ProductsManager() {
     const pType = product.productType || (product.isBundle ? 'bundle' : 'individual');
     setModalType(pType);
 
+    const fallbackDefaultImg = pType === 'bundle' ? '/pro1.png' : '/ring.jpg';
     const productImages = Array.isArray(product.images) && product.images.length > 0
       ? product.images.map((im) => ({
-          src: typeof im === 'string' ? im : (im.src || '/pro1.png'),
+          src: typeof im === 'string' ? im : (im.src || product.image || fallbackDefaultImg),
           title: im.title || '',
           subtitle: im.subtitle || '',
           description: im.description || '',
@@ -451,7 +316,7 @@ export default function ProductsManager() {
         }))
       : [
           {
-            src: product.image || '/pro1.png',
+            src: product.image || fallbackDefaultImg,
             title: product.name || '',
             subtitle: '',
             description: product.description || '',
@@ -482,18 +347,20 @@ export default function ProductsManager() {
 
     setFormData({
       name: product.name,
+      subheading: product.subheading || '',
       category: pType === 'bundle' ? 'Creator bundles' : (product.category || 'Lighting'),
       tag: product.tag || (pType === 'bundle' ? 'Most Popular' : 'Featured Gear'),
       price: product.price,
       originalPrice: product.originalPrice || '',
       stock: product.stock,
-      image: product.image || productImages[0]?.src || '/pro1.png',
+      image: product.image || productImages[0]?.src || fallbackDefaultImg,
+      video: product.video || product.videoUrl || '',
       description: product.description || '',
-      features: product.features || '',
-      items: product.items || '',
+      features: Array.isArray(product.features) ? product.features.join(', ') : (product.features || ''),
+      items: Array.isArray(product.items) ? product.items.join(', ') : (product.items || ''),
       images: productImages,
-      includeBonusCourses: product.includeBonusCourses !== undefined ? product.includeBonusCourses : true,
-      bonusMasterclasses: bonusCourses,
+      includeBonusCourses: (pType === 'bundle' || pType === 'thumbnail-bundle') ? (product.includeBonusCourses !== false) : false,
+      bonusMasterclasses: (pType === 'bundle' || pType === 'thumbnail-bundle') ? bonusCourses : [],
     });
     setIsModalOpen(true);
   };
@@ -506,6 +373,8 @@ export default function ProductsManager() {
         ...prev,
         category: 'Creator bundles',
         image: prev.image.includes('ring') ? '/pro1.png' : prev.image,
+        includeBonusCourses: prev.includeBonusCourses !== false,
+        bonusMasterclasses: prev.bonusMasterclasses && prev.bonusMasterclasses.length > 0 ? prev.bonusMasterclasses : DEFAULT_BONUS_MASTERCLASSES,
       }));
     } else if (type === 'thumbnail-bundle') {
       setFormData((prev) => {
@@ -516,25 +385,39 @@ export default function ProductsManager() {
               src: currentVariants[0]?.src || '/ring5.png',
               title: currentVariants[0]?.title || 'Ring Light',
               subtitle: currentVariants[0]?.subtitle || 'Professional 18 inch Ring Light with Desk Mount & Stand',
-              description: currentVariants[0]?.description || 'Achieve flawless, studio-quality illumination.',
-              price: currentVariants[0]?.price || prev.price || '2499',
-              originalPrice: currentVariants[0]?.originalPrice || prev.originalPrice || '3499',
+              description: currentVariants[0]?.description || 'Achieve flawless, studio-quality illumination with adjustable brightness and color temperature. Perfect for eliminating shadows and glowing on camera.',
             },
             {
               src: '/tripod6.png',
               title: 'Tripod',
               subtitle: 'Professional Aluminum Tripod Stand for Cameras & Mobiles',
-              description: 'Engineered for ultimate stability and smooth video pans.',
-              price: '1999',
-              originalPrice: '2499',
+              description: 'Engineered for ultimate stability. Keep your shots rock-solid and level during long streams, outdoor vlogging, and cinematic pans.',
+            },
+            {
+              src: '/chorma2.png',
+              title: 'Chroma Green',
+              subtitle: 'Portable Wrinkle-Resistant Green Screen Backdrop',
+              description: 'Instant background removal and replacement. Set up your virtual studio anywhere in seconds with this high-grade matte green fabric.',
+            },
+            {
+              src: '/wireless-mic4.png',
+              title: 'Wireless Mic',
+              subtitle: 'Dual Channel Wireless Microphone System for Creators, Vloggers & Filmmakers',
+              description: 'Capture professional, studio-quality audio with the Creators Kit wireless condenser microphone. Perfect for YouTubers, podcasters, and mobile creators.',
             },
           ];
         }
         return {
           ...prev,
+          name: prev.name || 'Creators Studio Gear',
+          price: prev.price || '3999',
+          originalPrice: prev.originalPrice || '4995',
+          stock: prev.stock || '10',
           category: prev.category === 'Creator bundles' ? 'Lighting' : prev.category,
           images: currentVariants,
           image: currentVariants[0]?.src || prev.image,
+          includeBonusCourses: prev.includeBonusCourses !== false,
+          bonusMasterclasses: prev.bonusMasterclasses && prev.bonusMasterclasses.length > 0 ? prev.bonusMasterclasses : DEFAULT_BONUS_MASTERCLASSES,
         };
       });
     } else {
@@ -550,17 +433,16 @@ export default function ProductsManager() {
   const handleAddVariant = () => {
     setFormData((prev) => {
       const nextIdx = (prev.images?.length || 0) + 1;
+      const defaultNewSrc = modalType === 'bundle' ? '/pro.png' : (modalType === 'thumbnail-bundle' ? '/ring5.png' : '/ring.jpg');
       return {
         ...prev,
         images: [
           ...(prev.images || []),
           {
-            src: '/ring5.png',
-            title: `Thumbnail Variant ${nextIdx}`,
+            src: defaultNewSrc,
+            title: modalType === 'thumbnail-bundle' ? `Thumbnail Variant ${nextIdx}` : (modalType === 'bundle' ? `Kit Angle View ${nextIdx}` : `Angle View ${nextIdx}`),
             subtitle: '',
             description: '',
-            price: prev.price || '',
-            originalPrice: prev.originalPrice || '',
           },
         ],
       };
@@ -586,11 +468,10 @@ export default function ProductsManager() {
         ...updated[index],
         [field]: value,
       };
-      const newImage = index === 0 && field === 'src' ? value : prev.image;
       return {
         ...prev,
         images: updated,
-        image: newImage,
+        image: index === 0 && field === 'src' ? value : prev.image,
       };
     });
   };
@@ -607,65 +488,88 @@ export default function ProductsManager() {
     const isBundle = modalType === 'bundle';
     const isThumbnailBundle = modalType === 'thumbnail-bundle';
 
-    const cleanedImages = isThumbnailBundle
-      ? (Array.isArray(formData.images) && formData.images.length > 0
-          ? formData.images.map((v, idx) => ({
-              src: v.src || (idx === 0 ? formData.image : '/ring5.png') || '/ring5.png',
-              title: v.title || `Variant ${idx + 1}`,
-              subtitle: v.subtitle || '',
-              description: v.description || formData.description || '',
-              price: v.price !== '' && v.price !== undefined ? Number(v.price) : priceNum,
-              originalPrice: v.originalPrice !== '' && v.originalPrice !== undefined ? Number(v.originalPrice) : origPriceNum,
-            }))
-          : [
-              {
-                src: formData.image || '/ring5.png',
-                title: formData.name,
-                subtitle: '',
-                description: formData.description,
-                price: priceNum,
-                originalPrice: origPriceNum,
-              },
-            ])
-      : [
-          {
-            src: formData.image || (isBundle ? '/pro1.png' : '/ring.jpg'),
-            title: formData.name,
-            subtitle: '',
-            description: formData.description,
+    const inputMainImage = (formData.image || '').trim();
+
+    // Map and clean all variant/gallery images for all product types
+    let cleanedImages = [];
+    if (Array.isArray(formData.images) && formData.images.length > 0) {
+      cleanedImages = formData.images
+        .filter((im) => {
+          const s = typeof im === 'string' ? im : im?.src;
+          return s && s.trim() !== '';
+        })
+        .map((v, idx) => {
+          const s = typeof v === 'string' ? v : v.src;
+          return {
+            src: s.trim(),
+            title: isThumbnailBundle
+              ? (typeof v === 'object' && v.title ? v.title : (idx === 0 ? formData.name : `Variant ${idx + 1}`))
+              : formData.name,
+            subtitle: typeof v === 'object' && v.subtitle ? v.subtitle : '',
+            description: typeof v === 'object' && v.description ? v.description : formData.description || '',
             price: priceNum,
             originalPrice: origPriceNum,
-          },
-        ];
+          };
+        });
+    }
+
+    // Fallback if no images were entered in the gallery list
+    if (cleanedImages.length === 0) {
+      const fallbackSrc = (isThumbnailBundle ? '' : inputMainImage) || (isBundle ? '/pro1.png' : '/ring.jpg');
+      cleanedImages = [
+        {
+          src: fallbackSrc,
+          title: formData.name || 'Product',
+          subtitle: '',
+          description: formData.description,
+          price: priceNum,
+          originalPrice: origPriceNum,
+        },
+      ];
+    } else if (inputMainImage && cleanedImages[0].src !== inputMainImage && !isThumbnailBundle) {
+      // Ensure the first variant stays matched with the main image input for individual products
+      cleanedImages[0].src = inputMainImage;
+    }
+
+    const primaryVariant = cleanedImages[0] || {};
+    const finalMainImage = (isThumbnailBundle ? primaryVariant.src : inputMainImage) || primaryVariant.src || (isBundle ? '/pro1.png' : '/ring.jpg');
+
+    const bonusCourses = (formData.bonusMasterclasses || DEFAULT_BONUS_MASTERCLASSES).map((c) => ({
+      id: c.id || (c.title ? c.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'masterclass'),
+      title: c.title || 'Masterclass',
+      description: c.description || '',
+      image: c.image || '/video 2.webp',
+      badge: c.badge || '100% Free',
+      originalPrice: Number(c.originalPrice) || 1999,
+      active: c.active !== false,
+    }));
 
     const payload = {
       name: formData.name,
+      subheading: (formData.subheading || '').trim(),
       productType: modalType,
       category: isBundle ? 'Creator bundles' : formData.category,
       isBundle,
       price: priceNum,
       originalPrice: origPriceNum,
       stock: stockNum,
-      image: cleanedImages[0]?.src || formData.image || (isBundle ? '/pro1.png' : '/ring.jpg'),
+      image: finalMainImage,
+      video: (formData.video || '').trim(),
+      videoUrl: (formData.video || '').trim(),
       images: cleanedImages,
       description: formData.description,
       tag: isBundle ? formData.tag : (isThumbnailBundle ? 'Featured Gear' : undefined),
       features: formData.features
-        ? formData.features.split(',').map((f) => f.trim()).filter(Boolean)
+        ? (Array.isArray(formData.features) ? formData.features : formData.features.split(',').map((f) => f.trim()).filter(Boolean))
         : [],
-      items: isBundle && formData.items
-        ? formData.items.split(',').map((f) => f.trim()).filter(Boolean)
+      items: formData.items
+        ? (Array.isArray(formData.items) ? formData.items : formData.items.split(',').map((f) => f.trim()).filter(Boolean))
         : [],
-      includeBonusCourses: formData.includeBonusCourses !== false,
-      bonusMasterclasses: (formData.bonusMasterclasses || DEFAULT_BONUS_MASTERCLASSES).map((c) => ({
-        id: c.id || (c.title ? c.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'masterclass'),
-        title: c.title || 'Masterclass',
-        description: c.description || '',
-        image: c.image || '/banner 5.png',
-        badge: c.badge || '100% Free',
-        originalPrice: Number(c.originalPrice) || 0,
-        active: c.active !== false,
-      })),
+      whatsInTheBox: (formData.items
+        ? (Array.isArray(formData.items) ? formData.items : formData.items.split(',').map((f) => f.trim()).filter(Boolean))
+        : []).map((name) => ({ name })),
+      includeBonusCourses: (isBundle || isThumbnailBundle) ? formData.includeBonusCourses !== false : false,
+      bonusMasterclasses: (isBundle || isThumbnailBundle) ? bonusCourses : [],
     };
 
     try {
@@ -737,14 +641,14 @@ export default function ProductsManager() {
     setDeleteModal({ isOpen: false, product: null, title: '', message: '', isDeleting: false });
 
     try {
-      const res = await fetch(`/api/products/${targetId}`, { method: 'DELETE' });
+      const res = await fetch(`/api/products/${encodeURIComponent(targetId)}`, { method: 'DELETE' });
       if (!res.ok) {
         console.error('Failed to delete on server');
-        fetchProducts();
+        await fetchProducts();
       }
     } catch (err) {
       console.error('Failed to delete product', err);
-      fetchProducts();
+      await fetchProducts();
     }
   };
 
@@ -901,7 +805,7 @@ export default function ProductsManager() {
                   : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200/70'
               }`}
             >
-              <span>📦 Individual Products</span>
+              <span>Individual Products</span>
               <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
                 activeSectionTab === 'individual' ? 'bg-white/20 text-white' : 'bg-neutral-200 text-neutral-700'
               }`}>
@@ -918,7 +822,7 @@ export default function ProductsManager() {
                   : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200/70'
               }`}
             >
-              <span>🎁 Creator Bundles</span>
+              <span>Creator Bundles</span>
               <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
                 activeSectionTab === 'bundles' ? 'bg-white/25 text-white' : 'bg-neutral-200 text-neutral-700'
               }`}>
@@ -935,7 +839,7 @@ export default function ProductsManager() {
                   : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200/70'
               }`}
             >
-              <span>🖼️ Thumbnail Bundles</span>
+              <span>Thumbnail Bundles</span>
               <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
                 activeSectionTab === 'thumbnail-bundles' ? 'bg-white/25 text-white' : 'bg-neutral-200 text-neutral-700'
               }`}>
@@ -1075,7 +979,7 @@ export default function ProductsManager() {
                   <td className="py-4 px-3 align-middle text-neutral-600 text-xs">
                     {prod.productType === 'thumbnail-bundle' ? (
                       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md font-bold text-[11px] bg-purple-50 text-purple-700 border border-purple-200">
-                        <span>🖼️</span> Thumbnail Bundle
+                        Thumbnail Bundle
                       </span>
                     ) : prod.productType === 'bundle' ? (
                       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md font-bold text-[11px] bg-red-50/70 text-[#900606] border border-red-100">
@@ -1297,7 +1201,30 @@ export default function ProductsManager() {
                 />
               </div>
 
-              {/* Dynamic Field: Category for Individual & Thumbnail vs Tag for Creator Bundle */}
+              {/* Product / Bundle Subheading */}
+              <div>
+                <label className="block text-neutral-700 mb-1 flex items-center justify-between">
+                  <span>
+                    {modalType === 'bundle'
+                      ? 'Bundle Subheading / Kit Tagline (Optional)'
+                      : 'Subheading / Tagline (Optional)'}
+                  </span>
+                  <span className="text-[10px] text-neutral-400 font-normal">Displayed above product title</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder={
+                    modalType === 'bundle'
+                      ? 'e.g. ALL-IN-ONE STUDIO KIT or PROFESSIONAL YOUTUBE SETUP'
+                      : 'e.g. Broadcast-Grade Dual Channel Microphone System'
+                  }
+                  value={formData.subheading || ''}
+                  onChange={(e) => setFormData({ ...formData, subheading: e.target.value })}
+                  className="w-full border border-neutral-200 rounded-xl px-3.5 py-2.5 outline-none focus:border-[#900606] text-neutral-800 font-normal"
+                />
+              </div>
+
+              {/* Dynamic Field: Category & Price */}
               <div className="grid grid-cols-2 gap-3">
                 {modalType === 'bundle' ? (
                   <div>
@@ -1342,7 +1269,7 @@ export default function ProductsManager() {
                   <input
                     type="number"
                     required
-                    placeholder="e.g. 9999"
+                    placeholder={modalType === 'thumbnail-bundle' ? 'e.g. 3999' : 'e.g. 9999'}
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     className="w-full border border-neutral-200 rounded-xl px-3.5 py-2.5 outline-none focus:border-[#900606] text-neutral-800 font-normal"
@@ -1356,7 +1283,7 @@ export default function ProductsManager() {
                   <label className="block text-neutral-700 mb-1">Original MRP (₹ - Optional)</label>
                   <input
                     type="number"
-                    placeholder="e.g. 14999"
+                    placeholder={modalType === 'thumbnail-bundle' ? 'e.g. 4995' : 'e.g. 14999'}
                     value={formData.originalPrice}
                     onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value })}
                     className="w-full border border-neutral-200 rounded-xl px-3.5 py-2.5 outline-none focus:border-[#900606] text-neutral-800 font-normal"
@@ -1368,12 +1295,39 @@ export default function ProductsManager() {
                   <input
                     type="number"
                     required
-                    placeholder="e.g. 25"
+                    placeholder="e.g. 10"
                     value={formData.stock}
                     onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                     className="w-full border border-neutral-200 rounded-xl px-3.5 py-2.5 outline-none focus:border-[#900606] text-neutral-800 font-normal"
                   />
                 </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-neutral-700 mb-1 flex items-center justify-between">
+                  <span>
+                    {modalType === 'bundle'
+                      ? 'Bundle Description'
+                      : modalType === 'thumbnail-bundle'
+                      ? 'Suite Description (Optional)'
+                      : 'Product Description (Optional)'}
+                  </span>
+                  <span className="text-[10px] text-neutral-400 font-normal">Detailed overview on storefront</span>
+                </label>
+                <textarea
+                  rows="3"
+                  placeholder={
+                    modalType === 'bundle'
+                      ? 'e.g. The foundational setup every aspiring creator needs. Clean lighting, directional audio, and solid tripod mounting to produce crisp videos right out of the box.'
+                      : modalType === 'thumbnail-bundle'
+                      ? 'Overview of this equipment suite and interactive gallery switcher...'
+                      : 'Detailed product specifications and usage guidance...'
+                  }
+                  value={formData.description || ''}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="w-full border border-neutral-200 rounded-xl px-3.5 py-2.5 outline-none focus:border-[#900606] text-neutral-800 font-normal resize-none"
+                />
               </div>
 
               {/* Standalone Image Input (For Individual Products & Creator Bundles) */}
@@ -1385,7 +1339,7 @@ export default function ProductsManager() {
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-lg bg-neutral-100 border border-neutral-200 overflow-hidden shrink-0 flex items-center justify-center p-0.5 shadow-2xs">
                       <img
-                        src={formData.image || (modalType === 'bundle' ? '/pro1.png' : '/ring.jpg')}
+                        src={getImageUrl(formData.image) || (modalType === 'bundle' ? '/pro1.png' : '/ring.jpg')}
                         alt="Preview"
                         className="w-full h-full object-cover rounded"
                         onError={(e) => {
@@ -1397,15 +1351,19 @@ export default function ProductsManager() {
                     <input
                       type="text"
                       required
-                      placeholder={modalType === 'bundle' ? 'e.g. /pro1.png, /pro2.png' : 'e.g. /ring.jpg, /tripod.jpg, /wireless-mic.jpg'}
+                      placeholder={modalType === 'bundle' ? 'e.g. /pro1.png, /pro2.png' : 'e.g. /wireless-mic.jpg, /ring.jpg, https://...'}
                       value={formData.image}
                       onChange={(e) => {
                         const val = e.target.value;
-                        setFormData((prev) => ({
-                          ...prev,
-                          image: val,
-                          images: prev.images?.length > 0 ? [{ ...prev.images[0], src: val }] : [{ src: val }],
-                        }));
+                        setFormData((prev) => {
+                          const currentImages = Array.isArray(prev.images) && prev.images.length > 0 ? [...prev.images] : [{ src: val }];
+                          currentImages[0] = { ...currentImages[0], src: val };
+                          return {
+                            ...prev,
+                            image: val,
+                            images: currentImages,
+                          };
+                        });
                       }}
                       className="w-full border border-neutral-200 rounded-xl px-3.5 py-2.5 outline-none focus:border-[#900606] text-neutral-800 font-normal"
                     />
@@ -1413,79 +1371,123 @@ export default function ProductsManager() {
                 </div>
               )}
 
-              {/* PRODUCT VARIANTS & THUMBNAIL GALLERY SECTION (Exclusively for Thumbnail Bundles) */}
-              {modalType === 'thumbnail-bundle' && (
-                <div className="pt-3 pb-1 border-t border-purple-100 bg-purple-50/20 -mx-6 px-6 py-4 rounded-xl border">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <label className="text-neutral-900 text-xs font-bold flex items-center gap-1.5">
-                        <span>🖼️</span>
-                        <span>Product Variants & Thumbnail Gallery</span>
-                        <span className="text-[10px] font-bold text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded-full">
-                          {formData.images?.length || 0} {formData.images?.length === 1 ? 'Thumbnail' : 'Thumbnails'}
-                        </span>
-                      </label>
-                      <p className="text-[11px] text-neutral-500 font-normal mt-0.5">
-                        Clicking each thumbnail changes its image, title, subtitle, price, MRP, and description dynamically on the product page.
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleAddVariant}
-                      className="shrink-0 px-3 py-1.5 bg-purple-700 hover:bg-purple-800 text-white rounded-lg text-xs font-bold transition-all shadow-2xs hover:shadow-xs cursor-pointer flex items-center gap-1"
-                    >
-                      <span>+ Add Variant</span>
-                    </button>
+              {/* Product Video URL / Path (Optional) */}
+              <div>
+                <label className="block text-neutral-700 mb-1 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <span>🎬</span>
+                    <span>Product Video URL / Path (Optional)</span>
+                  </span>
+                  <span className="text-[10px] text-neutral-400 font-normal">MP4, WebM, or video link</span>
+                </label>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-lg bg-neutral-100 border border-neutral-200 overflow-hidden shrink-0 flex items-center justify-center p-0.5 shadow-2xs text-lg">
+                    {formData.video ? '🎥' : '▶️'}
                   </div>
+                  <input
+                    type="text"
+                    placeholder="e.g. /product-video.mp4, https://example.com/video.mp4"
+                    value={formData.video || ''}
+                    onChange={(e) => setFormData({ ...formData, video: e.target.value })}
+                    className="w-full border border-neutral-200 rounded-xl px-3.5 py-2.5 outline-none focus:border-[#900606] text-neutral-800 font-normal"
+                  />
+                </div>
+              </div>
 
-                  {/* Quick Image Presets Suggestion Bar */}
-                  <div className="mb-3 p-2 bg-white rounded-lg border border-purple-100 flex items-center gap-1.5 overflow-x-auto text-[10px]">
-                    <span className="text-purple-600 font-bold shrink-0">Quick presets:</span>
-                    {[
-                      { label: 'Ring Light', src: '/ring5.png' },
-                      { label: 'Tripod', src: '/tripod6.png' },
-                      { label: 'Chroma Screen', src: '/chorma2.png' },
-                      { label: 'Wireless Mic', src: '/wireless-mic4.png' },
-                      { label: 'Pro Kit', src: '/pro1.png' },
-                    ].map((preset) => (
-                      <button
-                        key={preset.src}
-                        type="button"
-                        onClick={() => {
-                          setFormData((prev) => {
-                            const updated = [...(prev.images || [])];
-                            if (updated.length > 0) {
-                              updated[updated.length - 1] = {
-                                ...updated[updated.length - 1],
-                                src: preset.src,
-                                title: updated[updated.length - 1].title || preset.label,
-                              };
-                            }
-                            return { ...prev, images: updated, image: updated[0]?.src || preset.src };
-                          });
-                        }}
-                        className="px-2 py-0.5 bg-purple-50 hover:bg-purple-100 border border-purple-200 hover:border-purple-300 text-purple-700 rounded font-medium whitespace-nowrap transition-colors cursor-pointer"
-                      >
-                        + {preset.label}
-                      </button>
-                    ))}
+              {/* PRODUCT VARIANTS & THUMBNAIL GALLERY SECTION (For All Product Types: Individual, Creator Bundle, Thumbnail Bundle) */}
+              <div className={`pt-3 pb-1 border-t -mx-6 px-6 py-4 rounded-xl border ${modalType === 'thumbnail-bundle' ? 'border-purple-100 bg-purple-50/20' : 'border-red-100 bg-red-50/20'}`}>
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <label className="text-neutral-900 text-xs font-bold flex items-center gap-1.5">
+                      <span>🖼️</span>
+                      <span>
+                        {modalType === 'bundle'
+                          ? 'Bundle Gallery Angles & Thumbnails'
+                          : modalType === 'individual'
+                          ? 'Product Gallery Thumbnails'
+                          : 'Product Variants & Thumbnail Gallery'}
+                      </span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${modalType === 'thumbnail-bundle' ? 'text-purple-700 bg-purple-50 border-purple-200' : 'text-[#900606] bg-red-50 border-red-200'}`}>
+                        {formData.images?.length || 0} {formData.images?.length === 1 ? 'Image' : 'Images'}
+                      </span>
+                    </label>
+                    <p className="text-[11px] text-neutral-500 font-normal mt-0.5">
+                      {modalType === 'bundle'
+                        ? 'Add multiple image angles or kit views for this creator bundle to populate the vertical thumbnail gallery on the bundle detail page.'
+                        : modalType === 'individual'
+                        ? 'Add multiple image URLs/paths for the product gallery. Customers can click thumbnails to view each angle or variant.'
+                        : 'Clicking each thumbnail changes its image, title, subtitle, price, MRP, and description dynamically on the product page.'}
+                    </p>
                   </div>
+                  <button
+                    type="button"
+                    onClick={handleAddVariant}
+                    className={`shrink-0 px-3 py-1.5 text-white rounded-lg text-xs font-bold transition-all shadow-2xs hover:shadow-xs cursor-pointer flex items-center gap-1 ${modalType === 'thumbnail-bundle' ? 'bg-purple-700 hover:bg-purple-800' : 'bg-[#900606] hover:bg-[#7a0505]'}`}
+                  >
+                    <span>
+                      {modalType === 'bundle'
+                        ? '+ Add Bundle Angle / Image'
+                        : modalType === 'individual'
+                        ? '+ Add Gallery Image'
+                        : '+ Add Image / Variant'}
+                    </span>
+                  </button>
+                </div>
+
+                  {/* Quick Image Presets Suggestion Bar (Exclusively for Thumbnail Bundles) */}
+                  {modalType === 'thumbnail-bundle' && (
+                    <div className="mb-3 p-2 bg-white rounded-lg border border-purple-100 flex items-center gap-1.5 overflow-x-auto text-[10px]">
+                      <span className="font-bold shrink-0 text-purple-600">Quick presets:</span>
+                      {[
+                        { label: 'Ring Light', src: '/ring5.png' },
+                        { label: 'Tripod', src: '/tripod6.png' },
+                        { label: 'Chroma Screen', src: '/chorma2.png' },
+                        { label: 'Wireless Mic', src: '/wireless-mic4.png' },
+                        { label: 'Pro Kit', src: '/pro1.png' },
+                      ].map((preset) => (
+                        <button
+                          key={preset.src}
+                          type="button"
+                          onClick={() => {
+                            setFormData((prev) => {
+                              const updated = [...(prev.images || [])];
+                              if (updated.length > 0) {
+                                updated[updated.length - 1] = {
+                                  ...updated[updated.length - 1],
+                                  src: preset.src,
+                                  title: updated[updated.length - 1].title || preset.label,
+                                };
+                              }
+                              return { ...prev, images: updated, image: updated[0]?.src || preset.src };
+                            });
+                          }}
+                          className="px-2 py-0.5 border rounded font-medium whitespace-nowrap transition-colors cursor-pointer bg-purple-50 hover:bg-purple-100 border-purple-200 text-purple-700"
+                        >
+                          + {preset.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Variants List */}
                   <div className="space-y-3">
                     {formData.images?.map((variant, idx) => (
                       <div
                         key={idx}
-                        className="p-3.5 bg-white rounded-xl border border-purple-100 space-y-3 transition-all hover:border-purple-300 shadow-2xs"
+                        className={`p-3.5 bg-white rounded-xl border space-y-3 transition-all shadow-2xs ${modalType === 'thumbnail-bundle' ? 'border-purple-100 hover:border-purple-300' : 'border-red-100 hover:border-red-300'}`}
                       >
                         {/* Variant Card Header */}
                         <div className="flex items-center justify-between text-xs font-bold text-neutral-800">
                           <div className="flex items-center gap-2">
-                            <span className="w-5 h-5 rounded-full bg-purple-100 text-purple-700 border border-purple-200 text-[10px] flex items-center justify-center font-bold shadow-2xs">
+                            <span className={`w-5 h-5 rounded-full border text-[10px] flex items-center justify-center font-bold shadow-2xs ${
+                              modalType === 'thumbnail-bundle'
+                                ? 'bg-purple-100 text-purple-700 border-purple-200'
+                                : 'bg-red-100 text-[#900606] border-red-200'
+                            }`}>
                               {idx + 1}
                             </span>
                             <span>
-                              {idx === 0 ? 'Primary Thumbnail (Default View)' : `Thumbnail Variant #${idx + 1}`}
+                              {idx === 0 ? 'Primary / Cover Image' : (modalType === 'bundle' ? `Bundle Angle / View #${idx + 1}` : `Gallery Image #${idx + 1}`)}
                             </span>
                             {idx === 0 && (
                               <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded">
@@ -1499,7 +1501,7 @@ export default function ProductsManager() {
                               type="button"
                               onClick={() => handleRemoveVariant(idx)}
                               className="text-neutral-400 hover:text-red-600 text-[11px] font-semibold flex items-center gap-1 hover:bg-red-50 px-2 py-0.5 rounded cursor-pointer transition-colors"
-                              title="Remove this thumbnail variant"
+                              title="Remove this image"
                             >
                               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -1513,106 +1515,82 @@ export default function ProductsManager() {
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 rounded-lg bg-neutral-100 border border-neutral-200 overflow-hidden shrink-0 flex items-center justify-center p-0.5 shadow-2xs">
                             <img
-                              src={variant.src || '/pro1.png'}
+                              src={getImageUrl(variant.src) || (modalType === 'bundle' ? '/pro1.png' : '/ring.jpg')}
                               alt={`Variant ${idx + 1}`}
                               className="w-full h-full object-cover rounded"
                               onError={(e) => {
                                 e.currentTarget.onerror = null;
-                                e.currentTarget.src = '/pro1.png';
+                                e.currentTarget.src = modalType === 'bundle' ? '/pro1.png' : '/ring.jpg';
                               }}
                             />
                           </div>
                           <div className="flex-1">
                             <label className="block text-[10px] text-neutral-500 font-semibold mb-0.5">
-                              Thumbnail Image Path or URL
+                              Image Path or URL
                             </label>
                             <input
                               type="text"
                               required
-                              placeholder="e.g. /ring5.png, /tripod6.png, /chorma2.png, /wireless-mic4.png"
+                              placeholder={modalType === 'bundle' ? 'e.g. /pro1.png, /pro2.png, /pro.png, https://...' : 'e.g. /wireless-mic1.png, /tripod.jpg, https://...'}
                               value={variant.src}
                               onChange={(e) => handleVariantChange(idx, 'src', e.target.value)}
-                              className="w-full border border-neutral-200 bg-white rounded-lg px-3 py-1.5 outline-none focus:border-purple-600 text-neutral-800 font-normal text-xs"
+                              className="w-full border border-neutral-200 bg-white rounded-lg px-3 py-1.5 outline-none focus:border-[#900606] text-neutral-800 font-normal text-xs"
                             />
                           </div>
                         </div>
 
-                        {/* Variant Title & Subtitle */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                          <div>
-                            <label className="block text-[10px] text-neutral-500 font-semibold mb-0.5">
-                              Variant Title
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="e.g. Ring Light, Tripod, Chroma Green"
-                              value={variant.title}
-                              onChange={(e) => handleVariantChange(idx, 'title', e.target.value)}
-                              className="w-full border border-neutral-200 bg-white rounded-lg px-3 py-1.5 outline-none focus:border-purple-600 text-neutral-800 font-normal text-xs"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[10px] text-neutral-500 font-semibold mb-0.5">
-                              Variant Subtitle
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="e.g. Professional 18 inch Ring Light with Desk Mount & Stand"
-                              value={variant.subtitle}
-                              onChange={(e) => handleVariantChange(idx, 'subtitle', e.target.value)}
-                              className="w-full border border-neutral-200 bg-white rounded-lg px-3 py-1.5 outline-none focus:border-purple-600 text-neutral-800 font-normal text-xs"
-                            />
-                          </div>
-                        </div>
+                        {/* Extra variant fields exclusively for Thumbnail Bundles */}
+                        {modalType === 'thumbnail-bundle' && (
+                          <>
+                            {/* Variant Title & Subtitle */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                              <div>
+                                <label className="block text-[10px] text-neutral-500 font-semibold mb-0.5">
+                                  Variant Title
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="e.g. Ring Light, Tripod, Chroma Green"
+                                  value={variant.title}
+                                  onChange={(e) => handleVariantChange(idx, 'title', e.target.value)}
+                                  className="w-full border border-neutral-200 bg-white rounded-lg px-3 py-1.5 outline-none focus:border-purple-600 text-neutral-800 font-normal text-xs"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[10px] text-neutral-500 font-semibold mb-0.5">
+                                  Variant Subtitle
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="e.g. Professional 18 inch Ring Light with Desk Mount & Stand"
+                                  value={variant.subtitle}
+                                  onChange={(e) => handleVariantChange(idx, 'subtitle', e.target.value)}
+                                  className="w-full border border-neutral-200 bg-white rounded-lg px-3 py-1.5 outline-none focus:border-purple-600 text-neutral-800 font-normal text-xs"
+                                />
+                              </div>
+                            </div>
 
-                        {/* Variant Price & MRP Overrides */}
-                        <div className="grid grid-cols-2 gap-2.5">
-                          <div>
-                            <label className="block text-[10px] text-neutral-500 font-semibold mb-0.5">
-                              Variant Price (₹ - Dynamic on Click)
-                            </label>
-                            <input
-                              type="number"
-                              placeholder={formData.price ? `Default (₹${formData.price})` : 'e.g. 2499'}
-                              value={variant.price}
-                              onChange={(e) => handleVariantChange(idx, 'price', e.target.value)}
-                              className="w-full border border-neutral-200 bg-white rounded-lg px-3 py-1.5 outline-none focus:border-purple-600 text-neutral-800 font-normal text-xs"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[10px] text-neutral-500 font-semibold mb-0.5">
-                              Variant MRP (₹ - Optional)
-                            </label>
-                            <input
-                              type="number"
-                              placeholder={formData.originalPrice ? `Default (₹${formData.originalPrice})` : 'e.g. 3499'}
-                              value={variant.originalPrice}
-                              onChange={(e) => handleVariantChange(idx, 'originalPrice', e.target.value)}
-                              className="w-full border border-neutral-200 bg-white rounded-lg px-3 py-1.5 outline-none focus:border-purple-600 text-neutral-800 font-normal text-xs"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Variant Description */}
-                        <div>
-                          <label className="block text-[10px] text-neutral-500 font-semibold mb-0.5">
-                            Variant Description (Dynamic on Click)
-                          </label>
-                          <textarea
-                            rows="2"
-                            placeholder="Description displayed on the product detail page when this thumbnail is selected..."
-                            value={variant.description}
-                            onChange={(e) => handleVariantChange(idx, 'description', e.target.value)}
-                            className="w-full border border-neutral-200 bg-white rounded-lg px-3 py-1.5 outline-none focus:border-purple-600 text-neutral-800 font-normal text-xs resize-none"
-                          />
-                        </div>
+                            {/* Variant Description */}
+                            <div>
+                              <label className="block text-[10px] text-neutral-500 font-semibold mb-0.5">
+                                Variant Description (Dynamic on Click)
+                              </label>
+                              <textarea
+                                rows="2"
+                                placeholder="Description displayed on the product detail page when this thumbnail is selected..."
+                                value={variant.description}
+                                onChange={(e) => handleVariantChange(idx, 'description', e.target.value)}
+                                className="w-full border border-neutral-200 bg-white rounded-lg px-3 py-1.5 outline-none focus:border-purple-600 text-neutral-800 font-normal text-xs resize-none"
+                              />
+                            </div>
+                          </>
+                        )}
                       </div>
                     ))}
                   </div>
                 </div>
-              )}
 
-              {/* BUNDLE-SPECIFIC FIELD: Included Kit Items */}
+                {/* BUNDLE-SPECIFIC FIELD: Included Kit Items */}
               {modalType === 'bundle' && (
                 <div>
                   <label className="block text-neutral-700 mb-1 flex items-center justify-between">
@@ -1656,8 +1634,9 @@ export default function ProductsManager() {
                 />
               </div>
 
-              {/* FREE MASTERCLASSES BUNDLE OFFER (DYNAMICALLY LINKED TO STOREFRONT) */}
-              <div className="p-4 sm:p-5 rounded-2xl border-2 border-dashed border-red-200 bg-red-50/40">
+              {/* FREE MASTERCLASSES BUNDLE OFFER (For Creator Bundles & Thumbnail Bundles) */}
+              {(modalType === 'bundle' || modalType === 'thumbnail-bundle') && (
+                <div className="p-4 sm:p-5 rounded-2xl border-2 border-dashed border-red-200 bg-red-50/40">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-start gap-2.5">
                     <span className="text-xl">🎁</span>
@@ -1896,24 +1875,7 @@ export default function ProductsManager() {
                   </div>
                 )}
               </div>
-
-              {/* Description */}
-              <div>
-                <label className="block text-neutral-700 mb-1">Description (Optional)</label>
-                <textarea
-                  rows="3"
-                  placeholder={
-                    modalType === 'bundle'
-                      ? 'Full description of the creator studio bundle and who it is built for...'
-                      : modalType === 'thumbnail-bundle'
-                      ? 'Overview of this equipment suite and interactive gallery switcher...'
-                      : 'Detailed product specifications and usage guidance...'
-                  }
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full border border-neutral-200 rounded-xl px-3.5 py-2 outline-none focus:border-[#900606] text-neutral-800 font-normal resize-none"
-                />
-              </div>
+              )}
 
               {/* Action Buttons */}
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-neutral-100">

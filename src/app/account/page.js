@@ -33,6 +33,7 @@ import {
   Volume2, 
   Maximize
 } from 'lucide-react';
+import CustomVideoPlayer from '@/components/CustomVideoPlayer';
 
 /* =========================================================================
    1. MASTERCLASS / LEARNING PORTAL TAB COMPONENT
@@ -199,10 +200,6 @@ function LockedCoursesView() {
 }
 
 function AccountMasterclassTab({ hasAccess = true }) {
-  if (hasAccess === false) {
-    return <LockedCoursesView />;
-  }
-
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -451,6 +448,10 @@ function AccountMasterclassTab({ hasAccess = true }) {
     }
   };
 
+  if (hasAccess === false) {
+    return <LockedCoursesView />;
+  }
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full overflow-hidden">
       
@@ -555,119 +556,56 @@ function AccountMasterclassTab({ hasAccess = true }) {
         <div className="w-full space-y-6">
           <div className="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 md:p-8 border border-neutral-200 dark:border-neutral-800 shadow-sm">
             
-            {/* Player Container Wrapper with Context Menu & Selection Disabled */}
-            <div
-              onContextMenu={(e) => e.preventDefault()}
-              style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
-              className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black shadow-2xl border border-neutral-800 flex items-center justify-center group select-none"
-            >
-              {isPlaying ? (
-                (() => {
-                  const playableVideoUrl =
-                    activeLesson?.videoLink ||
-                    activeLesson?.videoUrl ||
-                    activeCourse?.videoLink ||
-                    activeCourse?.videoUrl ||
-                    'https://www.w3schools.com/html/mov_bbb.mp4';
-                  const embedUrl = getEmbedUrl(playableVideoUrl);
+            {/* Custom Video Player Workspace */}
+            {isPlaying ? (
+              (() => {
+                const playableVideoUrl =
+                  activeLesson?.videoLink ||
+                  activeLesson?.videoUrl ||
+                  activeCourse?.videoLink ||
+                  activeCourse?.videoUrl ||
+                  'https://www.w3schools.com/html/mov_bbb.mp4';
 
-                  return embedUrl ? (
-                    <div
-                      className="relative w-full h-full overflow-hidden select-none"
-                      onContextMenu={(e) => e.preventDefault()}
-                      style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
-                    >
-                      {/* Responsive 16:9 Video Player (Zero Letterboxing/Pillarboxing) */}
-                      <iframe
-                        key={`${activeCourseId}-${activeLesson?.id}`}
-                        src={embedUrl}
-                        title={activeLesson?.title || 'Lesson Video'}
-                        className="absolute inset-0 w-full h-full z-10 border-0 pointer-events-auto"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      />
+                return (
+                  <CustomVideoPlayer
+                    key={`${activeCourseId}-${activeLesson?.id}`}
+                    videoUrl={playableVideoUrl}
+                    title={activeLesson?.title || activeCourse?.title || 'Lesson Video'}
+                    courseBadge={activeCourse?.badge || '100% Free Included'}
+                    onEnded={handleNextLesson}
+                    autoPlay={true}
+                  />
+                );
+              })()
+            ) : (
+              <div
+                onContextMenu={(e) => e.preventDefault()}
+                style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+                className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black shadow-2xl border border-neutral-800 flex items-center justify-center group select-none"
+              >
+                {/* Video Backdrop Mockup */}
+                <div className="absolute inset-0 z-0 select-none" onContextMenu={(e) => e.preventDefault()}>
+                  <Image
+                    src={getImageUrl(activeCourse.image || '/video 2.webp')}
+                    alt={activeLesson?.title || 'Lesson Video'}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 75vw, 1200px"
+                    className="object-cover opacity-60 pointer-events-none"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/75"></div>
+                </div>
 
-                      {/* Transparent Top-Header Security Shield */}
-                      <div
-                        className="absolute top-0 left-0 right-0 h-16 z-20 select-none bg-transparent pointer-events-auto"
-                        onContextMenu={(e) => e.preventDefault()}
-                        onClick={(e) => e.stopPropagation()}
-                        aria-hidden="true"
-                      />
-
-                      {/* Transparent Bottom Corner Click Shields (No Black Boxes) */}
-                      <div className="absolute bottom-0 left-0 right-0 h-12 z-20 pointer-events-none flex items-end justify-between select-none">
-                        <div
-                          className="w-16 h-12 bg-transparent pointer-events-auto cursor-default"
-                          onContextMenu={(e) => e.preventDefault()}
-                          onClick={(e) => e.stopPropagation()}
-                          aria-hidden="true"
-                        />
-                        <div className="flex-1 h-full pointer-events-none" />
-                        <div
-                          className="w-56 h-12 bg-transparent pointer-events-auto cursor-default"
-                          onContextMenu={(e) => e.preventDefault()}
-                          onClick={(e) => e.stopPropagation()}
-                          aria-hidden="true"
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <div
-                      className="relative w-full h-full overflow-hidden select-none"
-                      onContextMenu={(e) => e.preventDefault()}
-                      style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
-                    >
-                      {/* Native HTML5 Video Player with Anti-Copy & Anti-Download */}
-                      <video
-                        key={`${activeCourseId}-${activeLesson?.id}`}
-                        src={playableVideoUrl}
-                        controls
-                        controlsList="nodownload nofullscreen noremoteplayback"
-                        disablePictureInPicture
-                        autoPlay
-                        playsInline
-                        onContextMenu={(e) => e.preventDefault()}
-                        onEnded={handleNextLesson}
-                        className="absolute inset-0 w-full h-full object-contain z-10 bg-black select-none pointer-events-auto"
-                        style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
-                      />
-
-                      {/* Targeted Top-Header Security Shield */}
-                      <div
-                        className="absolute top-0 left-0 right-0 h-16 z-20 select-none bg-transparent pointer-events-auto"
-                        onContextMenu={(e) => e.preventDefault()}
-                        onClick={(e) => e.stopPropagation()}
-                        aria-hidden="true"
-                      />
-                    </div>
-                  );
-                })()
-              ) : (
-                <>
-                  {/* Video Backdrop Mockup */}
-                  <div className="absolute inset-0 z-0 select-none" onContextMenu={(e) => e.preventDefault()}>
-                    <Image
-                      src={getImageUrl(activeCourse.image || '/video 2.webp')}
-                      alt={activeLesson?.title || 'Lesson Video'}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 75vw, 1200px"
-                      className="object-cover opacity-60 pointer-events-none"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/75"></div>
-                  </div>
-
-                  {/* Center Play Overlay */}
-                  <div className="relative z-10 text-center px-4 select-none">
-                    <button
-                      onClick={() => setIsPlaying(true)}
-                      className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-[#900606] hover:bg-[#a60808] text-white flex items-center justify-center shadow-[0_0_35px_rgba(144,6,6,0.7)] hover:scale-110 active:scale-95 transition-all duration-300 group-hover:shadow-[0_0_45px_rgba(144,6,6,0.9)] cursor-pointer mx-auto"
-                    >
-                      <Play className="w-8 h-8 fill-white ml-1" />
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
+                {/* Center Play Overlay */}
+                <div className="relative z-10 text-center px-4 select-none">
+                  <button
+                    onClick={() => setIsPlaying(true)}
+                    className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-[#900606] hover:bg-[#a60808] text-white flex items-center justify-center shadow-[0_0_35px_rgba(144,6,6,0.7)] hover:scale-110 active:scale-95 transition-all duration-300 group-hover:shadow-[0_0_45px_rgba(144,6,6,0.9)] cursor-pointer mx-auto"
+                  >
+                    <Play className="w-8 h-8 fill-white ml-1" />
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Lesson Title & Action Navigation Controls */}
             <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
