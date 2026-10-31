@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { getImageUrl } from '@/lib/imagekit';
 import Link from 'next/link';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ArrowLeft, ArrowRight, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 
 const fallbackBundles = [
   {
@@ -120,17 +120,43 @@ export default function PopularBundlesSection() {
     slidesToScroll: 1,
   });
 
-  const scrollBundleNext = useCallback(() => {
-    if (mobileBundleEmbla) mobileBundleEmbla.scrollNext();
+  const [bundleSelectedIndex, setBundleSelectedIndex] = useState(0);
+
+  const onSelectBundle = useCallback(() => {
+    if (!mobileBundleEmbla) return;
+    setBundleSelectedIndex(mobileBundleEmbla.selectedScrollSnap());
   }, [mobileBundleEmbla]);
 
-  const scrollBundlePrev = useCallback(() => {
-    if (mobileBundleEmbla) mobileBundleEmbla.scrollPrev();
-  }, [mobileBundleEmbla]);
+  useEffect(() => {
+    if (!mobileBundleEmbla) return;
+    onSelectBundle();
+    mobileBundleEmbla.on('select', onSelectBundle);
+    mobileBundleEmbla.on('reInit', onSelectBundle);
+    return () => {
+      mobileBundleEmbla.off('select', onSelectBundle);
+      mobileBundleEmbla.off('reInit', onSelectBundle);
+    };
+  }, [mobileBundleEmbla, onSelectBundle]);
 
   const mobileBundles = bundles && bundles.length > 0
     ? (bundles.length <= 4 ? [...bundles, ...bundles, ...bundles] : bundles)
     : [];
+
+  const scrollToBundle = useCallback(
+    (index) => {
+      if (!mobileBundleEmbla) return;
+      if (!bundles || bundles.length === 0) return;
+      const currentSnap = mobileBundleEmbla.selectedScrollSnap();
+      const cycle = Math.floor(currentSnap / bundles.length);
+      const targetSnap = cycle * bundles.length + index;
+      if (targetSnap >= 0 && targetSnap < mobileBundles.length) {
+        mobileBundleEmbla.scrollTo(targetSnap);
+      } else {
+        mobileBundleEmbla.scrollTo(index);
+      }
+    },
+    [mobileBundleEmbla, bundles, mobileBundles.length]
+  );
 
   return (
     <section className="w-full pt-3 pb-1 sm:pt-5 sm:pb-2 bg-[#FBFBF7] overflow-hidden">
@@ -146,28 +172,8 @@ export default function PopularBundlesSection() {
           </p>
         </div>
 
-        {/* MOBILE VIEW (block md:hidden) - EXACTLY 1 CARD PER SCREEN WITH BOTH ARROWS */}
+        {/* MOBILE VIEW (block md:hidden) - EXACTLY 1 CARD PER SCREEN WITH BOTTOM PAGINATION DOTS */}
         <div className="block md:hidden relative w-full px-2">
-          {/* Left Arrow Button */}
-          <button
-            type="button"
-            onClick={scrollBundlePrev}
-            aria-label="Previous bundle"
-            className="absolute left-0 top-[40%] -translate-y-1/2 z-20 w-8 h-8 bg-black text-white rounded-full flex items-center justify-center shadow-xl active:scale-90 transition-all cursor-pointer"
-          >
-            <ArrowLeft className="w-4 h-4 text-white stroke-[2.5]" />
-          </button>
-
-          {/* Right Arrow Button */}
-          <button
-            type="button"
-            onClick={scrollBundleNext}
-            aria-label="Next bundle"
-            className="absolute right-0 top-[40%] -translate-y-1/2 z-20 w-8 h-8 bg-black text-white rounded-full flex items-center justify-center shadow-xl active:scale-90 transition-all cursor-pointer"
-          >
-            <ArrowRight className="w-4 h-4 text-white stroke-[2.5]" />
-          </button>
-
           {/* Embla Viewport - 1 Card at a Time */}
           <div className="overflow-hidden w-full px-1" ref={mobileBundleRef}>
             <div className="flex">
@@ -259,6 +265,26 @@ export default function PopularBundlesSection() {
                 );
               })}
             </div>
+          </div>
+
+          {/* Pagination Dots Indicator */}
+          <div className="flex items-center justify-center gap-2 mt-4 pt-1">
+            {bundles.map((_, idx) => {
+              const isActive = (bundleSelectedIndex % bundles.length) === idx;
+              return (
+                <button
+                  key={`bundle-dot-${idx}`}
+                  type="button"
+                  onClick={() => scrollToBundle(idx)}
+                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                    isActive
+                      ? 'w-6 bg-[#900606]'
+                      : 'w-2 bg-neutral-300 dark:bg-neutral-700 hover:bg-neutral-400'
+                  }`}
+                  aria-label={`Go to bundle ${idx + 1}`}
+                />
+              );
+            })}
           </div>
         </div>
 

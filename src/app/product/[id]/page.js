@@ -234,16 +234,24 @@ export default function ProductDetailPage() {
     setIsDarkMode(savedTheme === 'dark');
   }, []);
 
+  const handleBack = () => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push('/product');
+    }
+  };
+
   if (loading) {
     return (
       <div className={`flex flex-col min-h-[85vh] ${isDarkMode ? 'bg-[#0B0F19] text-neutral-100' : 'bg-[#FBFBF7] text-neutral-900'} font-sans w-full pt-20 sm:pt-28 pb-16`}>
         <div className="w-full max-w-[150rem] mx-auto px-6 sm:px-8 lg:px-10">
           <div className="mb-6">
             <button
-              onClick={() => router.back()}
+              onClick={handleBack}
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 border ${isDarkMode ? 'bg-[#131C2E] border-neutral-700 text-neutral-200' : 'bg-white border-neutral-200 text-neutral-800'} shadow-sm cursor-pointer`}
             >
-              <span>←</span> Back to Store
+              <span>←</span> Back
             </button>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start w-full animate-pulse">
@@ -384,10 +392,10 @@ export default function ProductDetailPage() {
         {/* Back Button */}
         <div className="mb-6">
           <button
-            onClick={() => router.back()}
+            onClick={handleBack}
             className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 border ${isDarkMode ? 'bg-[#131C2E] border-neutral-700 text-neutral-200 hover:bg-neutral-800' : 'bg-white border-neutral-200 text-neutral-800 hover:bg-neutral-100'} shadow-sm cursor-pointer`}
           >
-            <span>←</span> Back to Store
+            <span>←</span> Back
           </button>
         </div>
 
@@ -590,26 +598,6 @@ export default function ProductDetailPage() {
               </div>
             )}
 
-            {/* Desktop Action Buttons */}
-            <div className="hidden md:block font-sans mb-6 sm:mb-8 mt-5">
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={handleAddToCart}
-                  type="button"
-                  className="py-3 px-4 bg-white dark:bg-[#131C2E] text-gray-900 dark:text-neutral-100 border border-gray-300 dark:border-neutral-700 font-medium text-xs sm:text-sm rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
-                >
-                  Add to Cart
-                </button>
-                <button
-                  onClick={handleBuyNow}
-                  type="button"
-                  className="py-3 px-4 bg-[#900606] hover:bg-[#7a0505] text-white font-semibold text-xs sm:text-sm rounded-lg active:scale-[0.98] transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  Buy Now
-                </button>
-              </div>
-            </div>
-
             {/* Trust Badges */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-5 border-t border-neutral-200 dark:border-neutral-800 text-left sm:text-center">
               {[
@@ -628,6 +616,26 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Action Buttons (Add to Cart & Buy Now) */}
+            <div className="font-sans mt-5 sm:mt-6 w-full">
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={handleAddToCart}
+                  type="button"
+                  className="py-3 px-4 bg-white dark:bg-[#131C2E] text-gray-900 dark:text-neutral-100 border border-gray-300 dark:border-neutral-700 font-semibold text-xs sm:text-sm rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                >
+                  Add to Cart
+                </button>
+                <button
+                  onClick={handleBuyNow}
+                  type="button"
+                  className="py-3 px-4 bg-[#900606] hover:bg-[#7a0505] text-white font-semibold text-xs sm:text-sm rounded-xl active:scale-[0.98] transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  Buy Now
+                </button>
+              </div>
             </div>
 
           </div>
@@ -673,25 +681,6 @@ export default function ProductDetailPage() {
         </section>
       )}
 
-      {/* MOBILE FIXED STICKY BOTTOM BAR */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-[#0B0F19] shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] p-3 border-t border-gray-200 dark:border-neutral-800">
-        <div className="flex items-center gap-3 w-full max-w-md mx-auto">
-          <button
-            onClick={handleAddToCart}
-            type="button"
-            className="flex-1 py-3 px-4 bg-white dark:bg-[#131C2E] text-gray-900 dark:text-neutral-100 border border-gray-300 dark:border-neutral-700 font-medium text-sm rounded-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
-          >
-            Add to Cart
-          </button>
-          <button
-            onClick={handleBuyNow}
-            type="button"
-            className="flex-1 py-3 px-4 bg-[#900606] hover:bg-[#7a0505] text-white font-semibold text-sm rounded-lg active:scale-[0.98] transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
-          >
-            Buy Now
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

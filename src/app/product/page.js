@@ -271,14 +271,6 @@ export default function ProductPage() {
               {/* FREE MASTERCLASSES BUNDLE OFFER (MATCHING REFERENCE SCREENSHOT) */}
               {shouldShowBonus && (
                 <div className="mt-4 rounded-2xl border-2 border-red-200/90 bg-gradient-to-br from-red-50/70 via-white to-amber-50/30 p-4 sm:p-5 shadow-sm relative overflow-hidden">
-                  <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
-                    <span className="inline-flex items-center gap-1.5 bg-[#900606] text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded tracking-wide">
-                      <span>🎁</span> FREE BUNDLE OFFER
-                    </span>
-                    <span className="inline-flex items-center text-[10px] font-bold text-[#900606] bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">
-                      Worth ₹{totalBonusValue.toLocaleString('en-IN')} • 100% Free
-                    </span>
-                  </div>
 
                   <h3 className="text-sm sm:text-base font-extrabold text-[#111827] tracking-tight">
                     Free Masterclasses Bundle
@@ -312,16 +304,6 @@ export default function ProductPage() {
                 </div>
               )}
 
-              {/* ACTION BUTTONS */}
-              <div className="flex gap-3 mt-4 mb-1 w-full">
-                <button onClick={handleAddToCart} type="button" className="flex-1 py-3 px-4 bg-white text-gray-800 border border-gray-300 font-medium text-xs sm:text-sm rounded-lg hover:bg-neutral-50 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs">
-                  Add to Cart
-                </button>
-                <button onClick={handleBuyNow} type="button" className="flex-1 py-3 px-4 bg-[#8B0000] hover:bg-[#720000] text-white font-semibold text-xs sm:text-sm rounded-lg transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
-                  Buy Now
-                </button>
-              </div>
-
               {/* Trust Badges */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-5 border-t border-neutral-200 text-center mt-5">
                 {[
@@ -335,6 +317,16 @@ export default function ProductPage() {
                     <span className="text-[10px] text-neutral-400 font-medium">{badge.sub}</span>
                   </div>
                 ))}
+              </div>
+
+              {/* ACTION BUTTONS */}
+              <div className="flex gap-3 mt-5 mb-1 w-full">
+                <button onClick={handleAddToCart} type="button" className="flex-1 py-3 px-4 bg-white text-gray-800 border border-gray-300 font-semibold text-xs sm:text-sm rounded-xl hover:bg-neutral-50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs">
+                  Add to Cart
+                </button>
+                <button onClick={handleBuyNow} type="button" className="flex-1 py-3 px-4 bg-[#900606] hover:bg-[#7a0505] text-white font-semibold text-xs sm:text-sm rounded-xl active:scale-[0.98] transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                  Buy Now
+                </button>
               </div>
             </div>
 
@@ -398,13 +390,6 @@ export default function ProductPage() {
                               <span className="text-emerald-600 text-[9px]">★</span>
                               <span className="text-neutral-300 text-[9px]">|</span>
                               <span className="text-neutral-500 text-[9px] font-medium">{reviews}</span>
-                            </div>
-
-                            {/* Wishlist Heart Icon (Top Right) */}
-                            <div className="absolute top-1.5 right-1.5 z-10 w-6 h-6 rounded-full bg-white/80 backdrop-blur-xs flex items-center justify-center text-neutral-400 shadow-2xs">
-                              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                              </svg>
                             </div>
 
                             <Image
@@ -583,26 +568,6 @@ export default function ProductPage() {
         )}
 
       </main>
-
-      {/* MOBILE FIXED STICKY BOTTOM BAR */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] p-3 border-t border-gray-200">
-        <div className="flex items-center gap-3 w-full max-w-md mx-auto">
-          <button
-            onClick={handleAddToCart}
-            type="button"
-            className="flex-1 py-3 px-4 bg-white text-gray-900 border border-gray-300 font-medium text-sm rounded-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
-          >
-            Add to Cart
-          </button>
-          <button
-            onClick={handleBuyNow}
-            type="button"
-            className="flex-1 py-3 px-4 bg-[#900606] hover:bg-[#7a0505] text-white font-semibold text-sm rounded-lg active:scale-[0.98] transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
-          >
-            Buy Now
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

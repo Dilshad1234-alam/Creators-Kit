@@ -299,12 +299,19 @@ export default function BundleDetailPage() {
         
         {/* Navigation Breadcrumb & Back */}
         <div className="flex items-center justify-between mb-8">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white border border-neutral-200 text-neutral-800 hover:bg-neutral-100 shadow-2xs transition-colors"
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined' && window.history.length > 1) {
+                router.back();
+              } else {
+                router.push('/');
+              }
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white border border-neutral-200 text-neutral-800 hover:bg-neutral-100 shadow-2xs transition-colors cursor-pointer"
           >
-            <span>←</span> Back to Store
-          </Link>
+            <span>←</span> Back
+          </button>
           <div className="text-xs text-neutral-400 font-medium hidden sm:block">
             Home / Creator Bundles / <span className="text-neutral-700 font-bold">{bundle.name}</span>
           </div>

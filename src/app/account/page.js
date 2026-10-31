@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, Suspense, useMemo, useCallback } from 'react';
+import { useState, useEffect, Suspense, useMemo, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useTheme } from '@/components/ThemeProvider';
 import { getImageUrl } from '@/lib/imagekit';
+import useEmblaCarousel from 'embla-carousel-react';
 import { 
   User, 
   ShoppingBag, 
@@ -28,6 +29,7 @@ import {
   Camera, 
   Check, 
   ChevronRight, 
+  ChevronLeft,
   ChevronDown,
   ChevronUp,
   Volume2, 
@@ -38,6 +40,20 @@ import CustomVideoPlayer from '@/components/CustomVideoPlayer';
 /* =========================================================================
    1. MASTERCLASS / LEARNING PORTAL TAB COMPONENT
    ========================================================================= */
+function isImageUrl(url) {
+  if (!url || typeof url !== 'string') return false;
+  const clean = url.trim().toLowerCase().split('?')[0];
+  return (
+    clean.endsWith('.webp') ||
+    clean.endsWith('.jpg') ||
+    clean.endsWith('.jpeg') ||
+    clean.endsWith('.png') ||
+    clean.endsWith('.gif') ||
+    clean.endsWith('.svg') ||
+    clean.endsWith('.avif')
+  );
+}
+
 function getEmbedUrl(rawUrl) {
   if (!rawUrl) return '';
   const url = rawUrl.trim();
@@ -78,16 +94,17 @@ const DEFAULT_BUNDLE_MASTERCLASSES = [
     image: '/video 2.webp',
     duration: '2h 15m',
     progress: 0,
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+    videoUrl: '/videos/instagram-masterclass.mp4',
+    videoLink: '/videos/instagram-masterclass.mp4',
     totalLessons: 4,
     modules: [
       {
         moduleTitle: 'Module 1: High-Growth Foundations & Reels Secrets',
         lessons: [
-          { id: 'ig-1', title: 'Profile Architecture & High-Converting Bio', duration: '08:24', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', locked: false, completed: false, overview: 'Learn to craft an irresistible bio and visual profile architecture that converts visitors into followers.' },
-          { id: 'ig-2', title: 'Defining Your Creator Niche & Target Audience', duration: '11:05', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', locked: false, completed: false, overview: 'Find your content moat and zero in on high-engagement demographics.' },
-          { id: 'ig-3', title: '2026 Instagram Algorithm & Reach Multipliers', duration: '14:32', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', locked: false, completed: false, overview: 'Deep dive into save/share ratios and algorithmic ranking triggers.' },
-          { id: 'ig-4', title: 'The 3-Second Visual Hook Formula for Viral Reels', duration: '12:40', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', locked: false, completed: false, overview: 'Hook viewers in under 3 seconds using audio and motion contrast.' }
+          { id: 'ig-1', title: 'Profile Architecture & High-Converting Bio', duration: '08:24', videoUrl: '/videos/instagram-masterclass.mp4', videoLink: '/videos/instagram-masterclass.mp4', locked: false, completed: false, overview: 'Learn to craft an irresistible bio and visual profile architecture that converts visitors into followers.' },
+          { id: 'ig-2', title: 'Defining Your Creator Niche & Target Audience', duration: '11:05', videoUrl: '/videos/instagram-masterclass.mp4', videoLink: '/videos/instagram-masterclass.mp4', locked: false, completed: false, overview: 'Find your content moat and zero in on high-engagement demographics.' },
+          { id: 'ig-3', title: '2026 Instagram Algorithm & Reach Multipliers', duration: '14:32', videoUrl: '/videos/instagram-masterclass.mp4', videoLink: '/videos/instagram-masterclass.mp4', locked: false, completed: false, overview: 'Deep dive into save/share ratios and algorithmic ranking triggers.' },
+          { id: 'ig-4', title: 'The 3-Second Visual Hook Formula for Viral Reels', duration: '12:40', videoUrl: '/videos/instagram-masterclass.mp4', videoLink: '/videos/instagram-masterclass.mp4', locked: false, completed: false, overview: 'Hook viewers in under 3 seconds using audio and motion contrast.' }
         ]
       }
     ]
@@ -100,15 +117,16 @@ const DEFAULT_BUNDLE_MASTERCLASSES = [
     image: '/video 1.webp',
     duration: '3h 10m',
     progress: 0,
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+    videoUrl: '/videos/youtube-masterclass.mp4',
+    videoLink: '/videos/youtube-masterclass.mp4',
     totalLessons: 3,
     modules: [
       {
         moduleTitle: 'Module 1: Channel Architecture & Monetization',
         lessons: [
-          { id: 'yt-1', title: 'Channel Branding, High-CTR Thumbnail Design & SEO', duration: '12:20', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', locked: false, completed: false, overview: 'Setting up your YouTube channel with proper metadata, tags, and click-worthy thumbnails.' },
-          { id: 'yt-2', title: 'Scripting for Maximum Watch Time & Retention', duration: '16:30', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', locked: false, completed: false, overview: 'Storyboarding and pacing secrets that keep audiences glued to the end.' },
-          { id: 'yt-3', title: 'Lighting & Studio Mic Setup for Crisp Audio/Video', duration: '14:15', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', locked: false, completed: false, overview: 'How to use your Creators Kit ring light and microphone for studio-grade production.' }
+          { id: 'yt-1', title: 'Channel Branding, High-CTR Thumbnail Design & SEO', duration: '12:20', videoUrl: '/videos/youtube-masterclass.mp4', videoLink: '/videos/youtube-masterclass.mp4', locked: false, completed: false, overview: 'Setting up your YouTube channel with proper metadata, tags, and click-worthy thumbnails.' },
+          { id: 'yt-2', title: 'Scripting for Maximum Watch Time & Retention', duration: '16:30', videoUrl: '/videos/youtube-masterclass.mp4', videoLink: '/videos/youtube-masterclass.mp4', locked: false, completed: false, overview: 'Storyboarding and pacing secrets that keep audiences glued to the end.' },
+          { id: 'yt-3', title: 'Lighting & Studio Mic Setup for Crisp Audio/Video', duration: '14:15', videoUrl: '/videos/youtube-masterclass.mp4', videoLink: '/videos/youtube-masterclass.mp4', locked: false, completed: false, overview: 'How to use your Creators Kit ring light and microphone for studio-grade production.' }
         ]
       }
     ]
@@ -121,15 +139,16 @@ const DEFAULT_BUNDLE_MASTERCLASSES = [
     image: '/video.webp',
     duration: '2h 45m',
     progress: 0,
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+    videoUrl: '/videos/filmora-masterclass.mp4',
+    videoLink: '/videos/filmora-masterclass.mp4',
     totalLessons: 3,
     modules: [
       {
         moduleTitle: 'Module 1: Professional Video Editing with Filmora',
         lessons: [
-          { id: 'fl-1', title: 'Interface Setup & Timeline Speed Shortcuts', duration: '10:50', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', locked: false, completed: false, overview: 'Essential hotkeys and project configuration for seamless editing.' },
-          { id: 'fl-2', title: 'Smart Cuts, J-Cuts, L-Cuts & Speed Ramping', duration: '14:40', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', locked: false, completed: false, overview: 'Seamless audio-visual transitions used by top creators.' },
-          { id: 'fl-3', title: 'Cinematic Color Grading, LUT Presets & Export', duration: '17:15', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', locked: false, completed: false, overview: 'Color correct footage, apply cinematic tones, and export in 4K.' }
+          { id: 'fl-1', title: 'Interface Setup & Timeline Speed Shortcuts', duration: '10:50', videoUrl: '/videos/filmora-masterclass.mp4', videoLink: '/videos/filmora-masterclass.mp4', locked: false, completed: false, overview: 'Essential hotkeys and project configuration for seamless editing.' },
+          { id: 'fl-2', title: 'Smart Cuts, J-Cuts, L-Cuts & Speed Ramping', duration: '14:40', videoUrl: '/videos/filmora-masterclass.mp4', videoLink: '/videos/filmora-masterclass.mp4', locked: false, completed: false, overview: 'Seamless audio-visual transitions used by top creators.' },
+          { id: 'fl-3', title: 'Cinematic Color Grading, LUT Presets & Export', duration: '17:15', videoUrl: '/videos/filmora-masterclass.mp4', videoLink: '/videos/filmora-masterclass.mp4', locked: false, completed: false, overview: 'Color correct footage, apply cinematic tones, and export in 4K.' }
         ]
       }
     ]
@@ -199,7 +218,11 @@ function LockedCoursesView() {
   );
 }
 
-function AccountMasterclassTab({ hasAccess = true }) {
+function AccountMasterclassTab({
+  hasAccess = true,
+  isMobileVideoFocused = false,
+  setIsMobileVideoFocused = () => {}
+}) {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -233,26 +256,53 @@ function AccountMasterclassTab({ hasAccess = true }) {
         // Filter out courses set to hidden (active === false)
         const visibleCourses = json.data.filter((c) => c.active !== false);
         const mapped = visibleCourses.map((c) => {
-          const directVideo = c.videoLink || c.videoUrl || '';
-          const courseModules =
-            c.modules && Array.isArray(c.modules) && c.modules.length > 0
-              ? c.modules
-              : [
-                  {
-                    moduleTitle: 'Module 1: Complete Masterclass',
-                    lessons: [
-                      {
-                        id: `${c._id || c.id}-lesson-1`,
-                        title: c.title,
-                        duration: 'Full Masterclass',
-                        videoUrl: directVideo,
-                        videoLink: directVideo,
-                        locked: false,
-                        completed: false,
-                      },
-                    ],
-                  },
-                ];
+          let directVideo = c.videoLink || c.videoUrl || '';
+          if (!directVideo || directVideo.includes('w3schools.com') || directVideo.includes('mov_bbb')) {
+            const titleLower = (c.title || '').toLowerCase();
+            const idLower = (c._id ? c._id.toString() : c.id || '').toLowerCase();
+            if (titleLower.includes('instagram') || idLower.includes('instagram')) {
+              directVideo = '/videos/instagram-masterclass.mp4';
+            } else if (titleLower.includes('youtube') || idLower.includes('youtube')) {
+              directVideo = '/videos/youtube-masterclass.mp4';
+            } else if (titleLower.includes('filmora') || idLower.includes('filmora')) {
+              directVideo = '/videos/filmora-masterclass.mp4';
+            } else {
+              directVideo = '/videos/masterclass-sample.mp4';
+            }
+          }
+
+          const rawModules = c.modules && Array.isArray(c.modules) && c.modules.length > 0 ? c.modules : null;
+          const courseModules = rawModules
+            ? rawModules.map((m) => ({
+                ...m,
+                lessons: (m.lessons || []).map((l) => ({
+                  ...l,
+                  videoUrl:
+                    !l.videoUrl || l.videoUrl.includes('w3schools.com') || l.videoUrl.includes('mov_bbb')
+                      ? directVideo
+                      : l.videoUrl,
+                  videoLink:
+                    !l.videoLink || l.videoLink.includes('w3schools.com') || l.videoLink.includes('mov_bbb')
+                      ? directVideo
+                      : l.videoLink,
+                })),
+              }))
+            : [
+                {
+                  moduleTitle: 'Module 1: Complete Masterclass',
+                  lessons: [
+                    {
+                      id: `${c._id || c.id}-lesson-1`,
+                      title: c.title,
+                      duration: 'Full Masterclass',
+                      videoUrl: directVideo,
+                      videoLink: directVideo,
+                      locked: false,
+                      completed: false,
+                    },
+                  ],
+                },
+              ];
 
           return {
             ...c,
@@ -261,8 +311,8 @@ function AccountMasterclassTab({ hasAccess = true }) {
             progress: typeof c.progress === 'number' ? c.progress : 0,
             badge: c.badge || '100% Free',
             image: c.image || '/banner 5.png',
-            videoUrl: directVideo || courseModules[0]?.lessons?.[0]?.videoLink || courseModules[0]?.lessons?.[0]?.videoUrl || '',
-            videoLink: directVideo || courseModules[0]?.lessons?.[0]?.videoLink || courseModules[0]?.lessons?.[0]?.videoUrl || '',
+            videoUrl: directVideo,
+            videoLink: directVideo,
             totalLessons:
               courseModules.reduce((acc, m) => acc + (m.lessons?.length || 0), 0) || 1,
             modules: courseModules,
@@ -386,11 +436,64 @@ function AccountMasterclassTab({ hasAccess = true }) {
     return courses || [];
   }, [courses]);
 
+  // Guaranteed 3 enrolled masterclasses (Instagram Mastery, YouTube Mastery, Filmora Mastery)
+  const coursesToDisplay = useMemo(() => {
+    return displayCourses.slice(0, 3);
+  }, [displayCourses]);
+
+  // Mobile Carousel (Embla) State for 3 Enrolled Masterclasses
+  const [mobileEmblaRef, mobileEmblaApi] = useEmblaCarousel({
+    loop: false,
+    align: 'start',
+    slidesToScroll: 1,
+  });
+  const [selectedSlideIndex, setSelectedSlideIndex] = useState(0);
+
+  const onSelectSlide = useCallback(() => {
+    if (!mobileEmblaApi) return;
+    setSelectedSlideIndex(mobileEmblaApi.selectedScrollSnap());
+  }, [mobileEmblaApi]);
+
+  useEffect(() => {
+    if (!mobileEmblaApi) return;
+    onSelectSlide();
+    mobileEmblaApi.on('select', onSelectSlide);
+    mobileEmblaApi.on('reInit', onSelectSlide);
+    return () => {
+      mobileEmblaApi.off('select', onSelectSlide);
+      mobileEmblaApi.off('reInit', onSelectSlide);
+    };
+  }, [mobileEmblaApi, onSelectSlide]);
+
+  const scrollToSlide = useCallback(
+    (index) => {
+      if (mobileEmblaApi) mobileEmblaApi.scrollTo(index);
+    },
+    [mobileEmblaApi]
+  );
+
+  const prevActiveCourseIdRef = useRef(activeCourseId);
+
+  // Sync mobile slider position ONLY if activeCourseId actually changes
+  useEffect(() => {
+    if (!mobileEmblaApi || coursesToDisplay.length === 0) return;
+    if (prevActiveCourseIdRef.current !== activeCourseId) {
+      prevActiveCourseIdRef.current = activeCourseId;
+      const activeIdx = coursesToDisplay.findIndex(
+        (c) => (c._id ? c._id.toString() : c.id) === activeCourseId || c.id === activeCourseId
+      );
+      if (activeIdx >= 0) {
+        mobileEmblaApi.scrollTo(activeIdx);
+      }
+    }
+  }, [activeCourseId, coursesToDisplay, mobileEmblaApi]);
+
   // Direct Click-to-Play Course Action
   const handlePlayCourse = (course, e) => {
     if (e) e.stopPropagation();
     const courseId = course._id ? course._id.toString() : course.id;
     setActiveCourseId(courseId);
+    prevActiveCourseIdRef.current = courseId;
 
     const flatLessons = (course.modules || []).flatMap((m) => m.lessons || []);
     const firstPlayable = flatLessons.find((l) => !l.locked) || flatLessons[0];
@@ -399,13 +502,30 @@ function AccountMasterclassTab({ hasAccess = true }) {
     }
     setIsPlaying(true);
 
-    // Smoothly scroll down to the video player workspace directly below
-    setTimeout(() => {
-      const el = document.getElementById('masterclass-player-workspace');
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    // If on mobile viewport (< 768px), switch to focused mobile video view
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      if (setIsMobileVideoFocused) {
+        setIsMobileVideoFocused(true);
       }
-    }, 50);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      // Smoothly scroll down to the video player workspace directly below on desktop
+      setTimeout(() => {
+        const el = document.getElementById('masterclass-player-workspace');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 80);
+    }
+  };
+
+  const handleBackToCourses = () => {
+    if (setIsMobileVideoFocused) {
+      setIsMobileVideoFocused(false);
+    }
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   // Toggle lesson completed
@@ -426,7 +546,7 @@ function AccountMasterclassTab({ hasAccess = true }) {
     });
   };
 
-  // Find next lesson
+  // Find next lesson or next masterclass course
   const handleNextLesson = () => {
     const currentIndex = activeCourseLessons.findIndex((l) => l.id === activeLessonId);
     if (currentIndex >= 0 && currentIndex < activeCourseLessons.length - 1) {
@@ -434,207 +554,151 @@ function AccountMasterclassTab({ hasAccess = true }) {
       if (!next.locked) {
         setActiveLessonId(next.id);
         setIsPlaying(true);
+        return;
       }
+    }
+
+    // When at the end of current course lessons (or course has 1 masterclass lesson), switch to the next course in playlist!
+    const currentCourseIdx = coursesToDisplay.findIndex(
+      (c) => (c._id ? c._id.toString() : c.id) === activeCourseId || c.id === activeCourseId
+    );
+    if (currentCourseIdx >= 0 && coursesToDisplay.length > 1) {
+      const nextCourseIdx = (currentCourseIdx + 1) % coursesToDisplay.length;
+      handlePlayCourse(coursesToDisplay[nextCourseIdx]);
     }
   };
 
-  // Find previous lesson
+  // Find previous lesson or previous masterclass course
   const handlePrevLesson = () => {
     const currentIndex = activeCourseLessons.findIndex((l) => l.id === activeLessonId);
     if (currentIndex > 0) {
       const prev = activeCourseLessons[currentIndex - 1];
       setActiveLessonId(prev.id);
       setIsPlaying(true);
+      return;
+    }
+
+    // When at the first lesson, switch to the previous course in playlist!
+    const currentCourseIdx = coursesToDisplay.findIndex(
+      (c) => (c._id ? c._id.toString() : c.id) === activeCourseId || c.id === activeCourseId
+    );
+    if (currentCourseIdx > 0 && coursesToDisplay.length > 1) {
+      handlePlayCourse(coursesToDisplay[currentCourseIdx - 1]);
+    } else if (currentCourseIdx === 0 && coursesToDisplay.length > 1) {
+      handlePlayCourse(coursesToDisplay[coursesToDisplay.length - 1]);
     }
   };
+
+  const playableVideoUrl = useMemo(() => {
+    const candidates = [
+      activeLesson?.videoLink,
+      activeLesson?.videoUrl,
+      activeCourse?.videoLink,
+      activeCourse?.videoUrl,
+    ];
+
+    for (const raw of candidates) {
+      if (
+        raw &&
+        typeof raw === 'string' &&
+        raw.trim() !== '' &&
+        !isImageUrl(raw) &&
+        !raw.includes('w3schools.com') &&
+        !raw.includes('mov_bbb')
+      ) {
+        return raw.trim();
+      }
+    }
+
+    const titleLower = (activeCourse?.title || '').toLowerCase();
+    const idLower = (activeCourse?.id || '').toLowerCase();
+    if (titleLower.includes('instagram') || idLower.includes('instagram')) {
+      return '/videos/instagram-masterclass.mp4';
+    }
+    if (titleLower.includes('youtube') || idLower.includes('youtube')) {
+      return '/videos/youtube-masterclass.mp4';
+    }
+    if (titleLower.includes('filmora') || idLower.includes('filmora')) {
+      return '/videos/filmora-masterclass.mp4';
+    }
+    return '/videos/masterclass-sample.mp4';
+  }, [activeLesson, activeCourse]);
 
   if (hasAccess === false) {
     return <LockedCoursesView />;
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full overflow-hidden">
+    <div className="w-full space-y-6">
       
-      {/* 1. CLEAN TOP HEADER */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-neutral-200 dark:border-neutral-800">
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight flex items-center gap-2.5">
-            <span>Enrolled Masterclasses</span>
-            <span className="text-xs font-bold bg-[#900606]/10 text-[#900606] px-3 py-1 rounded-full">
-              3 Courses Included
-            </span>
-          </h2>
-          <p className="text-xs sm:text-sm text-neutral-500 font-medium mt-1">
-            Click on any course card below to instantly stream its lessons directly underneath.
-          </p>
-        </div>
-
-      </div>
-
-      {/* 2. CLEAN 3-CARD DISPLAY (Instagram Mastery, YouTube Mastery, Filmora Mastery) */}
-      <div className="space-y-4">
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-80 rounded-xl bg-neutral-200 dark:bg-neutral-800"></div>
-            ))}
-          </div>
-        ) : displayCourses.length === 0 ? (
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-10 text-center">
-            <GraduationCap className="w-12 h-12 text-[#900606] mx-auto mb-3 opacity-80" />
-            <h4 className="font-bold text-lg text-neutral-800 dark:text-neutral-200">No Masterclasses Found</h4>
-            <p className="text-sm text-neutral-900 mt-1">Courses created in the Admin Panel will appear here automatically.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-            {displayCourses.map((course) => {
-              const courseId = course._id ? course._id.toString() : course.id;
-              const isSelected = courseId === activeCourseId || course.id === activeCourseId;
-
-              return (
-                <div
-                  key={courseId}
-                  onClick={(e) => handlePlayCourse(course, e)}
-                  className={`group cursor-pointer rounded-2xl overflow-hidden transition-all duration-300 border flex flex-col justify-between ${
-                    isSelected 
-                      ? 'border-[#900606] shadow-xl ring-2 ring-[#900606]/30 bg-rose-50/20 dark:bg-[#900606]/10 scale-[1.01]' 
-                      : 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 hover:shadow-lg'
-                  }`}
-                >
-                  <div>
-                    {/* Course Banner Image */}
-                    <div className="relative w-full aspect-video bg-neutral-900 overflow-hidden">
-                      <Image
-                        src={getImageUrl(course.image || '/banner 5.png')}
-                        alt={course.title}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    </div>
-
-                    {/* Content Section */}
-                    <div className="p-5 sm:p-6 pb-4">
-                      <h4 className="font-extrabold text-neutral-900 dark:text-white text-base sm:text-lg group-hover:text-[#900606] transition-colors line-clamp-1 mb-1">
-                        {course.title}
-                      </h4>
-                      <p className="text-neutral-900 text-xs sm:text-sm leading-relaxed line-clamp-2">
-                        {course.description}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Direct Play Action Section */}
-                  <div className="p-5 sm:p-6 pt-0">
-                    <button
-                      type="button"
-                      onClick={(e) => handlePlayCourse(course, e)}
-                      className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                        isSelected
-                          ? 'bg-[#900606] text-white shadow-md hover:bg-[#7a0505]'
-                          : 'bg-neutral-50 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 hover:bg-[#900606] hover:text-white hover:border-[#900606]'
-                      }`}
-                    >
-                      <Play className="w-3.5 h-3.5 fill-current" />
-                      <span>{isSelected && isPlaying ? 'Currently Playing • Watch Now' : 'Start Watching'}</span>
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* 3. INTERACTIVE VIDEO PLAYER WORKSPACE */}
-      <div
-        id="masterclass-player-workspace"
-        className="pt-2 select-none"
-        onContextMenu={(e) => e.preventDefault()}
-        style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
-      >
-        <div className="w-full space-y-6">
-          <div className="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 md:p-8 border border-neutral-200 dark:border-neutral-800 shadow-sm">
-            
-            {/* Custom Video Player Workspace */}
-            {isPlaying ? (
-              (() => {
-                const playableVideoUrl =
-                  activeLesson?.videoLink ||
-                  activeLesson?.videoUrl ||
-                  activeCourse?.videoLink ||
-                  activeCourse?.videoUrl ||
-                  'https://www.w3schools.com/html/mov_bbb.mp4';
-
-                return (
-                  <CustomVideoPlayer
-                    key={`${activeCourseId}-${activeLesson?.id}`}
-                    videoUrl={playableVideoUrl}
-                    title={activeLesson?.title || activeCourse?.title || 'Lesson Video'}
-                    courseBadge={activeCourse?.badge || '100% Free Included'}
-                    onEnded={handleNextLesson}
-                    autoPlay={true}
-                  />
-                );
-              })()
-            ) : (
-              <div
-                onContextMenu={(e) => e.preventDefault()}
-                style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
-                className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black shadow-2xl border border-neutral-800 flex items-center justify-center group select-none"
+      {/* =========================================================================
+         MOBILE VIEW (block md:hidden): EITHER FOCUSED VIDEO VIEW OR 3-CARD SLIDER
+         ========================================================================= */}
+      <div className="block md:hidden w-full">
+        {isMobileVideoFocused ? (
+          /* 1. DEDICATED FOCUSED MOBILE VIDEO VIEW (AT TOP, NO SCROLLING NEEDED) */
+          <div className="w-full space-y-4 animate-in fade-in duration-300">
+            {/* Top Bar with Back Button & Course Details */}
+            <div className="flex items-center justify-between gap-3 pb-3 border-b border-neutral-200 dark:border-neutral-800">
+              <button
+                type="button"
+                onClick={handleBackToCourses}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 font-bold text-xs transition-colors cursor-pointer"
               >
-                {/* Video Backdrop Mockup */}
-                <div className="absolute inset-0 z-0 select-none" onContextMenu={(e) => e.preventDefault()}>
-                  <Image
-                    src={getImageUrl(activeCourse.image || '/video 2.webp')}
-                    alt={activeLesson?.title || 'Lesson Video'}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 75vw, 1200px"
-                    className="object-cover opacity-60 pointer-events-none"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/75"></div>
-                </div>
-
-                {/* Center Play Overlay */}
-                <div className="relative z-10 text-center px-4 select-none">
-                  <button
-                    onClick={() => setIsPlaying(true)}
-                    className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-[#900606] hover:bg-[#a60808] text-white flex items-center justify-center shadow-[0_0_35px_rgba(144,6,6,0.7)] hover:scale-110 active:scale-95 transition-all duration-300 group-hover:shadow-[0_0_45px_rgba(144,6,6,0.9)] cursor-pointer mx-auto"
-                  >
-                    <Play className="w-8 h-8 fill-white ml-1" />
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Lesson Title & Action Navigation Controls */}
-            <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="min-w-0">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#900606] mb-1 block">
-                  {activeCourse.title} • Current Lesson
+                <ChevronLeft className="w-4 h-4 text-[#900606]" />
+                <span>Back to Courses</span>
+              </button>
+              <div className="text-right min-w-0">
+                <span className="text-xs font-black text-[#900606] truncate block">
+                  {activeCourse?.title || 'Masterclass'}
                 </span>
-                <h3 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white truncate">
+                <span className="text-[10px] text-neutral-500 font-medium">
+                  {activeLesson?.duration || '10:00'} • HD 1080p
+                </span>
+              </div>
+            </div>
+
+            {/* Video Player */}
+            <div className="w-full rounded-2xl overflow-hidden shadow-xl border border-neutral-800 bg-black">
+              <CustomVideoPlayer
+                key={`mobile-focus-${activeCourseId}-${activeLesson?.id}`}
+                videoUrl={playableVideoUrl}
+                title={activeLesson?.title || activeCourse?.title || 'Lesson Video'}
+                courseBadge={activeCourse?.badge || '100% Free Included'}
+                onEnded={handleNextLesson}
+                autoPlay={true}
+              />
+            </div>
+
+            {/* Current Lesson Info & Controls */}
+            <div className="bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-3.5">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#900606] block">
+                  Current Lesson
+                </span>
+                <h3 className="text-base font-extrabold text-neutral-900 dark:text-white mt-0.5">
                   {activeLesson?.title || 'Course Lesson'}
                 </h3>
-                <p className="text-xs text-neutral-500 mt-1 flex items-center gap-2">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>Duration: {activeLesson?.duration || '10:00'}</span>
-                  <span>•</span>
-                  <span>Full HD 1080p Stream</span>
-                </p>
+                {activeLesson?.overview && (
+                  <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1 leading-relaxed">
+                    {activeLesson.overview}
+                  </p>
+                )}
               </div>
 
-              {/* Complete & Next Navigation */}
-              <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-                {/* Lesson Switcher Dropdown */}
-                {activeCourseLessons.length > 1 && (
+              {/* Lesson Switcher Dropdown */}
+              {activeCourseLessons.length > 1 && (
+                <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800">
+                  <label className="text-[11px] font-bold text-neutral-500 mb-1.5 block">
+                    Select Lesson:
+                  </label>
                   <select
                     value={activeLessonId}
                     onChange={(e) => {
                       setActiveLessonId(e.target.value);
                       setIsPlaying(true);
                     }}
-                    className="px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-[#900606] cursor-pointer"
+                    className="w-full px-3 py-2.5 rounded-xl text-xs font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-[#900606] cursor-pointer"
                   >
                     {(activeCourse?.modules || []).map((mod, mIdx) => (
                       <optgroup key={mIdx} label={mod.moduleTitle}>
@@ -646,8 +710,11 @@ function AccountMasterclassTab({ hasAccess = true }) {
                       </optgroup>
                     ))}
                   </select>
-                )}
+                </div>
+              )}
 
+              {/* Prev / Complete / Next Controls */}
+              <div className="flex items-center justify-between gap-2 pt-2 border-t border-neutral-100 dark:border-neutral-800">
                 <button
                   onClick={handlePrevLesson}
                   className="p-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer"
@@ -658,26 +725,382 @@ function AccountMasterclassTab({ hasAccess = true }) {
 
                 <button
                   onClick={() => activeLesson && toggleLessonCompleted(activeLesson.id)}
-                  className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 cursor-pointer ${
+                  className={`flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer ${
                     activeLesson && completedLessonIds.has(activeLesson.id)
                       ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
                       : 'bg-neutral-100 dark:bg-neutral-800 hover:bg-[#900606] hover:text-white text-neutral-700 dark:text-neutral-300'
                   }`}
                 >
-                  <Check className="w-4 h-4" />
+                  <Check className="w-3.5 h-3.5" />
                   <span>{activeLesson && completedLessonIds.has(activeLesson.id) ? 'Completed' : 'Mark Done'}</span>
                 </button>
 
                 <button
                   onClick={handleNextLesson}
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-[#900606] hover:bg-[#7a0505] text-white shadow-md hover:shadow-lg transition-all cursor-pointer"
+                  className="inline-flex items-center gap-1 px-4 py-2.5 rounded-xl font-bold text-xs bg-[#900606] hover:bg-[#7a0505] text-white shadow-md transition-all cursor-pointer"
                 >
                   <span>Next</span>
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
 
+            {/* Masterclasses Playlist (Quick Switch) */}
+            <div className="bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black uppercase tracking-wider text-neutral-900 dark:text-white">
+                  Masterclasses in Bundle ({coursesToDisplay.length})
+                </span>
+                <span className="text-[10px] font-bold text-neutral-400">
+                  Tap to play
+                </span>
+              </div>
+
+              <div className="space-y-2">
+                {coursesToDisplay.map((course, cIdx) => {
+                  const courseId = course._id ? course._id.toString() : course.id;
+                  const isCurrent = courseId === activeCourseId || course.id === activeCourseId;
+
+                  return (
+                    <button
+                      key={`focus-playlist-${courseId || cIdx}`}
+                      type="button"
+                      onClick={(e) => handlePlayCourse(course, e)}
+                      className={`w-full flex items-center gap-3 p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                        isCurrent
+                          ? 'border-[#900606] bg-red-50/60 dark:bg-[#900606]/15 ring-1 ring-[#900606]'
+                          : 'border-neutral-200/80 dark:border-neutral-800 bg-neutral-50/60 dark:bg-neutral-800/40 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                      }`}
+                    >
+                      <div className="relative w-14 h-9 sm:w-16 sm:h-10 rounded-lg overflow-hidden shrink-0 bg-neutral-900 border border-neutral-200/50 dark:border-neutral-700">
+                        <Image
+                          src={getImageUrl(course.image || '/banner 5.png')}
+                          alt={course.title}
+                          fill
+                          sizes="64px"
+                          className="object-cover"
+                        />
+                        {isCurrent && (
+                          <div className="absolute inset-0 bg-[#900606]/50 flex items-center justify-center">
+                            <Play className="w-3.5 h-3.5 text-white fill-white" />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-bold text-neutral-900 dark:text-white truncate">
+                            {course.title}
+                          </span>
+                          {isCurrent && (
+                            <span className="shrink-0 text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-[#900606] text-white">
+                              Playing
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-neutral-500 font-medium block">
+                          {course.duration || 'Full Masterclass'}
+                        </span>
+                      </div>
+
+                      <ChevronRight className={`w-4 h-4 shrink-0 ${isCurrent ? 'text-[#900606]' : 'text-neutral-400'}`} />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* 2. COURSE SLIDER LIST VIEW WITH PAGINATION DOTS */
+          <div className="w-full space-y-4">
+            <div className="flex flex-col gap-1 pb-2 border-b border-neutral-200 dark:border-neutral-800">
+              <h2 className="text-2xl font-black text-neutral-900 dark:text-white tracking-tight">
+                Enrolled Masterclasses
+              </h2>
+              <p className="text-xs text-neutral-500 font-medium">
+                Click on any course card below to instantly stream its lessons.
+              </p>
+            </div>
+
+            {/* Embla 3-Card Slider */}
+            <div className="overflow-hidden w-full" ref={mobileEmblaRef}>
+              <div className="flex">
+                {coursesToDisplay.map((course, idx) => {
+                  const courseId = course._id ? course._id.toString() : course.id;
+                  const isSelected = courseId === activeCourseId || course.id === activeCourseId;
+
+                  return (
+                    <div
+                      key={`m-course-slide-${courseId || idx}`}
+                      className="flex-[0_0_100%] min-w-0 px-1 shrink-0"
+                    >
+                      <div
+                        onClick={(e) => handlePlayCourse(course, e)}
+                        className={`group cursor-pointer rounded-2xl overflow-hidden transition-all duration-300 border flex flex-col justify-between h-full ${
+                          isSelected 
+                            ? 'border-[#900606] shadow-xl ring-2 ring-[#900606]/30 bg-rose-50/20 dark:bg-[#900606]/10' 
+                            : 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm'
+                        }`}
+                      >
+                        <div>
+                          <div className="relative w-full aspect-video bg-neutral-900 overflow-hidden">
+                            <Image
+                              src={getImageUrl(course.image || '/banner 5.png')}
+                              alt={course.title}
+                              fill
+                              sizes="95vw"
+                              className="object-cover"
+                            />
+                            {course.badge && (
+                              <span className="absolute top-2.5 left-2.5 bg-[#900606] text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow-md">
+                                {course.badge}
+                              </span>
+                            )}
+                          </div>
+                          <div className="p-4 sm:p-5 pb-3">
+                            <h4 className="font-extrabold text-neutral-900 dark:text-white text-base group-hover:text-[#900606] transition-colors line-clamp-1 mb-1">
+                              {course.title}
+                            </h4>
+                            <p className="text-neutral-600 dark:text-neutral-400 text-xs leading-relaxed line-clamp-2">
+                              {course.description}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="p-4 sm:p-5 pt-0">
+                          <button
+                            type="button"
+                            onClick={(e) => handlePlayCourse(course, e)}
+                            className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                              isSelected
+                                ? 'bg-[#900606] text-white shadow-md hover:bg-[#7a0505]'
+                                : 'bg-neutral-50 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 hover:bg-[#900606] hover:text-white hover:border-[#900606]'
+                            }`}
+                          >
+                            <Play className="w-3.5 h-3.5 fill-current" />
+                            <span>{isSelected && isPlaying ? 'Currently Playing • Watch Now' : 'Start Watching'}</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Pagination Dots */}
+            <div className="flex items-center justify-center gap-1.5 mt-3 pt-1">
+              {coursesToDisplay.map((_, idx) => (
+                <button
+                  key={`course-dot-${idx}`}
+                  type="button"
+                  onClick={() => scrollToSlide(idx)}
+                  className="p-2 cursor-pointer focus:outline-none"
+                  aria-label={`Go to slide ${idx + 1}`}
+                >
+                  <span
+                    className={`block h-2.5 rounded-full transition-all duration-300 ${
+                      selectedSlideIndex === idx
+                        ? 'w-7 bg-[#900606]'
+                        : 'w-2.5 bg-neutral-300 dark:bg-neutral-700 hover:bg-neutral-400'
+                    }`}
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* =========================================================================
+         DESKTOP VIEW (hidden md:block): 3 COLUMNS GRID + INLINE VIDEO PLAYER
+         ========================================================================= */}
+      <div className="hidden md:block space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-neutral-200 dark:border-neutral-800">
+          <div>
+            <h2 className="text-3xl font-black text-neutral-900 dark:text-white tracking-tight">
+              Enrolled Masterclasses
+            </h2>
+            <p className="text-sm text-neutral-500 font-medium mt-1">
+              Click on any course card below to instantly stream its lessons directly underneath.
+            </p>
+          </div>
+        </div>
+
+        {/* Desktop 3 Columns Grid */}
+        <div className="grid grid-cols-3 gap-6">
+          {coursesToDisplay.map((course) => {
+            const courseId = course._id ? course._id.toString() : course.id;
+            const isSelected = courseId === activeCourseId || course.id === activeCourseId;
+
+            return (
+              <div
+                key={courseId}
+                onClick={(e) => handlePlayCourse(course, e)}
+                className={`group cursor-pointer rounded-2xl overflow-hidden transition-all duration-300 border flex flex-col justify-between ${
+                  isSelected 
+                    ? 'border-[#900606] shadow-xl ring-2 ring-[#900606]/30 bg-rose-50/20 dark:bg-[#900606]/10 scale-[1.01]' 
+                    : 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 hover:shadow-lg'
+                }`}
+              >
+                <div>
+                  <div className="relative w-full aspect-video bg-neutral-900 overflow-hidden">
+                    <Image
+                      src={getImageUrl(course.image || '/banner 5.png')}
+                      alt={course.title}
+                      fill
+                      sizes="33vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    {course.badge && (
+                      <span className="absolute top-2.5 left-2.5 bg-[#900606] text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow-md">
+                        {course.badge}
+                      </span>
+                    )}
+                  </div>
+                  <div className="p-5 sm:p-6 pb-4">
+                    <h4 className="font-extrabold text-neutral-900 dark:text-white text-base sm:text-lg group-hover:text-[#900606] transition-colors line-clamp-1 mb-1">
+                      {course.title}
+                    </h4>
+                    <p className="text-neutral-600 dark:text-neutral-400 text-xs sm:text-sm leading-relaxed line-clamp-2">
+                      {course.description}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-5 sm:p-6 pt-0">
+                  <button
+                    type="button"
+                    onClick={(e) => handlePlayCourse(course, e)}
+                    className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-[#900606] text-white shadow-md hover:bg-[#7a0505]'
+                        : 'bg-neutral-50 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 hover:bg-[#900606] hover:text-white hover:border-[#900606]'
+                    }`}
+                  >
+                    <Play className="w-3.5 h-3.5 fill-current" />
+                    <span>{isSelected && isPlaying ? 'Currently Playing • Watch Now' : 'Start Watching'}</span>
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Inline Player Workspace for Desktop */}
+        <div
+          id="masterclass-player-workspace"
+          className="pt-2 select-none"
+          onContextMenu={(e) => e.preventDefault()}
+          style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+        >
+          <div className="w-full space-y-6">
+            <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 md:p-8 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+              {isPlaying ? (
+                <CustomVideoPlayer
+                  key={`desktop-${activeCourseId}-${activeLesson?.id}`}
+                  videoUrl={playableVideoUrl}
+                  title={activeLesson?.title || activeCourse?.title || 'Lesson Video'}
+                  courseBadge={activeCourse?.badge || '100% Free Included'}
+                  onEnded={handleNextLesson}
+                  autoPlay={true}
+                />
+              ) : (
+                <div
+                  onContextMenu={(e) => e.preventDefault()}
+                  style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+                  className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black shadow-2xl border border-neutral-800 flex items-center justify-center group select-none"
+                >
+                  <div className="absolute inset-0 z-0 select-none" onContextMenu={(e) => e.preventDefault()}>
+                    <Image
+                      src={getImageUrl(activeCourse.image || '/video 2.webp')}
+                      alt={activeLesson?.title || 'Lesson Video'}
+                      fill
+                      sizes="1200px"
+                      className="object-cover opacity-60 pointer-events-none"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/75"></div>
+                  </div>
+                  <div className="relative z-10 text-center px-4 select-none">
+                    <button
+                      onClick={() => setIsPlaying(true)}
+                      className="w-20 h-20 rounded-full bg-[#900606] hover:bg-[#a60808] text-white flex items-center justify-center shadow-[0_0_35px_rgba(144,6,6,0.7)] hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer mx-auto"
+                    >
+                      <Play className="w-8 h-8 fill-white ml-1" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-6 flex flex-row items-center justify-between gap-4">
+                <div className="min-w-0">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#900606] mb-1 block">
+                    {activeCourse?.title} • Current Lesson
+                  </span>
+                  <h3 className="text-2xl font-black text-neutral-900 dark:text-white truncate">
+                    {activeLesson?.title || 'Course Lesson'}
+                  </h3>
+                  <p className="text-xs text-neutral-500 mt-1 flex items-center gap-2">
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>Duration: {activeLesson?.duration || '10:00'}</span>
+                    <span>•</span>
+                    <span>Full HD 1080p Stream</span>
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                  {activeCourseLessons.length > 1 && (
+                    <select
+                      value={activeLessonId}
+                      onChange={(e) => {
+                        setActiveLessonId(e.target.value);
+                        setIsPlaying(true);
+                      }}
+                      className="px-3.5 py-2.5 rounded-xl text-sm font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-[#900606] cursor-pointer"
+                    >
+                      {(activeCourse?.modules || []).map((mod, mIdx) => (
+                        <optgroup key={mIdx} label={mod.moduleTitle}>
+                          {(mod.lessons || []).map((lesson) => (
+                            <option key={lesson.id} value={lesson.id}>
+                              {lesson.title} ({lesson.duration})
+                            </option>
+                          ))}
+                        </optgroup>
+                      ))}
+                    </select>
+                  )}
+
+                  <button
+                    onClick={handlePrevLesson}
+                    className="p-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer"
+                    title="Previous Lesson"
+                  >
+                    <SkipBack className="w-4 h-4" />
+                  </button>
+
+                  <button
+                    onClick={() => activeLesson && toggleLessonCompleted(activeLesson.id)}
+                    className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 cursor-pointer ${
+                      activeLesson && completedLessonIds.has(activeLesson.id)
+                        ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
+                        : 'bg-neutral-100 dark:bg-neutral-800 hover:bg-[#900606] hover:text-white text-neutral-700 dark:text-neutral-300'
+                    }`}
+                  >
+                    <Check className="w-4 h-4" />
+                    <span>{activeLesson && completedLessonIds.has(activeLesson.id) ? 'Completed' : 'Mark Done'}</span>
+                  </button>
+
+                  <button
+                    onClick={handleNextLesson}
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-sm bg-[#900606] hover:bg-[#7a0505] text-white shadow-md hover:shadow-lg transition-all cursor-pointer"
+                  >
+                    <span>Next</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+            </div>
           </div>
         </div>
       </div>
@@ -1243,6 +1666,7 @@ function AccountContent() {
   }, []);
 
   const [hasBundleAccess, setHasBundleAccess] = useState(null);
+  const [isMobileVideoFocused, setIsMobileVideoFocused] = useState(false);
 
   // Verify user's bundle purchase access from database
   useEffect(() => {
@@ -1274,7 +1698,16 @@ function AccountContent() {
 
   // Update tab in URL without page reload
   const handleTabChange = (tabId) => {
+    setIsMobileVideoFocused(false);
     router.replace(`${pathname}?tab=${tabId}`, { scroll: false });
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setTimeout(() => {
+        const el = document.getElementById('account-tab-content');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
   };
 
   const handleSave = async (e) => {
@@ -1385,7 +1818,13 @@ function AccountContent() {
             </div>
           );
         }
-        return <AccountMasterclassTab hasAccess={hasBundleAccess} />;
+        return (
+          <AccountMasterclassTab
+            hasAccess={hasBundleAccess}
+            isMobileVideoFocused={isMobileVideoFocused}
+            setIsMobileVideoFocused={setIsMobileVideoFocused}
+          />
+        );
       case 'setting':
         return <AccountSettingsTab email={formData.email} theme={theme} toggleTheme={toggleTheme} />;
       case 'notifications':
@@ -1404,14 +1843,14 @@ function AccountContent() {
   };
 
   return (
-    <div className="bg-[#FDFBF7] dark:bg-background pt-20 md:pt-28 pb-8 md:pb-12">
+    <div className={`bg-[#FDFBF7] dark:bg-background ${isMobileVideoFocused ? 'pt-16 sm:pt-20 pb-6 sm:pb-12' : 'pt-20 md:pt-28 pb-8 md:pb-12'}`}>
       <div className="w-full px-4 md:px-8 lg:px-12">
         
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 items-start">
           
           
 
-          <div className="w-full lg:w-72 xl:w-80 shrink-0">
+          <div className={`w-full lg:w-72 xl:w-80 shrink-0 ${isMobileVideoFocused ? 'hidden lg:block' : 'block'}`}>
   <div className="mb-6">
     <h1 className="text-3xl font-black text-[#900606] dark:text-white tracking-tight">
       Account Details
@@ -1470,7 +1909,7 @@ function AccountContent() {
 </div>
 
           {/* Main Content Workspace */}
-          <div className="w-full lg:flex-1 min-w-0">
+          <div id="account-tab-content" className="w-full lg:flex-1 min-w-0">
             {renderContent()}
           </div>
           

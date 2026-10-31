@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import DeleteConfirmModal from './DeleteConfirmModal';
+import ContactManager from './ContactManager';
 
 export default function MessagesManager() {
+  const [activeView, setActiveView] = useState('inquiries'); // 'inquiries' | 'page-content'
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -154,8 +156,47 @@ export default function MessagesManager() {
 
   return (
     <div className="space-y-6 sm:space-y-7 pb-8 text-[#111827]">
-      
-      {/* 1. TOP HEADER & ACTION CONTROLS */}
+      {/* Top View Switcher */}
+      <div className="flex items-center gap-2 border-b border-neutral-200/80 pb-px">
+        <button
+          type="button"
+          onClick={() => setActiveView('inquiries')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-t-xl text-xs font-bold transition-all border-b-2 cursor-pointer ${
+            activeView === 'inquiries'
+              ? 'border-[#900606] text-[#900606] bg-white'
+              : 'border-transparent text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50'
+          }`}
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+          <span>Customer Inquiries</span>
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-600 font-bold">
+            {contacts.length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveView('page-content')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-t-xl text-xs font-bold transition-all border-b-2 cursor-pointer ${
+            activeView === 'page-content'
+              ? 'border-[#900606] text-[#900606] bg-white'
+              : 'border-transparent text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50'
+          }`}
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          <span>Contact Page CMS</span>
+        </button>
+      </div>
+
+      {activeView === 'page-content' ? (
+        <ContactManager />
+      ) : (
+        <>
+          {/* 1. TOP HEADER & ACTION CONTROLS */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-[28px] font-extrabold text-[#111827] tracking-tight leading-tight">
@@ -658,6 +699,8 @@ export default function MessagesManager() {
         }
         isDeleting={deleteModal.isDeleting}
       />
+        </>
+      )}
 
     </div>
   );

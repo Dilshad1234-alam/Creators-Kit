@@ -10,6 +10,8 @@ import MessagesManager from '@/components/admin/MessagesManager';
 import MasterclassesManager from '@/components/admin/MasterclassesManager';
 import CustomersManager from '@/components/admin/CustomersManager';
 import HomepageFeaturesManager from '@/components/admin/HomepageFeaturesManager';
+import AboutManager from '@/components/admin/AboutManager';
+import ContactManager from '@/components/admin/ContactManager';
 
 const validTabs = [
   'overview',
@@ -25,9 +27,12 @@ const validTabs = [
   'messages',
   'contacts',
   'contact',
+  'contact-page',
+  'contact-content',
   'features',
   'homepagefeatures',
   'home',
+  'about',
 ];
 
 const navLabels = {
@@ -44,8 +49,11 @@ const navLabels = {
   messages: 'Contacts',
   contacts: 'Contacts',
   contact: 'Contacts',
+  'contact-page': 'Contact Page',
+  'contact-content': 'Contact Page',
   features: 'Home',
   home: 'Home',
+  about: 'About Us',
 };
 
 function SettingsManager() {
@@ -116,9 +124,12 @@ function AdminContent() {
     tab === 'messages' ||
     tab === 'contacts' ||
     tab === 'contact' ||
+    tab === 'contact-page' ||
+    tab === 'contact-content' ||
     tab === 'features' ||
     tab === 'homepagefeatures' ||
     tab === 'home' ||
+    tab === 'about' ||
     tab === 'courses';
   const currentTabName = navLabels[tab] || (tab.charAt(0).toUpperCase() + tab.slice(1));
 
@@ -146,7 +157,9 @@ function AdminContent() {
         {tab === 'settings' && <SettingsManager />}
         {tab === 'blogs' && <BlogsManager />}
         {(tab === 'messages' || tab === 'contacts' || tab === 'contact') && <MessagesManager />}
+        {(tab === 'contact-page' || tab === 'contact-content') && <ContactManager />}
         {(tab === 'features' || tab === 'homepagefeatures' || tab === 'home') && <HomepageFeaturesManager />}
+        {tab === 'about' && <AboutManager />}
       </div>
     </div>
   );

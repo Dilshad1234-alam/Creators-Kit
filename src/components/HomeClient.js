@@ -1,6 +1,6 @@
 'use client';
 import { getImageUrl } from '@/lib/imagekit';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -244,6 +244,31 @@ export default function HomeClient({
     slidesToScroll: 1,
   });
 
+  const [testimonialSelectedIndex, setTestimonialSelectedIndex] = useState(0);
+
+  const onSelectTestimonial = useCallback(() => {
+    if (!mobileTestimonialEmbla) return;
+    setTestimonialSelectedIndex(mobileTestimonialEmbla.selectedScrollSnap());
+  }, [mobileTestimonialEmbla]);
+
+  useEffect(() => {
+    if (!mobileTestimonialEmbla) return;
+    onSelectTestimonial();
+    mobileTestimonialEmbla.on('select', onSelectTestimonial);
+    mobileTestimonialEmbla.on('reInit', onSelectTestimonial);
+    return () => {
+      mobileTestimonialEmbla.off('select', onSelectTestimonial);
+      mobileTestimonialEmbla.off('reInit', onSelectTestimonial);
+    };
+  }, [mobileTestimonialEmbla, onSelectTestimonial]);
+
+  const scrollToTestimonial = useCallback(
+    (index) => {
+      if (mobileTestimonialEmbla) mobileTestimonialEmbla.scrollTo(index);
+    },
+    [mobileTestimonialEmbla]
+  );
+
   const scrollTestimonialNext = useCallback(() => {
     if (mobileTestimonialEmbla) mobileTestimonialEmbla.scrollNext();
   }, [mobileTestimonialEmbla]);
@@ -283,37 +308,39 @@ export default function HomeClient({
     { id: 'story-5', name: 'Vikram Mehta', product: 'Pro Studio Lighting Setup', image: '/blog4.jpg', description: 'Vikram fixed dull lighting and achieved professional studio quality.' },
   ];
 
-  const coursesList = (masteryCourses && masteryCourses.length > 0)
-    ? masteryCourses
-    : [
-      {
-        _id: 'inst-1',
-        title: 'Instagram Mastery',
-        description: 'Learn the algorithm secrets, how to go viral with Reels, and build a dedicated following fast.',
-        image: '/video 2.webp',
-        badge: '100% Free',
-        ctaText: 'Explore Bundles',
-        ctaLink: '/product'
-      },
-      {
-        _id: 'yt-1',
-        title: 'YouTube Mastery',
-        description: 'Master SEO, thumbnail creation, and viewer retention to monetize your channel efficiently.',
-        image: '/video 1.webp',
-        badge: '100% Free',
-        ctaText: 'Explore Bundles',
-        ctaLink: '/product'
-      },
-      {
-        _id: 'film-1',
-        title: 'Filmora Mastery',
-        description: 'Professional video editing made simple. Learn cuts, transitions, effects, and color grading.',
-        image: '/video.webp',
-        badge: '100% Free',
-        ctaText: 'Explore Bundles',
-        ctaLink: '/product'
-      }
-    ];
+  const coursesList = useMemo(() => {
+    return (masteryCourses && masteryCourses.length > 0)
+      ? masteryCourses
+      : [
+        {
+          _id: 'inst-1',
+          title: 'Instagram Mastery',
+          description: 'Learn the algorithm secrets, how to go viral with Reels, and build a dedicated following fast.',
+          image: '/video 2.webp',
+          badge: '100% Free',
+          ctaText: 'Explore Bundles',
+          ctaLink: '/product'
+        },
+        {
+          _id: 'yt-1',
+          title: 'YouTube Mastery',
+          description: 'Master SEO, thumbnail creation, and viewer retention to monetize your channel efficiently.',
+          image: '/video 1.webp',
+          badge: '100% Free',
+          ctaText: 'Explore Bundles',
+          ctaLink: '/product'
+        },
+        {
+          _id: 'film-1',
+          title: 'Filmora Mastery',
+          description: 'Professional video editing made simple. Learn cuts, transitions, effects, and color grading.',
+          image: '/video.webp',
+          badge: '100% Free',
+          ctaText: 'Explore Bundles',
+          ctaLink: '/product'
+        }
+      ];
+  }, [masteryCourses]);
 
   const mobileCoursesList = coursesList.length <= 3
     ? [...coursesList, ...coursesList, ...coursesList]
@@ -339,6 +366,108 @@ export default function HomeClient({
         : [...customerStories, ...customerStories])
       : customerStories)
     : [];
+
+  // Category carousel pagination dots
+  const [catSelectedIndex, setCatSelectedIndex] = useState(0);
+
+  const onSelectCat = useCallback(() => {
+    if (!mobileCatEmbla) return;
+    setCatSelectedIndex(mobileCatEmbla.selectedScrollSnap());
+  }, [mobileCatEmbla]);
+
+  useEffect(() => {
+    if (!mobileCatEmbla) return;
+    onSelectCat();
+    mobileCatEmbla.on('select', onSelectCat);
+    mobileCatEmbla.on('reInit', onSelectCat);
+    return () => {
+      mobileCatEmbla.off('select', onSelectCat);
+      mobileCatEmbla.off('reInit', onSelectCat);
+    };
+  }, [mobileCatEmbla, onSelectCat]);
+
+  const catPagesCount = Math.max(1, Math.ceil(categories.length / 2));
+  const scrollToCat = useCallback(
+    (pageIndex) => {
+      if (!mobileCatEmbla) return;
+      if (catPagesCount === 0) return;
+      const currentSnap = mobileCatEmbla.selectedScrollSnap();
+      const cycle = Math.floor(currentSnap / catPagesCount);
+      const targetSnap = cycle * catPagesCount + pageIndex;
+      mobileCatEmbla.scrollTo(targetSnap);
+    },
+    [mobileCatEmbla, catPagesCount]
+  );
+
+  // Stories / "Review of Creators" pagination dots
+  const [storiesSelectedIndex, setStoriesSelectedIndex] = useState(0);
+
+  const onSelectStories = useCallback(() => {
+    if (!storiesEmbla) return;
+    setStoriesSelectedIndex(storiesEmbla.selectedScrollSnap());
+  }, [storiesEmbla]);
+
+  useEffect(() => {
+    if (!storiesEmbla) return;
+    onSelectStories();
+    storiesEmbla.on('select', onSelectStories);
+    storiesEmbla.on('reInit', onSelectStories);
+    return () => {
+      storiesEmbla.off('select', onSelectStories);
+      storiesEmbla.off('reInit', onSelectStories);
+    };
+  }, [storiesEmbla, onSelectStories]);
+
+  const scrollToStory = useCallback(
+    (index) => {
+      if (!storiesEmbla) return;
+      if (!customerStories || customerStories.length === 0) return;
+      const currentSnap = storiesEmbla.selectedScrollSnap();
+      const cycle = Math.floor(currentSnap / customerStories.length);
+      const targetSnap = cycle * customerStories.length + index;
+      if (targetSnap >= 0 && targetSnap < displayStories.length) {
+        storiesEmbla.scrollTo(targetSnap);
+      } else {
+        storiesEmbla.scrollTo(index);
+      }
+    },
+    [storiesEmbla, customerStories, displayStories.length]
+  );
+
+  // Courses / "Learn. Create. Grow." pagination dots
+  const [courseSelectedIndex, setCourseSelectedIndex] = useState(0);
+
+  const onSelectCourse = useCallback(() => {
+    if (!mobileCourseEmbla) return;
+    setCourseSelectedIndex(mobileCourseEmbla.selectedScrollSnap());
+  }, [mobileCourseEmbla]);
+
+  useEffect(() => {
+    if (!mobileCourseEmbla) return;
+    onSelectCourse();
+    mobileCourseEmbla.on('select', onSelectCourse);
+    mobileCourseEmbla.on('reInit', onSelectCourse);
+    return () => {
+      mobileCourseEmbla.off('select', onSelectCourse);
+      mobileCourseEmbla.off('reInit', onSelectCourse);
+    };
+  }, [mobileCourseEmbla, onSelectCourse]);
+
+  const scrollToCourse = useCallback(
+    (index) => {
+      if (!mobileCourseEmbla) return;
+      if (!coursesList || coursesList.length === 0) return;
+      const currentSnap = mobileCourseEmbla.selectedScrollSnap();
+      const cycle = Math.floor(currentSnap / coursesList.length);
+      const targetSnap = cycle * coursesList.length + index;
+      if (targetSnap >= 0 && targetSnap < mobileCoursesList.length) {
+        mobileCourseEmbla.scrollTo(targetSnap);
+      } else {
+        mobileCourseEmbla.scrollTo(index);
+      }
+    },
+    [mobileCourseEmbla, coursesList, mobileCoursesList.length]
+  );
 
   const testimonials = [
     {
@@ -556,7 +685,7 @@ export default function HomeClient({
               </div>
             </div>
 
-            {/* MOBILE VIEW (block md:hidden) - RESPONSIVE SLIDER EXACTLY LIKE IMAGE 3 */}
+            {/* MOBILE VIEW (block md:hidden) - RESPONSIVE SLIDER WITH BOTTOM PAGINATION DOTS */}
             <div className="block md:hidden">
               <div className="flex flex-col items-center text-center mb-4 relative">
                 <h2 className="text-2xl font-bold text-[#111827] dark:text-white tracking-tight">
@@ -565,26 +694,6 @@ export default function HomeClient({
               </div>
 
               <div className="relative w-full px-1">
-                {/* Left Arrow Button */}
-                <button
-                  type="button"
-                  onClick={scrollCatPrev}
-                  aria-label="Previous categories"
-                  className="absolute left-0 top-[36%] -translate-y-1/2 z-20 w-8 h-8 bg-black text-white rounded-full flex items-center justify-center shadow-md active:scale-90 transition-all cursor-pointer"
-                >
-                  <ArrowLeft className="w-4 h-4 text-white stroke-[2.5]" />
-                </button>
-
-                {/* Right Arrow Button */}
-                <button
-                  type="button"
-                  onClick={scrollCatNext}
-                  aria-label="Next categories"
-                  className="absolute right-0 top-[36%] -translate-y-1/2 z-20 w-8 h-8 bg-black text-white rounded-full flex items-center justify-center shadow-md active:scale-90 transition-all cursor-pointer"
-                >
-                  <ArrowRight className="w-4 h-4 text-white stroke-[2.5]" />
-                </button>
-
                 {/* Embla Viewport */}
                 <div className="overflow-hidden w-full px-2" ref={mobileCatRef}>
                   <div className="flex -ml-3">
@@ -626,6 +735,26 @@ export default function HomeClient({
                       </div>
                     ))}
                   </div>
+                </div>
+
+                {/* Pagination Dots Indicator */}
+                <div className="flex items-center justify-center gap-2 mt-4 pt-1">
+                  {[...Array(catPagesCount)].map((_, idx) => {
+                    const isActive = (catSelectedIndex % catPagesCount) === idx;
+                    return (
+                      <button
+                        key={`cat-dot-${idx}`}
+                        type="button"
+                        onClick={() => scrollToCat(idx)}
+                        className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                          isActive
+                            ? 'w-6 bg-[#900606]'
+                            : 'w-2 bg-neutral-300 dark:bg-neutral-700 hover:bg-neutral-400'
+                        }`}
+                        aria-label={`Go to category slide ${idx + 1}`}
+                      />
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -750,13 +879,6 @@ export default function HomeClient({
                             <span className="text-emerald-600 text-[9px]">★</span>
                             <span className="text-neutral-300 text-[9px]">|</span>
                             <span className="text-neutral-500 text-[9px] font-medium">{reviews}</span>
-                          </div>
-
-                          {/* Wishlist Heart Icon (Top Right) */}
-                          <div className="absolute top-1.5 right-1.5 z-10 w-6 h-6 rounded-full bg-white/80 backdrop-blur-xs flex items-center justify-center text-neutral-400 shadow-2xs">
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                            </svg>
                           </div>
 
                           <Image
@@ -984,22 +1106,22 @@ export default function HomeClient({
           </div>
 
           <div className="w-full max-w-[1750px] mx-auto px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 relative">
-            {/* Left Navigation Arrow */}
+            {/* Left Navigation Arrow (Desktop Only) */}
             <button
               type="button"
               onClick={scrollStoriesPrev}
               aria-label="Previous story"
-              className="absolute left-1 sm:left-2 md:left-3 lg:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white dark:bg-[#131C2E] text-neutral-800 dark:text-neutral-100 border border-neutral-200/90 dark:border-neutral-700 shadow-xl hover:bg-[#900606] hover:text-white hover:border-[#900606] active:scale-95 transition-all flex items-center justify-center cursor-pointer group"
+              className="hidden md:flex absolute left-1 sm:left-2 md:left-3 lg:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white dark:bg-[#131C2E] text-neutral-800 dark:text-neutral-100 border border-neutral-200/90 dark:border-neutral-700 shadow-xl hover:bg-[#900606] hover:text-white hover:border-[#900606] active:scale-95 transition-all items-center justify-center cursor-pointer group"
             >
               <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5] group-hover:-translate-x-0.5 transition-transform" />
             </button>
 
-            {/* Right Navigation Arrow */}
+            {/* Right Navigation Arrow (Desktop Only) */}
             <button
               type="button"
               onClick={scrollStoriesNext}
               aria-label="Next story"
-              className="absolute right-1 sm:right-2 md:right-3 lg:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white dark:bg-[#131C2E] text-neutral-800 dark:text-neutral-100 border border-neutral-200/90 dark:border-neutral-700 shadow-xl hover:bg-[#900606] hover:text-white hover:border-[#900606] active:scale-95 transition-all flex items-center justify-center cursor-pointer group"
+              className="hidden md:flex absolute right-1 sm:right-2 md:right-3 lg:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white dark:bg-[#131C2E] text-neutral-800 dark:text-neutral-100 border border-neutral-200/90 dark:border-neutral-700 shadow-xl hover:bg-[#900606] hover:text-white hover:border-[#900606] active:scale-95 transition-all items-center justify-center cursor-pointer group"
             >
               <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5] group-hover:translate-x-0.5 transition-transform" />
             </button>
@@ -1083,6 +1205,26 @@ export default function HomeClient({
                 ))}
               </div>
             </div>
+
+            {/* Mobile Pagination Dots */}
+            <div className="flex md:hidden items-center justify-center gap-2 mt-4 pt-1">
+              {customerStories.map((_, idx) => {
+                const isActive = (storiesSelectedIndex % customerStories.length) === idx;
+                return (
+                  <button
+                    key={`story-dot-${idx}`}
+                    type="button"
+                    onClick={() => scrollToStory(idx)}
+                    className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                      isActive
+                        ? 'w-6 bg-[#900606]'
+                        : 'w-2 bg-neutral-300 dark:bg-neutral-700 hover:bg-neutral-400'
+                    }`}
+                    aria-label={`Go to creator story ${idx + 1}`}
+                  />
+                );
+              })}
+            </div>
           </div>
         </section>
 
@@ -1155,28 +1297,8 @@ export default function HomeClient({
                 ))}
               </div>
 
-              {/* Right Side: Mobile View (block lg:hidden) - 1 Card at a Time with Left & Right Arrows */}
+              {/* Right Side: Mobile View (block lg:hidden) - 1 Card at a Time with Bottom Pagination Dots */}
               <div className="block lg:hidden relative w-full px-2 mt-1">
-                {/* Left Arrow Button */}
-                <button
-                  type="button"
-                  onClick={scrollCoursePrev}
-                  aria-label="Previous course"
-                  className="absolute left-0 top-[40%] -translate-y-1/2 z-20 w-8 h-8 bg-black text-white rounded-full flex items-center justify-center shadow-xl active:scale-90 transition-all cursor-pointer"
-                >
-                  <ArrowLeft className="w-4 h-4 text-white stroke-[2.5]" />
-                </button>
-
-                {/* Right Arrow Button */}
-                <button
-                  type="button"
-                  onClick={scrollCourseNext}
-                  aria-label="Next course"
-                  className="absolute right-0 top-[40%] -translate-y-1/2 z-20 w-8 h-8 bg-black text-white rounded-full flex items-center justify-center shadow-xl active:scale-90 transition-all cursor-pointer"
-                >
-                  <ArrowRight className="w-4 h-4 text-white stroke-[2.5]" />
-                </button>
-
                 {/* Carousel Viewport - Exactly 1 Card on Screen */}
                 <div className="overflow-hidden w-full px-1" ref={mobileCourseRef}>
                   <div className="flex">
@@ -1217,6 +1339,26 @@ export default function HomeClient({
                       </div>
                     ))}
                   </div>
+                </div>
+
+                {/* Pagination Dots Indicator */}
+                <div className="flex items-center justify-center gap-2 mt-4 pt-1">
+                  {coursesList.map((_, idx) => {
+                    const isActive = (courseSelectedIndex % coursesList.length) === idx;
+                    return (
+                      <button
+                        key={`course-dot-${idx}`}
+                        type="button"
+                        onClick={() => scrollToCourse(idx)}
+                        className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                          isActive
+                            ? 'w-6 bg-[#900606]'
+                            : 'w-2 bg-neutral-300 dark:bg-neutral-700 hover:bg-neutral-400'
+                        }`}
+                        aria-label={`Go to course ${idx + 1}`}
+                      />
+                    );
+                  })}
                 </div>
               </div>
 
@@ -1345,35 +1487,15 @@ export default function HomeClient({
               ))}
             </div>
 
-            {/* MOBILE REVIEW CAROUSEL (block md:hidden) - EXACTLY 1 CARD PER SCREEN WITH BOTH ARROWS */}
-            <div className="block md:hidden relative w-full px-2">
-              {/* Left Arrow Button */}
-              <button
-                type="button"
-                onClick={scrollTestimonialPrev}
-                aria-label="Previous review"
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-black text-white rounded-full flex items-center justify-center shadow-xl active:scale-90 transition-all cursor-pointer"
-              >
-                <ArrowLeft className="w-4 h-4 text-white stroke-[2.5]" />
-              </button>
-
-              {/* Right Arrow Button */}
-              <button
-                type="button"
-                onClick={scrollTestimonialNext}
-                aria-label="Next review"
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-black text-white rounded-full flex items-center justify-center shadow-xl active:scale-90 transition-all cursor-pointer"
-              >
-                <ArrowRight className="w-4 h-4 text-white stroke-[2.5]" />
-              </button>
-
+            {/* MOBILE REVIEW CAROUSEL (block md:hidden) - WITH PAGINATION DOTS */}
+            <div className="block md:hidden relative w-full">
               {/* Embla Viewport */}
-              <div className="overflow-hidden w-full px-1" ref={mobileTestimonialRef}>
+              <div className="overflow-hidden w-full" ref={mobileTestimonialRef}>
                 <div className="flex">
                   {mobileTestimonials.map((t, i) => (
                     <div
                       key={`m-test-${i}`}
-                      className="flex-[0_0_100%] min-w-0 px-2 shrink-0"
+                      className="flex-[0_0_100%] min-w-0 px-1 shrink-0"
                     >
                       <div className="bg-white dark:bg-[#131C2E] p-5 rounded-3xl border border-neutral-200/90 dark:border-neutral-800 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between h-full">
                         <div>
@@ -1439,6 +1561,26 @@ export default function HomeClient({
                     </div>
                   ))}
                 </div>
+              </div>
+
+              {/* Pagination Dots Indicator */}
+              <div className="flex items-center justify-center gap-2 mt-4 pt-1">
+                {mobileTestimonials.map((_, idx) => {
+                  const isActive = (testimonialSelectedIndex % mobileTestimonials.length) === idx;
+                  return (
+                    <button
+                      key={`test-dot-${idx}`}
+                      type="button"
+                      onClick={() => scrollToTestimonial(idx)}
+                      className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                        isActive
+                          ? 'w-6 bg-[#900606]'
+                          : 'w-2 bg-neutral-300 dark:bg-neutral-700 hover:bg-neutral-400'
+                      }`}
+                      aria-label={`Go to testimonial ${idx + 1}`}
+                    />
+                  );
+                })}
               </div>
             </div>
 

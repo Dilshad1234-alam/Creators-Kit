@@ -420,477 +420,483 @@ export default function AuthContainer({ initialMode = 'login', initialEmail = ''
   };
 
   return (
-    <div className="relative min-h-[100svh] w-full flex items-center justify-center py-6 px-4 sm:px-6 font-sans selection:bg-[#900606] selection:text-white overflow-y-auto">
-      {/* Fullscreen Background Image - CLEAR & VIBRANT (NOT PITCH BLACK) */}
-      <div className="fixed inset-0 z-0 pointer-events-none select-none">
+    <div className="h-[100svh] max-h-[100svh] w-full grid grid-cols-1 lg:grid-cols-12 overflow-hidden bg-[#FAF7F2] font-sans selection:bg-[#900606] selection:text-white">
+      {/* ========================================================================= */}
+      {/* LEFT PANEL (7-8 COLS): IMMERSIVE CREATOR STUDIO / OFFICE IMAGE              */}
+      {/* ========================================================================= */}
+      <div className="hidden lg:block lg:col-span-7 xl:col-span-8 2xl:col-span-8 relative overflow-hidden h-full max-h-[100svh] border-r border-neutral-200/80 bg-neutral-900 select-none">
+        {/* Clean Office Background Image - FULLY VISIBLE & VIBRANT COVER */}
         <Image
           src="/office-bg.jpg"
-          alt="CreatorsKit Office"
+          alt="CreatorsKit Office Studio"
           fill
+          sizes="(max-width: 1024px) 100vw, 68vw"
           priority
-          sizes="100vw"
+          quality={95}
           className="object-cover object-center"
         />
-        {/* Very subtle tint (20%) so the office room, wooden conference table, and red neon logo are bright, vivid, and clearly visible */}
-        <div className="absolute inset-0 bg-black/20" />
       </div>
 
-      {/* Centered Transparent Glassmorphic Authentication Card */}
-      <main className="relative z-10 w-full max-w-[460px] my-auto py-4">
-        <div
-          style={{
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
-          }}
-          className="w-full bg-black/45 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 lg:p-9 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.25)] border border-white/25 flex flex-col space-y-4 text-white"
-        >
-          {/* Top Brand Logo & Back Navigation */}
-          <div className="flex flex-col space-y-2">
-            <div>
+      {/* ========================================================================= */}
+      {/* RIGHT PANEL (4-5 COLS): SOLID AUTHENTICATION CARD                           */}
+      {/* ========================================================================= */}
+      <div className="w-full lg:col-span-5 xl:col-span-4 2xl:col-span-4 relative bg-[#FAF7F2] text-neutral-900 px-3 sm:px-5 lg:px-5 xl:px-6 py-4 flex flex-col justify-center items-center overflow-y-auto overflow-x-hidden h-full max-h-[100svh]">
+        {/* Soft Background Accent (no overflow-x) */}
+        <div className="absolute top-0 right-0 w-72 h-72 bg-red-100/40 rounded-full blur-3xl pointer-events-none -translate-y-1/3" />
+        <div className="absolute bottom-0 left-0 w-72 h-72 bg-amber-100/30 rounded-full blur-3xl pointer-events-none translate-y-1/3" />
+
+        {/* Solid Card Wrapper - Reduced side and vertical gaps */}
+        <div className="w-full max-w-[480px] xl:max-w-[500px] relative z-10 my-auto py-2 sm:py-3">
+          <div className="w-full bg-white rounded-3xl sm:rounded-[2.25rem] p-6 sm:p-8 xl:p-9 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-neutral-200/80 flex flex-col space-y-4 sm:space-y-4.5 text-neutral-900">
+            {/* Top Brand Logo replacing "Back to main site" */}
+            <div className="flex items-center justify-between">
               <Link
                 href="/"
                 className="group inline-flex items-center gap-1.5 transition-transform hover:scale-[1.02] cursor-pointer"
+                title="Go to main website"
               >
-                <span className="text-xl sm:text-2xl font-black tracking-tight text-white drop-shadow-md group-hover:text-red-200 transition-colors">
-                  Creators <span className="text-[#900606] bg-white px-2 py-0.5 rounded-lg text-lg sm:text-xl font-black shadow-md">kit</span>
+                <span className="text-xl sm:text-2xl font-black tracking-tight text-neutral-900 group-hover:text-neutral-700 transition-colors">
+                  Creators <span className="text-white bg-[#900606] px-2 py-0.5 rounded-lg text-lg sm:text-xl font-black shadow-sm">kit</span>
                 </span>
               </Link>
-            </div>
 
-            <div>
-              {isOtp ? (
+              {isOtp && (
                 <button
                   type="button"
                   onClick={() => toggleMode('register')}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-300 hover:text-white transition-colors cursor-pointer group"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer"
                 >
-                  <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" /> Back to Registration
+                  <ArrowLeft className="w-3.5 h-3.5" /> Back to Registration
                 </button>
-              ) : (
-                <Link
-                  href="/"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-300 hover:text-white transition-colors group"
-                >
-                  <span className="transition-transform group-hover:-translate-x-0.5">←</span> Back to main site
-                </Link>
               )}
             </div>
-          </div>
 
-          {/* Title */}
-          <div>
-            <h2 className="text-2xl sm:text-[1.75rem] font-black text-white tracking-tight leading-tight">
-              {isLogin ? (
-                <>
-                  Welcome Back, <span className="text-red-500">Creator</span>
-                </>
-              ) : isOtp ? (
-                <>
-                  Verify Your <span className="text-red-500">Email</span>
-                </>
-              ) : (
-                <>
-                  Create Account, <span className="text-red-500">Creator</span>
-                </>
-              )}
-            </h2>
-            {isOtp && (
-              <p className="text-neutral-300 text-xs sm:text-sm mt-1.5 leading-relaxed">
-                Enter the 6-digit code sent to <strong className="text-white">{otpEmail || 'your email'}</strong> to verify your account.
-              </p>
-            )}
-          </div>
-
-          {/* Status / Notice Alerts */}
-          {(loginError || registerError || otpError) && (
-            <div className="p-3 rounded-xl bg-red-500/20 border border-red-500/40 text-red-200 text-xs flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-              <div className="leading-snug">{loginError || registerError || otpError}</div>
-            </div>
-          )}
-
-          {(loginSuccessNotice || otpSuccess) && (
-            <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 text-xs flex items-start gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-              <div className="leading-snug">{loginSuccessNotice || otpSuccess}</div>
-            </div>
-          )}
-
-          {socialNotice && (
-            <div className="p-3 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-200 text-xs flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-              <div className="leading-snug">{socialNotice}</div>
-            </div>
-          )}
-
-          {/* DYNAMIC FORMS */}
-          {isLogin ? (
-            // -------------------------------------------------------------------
-            // FORM A: LOGIN FORM
-            // -------------------------------------------------------------------
-            <form className="space-y-3.5" onSubmit={handleLoginSubmit}>
-              <div>
-                <label className="block text-xs font-bold text-neutral-200 mb-1.5">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <Mail className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="email"
-                    required
-                    placeholder="creator@studio.com"
-                    value={loginData.email}
-                    onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-white/10 hover:bg-white/15 focus:bg-white/20 border border-white/20 focus:border-red-500 rounded-xl text-white text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-500/30 transition-all shadow-inner"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold text-neutral-200">
-                    Password
-                  </label>
-                  <Link href="/forgot-password" className="text-xs font-bold text-red-400 hover:text-red-300 hover:underline">
-                    Forgot Password?
-                  </Link>
-                </div>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <Lock className="w-4 h-4" />
-                  </div>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    placeholder="••••••••"
-                    value={loginData.password}
-                    onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                    className="w-full pl-10 pr-10 py-2.5 sm:py-3 bg-white/10 hover:bg-white/15 focus:bg-white/20 border border-white/20 focus:border-red-500 rounded-xl text-white text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-500/30 transition-all shadow-inner"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-neutral-300 hover:text-white text-xs cursor-pointer"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 pt-0.5">
-                <input
-                  type="checkbox"
-                  id="remember"
-                  className="w-4 h-4 rounded border-white/30 bg-white/10 text-red-600 focus:ring-red-500"
-                />
-                <label htmlFor="remember" className="text-xs text-neutral-300 font-medium cursor-pointer">
-                  Remember me
-                </label>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loginLoading}
-                className="w-full py-3 sm:py-3.5 mt-1 bg-[#900606] hover:bg-[#b91c1c] active:scale-[0.99] text-white rounded-xl font-bold text-sm transition-all duration-200 shadow-lg shadow-red-950/60 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {loginLoading ? (
+            {/* Title & Subtitle */}
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight">
+                {isLogin ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>Signing In...</span>
+                    Welcome Back, <span className="text-[#900606]">Creator</span>
+                  </>
+                ) : isOtp ? (
+                  <>
+                    Verify Your <span className="text-[#900606]">Email</span>
                   </>
                 ) : (
                   <>
-                    <span>Sign In to Creator Dashboard</span>
-                    <span>➔</span>
+                    Create Account, <span className="text-[#900606]">Creator</span>
                   </>
                 )}
-              </button>
-            </form>
-          ) : isRegister ? (
-            // -------------------------------------------------------------------
-            // FORM B: REGISTRATION FORM
-            // -------------------------------------------------------------------
-            <form className="space-y-3" onSubmit={handleRegisterSubmit}>
-              <div>
-                <label className="block text-xs font-bold text-neutral-200 mb-1">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <User className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Alex Morgan"
-                    value={registerData.name}
-                    onChange={(e) => setRegisterData({ ...registerData, name: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2.5 bg-white/10 hover:bg-white/15 focus:bg-white/20 border border-white/20 focus:border-red-500 rounded-xl text-white text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-500/30 transition-all shadow-inner"
-                  />
-                </div>
-              </div>
+              </h2>
+              <p className="text-neutral-500 text-xs sm:text-sm mt-1.5 leading-relaxed">
+                {isLogin
+                  ? 'Access your studio dashboard and manage your creator gear bookings.'
+                  : isOtp
+                  ? `Enter the 6-digit code sent to ${otpEmail || 'your email'} to verify your account.`
+                  : 'Join the ecosystem and equip your studio with premium tools.'}
+              </p>
+            </div>
 
-              <div>
-                <label className="block text-xs font-bold text-neutral-200 mb-1">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <Mail className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="email"
-                    required
-                    placeholder="creator@studio.com"
-                    value={registerData.email}
-                    onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2.5 bg-white/10 hover:bg-white/15 focus:bg-white/20 border border-white/20 focus:border-red-500 rounded-xl text-white text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-500/30 transition-all shadow-inner"
-                  />
-                </div>
+            {/* Status / Notice Alerts */}
+            {(loginError || registerError || otpError) && (
+              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+                <div className="leading-snug">{loginError || registerError || otpError}</div>
               </div>
+            )}
 
-              <div>
-                <label className="block text-xs font-bold text-neutral-200 mb-1">
-                  Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <Lock className="w-4 h-4" />
-                  </div>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    placeholder="At least 6 characters"
-                    value={registerData.password}
-                    onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
-                    className="w-full pl-10 pr-10 py-2.5 bg-white/10 hover:bg-white/15 focus:bg-white/20 border border-white/20 focus:border-red-500 rounded-xl text-white text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-500/30 transition-all shadow-inner"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-neutral-300 hover:text-white text-xs cursor-pointer"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
+            {(loginSuccessNotice || otpSuccess) && (
+              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <div className="leading-snug">{loginSuccessNotice || otpSuccess}</div>
               </div>
+            )}
 
-              <div className="pt-0.5">
-                <label className="flex items-start gap-2 cursor-pointer select-none">
+            {socialNotice && (
+              <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <div className="leading-snug">{socialNotice}</div>
+              </div>
+            )}
+
+            {/* DYNAMIC FORMS */}
+            {isLogin ? (
+              // -------------------------------------------------------------------
+              // FORM A: LOGIN FORM
+              // -------------------------------------------------------------------
+              <form className="space-y-4" onSubmit={handleLoginSubmit}>
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-500 mb-1.5">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                      <Mail className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="email"
+                      required
+                      placeholder="creator@studio.com"
+                      value={loginData.email}
+                      onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                      className="w-full pl-10 pr-4 py-3.5 bg-white border border-neutral-300 rounded-xl text-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#900606]/20 focus:border-[#900606] shadow-sm placeholder:text-neutral-400"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-500">
+                      Password
+                    </label>
+                    <Link href="/forgot-password" className="text-xs font-bold text-[#900606] hover:underline">
+                      Forgot Password?
+                    </Link>
+                  </div>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                      <Lock className="w-4 h-4" />
+                    </div>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      placeholder="••••••••"
+                      value={loginData.password}
+                      onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                      className="w-full pl-10 pr-10 py-3.5 bg-white border border-neutral-300 rounded-xl text-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#900606]/20 focus:border-[#900606] shadow-sm placeholder:text-neutral-400"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-neutral-400 hover:text-neutral-700 text-xs cursor-pointer"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-0.5">
                   <input
                     type="checkbox"
-                    checked={registerData.agreeTerms}
-                    onChange={(e) => setRegisterData({ ...registerData, agreeTerms: e.target.checked })}
-                    className="w-3.5 h-3.5 mt-0.5 rounded border-white/30 bg-white/10 text-red-600 focus:ring-red-500"
+                    id="remember"
+                    className="w-4 h-4 rounded border-neutral-300 text-[#900606] focus:ring-[#900606]"
                   />
-                  <span className="text-[11px] text-neutral-300 leading-snug">
-                    I agree to the{' '}
-                    <Link href="/terms" className="text-red-400 hover:text-red-300 hover:underline font-semibold">
-                      Terms
-                    </Link>{' '}
-                    &{' '}
-                    <Link href="/privacy" className="text-red-400 hover:text-red-300 hover:underline font-semibold">
-                      Privacy Policy
-                    </Link>
-                  </span>
-                </label>
-              </div>
-
-              <button
-                type="submit"
-                disabled={registerLoading}
-                className="w-full py-3 sm:py-3.5 mt-1 bg-[#900606] hover:bg-[#b91c1c] active:scale-[0.99] text-white rounded-xl font-bold text-sm transition-all duration-200 shadow-lg shadow-red-950/60 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {registerLoading ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>Sending Verification Code...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Create Account & Verify</span>
-                    <span>➔</span>
-                  </>
-                )}
-              </button>
-            </form>
-          ) : (
-            // -------------------------------------------------------------------
-            // FORM C: OTP VERIFICATION FORM
-            // -------------------------------------------------------------------
-            <form className="space-y-4" onSubmit={handleVerifyOtpSubmit}>
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold text-neutral-200">
-                    6-Digit Verification Code
+                  <label htmlFor="remember" className="text-xs text-neutral-600 font-medium cursor-pointer">
+                    Remember me
                   </label>
-                  <button
-                    type="button"
-                    onClick={() => toggleMode('register')}
-                    className="text-xs font-bold text-red-400 hover:text-red-300 hover:underline cursor-pointer"
-                  >
-                    Edit details
-                  </button>
                 </div>
 
-                <div className="relative">
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    autoComplete="one-time-code"
-                    pattern="[0-9]*"
-                    maxLength={6}
-                    autoFocus
-                    required
-                    placeholder="••••••"
-                    value={otp}
-                    onChange={(e) => {
-                      const val = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
-                      setOtp(val);
-                      setOtpError('');
-                    }}
-                    className="w-full text-center text-3xl font-mono font-bold tracking-[0.45em] py-3.5 bg-white/10 hover:bg-white/15 focus:bg-white/20 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500 shadow-inner transition-all placeholder:text-neutral-500"
-                  />
-                </div>
-                <p className="text-[11px] text-neutral-300 mt-1.5 text-center">
-                  Check your inbox or spam folder for code sent to{' '}
-                  <strong className="text-white">{otpEmail}</strong>
-                </p>
-              </div>
-
-              <button
-                type="submit"
-                disabled={otpLoading || otp.length !== 6}
-                className="w-full py-3 sm:py-3.5 mt-1 bg-[#900606] hover:bg-[#b91c1c] active:scale-[0.99] text-white rounded-xl font-bold text-sm transition-all duration-200 shadow-lg shadow-red-950/60 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {otpLoading ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>Verifying & Saving...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Confirm Code & Finalize Account</span>
-                    <span>➔</span>
-                  </>
-                )}
-              </button>
-
-              {/* Resend Code Section */}
-              <div className="pt-1 text-center">
-                <p className="text-xs text-neutral-300">
-                  Didn&apos;t receive the code?{' '}
-                  <button
-                    type="button"
-                    onClick={handleResendOtp}
-                    disabled={resendLoading || resendCooldown > 0}
-                    className="font-bold text-red-400 hover:text-red-300 hover:underline cursor-pointer disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed inline-flex items-center gap-1"
-                  >
-                    {resendLoading ? (
-                      'Sending...'
-                    ) : resendCooldown > 0 ? (
-                      `Resend code in 00:${resendCooldown.toString().padStart(2, '0')}`
+                <button
+                  type="submit"
+                  disabled={loginLoading}
+                  className="relative w-full py-3.5 sm:py-4 mt-2 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer disabled:opacity-60 hover:border-[#900606]"
+                >
+                  <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                  <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                    {loginLoading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+                        <span>Signing In...</span>
+                      </>
                     ) : (
                       <>
-                        <RefreshCw className="w-3 h-3 inline" /> Resend Code
+                        <span>Sign In to Creator Dashboard</span>
+                        <span>➔</span>
                       </>
                     )}
-                  </button>
-                </p>
-              </div>
-            </form>
-          )}
-
-          {/* Social Logins: "Continue with Google" button */}
-          {!isOtp && (
-            <div className="pt-0.5">
-              <div className="relative flex items-center justify-center my-2.5">
-                <div className="border-t border-white/20 w-full" />
-                <span className="px-3 text-[10px] font-bold text-neutral-400 uppercase tracking-widest shrink-0">
-                  Or continue with
-                </span>
-                <div className="border-t border-white/20 w-full" />
-              </div>
-
-              <div className="space-y-2">
-                <button
-                  type="button"
-                  onClick={handleGoogleSignIn}
-                  disabled={googleLoading}
-                  id="google-signin-btn"
-                  className="w-full flex items-center justify-center gap-3 py-2.5 sm:py-3 px-4 rounded-xl border border-white/20 bg-white/10 hover:bg-white/20 active:bg-white/25 text-white font-bold text-sm shadow-sm cursor-pointer transition-all duration-200 backdrop-blur-md disabled:opacity-60 disabled:cursor-not-allowed group"
-                >
-                  {googleLoading ? (
-                    <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <svg className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
-                      <path
-                        fill="#4285F4"
-                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                      />
-                      <path
-                        fill="#34A853"
-                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                      />
-                      <path
-                        fill="#FBBC05"
-                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                      />
-                      <path
-                        fill="#EA4335"
-                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                      />
-                    </svg>
-                  )}
-                  <span>{googleLoading ? 'Connecting to Google...' : 'Continue with Google'}</span>
+                  </span>
                 </button>
-              </div>
-            </div>
-          )}
+              </form>
+            ) : isRegister ? (
+              // -------------------------------------------------------------------
+              // FORM B: REGISTRATION FORM
+              // -------------------------------------------------------------------
+              <form className="space-y-3.5" onSubmit={handleRegisterSubmit}>
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-500 mb-1.5">
+                    Full Name
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                      <User className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Alex Morgan"
+                      value={registerData.name}
+                      onChange={(e) => setRegisterData({ ...registerData, name: e.target.value })}
+                      className="w-full pl-10 pr-4 py-3.5 bg-white border border-neutral-300 rounded-xl text-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#900606]/20 focus:border-[#900606] shadow-sm placeholder:text-neutral-400"
+                    />
+                  </div>
+                </div>
 
-          {/* Bottom Footer Switch */}
-          <div className="pt-2 border-t border-white/15 text-center">
-            <p className="text-xs text-neutral-300">
-              {isLogin ? (
-                <>
-                  Don&apos;t have an account?{' '}
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-500 mb-1.5">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                      <Mail className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="email"
+                      required
+                      placeholder="creator@studio.com"
+                      value={registerData.email}
+                      onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
+                      className="w-full pl-10 pr-4 py-3.5 bg-white border border-neutral-300 rounded-xl text-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#900606]/20 focus:border-[#900606] shadow-sm placeholder:text-neutral-400"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-500 mb-1.5">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                      <Lock className="w-4 h-4" />
+                    </div>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      placeholder="At least 6 characters"
+                      value={registerData.password}
+                      onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
+                      className="w-full pl-10 pr-10 py-3.5 bg-white border border-neutral-300 rounded-xl text-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#900606]/20 focus:border-[#900606] shadow-sm placeholder:text-neutral-400"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-neutral-400 hover:text-neutral-700 text-xs cursor-pointer"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="pt-0.5">
+                  <label className="flex items-start gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={registerData.agreeTerms}
+                      onChange={(e) => setRegisterData({ ...registerData, agreeTerms: e.target.checked })}
+                      className="w-3.5 h-3.5 mt-0.5 rounded border-neutral-300 text-[#900606] focus:ring-[#900606]"
+                    />
+                    <span className="text-[11px] text-neutral-600 leading-snug">
+                      I agree to the{' '}
+                      <Link href="/terms" className="text-[#900606] hover:underline font-semibold">
+                        Terms
+                      </Link>{' '}
+                      &{' '}
+                      <Link href="/privacy" className="text-[#900606] hover:underline font-semibold">
+                        Privacy Policy
+                      </Link>
+                    </span>
+                  </label>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={registerLoading}
+                  className="relative w-full py-3.5 sm:py-4 mt-2 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer disabled:opacity-60 hover:border-[#900606]"
+                >
+                  <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                  <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                    {registerLoading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+                        <span>Sending Verification Code...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Create Account & Verify</span>
+                        <span>➔</span>
+                      </>
+                    )}
+                  </span>
+                </button>
+              </form>
+            ) : (
+              // -------------------------------------------------------------------
+              // FORM C: OTP VERIFICATION FORM
+              // -------------------------------------------------------------------
+              <form className="space-y-4" onSubmit={handleVerifyOtpSubmit}>
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-500">
+                      6-Digit Verification Code
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => toggleMode('register')}
+                      className="text-xs font-bold text-[#900606] hover:underline cursor-pointer"
+                    >
+                      Edit details
+                    </button>
+                  </div>
+
+                  <div className="relative">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      pattern="[0-9]*"
+                      maxLength={6}
+                      autoFocus
+                      required
+                      placeholder="••••••"
+                      value={otp}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
+                        setOtp(val);
+                        setOtpError('');
+                      }}
+                      className="w-full text-center text-3xl font-mono font-bold tracking-[0.45em] py-3.5 bg-neutral-50 border border-neutral-200 rounded-xl text-neutral-900 focus:outline-none focus:ring-2 focus:ring-[#900606]/20 focus:border-[#900606] shadow-inner transition-all placeholder:text-neutral-300"
+                    />
+                  </div>
+                  <p className="text-[11px] text-neutral-400 mt-1.5 text-center">
+                    Check your inbox or spam folder for code sent to{' '}
+                    <strong className="text-neutral-700">{otpEmail}</strong>
+                  </p>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={otpLoading || otp.length !== 6}
+                  className="relative w-full py-3.5 mt-2 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed hover:border-[#900606]"
+                >
+                  <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                  <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                    {otpLoading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+                        <span>Verifying & Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Confirm Code & Finalize Account</span>
+                        <span>➔</span>
+                      </>
+                    )}
+                  </span>
+                </button>
+
+                {/* Resend Code Section */}
+                <div className="pt-1 text-center">
+                  <p className="text-xs text-neutral-500">
+                    Didn&apos;t receive the code?{' '}
+                    <button
+                      type="button"
+                      onClick={handleResendOtp}
+                      disabled={resendLoading || resendCooldown > 0}
+                      className="font-bold text-[#900606] hover:underline cursor-pointer disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed inline-flex items-center gap-1"
+                    >
+                      {resendLoading ? (
+                        'Sending...'
+                      ) : resendCooldown > 0 ? (
+                        `Resend code in 00:${resendCooldown.toString().padStart(2, '0')}`
+                      ) : (
+                        <>
+                          <RefreshCw className="w-3 h-3 inline" /> Resend Code
+                        </>
+                      )}
+                    </button>
+                  </p>
+                </div>
+              </form>
+            )}
+
+            {/* Social Logins: "Continue with Google" button */}
+            {!isOtp && (
+              <div className="pt-0.5">
+                <div className="relative flex items-center justify-center my-2.5">
+                  <div className="border-t border-neutral-200 w-full" />
+                  <span className="px-3 text-[10px] font-bold text-neutral-400 uppercase tracking-widest shrink-0 bg-white">
+                    Or continue with
+                  </span>
+                  <div className="border-t border-neutral-200 w-full" />
+                </div>
+
+                <div className="space-y-2">
                   <button
                     type="button"
-                    onClick={() => toggleMode('register')}
-                    className="font-bold text-red-400 hover:text-red-300 hover:underline cursor-pointer ml-1"
+                    onClick={handleGoogleSignIn}
+                    disabled={googleLoading}
+                    id="google-signin-btn"
+                    className="w-full flex items-center justify-center gap-3 py-3.5 px-4 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-800 font-bold text-sm shadow-sm cursor-pointer transition-all duration-200 hover:border-neutral-300 hover:shadow disabled:opacity-60 disabled:cursor-not-allowed group"
                   >
-                    Create an Account
+                    {googleLoading ? (
+                      <div className="w-4 h-4 border-2 border-neutral-400 border-t-[#900606] rounded-full animate-spin" />
+                    ) : (
+                      <svg className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
+                        <path
+                          fill="#4285F4"
+                          d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                        />
+                        <path
+                          fill="#34A853"
+                          d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                        />
+                        <path
+                          fill="#FBBC05"
+                          d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                        />
+                        <path
+                          fill="#EA4335"
+                          d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                        />
+                      </svg>
+                    )}
+                    <span>{googleLoading ? 'Connecting to Google...' : 'Continue with Google'}</span>
                   </button>
-                </>
-              ) : isOtp ? (
-                <>
-                  Already completed verification?{' '}
-                  <button
-                    type="button"
-                    onClick={() => toggleMode('login')}
-                    className="font-bold text-red-400 hover:text-red-300 hover:underline cursor-pointer ml-1"
-                  >
-                    Sign In
-                  </button>
-                </>
-              ) : (
-                <>
-                  Already have an account?{' '}
-                  <button
-                    type="button"
-                    onClick={() => toggleMode('login')}
-                    className="font-bold text-red-400 hover:text-red-300 hover:underline cursor-pointer ml-1"
-                  >
-                    Sign In
-                  </button>
-                </>
-              )}
-            </p>
+                </div>
+              </div>
+            )}
+
+            {/* Bottom Footer Switch */}
+            <div className="pt-2 border-t border-neutral-100 text-center">
+              <p className="text-xs text-neutral-600">
+                {isLogin ? (
+                  <>
+                    Don&apos;t have an account?{' '}
+                    <button
+                      type="button"
+                      onClick={() => toggleMode('register')}
+                      className="font-bold text-[#900606] hover:underline cursor-pointer ml-1"
+                    >
+                      Create an Account
+                    </button>
+                  </>
+                ) : isOtp ? (
+                  <>
+                    Already completed verification?{' '}
+                    <button
+                      type="button"
+                      onClick={() => toggleMode('login')}
+                      className="font-bold text-[#900606] hover:underline cursor-pointer ml-1"
+                    >
+                      Sign In
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    Already have an account?{' '}
+                    <button
+                      type="button"
+                      onClick={() => toggleMode('login')}
+                      className="font-bold text-[#900606] hover:underline cursor-pointer ml-1"
+                    >
+                      Sign In
+                    </button>
+                  </>
+                )}
+              </p>
+            </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
