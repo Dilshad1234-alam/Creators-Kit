@@ -287,7 +287,13 @@ export default function BundleDetailPage() {
     const isLoggedIn = (user?.email || sessionEmail) && userRole !== 'admin' && user?.role !== 'admin';
 
     if (!isLoggedIn) {
-      router.push('/login?redirect=/checkout');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('creatorskit-open-auth', {
+            detail: { mode: 'register', redirectUrl: '/checkout' },
+          })
+        );
+      }
     } else {
       router.push('/checkout');
     }

@@ -57,6 +57,9 @@ export default function AuthCallbackClient({ initialUser, redirectParam }) {
           return;
         }
 
+        sessionStorage.removeItem('creatorskit_logged_out');
+        localStorage.removeItem('creatorskit_logged_out');
+
         const userInfo = {
           id: user.id || user._id,
           name: user.name,
@@ -65,6 +68,12 @@ export default function AuthCallbackClient({ initialUser, redirectParam }) {
           profileImage: user.image || user.profileImage || '',
           authProvider: 'google',
         };
+        sessionStorage.setItem('creatorsKitUserInfo', JSON.stringify(userInfo));
+        sessionStorage.setItem('userName', user.name || '');
+        sessionStorage.setItem('userEmail', user.email || '');
+        sessionStorage.setItem('userRole', 'user');
+        sessionStorage.setItem('token', 'session_active');
+
         localStorage.setItem('creatorsKitUserInfo', JSON.stringify(userInfo));
         localStorage.setItem('userName', user.name || '');
         localStorage.setItem('userEmail', user.email || '');
@@ -80,7 +89,7 @@ export default function AuthCallbackClient({ initialUser, redirectParam }) {
           !redirectParam.startsWith('/register') &&
           !redirectParam.startsWith('/auth')
             ? redirectParam
-            : '/account';
+            : '/';
 
         window.location.replace(target);
       } catch (err) {

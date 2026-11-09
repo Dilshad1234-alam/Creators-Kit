@@ -5,6 +5,16 @@ import Blog from '@/models/Blog';
 
 export const dynamic = 'force-dynamic';
 
+const getProductImageForStory = (productName = '') => {
+  const pLower = (productName || '').toLowerCase();
+  if (pLower.includes('mic')) return '/wireless-mic.jpg';
+  if (pLower.includes('tripod') || pLower.includes('stand')) return '/tripod.jpg';
+  if (pLower.includes('ring') || pLower.includes('light')) return '/ring.jpg';
+  if (pLower.includes('bundle') || pLower.includes('kit')) return '/banner 6.png';
+  if (pLower.includes('gimbal') || pLower.includes('chorma') || pLower.includes('rig') || pLower.includes('green')) return '/chorma.jpg';
+  return '/ring.jpg';
+};
+
 function getFilter(identifier) {
   if (mongoose.Types.ObjectId.isValid(identifier)) {
     return { $or: [{ _id: identifier }, { slug: identifier }] };
@@ -43,7 +53,13 @@ export async function PUT(req, { params }) {
       body.title = body.product ? `${body.author} - ${body.product}` : `${body.author}'s Review`;
     }
 
-    const blog = await Blog.findOneAndUpdate(getFilter(slug), body, {
+    if (body.productImage === undefined || body.productImage === '') {
+      if (body.product) {
+        body.productImage = getProductImageForStory(body.product);
+      }
+    }
+
+    const blog = await Blog.findOneAndUpdate(getFilter(slug), { $set: body }, {
       new: true,
       runValidators: true,
     });

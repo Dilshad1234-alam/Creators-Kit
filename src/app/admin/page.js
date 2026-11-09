@@ -12,12 +12,14 @@ import CustomersManager from '@/components/admin/CustomersManager';
 import HomepageFeaturesManager from '@/components/admin/HomepageFeaturesManager';
 import AboutManager from '@/components/admin/AboutManager';
 import ContactManager from '@/components/admin/ContactManager';
+import LiveSaleManager from '@/components/admin/LiveSaleManager';
 
 const validTabs = [
   'overview',
   'dashboard',
   'analytics',
   'orders',
+  'sale',
   'products',
   'bundles',
   'customers',
@@ -39,6 +41,7 @@ const navLabels = {
   overview: 'Overview',
   dashboard: 'Overview',
   orders: 'Orders',
+  sale: 'Live Sale & Offers',
   products: 'Products',
   bundles: 'Products',
   customers: 'Customers',
@@ -130,7 +133,8 @@ function AdminContent() {
     tab === 'homepagefeatures' ||
     tab === 'home' ||
     tab === 'about' ||
-    tab === 'courses';
+    tab === 'courses' ||
+    tab === 'sale';
   const currentTabName = navLabels[tab] || (tab.charAt(0).toUpperCase() + tab.slice(1));
 
   return (
@@ -152,6 +156,7 @@ function AdminContent() {
         {isOverview && <DashboardOverview />}
         {(tab === 'products' || tab === 'bundles') && <ProductsManager />}
         {tab === 'orders' && <OrdersManager />}
+        {tab === 'sale' && <LiveSaleManager />}
         {tab === 'customers' && <CustomersManager />}
         {tab === 'courses' && <MasterclassesManager />}
         {tab === 'settings' && <SettingsManager />}

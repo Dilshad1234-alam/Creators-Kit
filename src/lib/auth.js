@@ -8,6 +8,13 @@ export const authOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      authorization: {
+        params: {
+          prompt: 'select_account',
+          access_type: 'offline',
+          response_type: 'code',
+        },
+      },
     }),
   ],
   session: {
@@ -89,9 +96,8 @@ export const authOptions = {
         return token;
       }
 
-      // 2. Subsequent requests: token already contains id and role.
-      // Only query DB if token id or role is absent, using lean query.
-      if (token?.email && (!token.id || !token.role)) {
+      // 2. Check if user still exists in MongoDB Compass (in case of logout / deletion)
+      if (token?.email) {
         try {
           await dbConnect();
           const cleanEmail = token.email.toLowerCase().trim();
@@ -99,32 +105,50 @@ export const authOptions = {
             .select('_id name email role profileImage isVerified')
             .lean();
 
-          if (dbUser) {
-            token.id = dbUser._id.toString();
-            token.role = dbUser.role || 'user';
-            token.name = dbUser.name;
-            token.isVerified = dbUser.isVerified;
-            if (dbUser.profileImage) {
-              token.picture = dbUser.profileImage;
-            }
+          if (!dbUser) {
+            // User deleted from MongoDB Compass on logout -> Revoke session and clean cookies
+            throw new Error('SessionRevoked');
+          }
+
+          token.id = dbUser._id.toString();
+          token.role = dbUser.role || 'user';
+          token.name = dbUser.name || token.name;
+          token.isVerified = dbUser.isVerified;
+          if (dbUser.profileImage) {
+            token.picture = dbUser.profileImage;
           }
         } catch (err) {
-          console.error('[AUTH] NextAuth jwt callback error:', err);
+          if (err.message === 'SessionRevoked') {
+            throw err;
+          }
+          console.error('[AUTH] NextAuth jwt verification error:', err);
         }
       }
       return token;
     },
 
     async session({ session, token }) {
-      if (token) {
-        if (!session.user) session.user = {};
-        session.user.id = token.id;
-        session.user.role = token.role || 'user';
-        session.user.name = token.name || session.user.name;
-        session.user.email = token.email || session.user.email;
-        session.user.isVerified = token.isVerified;
-        if (token.picture) {
-          session.user.image = token.picture;
+      if (token?.email) {
+        try {
+          await dbConnect();
+          const cleanEmail = token.email.toLowerCase().trim();
+          const dbUser = await User.findOne({ email: cleanEmail }).select('_id name role profileImage isVerified').lean();
+          if (!dbUser) {
+            // User does not exist in MongoDB Compass (e.g. was deleted on logout)
+            return null;
+          }
+          if (!session.user) session.user = {};
+          session.user.id = dbUser._id.toString();
+          session.user.role = dbUser.role || 'user';
+          session.user.name = dbUser.name || session.user.name;
+          session.user.email = cleanEmail;
+          session.user.isVerified = dbUser.isVerified;
+          if (dbUser.profileImage) {
+            session.user.image = dbUser.profileImage;
+          }
+          return session;
+        } catch (e) {
+          return null;
         }
       }
       return session;

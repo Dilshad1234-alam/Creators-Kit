@@ -3,7 +3,6 @@ import { z } from 'zod';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import PendingUser from '@/models/PendingUser';
-import crypto from 'crypto';
 import { sendEmail } from '@/lib/mailer';
 
 const registerSchema = z.object({
@@ -37,81 +36,80 @@ export async function POST(req) {
       );
     }
 
-    // Check if there is an existing pending unverified registration attempt
-    let pendingUser = await PendingUser.findOne({ email });
+    // Create and save new User directly into the MongoDB Compass 'users' collection
+    // The User model pre-save hook automatically hashes the password with bcrypt
+    const newUser = new User({
+      name,
+      email,
+      password,
+      role: 'user',
+      isVerified: true,
+      authProvider: 'credentials',
+    });
 
-    if (pendingUser) {
-      // Update details for fresh registration attempt
-      pendingUser.name = name;
-      pendingUser.password = password;
-    } else {
-      pendingUser = new PendingUser({
-        name,
-        email,
-        password,
-      });
+    await newUser.save();
+    console.log(`[AUTH] User successfully registered and saved in MongoDB 'users' collection: ${newUser.email} (ID: ${newUser._id})`);
+
+    // Clean up any stale unverified/pending entries for this email
+    try {
+      await PendingUser.deleteMany({ email });
+    } catch (cleanErr) {
+      console.warn('[AUTH] Cleaned pending user warning:', cleanErr.message);
     }
 
-    // Generate a secure 6-digit OTP code
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
-
-    pendingUser.otpCode = hashedOtp;
-    pendingUser.otpExpire = Date.now() + 10 * 60 * 1000; // 10 minutes expiry
-
-    await pendingUser.save();
-
-    // Send email with OTP code
+    // Send welcome confirmation email in background without blocking response
     try {
-      const message = `
+      const welcomeHtml = `
         <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; background: #ffffff; border-radius: 20px; border: 1px solid #eaeaea;">
           <div style="text-align: center; margin-bottom: 24px;">
-            <h1 style="font-size: 24px; font-weight: 900; color: #111111; margin: 0 0 8px 0; letter-spacing: -0.5px;">
-              Creators <span style="color: #FF1F2D;">kit</span>
+            <h1 style="font-size: 26px; font-weight: 900; color: #111111; margin: 0 0 8px 0; letter-spacing: -0.5px;">
+              Creators <span style="color: #900606;">kit</span>
             </h1>
-            <p style="font-size: 14px; color: #666666; margin: 0;">Account Verification</p>
+            <p style="font-size: 14px; color: #666666; margin: 0;">Welcome to Creators Kit</p>
           </div>
           
           <div style="background: #FAF7F2; border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px;">
-            <p style="font-size: 15px; color: #333333; margin: 0 0 16px 0; font-weight: 500;">
-              Hello <strong style="color: #111111;">${name}</strong>, use the verification code below to complete your registration:
+            <p style="font-size: 16px; color: #333333; margin: 0 0 12px 0; font-weight: 600;">
+              Hello <strong style="color: #111111;">${name}</strong>, welcome aboard!
             </p>
-            <div style="background: #ffffff; border: 2px dashed #FF1F2D; border-radius: 12px; padding: 16px 24px; display: inline-block;">
-              <span style="font-size: 32px; font-weight: 900; letter-spacing: 10px; color: #FF1F2D; font-family: monospace;">${otp}</span>
-            </div>
-            <p style="font-size: 12px; color: #777777; margin: 16px 0 0 0;">This code will expire in 10 minutes.</p>
+            <p style="font-size: 13px; color: #666666; margin: 0; line-height: 1.6;">
+              Your account has been created successfully. You can now explore studio gear, creator bundles, and enjoy exclusive member checkout.
+            </p>
           </div>
 
           <p style="font-size: 12px; color: #999999; text-align: center; margin: 0; line-height: 1.5;">
-            If you didn't create an account with Creators Kit, you can safely ignore this email.
+            Creators Kit Hub &bull; Equip Your Studio
           </p>
         </div>
       `;
 
-      await sendEmail({
-        to: pendingUser.email,
-        subject: `${otp} is your Creators Kit verification code`,
-        html: message,
+      sendEmail({
+        to: newUser.email,
+        subject: `Welcome to Creators Kit, ${name}!`,
+        html: welcomeHtml,
+      }).catch((emailErr) => {
+        console.warn('[AUTH] Welcome email dispatch note:', emailErr.message);
       });
-
-      return NextResponse.json(
-        { message: 'Verification code sent to your email.', email: pendingUser.email },
-        { status: 201 }
-      );
-    } catch (emailErr) {
-      console.error('Email sending failed in register route:', emailErr.message);
-      console.log('--------------------------------------------------');
-      console.log(`[TESTING OTP DISPATCH] Email: ${pendingUser.email} | OTP: ${otp}`);
-      console.log('--------------------------------------------------');
-      return NextResponse.json(
-        { message: 'Registration initiated. Verification code dispatched.', email: pendingUser.email },
-        { status: 201 }
-      );
+    } catch (e) {
+      // Non-fatal
     }
+
+    return NextResponse.json(
+      {
+        message: 'Account created successfully!',
+        user: {
+          _id: newUser._id,
+          name: newUser.name,
+          email: newUser.email,
+          role: newUser.role,
+        },
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Registration Error:', error);
     return NextResponse.json(
-      { error: 'Failed to initiate registration', details: error.message },
+      { error: 'Failed to create account', details: error.message },
       { status: 500 }
     );
   }

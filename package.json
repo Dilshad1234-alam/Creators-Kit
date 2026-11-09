@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node --max-old-space-size=4096 ./node_modules/next/dist/bin/next dev --webpack",
-    "build": "next build --webpack",
+    "dev": "cross-env NODE_OPTIONS='--max-old-space-size=4096' next dev",
+    "build": "cross-env NODE_OPTIONS='--max-old-space-size=4096' next build",
     "start": "next start",
     "lint": "eslint"
   },
@@ -26,7 +26,10 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/node": "26.6.6",
+    "@types/react": "19.3.0",
     "babel-plugin-react-compiler": "1.0.0",
+    "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.3.5",
     "tailwindcss": "^4",

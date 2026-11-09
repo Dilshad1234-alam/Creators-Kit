@@ -42,18 +42,6 @@ export async function POST(req) {
       );
     }
 
-    // Block login if user has not verified their OTP
-    if (!user.isVerified) {
-      return NextResponse.json(
-        {
-          error: 'Please verify your email address before logging in.',
-          email: user.email,
-          isPending: true,
-        },
-        { status: 403 }
-      );
-    }
-
     // Check if password matches
     const isMatch = await user.matchPassword(password);
 
@@ -64,9 +52,15 @@ export async function POST(req) {
       );
     }
 
+    // Auto-verify user upon successful credentials match if not already verified
+    if (!user.isVerified) {
+      user.isVerified = true;
+      await user.save().catch(() => {});
+    }
+
     const userRole = user.role || 'user';
     const isAdmin = userRole === 'admin';
-    const redirectTo = isAdmin ? '/admin' : '/account';
+    const redirectTo = isAdmin ? '/admin' : '/';
 
     const response = NextResponse.json(
       {

@@ -1,395 +1,914 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
-import useEmblaCarousel from 'embla-carousel-react';
-import { ArrowLeft, ArrowRight, Star } from 'lucide-react';
-import { useCart } from '@/context/CartContext';
+
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Star,
+  Check,
+  ShoppingCartPlus,
+  Truck,
+  RotateCcw,
+  ShieldCheck,
+  Award,
+  Search,
+  X,
+  ShoppingBag,
+  Sparkles,
+  Zap,
+  Flame,
+  Gift
+} from 'lucide-react';
+import { useCart } from '@/context/CartContext';
 import { getImageUrl } from '@/lib/imagekit';
 import BuiltForCreators from '@/components/BuiltForCreators';
+import WhatCreatorsSay from '@/components/WhatCreatorsSay';
 
-const defaultBonusMasterclasses = [
+// Pro Creator Bundle Hero Data (Matching Reference Screenshot 2)
+const proCreatorBundleHero = {
+  id: 'pro-creator-kit',
+  name: 'Creator Bundle Kits',
+  badge: 'LIMITED-TIME BUNDLE OFFER',
+  subtitle: 'Your complete setup. One powerful bundle.',
+  rating: 4.8,
+  reviewsCount: 120,
+  price: 3999,
+  originalPrice: 4999,
+  savings: 1000,
+  savingsPercent: 20,
+  images: [
+    { src: '/pro1.png', alt: 'Creator Bundle Kits Complete Studio Setup' },
+    { src: '/ring5.png', alt: '18-inch Professional LED Ring Light' },
+    { src: '/chorma2.png', alt: 'Chroma Key Green Screen Backdrop' },
+    { src: '/wireless-mic4.png', alt: 'Dual-Channel Wireless Studio Mic' },
+    { src: '/tripod6.png', alt: 'Heavy-Duty Aluminum Camera & Mobile Tripod' },
+  ],
+  whatsInTheBundle: [
+    {
+      name: '18-inch Ring Light',
+      type: 'ring',
+    },
+    {
+      name: 'Adjustable Tripod',
+      type: 'tripod',
+    },
+    {
+      name: 'Wireless Microphone',
+      type: 'mic',
+    },
+    {
+      name: 'Green Screen Backdrop',
+      type: 'backdrop',
+    },
+  ],
+  masterclasses: [
+    {
+      id: 'instagram-mastery',
+      title: 'Instagram Mastery',
+      image: '/video 2.webp',
+    },
+    {
+      id: 'youtube-mastery',
+      title: 'YouTube Mastery',
+      image: '/video 1.webp',
+    },
+    {
+      id: 'filmora-mastery',
+      title: 'Filmora Mastery',
+      image: '/video.webp',
+    },
+  ],
+};
+
+// Standard fallback catalog for individual products
+const fallbackCatalog = [
   {
-    id: 'instagram-mastery',
-    title: 'Instagram Mastery',
-    description: 'Learn the algorithm secrets, how to go viral with Reels, and build a dedicated following fast.',
-    image: '/video 2.webp',
-    badge: '100% Free',
-    originalPrice: 1999,
-    active: true,
+    id: 'ring-light-18',
+    slug: 'ring-light-18',
+    name: '18-Inch Professional Studio Ring Light',
+    subheading: 'Adjustable Bi-Color Lighting with Heavy Desk Mount',
+    category: 'Ring Lights',
+    tag: 'BESTSELLER',
+    price: 3999,
+    mrp: 4995,
+    rating: 4.8,
+    reviewsCount: 140,
+    image: '/ring5.png',
+    stock: 12,
+    productType: 'individual',
+    description: 'Achieve studio-grade illumination with 3200K-5600K color temperature and flicker-free dimming.',
   },
   {
-    id: 'youtube-mastery',
-    title: 'YouTube Mastery',
-    description: 'Master SEO, thumbnail creation, and viewer retention to monetize your channel efficiently.',
-    image: '/video 1.webp',
-    badge: '100% Free',
-    originalPrice: 1999,
-    active: true,
+    id: 'tripod',
+    slug: 'tripod',
+    name: 'Heavy-Duty Aluminum Camera & Mobile Tripod',
+    subheading: '3-Way Fluid Pan Head with Quick-Release Plate',
+    category: 'Tripods & Stands',
+    tag: 'TOP RATED',
+    price: 999,
+    mrp: 1299,
+    rating: 4.8,
+    reviewsCount: 120,
+    image: '/tripod6.png',
+    stock: 15,
+    productType: 'individual',
+    description: 'Rock-solid 170cm height extension with smooth 360-degree panning for horizontal & vertical shooting.',
   },
   {
-    id: 'filmora-mastery',
-    title: 'Filmora Mastery',
-    description: 'Professional video editing made simple. Learn cuts, transitions, effects, and color grading.',
-    image: '/video.webp',
-    badge: '100% Free',
-    originalPrice: 999,
-    active: true,
+    id: 'wireless-studio-mic',
+    slug: 'wireless-studio-mic',
+    name: 'Dual-Channel Wireless Studio Microphone System',
+    subheading: '2.4GHz Ultra-Low Latency with AI Noise Cancellation',
+    category: 'Wireless Mics',
+    tag: 'TRENDING',
+    price: 999,
+    mrp: 1499,
+    rating: 4.8,
+    reviewsCount: 120,
+    image: '/wireless-mic4.png',
+    stock: 10,
+    productType: 'individual',
+    description: 'Crystal-clear 48kHz/24-bit broadcast audio for YouTubers, vloggers, reels creators, and podcasters.',
+  },
+  {
+    id: 'green-screen-backdrop',
+    slug: 'green-screen-backdrop',
+    name: 'Wrinkle-Resistant Chroma Key Green Screen',
+    subheading: 'High-Density Studio Fabric with Heavy-Duty Stand',
+    category: 'Green Screen',
+    tag: 'BESTSELLER',
+    price: 899,
+    mrp: 1099,
+    rating: 4.8,
+    reviewsCount: 110,
+    image: '/chorma2.png',
+    stock: 14,
+    productType: 'individual',
+    description: 'Pure chroma green non-reflective matte cloth for seamless background replacement in OBS and Premiere.',
+  },
+  {
+    id: 'rode-wireless-go-2',
+    slug: 'rode-wireless-go-2',
+    name: 'Rode Wireless GO II Dual Mic System',
+    subheading: 'Broadcast-Grade Dual Transmitter & Receiver Suite',
+    category: 'Wireless Mics',
+    tag: 'STUDIO PRO',
+    price: 1499,
+    mrp: 2199,
+    rating: 4.9,
+    reviewsCount: 215,
+    image: '/wireless-mic2.png',
+    stock: 8,
+    productType: 'individual',
+    description: 'World-renowned wireless audio performance with 200m range and 7-hour battery life.',
+  },
+  {
+    id: 'pro-creator-kit',
+    slug: 'pro-creator-kit',
+    name: 'Pro Creator Kit (Complete 4-in-1 Studio Suite)',
+    subheading: 'Ring Light + Wireless Mic + Tripod + Green Screen + Bag',
+    category: 'Creator Bundles',
+    tag: 'BEST VALUE',
+    price: 9999,
+    mrp: 14999,
+    rating: 5.0,
+    reviewsCount: 280,
+    image: '/pro1.png',
+    stock: 6,
+    productType: 'bundle',
+    isBundle: true,
+    description: 'The complete creator powerhouse. Everything you need to produce cinematic content from day one.',
+  },
+  {
+    id: 'basic-creator-kit',
+    slug: 'basic-creator-kit',
+    name: 'Basic Creator Kit (Starter Suite)',
+    subheading: '18" Ring Light + Adjustable Aluminum Tripod Stand',
+    category: 'Creator Bundles',
+    tag: 'STARTER PACK',
+    price: 4999,
+    mrp: 6999,
+    rating: 4.9,
+    reviewsCount: 310,
+    image: '/pro.png',
+    stock: 9,
+    productType: 'bundle',
+    isBundle: true,
+    description: 'Essential lighting and stable mounting setup designed for beginner creators and unboxing channels.',
+  },
+  {
+    id: 'ultimate-creator-kit',
+    slug: 'ultimate-creator-kit',
+    name: 'Ultimate Creator Studio Suite',
+    subheading: 'Dual RGB LED Panels + Boom Arm + Condenser Mic + Tripod',
+    category: 'Creator Bundles',
+    tag: 'NEW ARRIVAL',
+    price: 14999,
+    mrp: 19999,
+    rating: 5.0,
+    reviewsCount: 195,
+    image: '/pro2.png',
+    stock: 5,
+    productType: 'bundle',
+    isBundle: true,
+    description: 'Maximum production value for top gaming streamers, podcasts, and video production houses.',
+  },
+  {
+    id: 'ring-light-desk-compact',
+    slug: 'ring-light-desk-compact',
+    name: 'Compact 10" RGB Desktop Ring Light',
+    subheading: 'Multi-Color RGB Modes with 360 Ball Head',
+    category: 'Ring Lights',
+    tag: 'HOT DEAL',
+    price: 799,
+    mrp: 1199,
+    rating: 4.7,
+    reviewsCount: 95,
+    image: '/ring1.png',
+    stock: 20,
+    productType: 'individual',
+    description: 'Vibrant RGB lighting with 26 color modes, USB powered, ideal for streaming and makeup tutorials.',
+  },
+  {
+    id: 'overhead-boom-arm-tripod',
+    slug: 'overhead-boom-arm-tripod',
+    name: 'Overhead 2-in-1 Boom Arm & Floor Tripod',
+    subheading: 'Horizontal 90-Degree Cross-Arm for Flatlay Shoots',
+    category: 'Tripods & Stands',
+    tag: 'CREATOR PICK',
+    price: 1299,
+    mrp: 1799,
+    rating: 4.8,
+    reviewsCount: 88,
+    image: '/tripod3.png',
+    stock: 11,
+    productType: 'individual',
+    description: 'Engineered for overhead unboxings, cooking videos, art tutorials, and table-top photography.',
   },
 ];
 
 export default function ProductPage() {
   const router = useRouter();
-  const { addToCart } = useCart();
-  const [mounted, setMounted] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { addToCart, buyNow } = useCart();
+
+  // State management
+  const [productsList, setProductsList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('featured');
+  const [addedMap, setAddedMap] = useState({});
   const [openFaq, setOpenFaq] = useState(null);
 
-  const [product, setProduct] = useState(null);
-  const [relatedProducts, setRelatedProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Hero Section State (Pro Creator Bundle)
+  const [heroImageIdx, setHeroImageIdx] = useState(0);
+  const [heroQuantity, setHeroQuantity] = useState(1);
+  const [heroBundleAdded, setHeroBundleAdded] = useState(false);
 
+  // Load products from API with fallback
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const [mobileProdRef, mobileProdEmbla] = useEmblaCarousel({ loop: true, align: 'start', slidesToScroll: 1 });
-  const scrollProdNext = useCallback(() => { if (mobileProdEmbla) mobileProdEmbla.scrollNext(); }, [mobileProdEmbla]);
-  const scrollProdPrev = useCallback(() => { if (mobileProdEmbla) mobileProdEmbla.scrollPrev(); }, [mobileProdEmbla]);
-  const mobileFeaturedProducts = relatedProducts && relatedProducts.length > 0 ? (relatedProducts.length <= 4 ? [...relatedProducts, ...relatedProducts, ...relatedProducts] : relatedProducts) : [];
-
-  const faqs = [
-    { q: 'Is this compatible with smartphones?', a: 'Yes, it comes with cables compatible with both Android and iOS smartphones.' },
-    { q: 'Does it come with warranty?', a: 'Yes, includes a 1-year official manufacturer warranty.' },
-    { q: 'What is the battery life?', a: 'Up to 7 hours of continuous recording on a single charge.' },
-    { q: 'Is it suitable for interviews?', a: 'Yes, dual channel recording makes it ideal for two-person interviews.' },
-    { q: 'Can I use it for live streaming?', a: 'Absolutely, it plugs directly into computers and capture cards.' },
-    { q: 'Can I connect it to a laptop?', a: 'Yes, via USB-C plug-and-play connectivity.' }
-  ];
-
-  useEffect(() => {
-    async function loadDynamicCatalog() {
+    let isMounted = true;
+    async function fetchStoreCatalog() {
       try {
-        const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-        const targetId = urlParams?.get('id') || urlParams?.get('productId');
-
-        const [prodRes, heroRes] = await Promise.all([
-          fetch('/api/products?type=individual').catch(() => null),
-          targetId ? fetch(`/api/products/${targetId}`).catch(() => null) : fetch('/api/products').catch(() => null),
-        ]);
-
-        let productItem = null;
-        if (heroRes && heroRes.ok) {
-          const heroData = await heroRes.json();
-          productItem = Array.isArray(heroData.data) ? heroData.data[0] : heroData.data;
-        }
-
-        if (productItem) {
-          const priceNum = typeof productItem.price === 'number' ? productItem.price : Number(productItem.price) || 0;
-          const mrpNum = productItem.originalPrice ? Number(productItem.originalPrice) : Math.round(priceNum * 1.35);
-          const rawImages = (Array.isArray(productItem.images) && productItem.images.length > 0)
-            ? productItem.images
-            : [{ src: productItem.image || '/pro1.png', title: productItem.name, subtitle: productItem.subheading || '', description: productItem.description || '', price: priceNum, originalPrice: mrpNum }];
-
-          setProduct({
-            id: productItem.id || productItem._id,
-            name: productItem.name,
-            price: priceNum,
-            originalPrice: mrpNum,
-            discount: productItem.discount || (mrpNum > priceNum ? `${Math.round(((mrpNum - priceNum) / mrpNum) * 100)}% OFF` : ''),
-            rating: productItem.rating || 4.8,
-            reviewsCount: productItem.reviewsCount || 120,
-            soldCount: productItem.stock ? `${productItem.stock} units available` : 'In Stock',
-            includeBonusCourses: productItem.includeBonusCourses !== undefined ? productItem.includeBonusCourses : (productItem.productType === 'bundle' || productItem.productType === 'thumbnail-bundle'),
-            bonusMasterclasses: (Array.isArray(productItem.bonusMasterclasses) && productItem.bonusMasterclasses.length > 0)
-              ? productItem.bonusMasterclasses
-              : defaultBonusMasterclasses,
-            images: rawImages.map((im) => ({
-              src: im.src || productItem.image || '/pro1.png',
-              title: im.title || productItem.name,
-              subtitle: im.subtitle || productItem.subheading || '',
-              description: im.description || productItem.description || '',
-              price: priceNum,
-              originalPrice: mrpNum,
-            })),
-            features: Array.isArray(productItem.features) ? productItem.features.map(f => typeof f === 'string' ? { title: f, desc: '' } : f) : [],
-            specifications: productItem.specifications || [],
-            whatsInTheBox: productItem.whatsInTheBox || [],
-          });
-        }
-
-        if (prodRes && prodRes.ok) {
-          const pData = await prodRes.json();
-          if (Array.isArray(pData.data)) {
-            setRelatedProducts(pData.data.map((p) => {
-              const priceNum = typeof p.price === 'number' ? p.price : Number(p.price) || 0;
-              const mrpNum = p.originalPrice || Math.round(priceNum * 1.3);
+        const res = await fetch('/api/products', { cache: 'no-store' });
+        if (res.ok) {
+          const json = await res.json();
+          if (isMounted && Array.isArray(json.data) && json.data.length > 0) {
+            const formatted = json.data.map((p) => {
+              const priceVal = typeof p.price === 'number' ? p.price : Number(p.price) || 999;
+              const mrpVal = p.originalPrice || Math.round(priceVal * 1.3);
               return {
                 id: p.id || p._id,
                 _id: p._id,
-                name: p.name,
-                price: priceNum,
-                mrp: mrpNum,
-                image: p.image || '/ring.jpg',
-                rating: p.rating || 4.8,
-                reviewsCount: p.reviewsCount || 120,
+                name: p.name || 'Creator Gear',
+                subheading: p.subheading || p.subtitle || '',
+                description: p.description || '',
+                category: p.category || (p.isBundle ? 'Creator Bundles' : 'Accessories'),
+                tag: p.tag || (p.isBundle ? 'BEST VALUE' : 'BESTSELLER'),
+                price: priceVal,
+                mrp: mrpVal,
+                rating: Number(p.rating) || 4.8,
+                reviewsCount: Number(p.reviewsCount) || 120,
+                image: p.image || (Array.isArray(p.images) && p.images[0]?.src) || '/pro1.png',
+                stock: p.stock !== undefined ? Number(p.stock) : 10,
+                isBundle: Boolean(p.isBundle || p.productType === 'bundle'),
+                productType: p.productType || (p.isBundle ? 'bundle' : 'individual'),
               };
-            }));
+            });
+            setProductsList(formatted);
+            setLoading(false);
+            return;
           }
         }
       } catch (err) {
-        console.error('Error fetching catalog data:', err);
-      } finally {
+        console.error('Failed to load store catalog, using fallback:', err);
+      }
+      if (isMounted) {
+        setProductsList(fallbackCatalog);
         setLoading(false);
       }
     }
-    loadDynamicCatalog();
+    fetchStoreCatalog();
+    return () => { isMounted = false; };
   }, []);
 
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-[#FBFBF7] text-neutral-800 font-bold">Loading Catalog...</div>;
-  }
+  // Hero Bundle Actions
+  const handleBuyHeroBundle = () => {
+    buyNow({
+      id: proCreatorBundleHero.id,
+      name: proCreatorBundleHero.name,
+      price: proCreatorBundleHero.price,
+      quantity: heroQuantity,
+      img: proCreatorBundleHero.images[0].src,
+      image: proCreatorBundleHero.images[0].src,
+    }, '/checkout');
+  };
 
-  if (!product) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FBFBF7] text-neutral-800 p-6 text-center">
-        <h2 className="text-2xl font-bold mb-2">No Products Available</h2>
-        <p className="text-neutral-500 mb-4">Please add products through the admin panel.</p>
-        <button onClick={() => router.push('/')} className="px-6 py-2.5 bg-[#900606] text-white font-bold rounded-xl shadow-md">Back to Home</button>
-      </div>
-    );
-  }
-
-  const activeVariant = product.images?.[currentImageIndex] || product.images?.[0] || {};
-  const activePrice = product.price; // Unified Suite Price
-  const activeOriginalPrice = product.originalPrice;
-  const activeDiscount = product.discount || (activeOriginalPrice && activePrice && activeOriginalPrice > activePrice ? `${Math.round(((activeOriginalPrice - activePrice) / activeOriginalPrice) * 100)}% OFF` : '');
-
-  const activeBonusCourses = Array.isArray(product.bonusMasterclasses) && product.bonusMasterclasses.length > 0
-    ? product.bonusMasterclasses.filter((c) => c.active !== false)
-    : defaultBonusMasterclasses;
-  const totalBonusValue = activeBonusCourses.reduce((sum, c) => sum + (Number(c.originalPrice) || 1999), 0);
-  const shouldShowBonus = product.includeBonusCourses !== false && activeBonusCourses.length > 0;
-
-  const handleAddToCart = () => {
+  const handleAddToCartHeroBundle = () => {
     const ok = addToCart({
-      id: `${product.id}-${currentImageIndex}`,
-      name: activeVariant.title || product.name,
-      price: activePrice,
-      quantity: 1,
-      img: activeVariant.src,
-      image: activeVariant.src
+      id: proCreatorBundleHero.id,
+      name: proCreatorBundleHero.name,
+      price: proCreatorBundleHero.price,
+      quantity: heroQuantity,
+      img: proCreatorBundleHero.images[0].src,
+      image: proCreatorBundleHero.images[0].src,
     });
-    if (ok) router.push('/cart');
+    if (ok) {
+      setHeroBundleAdded(true);
+      setTimeout(() => setHeroBundleAdded(false), 2000);
+    }
   };
 
-  const handleBuyNow = () => {
-    const ok = buyNow({
-      id: `${product.id}-${currentImageIndex}`,
-      name: activeVariant.title || product.name,
-      price: activePrice,
+  // Grid Product Actions
+  const handleAddToCartProduct = useCallback((productItem) => {
+    const priceVal = typeof productItem.price === 'number' ? productItem.price : Number(productItem.price) || 0;
+    const ok = addToCart({
+      id: String(productItem.id || productItem._id),
+      name: productItem.name,
+      price: priceVal,
       quantity: 1,
-      img: activeVariant.src,
-      image: activeVariant.src
+      img: productItem.image,
+      image: productItem.image,
     });
-    if (ok) router.push('/checkout');
-  };
+    if (ok) {
+      const pid = String(productItem.id || productItem._id);
+      setAddedMap((prev) => ({ ...prev, [pid]: true }));
+      setTimeout(() => {
+        setAddedMap((prev) => ({ ...prev, [pid]: false }));
+      }, 1800);
+    }
+  }, [addToCart]);
 
-  const nextImage = () => setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
-  const prevImage = () => setCurrentImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
+  const handleBuyNowProduct = useCallback((productItem) => {
+    const priceVal = typeof productItem.price === 'number' ? productItem.price : Number(productItem.price) || 0;
+    buyNow({
+      id: String(productItem.id || productItem._id),
+      name: productItem.name,
+      price: priceVal,
+      quantity: 1,
+      img: productItem.image,
+      image: productItem.image,
+    }, '/checkout');
+  }, [buyNow]);
+
+  // Categories list with dynamic counters
+  const categoriesList = useMemo(() => {
+    const counts = {
+      all: productsList.length,
+      bundles: 0,
+      ringLights: 0,
+      mics: 0,
+      tripods: 0,
+      greenScreen: 0,
+    };
+
+    productsList.forEach((p) => {
+      const name = (p.name || '').toLowerCase();
+      const cat = (p.category || '').toLowerCase();
+      const isBun = p.isBundle || p.productType === 'bundle' || p.productType === 'thumbnail-bundle' || cat.includes('bundle') || name.includes('bundle') || name.includes('kit');
+      const isRing = cat.includes('ring') || cat.includes('light') || name.includes('ring') || name.includes('light');
+      const isMic = cat.includes('mic') || cat.includes('audio') || name.includes('mic') || name.includes('audio');
+      const isTripod = cat.includes('tripod') || cat.includes('stand') || name.includes('tripod') || name.includes('stand');
+      const isGreen = cat.includes('green') || cat.includes('chroma') || cat.includes('backdrop') || name.includes('green') || name.includes('chroma');
+
+      if (isBun) counts.bundles += 1;
+      if (isRing && !isBun) counts.ringLights += 1;
+      if (isMic && !isBun) counts.mics += 1;
+      if (isTripod && !isBun) counts.tripods += 1;
+      if (isGreen && !isBun) counts.greenScreen += 1;
+    });
+
+    return [
+      { id: 'all', name: 'All Gear', count: counts.all },
+      { id: 'bundles', name: 'Creator Bundles', count: counts.bundles },
+      { id: 'ring-lights', name: 'Ring Lights', count: counts.ringLights },
+      { id: 'wireless-mics', name: 'Wireless Mics', count: counts.mics },
+      { id: 'tripods', name: 'Tripods & Stands', count: counts.tripods },
+      { id: 'green-screen', name: 'Green Screen', count: counts.greenScreen },
+    ];
+  }, [productsList]);
+
+  // Filter and sort products
+  const filteredProducts = useMemo(() => {
+    let result = [...productsList];
+
+    if (activeCategory !== 'all') {
+      result = result.filter((p) => {
+        const name = (p.name || '').toLowerCase();
+        const cat = (p.category || '').toLowerCase();
+        if (activeCategory === 'bundles') {
+          return p.isBundle || p.productType === 'bundle' || p.productType === 'thumbnail-bundle' || cat.includes('bundle') || name.includes('bundle') || name.includes('kit');
+        }
+        if (activeCategory === 'ring-lights') {
+          return (cat.includes('ring') || cat.includes('light') || name.includes('ring') || name.includes('light')) && !p.isBundle;
+        }
+        if (activeCategory === 'wireless-mics') {
+          return (cat.includes('mic') || cat.includes('audio') || name.includes('mic') || name.includes('audio')) && !p.isBundle;
+        }
+        if (activeCategory === 'tripods') {
+          return (cat.includes('tripod') || cat.includes('stand') || name.includes('tripod') || name.includes('stand')) && !p.isBundle;
+        }
+        if (activeCategory === 'green-screen') {
+          return (cat.includes('green') || cat.includes('chroma') || cat.includes('backdrop') || name.includes('green') || name.includes('chroma')) && !p.isBundle;
+        }
+        return true;
+      });
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter(
+        (p) =>
+          p.name?.toLowerCase().includes(q) ||
+          p.subheading?.toLowerCase().includes(q) ||
+          p.category?.toLowerCase().includes(q) ||
+          p.description?.toLowerCase().includes(q)
+      );
+    }
+
+    if (sortBy === 'price-low') {
+      result.sort((a, b) => a.price - b.price);
+    } else if (sortBy === 'price-high') {
+      result.sort((a, b) => b.price - a.price);
+    } else if (sortBy === 'rating') {
+      result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    } else if (sortBy === 'discount') {
+      result.sort((a, b) => {
+        const discA = a.mrp > a.price ? (a.mrp - a.price) / a.mrp : 0;
+        const discB = b.mrp > b.price ? (b.mrp - b.price) / b.mrp : 0;
+        return discB - discA;
+      });
+    }
+
+    return result;
+  }, [productsList, activeCategory, searchQuery, sortBy]);
 
   return (
-    <div className="min-h-[100svh] bg-[#FBFBF7] text-[#111827] font-sans pb-2 sm:pb-4">
-      <main className="w-full pt-14 sm:pt-20 md:pt-24">
-        
-        {/* PRODUCT HERO SECTION */}
-        <section className="w-full pt-0 pb-1.5 sm:pb-5 bg-[#FBFBF7]">
-          <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-14 grid grid-cols-1 lg:grid-cols-12 gap-2 sm:gap-6 lg:gap-10 xl:gap-12 items-start">
-            
-            {/* THUMBNAILS + MAIN IMAGE */}
-            <div className="lg:col-span-7 flex flex-col md:flex-row gap-2 md:gap-2.5 lg:gap-3 items-start w-full">
-              {product.images && product.images.length > 1 && (
-                <div className="flex md:flex-col gap-1.5 sm:gap-2 md:gap-2 order-2 md:order-1 overflow-x-auto md:overflow-visible no-scrollbar pb-0 md:pb-0 shrink-0 w-full md:w-[160px] lg:w-[180px] xl:w-[200px]">
-                  {product.images.map((img, idx) => (
+    <div className="min-h-screen bg-[#FBFBF7] text-[#111827] font-sans selection:bg-[#900606] selection:text-white ">
+      <main className="w-full pt-[96px] sm:pt-[116px]">
+
+        {/* ========================================================================= */}
+        {/* 1. HERO SECTION (PRO CREATOR BUNDLE - MATCHING REFERENCE SCREENSHOT 2)    */}
+        {/* ========================================================================= */}
+        <section className="w-full pt-1 sm:pt-2 pb-1.5 sm:pb-2 bg-[#FBFBF7]">
+          <div className="w-full px-3.5 sm:px-6 md:px-8 lg:px-10">
+
+            {/* Grid Layout: Left Gallery + Right Details */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-5 xl:gap-6 lg:items-stretch w-full">
+
+              {/* LEFT: VERTICAL THUMBNAILS + MAIN SHOWCASE CARD */}
+              <div className="lg:col-span-7 flex flex-col md:flex-row gap-2.5 sm:gap-3 items-stretch w-full h-full">
+
+                {/* Vertical Thumbnails */}
+                <div className="flex md:flex-col gap-2 sm:gap-2.5 order-2 md:order-1 overflow-x-auto md:overflow-visible no-scrollbar pb-1 md:pb-0 shrink-0 w-full md:w-20 lg:w-22 xl:w-24">
+                  {proCreatorBundleHero.images.map((img, idx) => (
                     <button
                       key={idx}
                       type="button"
-                      onClick={() => setCurrentImageIndex(idx)}
-                      className={`relative flex-1 min-w-[84px] max-w-[108px] h-[72px] sm:h-[82px] md:h-[105px] lg:h-[115px] xl:h-[125px] md:w-[160px] lg:w-[180px] xl:w-[200px] md:flex-none rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-[2.5px] bg-white flex items-center justify-center shrink-0 transition-all cursor-pointer ${
-                        currentImageIndex === idx ? 'border-[#900606] shadow-sm ring-2 ring-[#900606]/20' : 'border-neutral-200 hover:border-neutral-400 opacity-75 hover:opacity-100'
-                      }`}
+                      onClick={() => setHeroImageIdx(idx)}
+                      className={`relative w-16 h-16 sm:w-20 sm:h-20 md:w-20 md:h-20 lg:w-22 lg:h-22 xl:w-24 xl:h-24 rounded-2xl overflow-hidden border-2 bg-white flex items-center justify-center shrink-0 transition-all cursor-pointer ${heroImageIdx === idx
+                        ? 'border-[#900606] shadow-sm ring-2 ring-[#900606]/20'
+                        : 'border-neutral-200 hover:border-neutral-400 opacity-75 hover:opacity-100'
+                        }`}
                     >
-                      <Image src={getImageUrl(img.src)} alt={img.title || product.name} fill sizes="220px" className="object-cover object-center" />
+                      <Image
+                        src={getImageUrl(img.src)}
+                        alt={img.alt}
+                        fill
+                        sizes="112px"
+                        className="object-cover object-center"
+                      />
                     </button>
                   ))}
                 </div>
-              )}
 
-              {/* MAIN IMAGE SHOWCASE */}
-              <div className="relative flex-1 min-w-0 w-full aspect-square sm:aspect-[4/3] md:aspect-auto md:h-[540px] lg:h-[600px] xl:h-[660px] rounded-2xl md:rounded-3xl bg-white border border-neutral-200 shadow-sm overflow-hidden order-1 md:order-2 group">
-                <span className="absolute top-3.5 left-3.5 z-20 bg-[#900606] text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded shadow-sm uppercase tracking-wide">
-                  BESTSELLER
-                </span>
+                {/* Main Showcase Image Card - Stretches full height to align bottom with right column */}
+                <div className="relative flex-1 min-w-0 w-full h-full min-h-[460px] sm:min-h-[500px] lg:min-h-0 rounded-3xl bg-white border border-neutral-200 shadow-sm overflow-hidden order-1 md:order-2 flex items-center justify-center">
 
-                <button type="button" onClick={prevImage} className="absolute left-3.5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white/90 hover:bg-white text-neutral-800 shadow-md flex items-center justify-center transition-all border border-neutral-200/80 cursor-pointer">
-                  <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
-                </button>
-                <button type="button" onClick={nextImage} className="absolute right-3.5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white/90 hover:bg-white text-neutral-800 shadow-md flex items-center justify-center transition-all border border-neutral-200/80 cursor-pointer">
-                  <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-                </button>
+                  {/* BEST VALUE Badge */}
+                  <span className="absolute top-4 left-4 z-20 bg-[#900606] text-white text-[10px] sm:text-xs font-black px-3.5 py-1.5 rounded-lg uppercase tracking-wider shadow-sm">
+                    BEST VALUE
+                  </span>
 
-                <Image src={getImageUrl(activeVariant.src)} alt={activeVariant.title || product.name} fill sizes="(max-width: 1024px) 100vw, 60vw" className="object-cover object-center" priority />
-              </div>
-            </div>
+                  {/* Navigation Arrows */}
+                  <button
+                    type="button"
+                    onClick={() => setHeroImageIdx((prev) => (prev - 1 + proCreatorBundleHero.images.length) % proCreatorBundleHero.images.length)}
+                    aria-label="Previous image"
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white/95 hover:bg-white text-neutral-800 shadow-md flex items-center justify-center transition-all border border-neutral-200 cursor-pointer hover:scale-105 active:scale-95"
+                  >
+                    <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setHeroImageIdx((prev) => (prev + 1) % proCreatorBundleHero.images.length)}
+                    aria-label="Next image"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white/95 hover:bg-white text-neutral-800 shadow-md flex items-center justify-center transition-all border border-neutral-200 cursor-pointer hover:scale-105 active:scale-95"
+                  >
+                    <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                  </button>
 
-            {/* PRODUCT INFO */}
-            <div className="lg:col-span-5 flex flex-col justify-start">
-              <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-medium text-[#111827] tracking-tight">{activeVariant.title || product.name}</h1>
-                {activeVariant.subtitle && <p className="text-neutral-500 text-xs sm:text-sm font-medium mt-1.5">{activeVariant.subtitle}</p>}
-
-                <div className="flex items-center gap-2 mt-3 text-xs flex-wrap">
-                  <div className="flex text-amber-400 text-sm">★★★★★</div>
-                  <span className="font-bold text-neutral-800">{product.rating} ({product.reviewsCount} reviews)</span>
-                  <span className="text-neutral-300">|</span>
-                  <span className="text-neutral-500 font-medium">{product.soldCount}</span>
-                </div>
-
-                <div className="mt-3">
-                  <div className="flex items-baseline gap-2.5">
-                    <span className="text-3xl sm:text-4xl font-black text-[#900606]">₹{activePrice.toLocaleString()}</span>
-                    {activeOriginalPrice > activePrice && <span className="text-lg text-neutral-400 line-through font-normal">₹{activeOriginalPrice.toLocaleString()}</span>}
-                    {activeDiscount && <span className="bg-[#900606] text-white text-[10px] font-bold px-2 py-0.5 rounded">{activeDiscount}</span>}
+                  {/* Main Image Display: zero padding, proper full display */}
+                  <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+                    <Image
+                      src={getImageUrl(proCreatorBundleHero.images[heroImageIdx].src)}
+                      alt={proCreatorBundleHero.images[heroImageIdx].alt}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 55vw"
+                      className={`${heroImageIdx === 0 ? 'object-cover object-center' : 'object-contain object-center p-4 sm:p-6'} select-none transition-all duration-300`}
+                      priority
+                    />
                   </div>
-                  <p className="text-[11px] text-neutral-400 font-normal mt-0.5">Inclusive of all taxes</p>
-                  <p className="text-xs font-bold text-emerald-600 flex items-center gap-1.5 mt-2">✓ In Stock - Ready to Ship</p>
-                </div>
 
-                {activeVariant.description && <p className="text-neutral-600 text-xs sm:text-sm font-bold leading-relaxed mt-3">{activeVariant.description}</p>}
-              </div>
-
-              {/* FREE MASTERCLASSES BUNDLE OFFER (MATCHING REFERENCE SCREENSHOT) */}
-              {shouldShowBonus && (
-                <div className="mt-4 rounded-2xl border-2 border-red-200/90 bg-gradient-to-br from-red-50/70 via-white to-amber-50/30 p-4 sm:p-5 shadow-sm relative overflow-hidden">
-
-                  <h3 className="text-sm sm:text-base font-extrabold text-[#111827] tracking-tight">
-                    Free Masterclasses Bundle
-                  </h3>
-                  <p className="text-[11px] sm:text-xs text-neutral-600 mt-0.5 leading-relaxed">
-                    Purchasing this product automatically unlocks lifetime access to all courses directly inside your account:
-                  </p>
-
-                  {/* Clean 3 Course Thumbnail Cards */}
-                  <div className={`grid ${activeBonusCourses.length === 1 ? 'grid-cols-1' : activeBonusCourses.length === 2 ? 'grid-cols-2' : 'grid-cols-3'} gap-2.5 sm:gap-3 mt-3.5`}>
-                    {activeBonusCourses.map((c) => (
-                      <div
-                        key={c.id || c.title}
-                        className="group flex flex-col items-center text-center cursor-pointer"
-                      >
-                        <div className="w-full h-20 sm:h-24 md:h-28 rounded-xl overflow-hidden relative mb-2 flex items-center justify-center p-1 bg-white border border-neutral-100 shadow-2xs">
-                          <Image
-                            src={getImageUrl(c.image || '/video 2.webp')}
-                            alt={c.title}
-                            fill
-                            sizes="(max-width: 768px) 33vw, 150px"
-                            className="object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300"
-                          />
-                        </div>
-                        <h4 className="font-bold text-[11px] sm:text-xs text-[#111827] line-clamp-1 group-hover:text-[#900606] transition-colors">
-                          {c.title}
-                        </h4>
-                      </div>
+                  {/* Carousel Pagination Dots */}
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+                    {proCreatorBundleHero.images.map((_, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setHeroImageIdx(idx)}
+                        aria-label={`Go to slide ${idx + 1}`}
+                        className={`h-2 rounded-full transition-all cursor-pointer ${heroImageIdx === idx ? 'w-5 bg-[#900606]' : 'w-2 bg-neutral-300 hover:bg-neutral-400'
+                          }`}
+                      />
                     ))}
                   </div>
-                </div>
-              )}
 
-              {/* Trust Badges */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-5 border-t border-neutral-200 text-center mt-5">
-                {[
-                  { title: 'Free Delivery', sub: '2-3 days' },
-                  { title: '7 Days Returns', sub: 'Easy replacement' },
-                  { title: 'Secure Payment', sub: '100% safe' },
-                  { title: 'Genuine Product', sub: 'Official warranty' }
-                ].map((badge, idx) => (
-                  <div key={idx} className="flex flex-col items-center">
-                    <span className="text-xs font-bold text-neutral-800">{badge.title}</span>
-                    <span className="text-[10px] text-neutral-400 font-medium">{badge.sub}</span>
-                  </div>
-                ))}
+                </div>
+
               </div>
 
-              {/* ACTION BUTTONS */}
-              <div className="flex gap-3 mt-5 mb-1 w-full">
-                <button onClick={handleAddToCart} type="button" className="flex-1 py-3 px-4 bg-white text-gray-800 border border-gray-300 font-semibold text-xs sm:text-sm rounded-xl hover:bg-neutral-50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs">
-                  Add to Cart
-                </button>
-                <button onClick={handleBuyNow} type="button" className="flex-1 py-3 px-4 bg-[#900606] hover:bg-[#7a0505] text-white font-semibold text-xs sm:text-sm rounded-xl active:scale-[0.98] transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer">
-                  Buy Now
-                </button>
+              {/* RIGHT: DETAILS, BUNDLE BREAKDOWN, MASTERCLASSES, BUY ACTIONS */}
+              <div className="lg:col-span-5 flex flex-col justify-start">
+
+                {/* LIMITED-TIME BUNDLE OFFER Badge */}
+                <div>
+                  <span className="inline-block bg-[#900606] text-white text-[11px] font-extrabold px-3 py-1 rounded shadow-2xs uppercase tracking-wider mb-2">
+                    {proCreatorBundleHero.badge}
+                  </span>
+
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium text-[#111827] tracking-tight leading-tight">
+                    Creator <span className="text-[#900606] whitespace-nowrap">Bundle Kits</span>
+                  </h1>
+
+                  <p className="text-neutral-500 text-xs sm:text-sm md:text-base font-normal mt-1.5">
+                    {proCreatorBundleHero.subtitle}
+                  </p>
+
+                  {/* Ratings & Reviews */}
+                  <div className="flex items-center gap-1.5 mt-2.5 text-xs">
+                    <div className="flex text-amber-400 text-sm">★★★★★</div>
+                    <span className="font-bold text-neutral-800">{proCreatorBundleHero.rating}</span>
+                    <span className="text-neutral-400">({proCreatorBundleHero.reviewsCount} reviews)</span>
+                  </div>
+
+                  {/* Pricing Box */}
+                  <div className="mt-3.5 pt-3 border-t border-neutral-200">
+                    <div className="flex items-baseline gap-2.5 flex-wrap">
+                      <span className="text-3xl sm:text-4xl font-black text-[#900606]">
+                        ₹{proCreatorBundleHero.price.toLocaleString('en-IN')}
+                      </span>
+                      <span className="text-lg text-neutral-400 line-through font-normal">
+                        ₹{proCreatorBundleHero.originalPrice.toLocaleString('en-IN')}
+                      </span>
+                      <span className="bg-[#900606] text-white text-[11px] font-black px-2.5 py-0.5 rounded shadow-2xs">
+                        SAVE ₹{proCreatorBundleHero.savings.toLocaleString('en-IN')}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-neutral-400 font-normal mt-0.5">
+                      Inclusive of all taxes
+                    </p>
+
+                    <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 mt-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      <span>In Stock – Ready to Ship</span>
+                    </div>
+                  </div>
+
+                  {/* Save Callout Pill (Compact Width) */}
+                  <div className="mt-3 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-50/90 border border-red-200/80 text-[#900606] text-xs font-bold w-fit shadow-2xs">
+                    <span>🏷</span>
+                    <span>Save {proCreatorBundleHero.savingsPercent}% when you buy the complete kit</span>
+                  </div>
+
+                  {/* What's in the bundle section */}
+                  <div className="mt-3">
+                    <h3 className="font-extrabold text-xs sm:text-sm text-neutral-900 tracking-tight">
+                      What&apos;s in the bundle
+                    </h3>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 mt-2">
+                      {proCreatorBundleHero.whatsInTheBundle.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="bg-white rounded-xl border border-neutral-200/90 p-2 sm:p-2.5 flex flex-col items-center text-center shadow-2xs hover:border-[#900606] transition-colors"
+                        >
+                          <div className="h-9 sm:h-10 flex items-center justify-center mb-1">
+                            {item.type === 'ring' && (
+                              <svg viewBox="0 0 48 48" className="w-7 h-7 sm:w-9 sm:h-9 text-neutral-800" fill="none" stroke="currentColor" strokeWidth="2">
+                                <circle cx="24" cy="18" r="11" strokeWidth="2.5" />
+                                <circle cx="24" cy="18" r="6" strokeWidth="1.5" />
+                                <path d="M24 29v9M18 43l6-5 6 5" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            )}
+                            {item.type === 'tripod' && (
+                              <svg viewBox="0 0 48 48" className="w-7 h-7 sm:w-9 sm:h-9 text-neutral-800" fill="none" stroke="currentColor" strokeWidth="2">
+                                <rect x="19" y="6" width="10" height="6" rx="1.5" strokeWidth="2" />
+                                <path d="M24 12v8M24 20l-9 22M24 20l9 22M24 20v22" strokeLinecap="round" strokeLinejoin="round" />
+                                <path d="M19 33h10" strokeLinecap="round" />
+                              </svg>
+                            )}
+                            {item.type === 'mic' && (
+                              <svg viewBox="0 0 48 48" className="w-7 h-7 sm:w-9 sm:h-9 text-neutral-800" fill="none" stroke="currentColor" strokeWidth="2">
+                                <rect x="16" y="8" width="16" height="23" rx="4" strokeWidth="2" />
+                                <circle cx="24" cy="15" r="3" fill="currentColor" />
+                                <path d="M20 22h8M22 26h4" strokeLinecap="round" />
+                                <path d="M24 31v9M20 40h8" strokeLinecap="round" />
+                              </svg>
+                            )}
+                            {item.type === 'backdrop' && (
+                              <svg viewBox="0 0 48 48" className="w-7 h-7 sm:w-9 sm:h-9 text-neutral-800" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M8 8h32M10 8v34M38 8v34" strokeLinecap="round" strokeWidth="2" />
+                                <rect x="13" y="11" width="22" height="25" rx="2" fill="#22c55e" fillOpacity="0.8" stroke="#16a34a" strokeWidth="1.5" />
+                                <path d="M6 42h8M34 42h8" strokeLinecap="round" strokeWidth="2" />
+                              </svg>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1 mt-auto">
+                            <span className="w-3.5 h-3.5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[9px] font-bold shrink-0">✓</span>
+                            <span className="text-[10px] font-bold text-neutral-800 leading-tight text-center">
+                              {item.name}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 3 Masterclasses. Included FREE. */}
+                  <div className="mt-3 rounded-2xl border border-red-200/90 bg-[#FFFBFB] p-2.5 sm:p-3 shadow-2xs">
+                    <div className="flex items-center justify-between text-xs mb-2 flex-wrap gap-1">
+                      <div className="flex items-center gap-1.5 font-bold text-neutral-900 text-xs sm:text-sm">
+                        <span className="text-base">🎓</span>
+                        <span>3 Masterclasses. Included <span className="text-[#900606]">FREE.</span></span>
+                      </div>
+                      <span className="text-[11px] text-neutral-400 font-medium">
+                        Lifetime access with your bundle
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2">
+                      {proCreatorBundleHero.masterclasses.map((c) => (
+                        <div key={c.id} className="flex flex-col items-center text-center">
+                          <div className="relative w-full h-14 sm:h-16 md:h-18 rounded-xl overflow-hidden bg-white border border-neutral-200/80 p-1 flex items-center justify-center shadow-2xs">
+                            <Image
+                              src={getImageUrl(c.image)}
+                              alt={c.title}
+                              fill
+                              sizes="120px"
+                              className="object-contain"
+                            />
+                          </div>
+                          <span className="font-bold text-[10px] sm:text-xs text-neutral-900 mt-1 line-clamp-1">
+                            {c.title}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Actions Row: Quantity + Buy Bundle Now + Add to Cart */}
+                  <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3 mt-3 w-full">
+                    {/* Buy Bundle Now */}
+                    <button
+                      type="button"
+                      onClick={handleBuyHeroBundle}
+                      className="flex-1 py-3 px-3 bg-[#900606] hover:bg-[#780505] text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                    >
+                      <span>Buy Bundle Now</span>
+                      <span>➔</span>
+                    </button>
+
+                    {/* Add to Cart */}
+                    <button
+                      type="button"
+                      onClick={handleAddToCartHeroBundle}
+                      className="px-5 py-3 bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 font-bold text-xs sm:text-sm rounded-xl transition shadow-2xs hover:shadow-sm cursor-pointer active:scale-95"
+                    >
+                      {heroBundleAdded ? '✓ Added' : 'Add to Cart'}
+                    </button>
+                  </div>
+
+                  {/* Trust badges row */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 border-t border-neutral-200 mt-3 text-neutral-800">
+                    <div className="flex items-center gap-2">
+                      <Truck className="w-4 h-4 text-[#900606] shrink-0 stroke-[2]" />
+                      <div>
+                        <p className="text-[11px] font-bold leading-tight">Free Delivery</p>
+                        <p className="text-[10px] text-neutral-400">2–3 days</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <RotateCcw className="w-4 h-4 text-[#900606] shrink-0 stroke-[2]" />
+                      <div>
+                        <p className="text-[11px] font-bold leading-tight">7-Day Returns</p>
+                        <p className="text-[10px] text-neutral-400">Easy replacement</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-[#900606] shrink-0 stroke-[2]" />
+                      <div>
+                        <p className="text-[11px] font-bold leading-tight">Secure Payment</p>
+                        <p className="text-[10px] text-neutral-400">100% safe</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Award className="w-4 h-4 text-[#900606] shrink-0 stroke-[2]" />
+                      <div>
+                        <p className="text-[11px] font-bold leading-tight">Genuine Products</p>
+                        <p className="text-[10px] text-neutral-400">Official warranty</p>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        {/* ========================================================================= */}
+        {/* 2. FEATURED STUDIO PRODUCTS (CATALOG + FILTERS + SEARCH & SORT)           */}
+        {/* ========================================================================= */}
+        <section id="catalog-section" className="w-full pt-3 sm:pt-4 pb-1 bg-[#FBFBF7] border-t border-neutral-200">
+          <div className="w-full px-2.5 sm:px-4 md:px-6 lg:px-8">
+
+            {/* Centered Heading - Matching Popular Creators Bundles Font Style */}
+            <div className="flex flex-col items-center text-center mb-3 sm:mb-4 max-w-3xl mx-auto px-4">
+              <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-medium text-[#111827] dark:text-white tracking-tight pb-1">
+                Featured <span className="text-[#900606] whitespace-nowrap">Studio Products</span>
+              </h2>
+              <p className="text-neutral-500 text-xs sm:text-sm md:text-base font-normal max-w-xl leading-relaxed mt-1">
+                Explore individual creator products and studio tools designed to elevate your content creation.
+              </p>
+            </div>
+
+            {/* Controls Bar: Category Filter Pills + Search & Sort */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
+              {/* Category Filter Pills (Horizontal Scroll on Mobile) */}
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+                {categoriesList.map((cat) => {
+                  const isActive = activeCategory === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setActiveCategory(cat.id)}
+                      className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 cursor-pointer shrink-0 ${isActive
+                        ? 'bg-[#900606] text-white shadow-md ring-2 ring-[#900606]/20'
+                        : 'bg-white hover:bg-neutral-50 text-neutral-700 border border-neutral-200/90 hover:border-neutral-300 shadow-2xs'
+                        }`}
+                    >
+                      <span>{cat.name}</span>
+                      <span
+                        className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${isActive ? 'bg-white/20 text-white' : 'bg-neutral-100 text-neutral-500'
+                          }`}
+                      >
+                        {cat.count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Search & Sort Controls */}
+              <div className="flex items-center gap-2.5 shrink-0 flex-wrap sm:flex-nowrap">
+                <div className="relative min-w-[200px] sm:min-w-[240px] flex-1">
+                  <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Search gear (e.g. tripod, mic)..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl focus:outline-none focus:border-[#900606] shadow-2xs text-neutral-900 placeholder:text-neutral-400"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl focus:outline-none focus:border-[#900606] text-neutral-800 font-semibold shadow-2xs cursor-pointer"
+                >
+                  <option value="featured">Featured / Top Sellers</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="rating">Highest Rated</option>
+                  <option value="discount">Biggest Discount</option>
+                </select>
               </div>
             </div>
 
           </div>
         </section>
 
-        {/* KEY FEATURES */}
-        {product.features && product.features.length > 0 && (
-          <section className="w-full pt-1 pb-2 sm:py-6 bg-[#FBFBF7]">
-            <div className="w-full px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium text-[#111827] tracking-tight pb-1.5 sm:pb-4">
-                Key <span className="text-[#900606]">Features</span>
-              </h2>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-                {product.features.map((feature, idx) => (
-                  <div key={idx} className="bg-white rounded-xl sm:rounded-2xl p-3.5 sm:p-5 lg:p-6 border border-neutral-200/90 shadow-2xs flex flex-col justify-start">
-                    <div className="w-8 h-8 sm:w-11 sm:h-11 rounded-lg bg-red-50 text-[#900606] flex items-center justify-center font-bold text-xs sm:text-base shrink-0 mb-2.5 sm:mb-3.5">✓</div>
-                    <div>
-                      <h3 className="font-semibold text-[#080b11] text-xs sm:text-base mb-1">{feature.title}</h3>
-                      {feature.desc && <p className="text-neutral-500 text-[11px] sm:text-xs leading-relaxed">{feature.desc}</p>}
-                    </div>
+        {/* ========================================================================= */}
+        {/* 3. OPTIMIZED PRODUCT GRID (DESKTOP: 5-COLUMN | MOBILE: 2-COLUMN)         */}
+        {/* ========================================================================= */}
+        <section className="w-full pt-0 pb-8 bg-[#FBFBF7]">
+          <div className="w-full px-2.5 sm:px-4 md:px-6 lg:px-8">
+
+            {loading ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5 sm:gap-4 animate-pulse">
+                {[...Array(10)].map((_, i) => (
+                  <div key={i} className="bg-white rounded-3xl p-4 border border-neutral-200 h-80 flex flex-col justify-between">
+                    <div className="aspect-square bg-neutral-200 rounded-2xl w-full" />
+                    <div className="h-4 bg-neutral-200 rounded w-3/4 mt-3" />
+                    <div className="h-4 bg-neutral-200 rounded w-1/2 mt-2" />
                   </div>
                 ))}
               </div>
-            </div>
-          </section>
-        )}
-
-        {/* FEATURES PRODUCTS CATEGORY GRID SECTION */}
-        {relatedProducts && relatedProducts.length > 0 && (
-          <section className="w-full pt-2 pb-2 sm:pt-8 sm:pb-6 bg-[#FBFBF7]">
-            <div className="w-full px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12">
-              <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-medium text-[#111827] tracking-tight pb-2 sm:pb-4 md:pb-8">
-                Features <span className="text-[#900606] whitespace-nowrap">Products</span>
-              </h2>
-
-              {/* MOBILE VIEW (block md:hidden) - FLIPKART STYLE 2-COLUMN GRID */}
-              <div className="block md:hidden w-full">
-                <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full">
-                  {relatedProducts.slice(0, 4).map((rel, idx) => {
+            ) : filteredProducts.length === 0 ? (
+              <div className="bg-white rounded-3xl border border-neutral-200 p-12 text-center max-w-md mx-auto my-12 shadow-sm">
+                <ShoppingBag className="w-12 h-12 text-neutral-300 mx-auto mb-3" />
+                <h3 className="font-bold text-lg text-neutral-900">No matching gear found</h3>
+                <p className="text-xs text-neutral-500 mt-1">Try another search term or switch your category filter.</p>
+                <button
+                  type="button"
+                  onClick={() => { setActiveCategory('all'); setSearchQuery(''); }}
+                  className="mt-4 px-5 py-2.5 bg-[#900606] text-white font-bold text-xs rounded-xl shadow-md cursor-pointer"
+                >
+                  Reset All Filters
+                </button>
+              </div>
+            ) : (
+              <>
+                {/* ------------------------------------------------------------- */}
+                {/* MOBILE VIEW (block md:hidden) - 2-COLUMN FLIPKART/D2C STYLE */}
+                {/* ------------------------------------------------------------- */}
+                <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 md:hidden w-full">
+                  {filteredProducts.map((rel) => {
                     const priceVal = typeof rel.price === 'number' ? rel.price : Number(rel.price) || 0;
                     const mrpVal = rel.mrp ? Number(rel.mrp) : Math.round(priceVal * 1.3);
                     const savePercent = mrpVal > priceVal ? Math.round(((mrpVal - priceVal) / mrpVal) * 100) : 25;
-                    const rating = rel.rating ? Number(rel.rating).toFixed(1) : (idx % 2 === 0 ? '4.8' : '4.6');
-                    const reviews = rel.reviewsCount || (idx % 2 === 0 ? 120 : 85);
-                    const promoTag = idx % 2 === 0 ? 'Top Deal of the Day' : 'Lowest Price Live';
-                    const promoColor = idx % 2 === 0 ? 'text-purple-700 bg-purple-50 border-purple-200/70' : 'text-emerald-700 bg-emerald-50 border-emerald-200/70';
+                    const ratingVal = Number(rel.rating) || 4.8;
+                    const isAdded = addedMap[String(rel.id || rel._id)];
 
                     return (
                       <div
-                        key={rel.id || rel._id || idx}
+                        key={rel.id || rel._id}
                         onClick={() => router.push(`/product/${rel.id || rel._id}`)}
                         className="flex flex-col bg-white rounded-2xl p-2.5 border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-md transition-all cursor-pointer group justify-between"
                       >
                         <div>
-                          {/* Image Container with Flipkart aspect ratio and floating rating pill */}
+                          {/* Image Container with floating rating and discount badge */}
                           <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden bg-neutral-100 flex items-center justify-center">
-                            {/* Flipkart-style Rating Pill Badge (Bottom Left) */}
+                            {savePercent > 0 && (
+                              <span className="absolute top-1.5 right-1.5 z-10 bg-[#900606] text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded shadow-2xs">
+                                {savePercent}% OFF
+                              </span>
+                            )}
+
+                            {/* Floating Rating Pill */}
                             <div className="absolute bottom-1.5 left-1.5 z-10 bg-white/95 backdrop-blur-xs text-neutral-800 text-[10px] font-bold px-1.5 py-0.5 rounded shadow-2xs flex items-center gap-1 border border-neutral-200/70">
-                              <span>{rating}</span>
-                              <span className="text-emerald-600 text-[9px]">★</span>
+                              <span>{ratingVal.toFixed(1)}</span>
+                              <span className="text-amber-500 text-[9px]">★</span>
                               <span className="text-neutral-300 text-[9px]">|</span>
-                              <span className="text-neutral-500 text-[9px] font-medium">{reviews}</span>
+                              <span className="text-neutral-500 text-[9px] font-medium">{rel.reviewsCount || 120}</span>
                             </div>
 
                             <Image
@@ -403,172 +922,283 @@ export default function ProductPage() {
 
                           {/* Product Info */}
                           <div className="pt-2 pb-1">
-                            {/* Brand / Product Name */}
                             <h3 className="font-bold text-neutral-900 text-xs sm:text-sm leading-tight line-clamp-1 group-hover:text-[#900606] transition-colors">
                               {rel.name}
                             </h3>
-
-                            {/* Subtitle / Category */}
-                            <p className="text-[11px] text-neutral-400 font-medium line-clamp-1 mt-0.5">
-                              Creator Studio Gear
+                            <p className="text-[11px] text-neutral-500 font-normal line-clamp-1 mt-0.5">
+                              {rel.subheading || rel.description || 'Creator Studio Gear'}
                             </p>
 
-                            {/* Price & Discount Row (Flipkart Style: ↓Discount% MRP SellingPrice) */}
+                            {/* Price Row */}
                             <div className="flex items-center gap-1.5 flex-wrap mt-1.5">
-                              {savePercent > 0 && (
-                                <span className="text-emerald-700 font-bold text-[11px] flex items-center">
-                                  ↓{savePercent}%
-                                </span>
-                              )}
+                              <span className="font-extrabold text-sm sm:text-base text-[#900606]">
+                                ₹{priceVal.toLocaleString('en-IN')}
+                              </span>
                               {mrpVal > priceVal && (
-                                <span className="text-[11px] text-neutral-400 font-medium line-through">
+                                <span className="text-[10px] text-neutral-400 line-through">
                                   ₹{mrpVal.toLocaleString('en-IN')}
                                 </span>
                               )}
-                              <span className="font-extrabold text-sm sm:text-base text-neutral-900">
-                                ₹{priceVal.toLocaleString('en-IN')}
-                              </span>
-                            </div>
-
-                            {/* Flipkart-style Tag Badge */}
-                            <div className="mt-1">
-                              <span className={`inline-block text-[9px] font-bold px-1.5 py-0.5 rounded border ${promoColor}`}>
-                                {promoTag}
-                              </span>
                             </div>
                           </div>
                         </div>
 
-                        {/* Compact Add to Cart Button */}
-                        <div className="pt-2">
+                        {/* Action Buttons */}
+                        <div className="pt-2 flex items-center gap-1.5 w-full">
                           <button
+                            type="button"
                             onClick={(e) => {
                               e.stopPropagation();
-                              const ok = addToCart({ id: rel.id || rel._id, name: rel.name, price: priceVal, quantity: 1, img: rel.image, image: rel.image }); if (ok) router.push('/cart');
+                              handleBuyNowProduct(rel);
                             }}
-                            className="relative w-full py-2 bg-white text-[#111827] border border-neutral-300 rounded-xl font-bold text-xs overflow-hidden group/btn transition-all duration-300 shadow-2xs flex items-center justify-center cursor-pointer active:scale-95"
+                            className="flex-1 py-2 bg-[#900606] hover:bg-[#780505] text-white rounded-xl font-bold text-xs transition-all shadow-xs flex items-center justify-center cursor-pointer active:scale-95"
                           >
-                            <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0 pointer-events-none"></span>
-                            <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-1">
-                              Add to Cart
-                            </span>
+                            Buy Now
+                          </button>
+                          <button
+                            type="button"
+                            title="Add to Cart"
+                            aria-label="Add to Cart"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAddToCartProduct(rel);
+                            }}
+                            className="w-8 h-8 flex-shrink-0 bg-white hover:bg-neutral-50 text-[#111827] hover:text-[#900606] border border-neutral-300 hover:border-[#900606] rounded-xl font-bold transition-all shadow-xs flex items-center justify-center cursor-pointer active:scale-95"
+                          >
+                            {isAdded ? (
+                              <Check className="w-4 h-4 text-emerald-600 animate-in zoom-in" />
+                            ) : (
+                              <ShoppingCartPlus className="w-4 h-4 text-[#111827]" />
+                            )}
                           </button>
                         </div>
-
                       </div>
                     );
                   })}
                 </div>
-              </div>
 
-              {/* DESKTOP VIEW (hidden md:grid) - COMPACT WITH REMOVED GAPS */}
-              <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 w-full">
-                {relatedProducts.slice(0, 4).map((rel) => (
-                  <div
-                    key={rel.id || rel._id}
-                    onClick={() => router.push(`/product/${rel.id || rel._id}`)}
-                    className="group flex flex-col bg-white rounded-3xl border border-neutral-200/90 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer"
-                  >
-                    <div>
-                      {/* Product Image Container */}
-                      <div className="relative w-full aspect-square bg-neutral-100/90 overflow-hidden flex items-center justify-center p-3 sm:p-4 group">
-                        <Image
-                          src={getImageUrl(rel.image)}
-                          alt={rel.name}
-                          fill
-                          sizes="(max-width: 640px) 100vw, 25vw"
-                          className="object-cover object-center w-full h-full group-hover:scale-105 transition-transform duration-500"
-                        />
-                      </div>
+                {/* ------------------------------------------------------------- */}
+                {/* DESKTOP VIEW (hidden md:grid) - 5-COLUMN BALANCED D2C GRID */}
+                {/* ------------------------------------------------------------- */}
+                <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-3.5 lg:gap-4 w-full">
+                  {filteredProducts.map((rel) => {
+                    const priceVal = typeof rel.price === 'number' ? rel.price : Number(rel.price) || 0;
+                    const mrpVal = rel.mrp ? Number(rel.mrp) : Math.round(priceVal * 1.3);
+                    const savePercent = mrpVal > priceVal ? Math.round(((mrpVal - priceVal) / mrpVal) * 100) : 25;
+                    const ratingVal = Number(rel.rating) || 4.8;
+                    const isAdded = addedMap[String(rel.id || rel._id)];
 
-                      {/* Product Info - Compact Spacing Without Gaps */}
-                      <div className="px-5 pt-3.5 pb-0">
-                        <h3 className="font-extrabold text-[#111827] text-base sm:text-lg mb-0.5 leading-snug line-clamp-1 group-hover:text-[#900606] transition-colors">
-                          {rel.name}
-                        </h3>
+                    return (
+                      <div
+                        key={rel.id || rel._id}
+                        onClick={() => router.push(`/product/${rel.id || rel._id}`)}
+                        className="group flex flex-col bg-white rounded-2xl lg:rounded-3xl border border-neutral-200/90 shadow-2xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer justify-between"
+                      >
+                        <div>
+                          {/* Product Image Container with Badges */}
+                          <div className="relative w-full aspect-square bg-white overflow-hidden flex items-center justify-center group">
+                            {/* Promo Tag */}
+                            {rel.tag && (
+                              <span className="absolute top-2.5 left-2.5 z-10 bg-[#900606] text-white text-[9px] font-black px-2 py-0.5 rounded shadow-xs uppercase tracking-wider">
+                                {rel.tag}
+                              </span>
+                            )}
 
-                        {/* Rating Stars */}
-                        <div className="flex items-center gap-1.5 mb-1">
-                          <div className="flex items-center">
-                            {[...Array(5)].map((_, starIdx) => {
-                              const ratingVal = Number(rel.rating) || 4.8;
-                              return (
-                                <Star
-                                  key={starIdx}
-                                  className={`w-3.5 h-3.5 ${starIdx < Math.round(ratingVal)
+                            {/* Discount Pill */}
+                            {savePercent > 0 && (
+                              <span className="absolute top-2.5 right-2.5 z-10 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-bold px-2 py-0.5 rounded-full shadow-2xs">
+                                {savePercent}% OFF
+                              </span>
+                            )}
+
+                            <Image
+                              src={getImageUrl(rel.image)}
+                              alt={rel.name}
+                              fill
+                              sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                              className="object-cover object-center w-full h-full group-hover:scale-108 transition-transform duration-500 ease-out"
+                            />
+                          </div>
+
+                          {/* Product Information */}
+                          <div className="p-3 sm:p-3.5 pb-1 flex flex-col">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#900606] mb-0.5">
+                              {rel.category || 'Creator Studio'}
+                            </span>
+
+                            <h3 className="font-bold text-[#111827] text-sm sm:text-base leading-tight line-clamp-1 group-hover:text-[#900606] transition-colors">
+                              {rel.name}
+                            </h3>
+
+                            <p className="text-[11px] text-neutral-500 line-clamp-1 mt-0.5 font-normal">
+                              {rel.subheading || rel.description || 'Professional creator equipment'}
+                            </p>
+
+                            {/* Ratings & Reviews */}
+                            <div className="flex items-center gap-1 mt-1">
+                              <div className="flex items-center text-amber-400">
+                                {[...Array(5)].map((_, sIdx) => (
+                                  <Star
+                                    key={sIdx}
+                                    className={`w-3 h-3 ${sIdx < Math.round(ratingVal)
                                       ? 'fill-amber-400 text-amber-400'
                                       : 'fill-neutral-200 text-neutral-200'
-                                    }`}
-                                />
-                              );
-                            })}
+                                      }`}
+                                  />
+                                ))}
+                              </div>
+                              <span className="text-[11px] font-bold text-neutral-800 ml-0.5">
+                                {ratingVal.toFixed(1)}
+                              </span>
+                              <span className="text-[11px] text-neutral-400">
+                                ({rel.reviewsCount || 120})
+                              </span>
+                            </div>
+
+                            {/* Price & Savings */}
+                            <div className="mt-1.5 pt-1.5 border-t border-neutral-100 flex items-baseline gap-1.5 flex-wrap">
+                              <span className="font-black text-lg sm:text-xl text-[#900606]">
+                                ₹{priceVal.toLocaleString('en-IN')}
+                              </span>
+                              {mrpVal > priceVal && (
+                                <span className="text-[11px] text-neutral-400 line-through font-medium">
+                                  ₹{mrpVal.toLocaleString('en-IN')}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* In Stock & Bonus Badges */}
+                            <div className="flex items-center justify-between text-[10px] mt-1 pt-1 border-t border-neutral-50 text-neutral-500">
+                              <span className="flex items-center gap-1 text-emerald-600 font-bold">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                In Stock
+                              </span>
+                              <span className="text-[#900606] font-semibold text-[10px]">
+                                +3 Free Courses
+                              </span>
+                            </div>
                           </div>
-                          <span className="text-xs font-bold text-neutral-700 ml-0.5">
-                            {(Number(rel.rating) || 4.8).toFixed(1)}
-                          </span>
-                          <span className="text-[11px] text-neutral-400 font-medium">
-                            ({rel.reviewsCount || 120})
-                          </span>
                         </div>
 
-                        <div className="flex items-baseline gap-2.5 flex-wrap mb-3">
-                          <span className="font-black text-xl sm:text-2xl text-[#900606]">
-                            ₹{Number(rel.price).toLocaleString('en-IN')}
-                          </span>
-                          {rel.mrp > rel.price && (
-                            <span className="text-xs sm:text-sm text-neutral-400 font-medium line-through">
-                              MRP ₹{Number(rel.mrp).toLocaleString('en-IN')}
-                            </span>
-                          )}
+                        {/* Action Buttons: Direct Buy Now + Add to Cart */}
+                        <div className="px-3 pb-3 sm:px-3.5 sm:pb-3.5 pt-1 mt-auto flex items-center gap-2 w-full">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleBuyNowProduct(rel);
+                            }}
+                            className="flex-1 py-2 bg-[#900606] hover:bg-[#780505] text-white rounded-xl font-bold text-xs transition-all shadow-xs flex items-center justify-center cursor-pointer active:scale-[0.98]"
+                          >
+                            Buy Now
+                          </button>
+                          <button
+                            type="button"
+                            title="Add to Cart"
+                            aria-label="Add to Cart"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAddToCartProduct(rel);
+                            }}
+                            className="w-8 h-8 sm:w-9 sm:h-9 flex-shrink-0 bg-white hover:bg-neutral-50 text-[#111827] hover:text-[#900606] border border-neutral-300 hover:border-[#900606] rounded-xl font-bold transition-all shadow-2xs flex items-center justify-center cursor-pointer active:scale-95"
+                          >
+                            {isAdded ? (
+                              <Check className="w-4 h-4 text-emerald-600 animate-in zoom-in" />
+                            ) : (
+                              <ShoppingCartPlus className="w-4 h-4 text-[#111827]" />
+                            )}
+                          </button>
                         </div>
                       </div>
-                    </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
 
-                    {/* Add to Cart Button */}
-                    <div className="px-5 pb-5 pt-0 mt-auto">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const ok = addToCart({ id: rel.id || rel._id, name: rel.name, price: rel.price, quantity: 1, img: rel.image, image: rel.image }); if (ok) router.push('/cart');
-                        }}
-                        className="relative w-full py-2.5 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer"
-                      >
-                        <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
-                        <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
-                          Add to Cart
-                        </span>
-                      </button>
-                    </div>
+          </div>
+        </section>
 
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* POPULAR CREATORS BUNDLES SECTION */}
+        {/* ========================================================================= */}
+        {/* 4. POPULAR CREATORS BUNDLES SECTION                                      */}
+        {/* ========================================================================= */}
         <BuiltForCreators />
 
-        {/* SPECIFICATIONS */}
-        {product.specifications && product.specifications.length > 0 && (
-          <section className="w-full pt-2 pb-3 sm:py-6 bg-[#FBFBF7]">
-            <div className="w-full max-w-[1750px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
-              <h2 className="text-2xl sm:text-3xl font-medium text-[#111827] text-center pb-3">Product <span className="text-[#900606]">Specifications</span></h2>
-              <div className="max-w-4xl mx-auto rounded-2xl border border-neutral-200 bg-white overflow-hidden divide-y divide-neutral-200/70">
-                {product.specifications.map((spec, idx) => (
-                  <div key={idx} className="flex justify-between p-4 text-xs sm:text-sm">
-                    <span className="font-semibold text-neutral-800 w-2/5">{spec.label}</span>
-                    <span className="text-neutral-600 font-medium text-right w-3/5">{spec.value}</span>
-                  </div>
-                ))}
-              </div>
+        {/* ========================================================================= */}
+        {/* 4.5 WHAT CREATORS SAY TESTIMONIALS SECTION                                */}
+        {/* ========================================================================= */}
+        <WhatCreatorsSay />
+
+        {/* ========================================================================= */}
+        {/* 5. STORE FAQ REASSURANCE SECTION                                         */}
+        {/* ========================================================================= */}
+        <section className="w-full pt-2.5 pb-3 sm:pt-3.5 sm:pb-4 border-t border-neutral-200/70 bg-[#FBFBF7]">
+          <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-14 max-w-5xl mx-auto">
+            <div className="text-center mb-2.5 sm:mb-3.5">
+              <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-medium text-[#111827] dark:text-white tracking-tight">
+                Frequently Asked <span className="text-[#900606] whitespace-nowrap">Questions</span>
+              </h2>
+              <p className="text-neutral-500 text-xs sm:text-sm md:text-base font-normal max-w-xl mx-auto mt-1">
+                Everything you need to know about compatibility, shipping, and warranty.
+              </p>
             </div>
-          </section>
-        )}
+
+            <div className="space-y-3">
+              {[
+                {
+                  q: 'Are Creators Kit gear compatible with smartphones & DSLRs?',
+                  a: 'Yes! All our tripods, ring lights, and microphones include universal mounts and adapters compatible with Android phones, iPhones, DSLRs, mirrorless cameras, and laptops.'
+                },
+                {
+                  q: 'How long does delivery take across India?',
+                  a: 'We provide Free Express Delivery. Orders are dispatched from our Delhi warehouse within 24 hours, with typical doorstep delivery taking 2 to 3 business days.'
+                },
+                {
+                  q: 'How do I claim the 7-day replacement or 1-year warranty?',
+                  a: 'Simply message our WhatsApp support or email support@creatorskit.in with your Order ID. Defective or transit-damaged items receive instant no-questions-asked replacements.'
+                },
+                {
+                  q: 'How do I access the 3 Free Masterclasses (Worth ₹4,999)?',
+                  a: 'Upon ordering, the Instagram, YouTube, and Video Editing Masterclasses are automatically activated inside your Creators Kit account under the "My Courses" tab.'
+                }
+              ].map((faq, idx) => (
+                <div key={idx} className="bg-white rounded-2xl border border-neutral-200/90 shadow-2xs overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                    className="w-full flex items-center justify-between p-4 sm:p-5 text-left font-bold text-xs sm:text-sm text-neutral-900 hover:bg-neutral-50 transition cursor-pointer"
+                  >
+                    <span className="pr-3 leading-snug">{faq.q}</span>
+                    <span className="text-lg text-neutral-400 font-bold ml-auto shrink-0">
+                      {openFaq === idx ? '−' : '+'}
+                    </span>
+                  </button>
+                  {openFaq === idx && (
+                    <div className="px-4 pb-4 sm:px-5 sm:pb-5 text-xs sm:text-sm text-neutral-600 leading-relaxed border-t border-neutral-100 bg-[#FAF9F5]">
+                      {faq.a}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+
+        <section className="w-full my-2 sm:my-5 overflow-hidden bg-[#0A2212]">
+          <div className="w-full relative h-[280px] xs:h-[320px] sm:h-[360px] md:h-[400px] lg:h-[440px] xl:h-[570px]">
+            <Image
+              src={getImageUrl('/img-kit10.png')}
+              alt="Shop More, Save More - Creator Sale"
+              fill
+              sizes="100vw"
+              priority
+              className="object-cover object-[center_35%] w-full h-full block"
+            />
+          </div>
+        </section>
 
       </main>
     </div>
   );
 }
-

@@ -5,6 +5,19 @@ import { getImageUrl } from '@/lib/imagekit';
 import { useRouter } from 'next/navigation';
 import DeleteConfirmModal from './DeleteConfirmModal';
 
+export const getProductImageForBlog = (productName = '', customProductImage = '') => {
+  if (customProductImage && customProductImage.trim() !== '') {
+    return customProductImage;
+  }
+  const pLower = (productName || '').toLowerCase();
+  if (pLower.includes('mic')) return '/wireless-mic.jpg';
+  if (pLower.includes('tripod') || pLower.includes('stand')) return '/tripod.jpg';
+  if (pLower.includes('ring') || pLower.includes('light')) return '/ring.jpg';
+  if (pLower.includes('bundle') || pLower.includes('kit')) return '/banner 6.png';
+  if (pLower.includes('gimbal') || pLower.includes('chorma') || pLower.includes('rig') || pLower.includes('green')) return '/chorma.jpg';
+  return '/ring.jpg';
+};
+
 export default function BlogsManager() {
   const router = useRouter();
   const [blogs, setBlogs] = useState([]);
@@ -28,9 +41,9 @@ export default function BlogsManager() {
   const [formData, setFormData] = useState({
     author: '',
     product: '',
+    productImage: '',
     image: '',
     videoUrl: '',
-    rating: 5,
   });
 
   useEffect(() => {
@@ -56,18 +69,18 @@ export default function BlogsManager() {
       setFormData({
         author: blog.author || '',
         product: blog.product || '',
+        productImage: blog.productImage || getProductImageForBlog(blog.product, blog.productImage),
         image: blog.image || '',
         videoUrl: blog.videoUrl || blog.video || '',
-        rating: blog.rating !== undefined ? Number(blog.rating) : 5,
       });
     } else {
       setEditingBlog(null);
       setFormData({
         author: '',
         product: '',
+        productImage: '',
         image: '/blog.jpg',
         videoUrl: '',
-        rating: 5,
       });
     }
     setIsModalOpen(true);
@@ -90,16 +103,20 @@ export default function BlogsManager() {
     setIsSubmitting(true);
     try {
       const isEdit = !!editingBlog;
-      const targetId = editingBlog ? (editingBlog.slug || editingBlog._id) : '';
+      const targetId = editingBlog ? (editingBlog._id || editingBlog.slug) : '';
       const url = isEdit ? `/api/blogs/${targetId}` : '/api/blogs';
       const method = isEdit ? 'PUT' : 'POST';
+
+      const resolvedProductImage = (formData.productImage && formData.productImage.trim())
+        ? formData.productImage.trim()
+        : getProductImageForBlog(formData.product);
 
       const payload = {
         author: formData.author,
         product: formData.product,
+        productImage: resolvedProductImage,
         image: formData.image,
         videoUrl: formData.videoUrl,
-        rating: Number(formData.rating) || 5,
         title: editingBlog?.title || (formData.product ? `${formData.author} - ${formData.product}` : `${formData.author}'s Review`),
       };
 
@@ -117,7 +134,7 @@ export default function BlogsManager() {
       await fetchBlogs();
       router.refresh();
       closeModal();
-      setFormData({ author: '', product: '', image: '', videoUrl: '', rating: 5 });
+      setFormData({ author: '', product: '', productImage: '', image: '', videoUrl: '' });
     } catch (error) {
       alert(error.message);
     } finally {
@@ -157,11 +174,11 @@ export default function BlogsManager() {
   const handleExportReport = () => {
     const csvContent =
       'data:text/csv;charset=utf-8,' +
-      'Author,Featured Gear,Rating,Image,Video URL,Published Date\n' +
+      'Author,Featured Gear,Product Image,Image,Video URL,Published Date\n' +
       blogs
         .map(
           (b) =>
-            `"${(b.author || '').replace(/"/g, '""')}","${(b.product || '').replace(/"/g, '""')}","${b.rating || 5}","${(b.image || '').replace(/"/g, '""')}","${(b.videoUrl || '').replace(/"/g, '""')}","${new Date(b.createdAt || Date.now()).toLocaleDateString('en-US')}"`
+            `"${(b.author || '').replace(/"/g, '""')}","${(b.product || '').replace(/"/g, '""')}","${(b.productImage || '').replace(/"/g, '""')}","${(b.image || '').replace(/"/g, '""')}","${(b.videoUrl || '').replace(/"/g, '""')}","${new Date(b.createdAt || Date.now()).toLocaleDateString('en-US')}"`
         )
         .join('\n');
 
@@ -305,11 +322,11 @@ export default function BlogsManager() {
             <thead>
               <tr className="border-b border-neutral-100 text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
                 <th className="py-3.5 px-3 font-bold w-[12%]">IMAGE</th>
-                <th className="py-3.5 px-3 font-bold w-[25%]">CREATOR / AUTHOR</th>
-                <th className="py-3.5 px-3 font-bold w-[25%]">FEATURED GEAR</th>
-                <th className="py-3.5 px-3 font-bold w-[15%]">RATING</th>
-                <th className="py-3.5 px-3 font-bold w-[11%]">DATE</th>
-                <th className="py-3.5 px-3 text-right font-bold w-[12%]">ACTIONS</th>
+                <th className="py-3.5 px-3 font-bold w-[12%]">PRODUCT ICON</th>
+                <th className="py-3.5 px-3 font-bold w-[24%]">CREATOR / AUTHOR</th>
+                <th className="py-3.5 px-3 font-bold w-[24%]">FEATURED GEAR</th>
+                <th className="py-3.5 px-3 font-bold w-[14%]">DATE</th>
+                <th className="py-3.5 px-3 text-right font-bold w-[14%]">ACTIONS</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100 font-medium text-neutral-700">
@@ -320,13 +337,13 @@ export default function BlogsManager() {
                       <div className="w-14 h-11 bg-neutral-100 rounded-lg"></div>
                     </td>
                     <td className="py-4 px-3">
+                      <div className="w-11 h-11 bg-neutral-100 rounded-lg"></div>
+                    </td>
+                    <td className="py-4 px-3">
                       <div className="w-32 h-4 bg-neutral-100 rounded"></div>
                     </td>
                     <td className="py-4 px-3">
                       <div className="w-28 h-4 bg-neutral-100 rounded"></div>
-                    </td>
-                    <td className="py-4 px-3">
-                      <div className="w-20 h-4 bg-neutral-100 rounded"></div>
                     </td>
                     <td className="py-4 px-3">
                       <div className="w-16 h-4 bg-neutral-100 rounded"></div>
@@ -339,7 +356,7 @@ export default function BlogsManager() {
               ) : (
                 filteredBlogs.map((blog) => (
                   <tr key={blog._id} className="hover:bg-neutral-50/70 transition-colors group">
-                    {/* Image Thumbnail */}
+                    {/* Creator Image Thumbnail */}
                     <td className="py-4 px-3 align-middle">
                       <div className="w-14 h-11 relative rounded-lg overflow-hidden bg-neutral-100 border border-neutral-200/80 shadow-2xs flex-shrink-0">
                         <img 
@@ -354,6 +371,18 @@ export default function BlogsManager() {
                             </svg>
                           </span>
                         )}
+                      </div>
+                    </td>
+
+                    {/* Product Icon Thumbnail */}
+                    <td className="py-4 px-3 align-middle">
+                      <div className="w-11 h-11 relative rounded-xl overflow-hidden bg-neutral-100 border border-neutral-200/90 shadow-2xs flex-shrink-0 p-1 flex items-center justify-center">
+                        <img 
+                          src={getImageUrl(getProductImageForBlog(blog.product, blog.productImage))} 
+                          alt={blog.product || 'product'} 
+                          className="w-full h-full object-cover rounded-lg"
+                          onError={(e) => { e.currentTarget.src = '/ring.jpg'; }}
+                        />
                       </div>
                     </td>
 
@@ -373,27 +402,6 @@ export default function BlogsManager() {
                       ) : (
                         <span className="text-neutral-400 font-normal">—</span>
                       )}
-                    </td>
-
-                    {/* Rating */}
-                    <td className="py-4 px-3 align-middle">
-                      <div className="flex items-center gap-1.5">
-                        <div className="flex items-center">
-                          {[1, 2, 3, 4, 5].map((s) => (
-                            <svg
-                              key={s}
-                              className={`w-3.5 h-3.5 ${s <= Math.round(Number(blog.rating) || 5) ? 'text-amber-400 fill-amber-400' : 'text-neutral-200 fill-neutral-200'}`}
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                          ))}
-                        </div>
-                        <span className="font-bold text-neutral-800 text-xs">
-                          {(Number(blog.rating) || 5).toFixed(1)}
-                        </span>
-                      </div>
                     </td>
 
                     {/* Date */}
@@ -493,7 +501,7 @@ export default function BlogsManager() {
                 </h3>
                 <p className="text-xs text-neutral-500 mt-1">
                   {editingBlog
-                    ? 'Update the author, featured gear, media, or star rating.'
+                    ? 'Update the author, featured gear, media, and product thumbnail.'
                     : 'Create and publish a verified creator review to showcase on your storefront.'}
                 </p>
               </div>
@@ -539,57 +547,40 @@ export default function BlogsManager() {
                 </div>
               </div>
 
-              {/* Star Rating Control */}
+              {/* Product Thumbnail Image URL / Path with Live Preview */}
               <div>
                 <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2">
-                  Star Rating
+                  Product Thumbnail Image URL / Path
                 </label>
-                <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap">
-                  <div className="flex items-center gap-1.5 bg-neutral-50 px-3.5 py-2 rounded-xl border border-neutral-200/90">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        type="button"
-                        onClick={() => setFormData((prev) => ({ ...prev, rating: star }))}
-                        className="focus:outline-none cursor-pointer transition-transform hover:scale-110"
-                        title={`${star} Star`}
-                      >
-                        <svg
-                          className={`w-5 h-5 ${
-                            star <= (Number(formData.rating) || 5)
-                              ? 'text-amber-400 fill-amber-400'
-                              : 'text-neutral-300 fill-neutral-200'
-                          }`}
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      </button>
-                    ))}
-                    <span className="ml-2 text-xs font-bold text-neutral-800">
-                      {Number(formData.rating || 5).toFixed(1)} / 5.0
-                    </span>
-                  </div>
-                  <select
-                    name="rating"
-                    value={formData.rating || 5}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, rating: Number(e.target.value) }))}
-                    className="bg-white border border-neutral-200/90 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-neutral-800 outline-none focus:border-[#900606] transition-colors shadow-2xs cursor-pointer"
-                  >
-                    <option value={5}>⭐⭐⭐⭐⭐ 5 Stars (Excellent)</option>
-                    <option value={4}>⭐⭐⭐⭐ 4 Stars (Very Good)</option>
-                    <option value={3}>⭐⭐⭐ 3 Stars (Good)</option>
-                    <option value={2}>⭐⭐ 2 Stars (Fair)</option>
-                    <option value={1}>⭐ 1 Star (Poor)</option>
-                  </select>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="text"
+                    name="productImage"
+                    value={formData.productImage}
+                    onChange={handleChange}
+                    className="flex-1 bg-white border border-neutral-200/90 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-neutral-900 placeholder-neutral-400 outline-none focus:border-[#900606] transition-colors shadow-2xs"
+                    placeholder="e.g. /ring.jpg, /wireless-mic.jpg, /tripod.jpg or ImageKit URL"
+                  />
+                  {(formData.productImage || formData.product) && (
+                    <div className="w-10 h-10 rounded-xl overflow-hidden border border-neutral-200 bg-neutral-100 flex-shrink-0 shadow-2xs p-0.5">
+                      <img
+                        src={getImageUrl(getProductImageForBlog(formData.product, formData.productImage))}
+                        alt="Product Preview"
+                        className="w-full h-full object-cover rounded-lg"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                    </div>
+                  )}
                 </div>
+                <p className="text-[11px] text-neutral-400 mt-1 font-normal">
+                  Shows as the product icon at the bottom-left of the creator review card on the homepage.
+                </p>
               </div>
 
-              {/* Image URL / Path with Live Preview Thumbnail */}
+              {/* Creator Image URL / Path (Review Photo) with Live Preview Thumbnail */}
               <div>
                 <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2">
-                  Image URL / Path
+                  Creator Image URL / Path (Review Photo)
                 </label>
                 <div className="flex items-center gap-3">
                   <input

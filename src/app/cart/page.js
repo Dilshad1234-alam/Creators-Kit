@@ -19,54 +19,13 @@ import {
   Award,
   CheckCircle2
 } from 'lucide-react';
+import GoKwikCheckout from '@/components/GoKwikCheckout';
 
 export default function CartPage() {
   const { cart, isAuthenticated, removeFromCart, updateQuantity, clearCart, cartTotal, cartCount } = useCart();
   const router = useRouter();
 
   if (!cart) return null; // Hydration/loading state
-
-  // 0. GUEST / UNAUTHENTICATED STATE
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-[100svh] bg-[#FBFBF7] text-neutral-900 font-sans selection:bg-[#900606] selection:text-white relative overflow-hidden flex flex-col justify-center items-center px-4 py-24">
-        {/* Subtle Signature Ambient Glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#900606]/10 blur-[140px] rounded-full pointer-events-none -z-0"></div>
-
-        <div className="relative z-10 max-w-lg w-full bg-white rounded-3xl sm:rounded-[2.5rem] border border-neutral-200/90 shadow-[0_8px_30px_rgba(0,0,0,0.04)] p-8 sm:p-12 text-center flex flex-col items-center">
-          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-red-50 text-[#900606] flex items-center justify-center mb-6 shadow-inner border border-red-100/80">
-            <Lock className="w-10 h-10 sm:w-12 sm:h-12 stroke-[1.75]" />
-          </div>
-
-          <span className="text-xs font-bold tracking-[0.2em] text-[#900606] uppercase mb-2">
-            SIGN IN REQUIRED
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#111827] tracking-tight mb-3">
-            Sign In to View Your Cart
-          </h2>
-          <p className="text-neutral-600 text-sm sm:text-base font-normal leading-relaxed mb-8 max-w-sm">
-            Your studio equipment and creator bundles are securely tied to your personal account. Sign in to view and manage your cart items.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-            <Link
-              href="/login?redirect=/cart"
-              className="w-full sm:w-auto px-8 py-3.5 bg-[#900606] hover:bg-[#b91c1c] text-white rounded-xl font-bold text-sm transition-all duration-300 shadow-md inline-flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <span>Sign In to Account</span>
-              <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-            </Link>
-            <Link
-              href="/product"
-              className="w-full sm:w-auto px-6 py-3.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 rounded-xl font-bold text-sm transition-all duration-300 inline-flex items-center justify-center"
-            >
-              <span>Browse Gear</span>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   // 1. EMPTY CART STATE
   if (cart.length === 0) {
@@ -396,7 +355,13 @@ export default function CartPage() {
                   const isLoggedIn = (user?.email || sessionEmail) && userRole !== 'admin' && user?.role !== 'admin';
 
                   if (!isLoggedIn) {
-                    router.push('/login?redirect=/checkout');
+                    if (typeof window !== 'undefined') {
+                      window.dispatchEvent(
+                        new CustomEvent('creatorskit-open-auth', {
+                          detail: { mode: 'register', redirectUrl: '/checkout' },
+                        })
+                      );
+                    }
                   } else {
                     router.push('/checkout');
                   }
@@ -409,6 +374,38 @@ export default function CartPage() {
                   <ArrowRight className="w-4 h-4 stroke-[2.5]" />
                 </span>
               </button>
+
+              {/* GoKwik Express Checkout Option */}
+              <div className="pt-2">
+                <div className="relative flex py-1.5 items-center">
+                  <div className="flex-grow border-t border-neutral-200"></div>
+                  <span className="flex-shrink mx-2 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
+                    Or Fast 1-Click Checkout
+                  </span>
+                  <div className="flex-grow border-t border-neutral-200"></div>
+                </div>
+
+                <GoKwikCheckout
+                  cartItems={cart}
+                  cartTotal={cartTotal}
+                  buttonText="⚡ GoKwik 1-Click Express Checkout"
+                  buttonSize="md"
+                  onSuccess={(orderData) => {
+                    clearCart();
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('creatorskit_courses_unlocked', 'true');
+                      try {
+                        const bc = new BroadcastChannel('creatorskit_masterclasses_channel');
+                        bc.postMessage({ type: 'updated' });
+                        bc.close();
+                      } catch (e) {}
+                      window.dispatchEvent(new Event('masterclasses-updated'));
+                    }
+                    const savedOrderId = orderData.orderNumber || orderData.orderId;
+                    router.push(`/order-success?orderId=${savedOrderId}`);
+                  }}
+                />
+              </div>
 
               {/* Trust Badges Inside Summary */}
               <div className="pt-3.5 sm:pt-4 border-t border-neutral-100 space-y-2 text-xs text-neutral-500 font-medium">

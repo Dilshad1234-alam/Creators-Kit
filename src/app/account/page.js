@@ -1745,20 +1745,45 @@ function AccountContent() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('creatorsKitUserInfo');
-    sessionStorage.removeItem('userName');
-    sessionStorage.removeItem('userEmail');
-    sessionStorage.removeItem('userRole');
-    sessionStorage.removeItem('token');
-    localStorage.removeItem('userName');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('token');
+  const handleLogout = async () => {
+    let activeEmail =
+      sessionStorage.getItem('userEmail') ||
+      localStorage.getItem('userEmail') ||
+      '';
+
+    if (!activeEmail) {
+      try {
+        const u = JSON.parse(sessionStorage.getItem('creatorsKitUserInfo') || localStorage.getItem('creatorsKitUserInfo') || '{}');
+        if (u.email) activeEmail = u.email;
+      } catch (e) {}
+    }
+
     try {
-      import('next-auth/react').then(({ signOut }) => signOut({ redirect: false }));
+      sessionStorage.setItem('creatorskit_logged_out', '1');
+      localStorage.setItem('creatorskit_logged_out', '1');
     } catch (e) {}
-    router.push('/login');
+
+    ['creatorsKitUserInfo', 'userName', 'userEmail', 'userRole', 'token', 'adminToken', 'admin_role'].forEach((k) => {
+      sessionStorage.removeItem(k);
+      localStorage.removeItem(k);
+    });
+
+    if (activeEmail) {
+      try {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: activeEmail }),
+        });
+      } catch (e) {}
+    }
+
+    try {
+      const { signOut } = await import('next-auth/react');
+      await signOut({ redirect: false });
+    } catch (e) {}
+
+    window.location.href = '/';
   };
 
   // Exact tabs as specified

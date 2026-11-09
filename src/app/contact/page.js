@@ -149,10 +149,21 @@ export default function ContactPage() {
   const [mapMode, setMapMode] = useState('studio'); // 'studio' or 'live'
   const [zoomLevel, setZoomLevel] = useState(1);
   const [mounted, setMounted] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(0);
 
   useEffect(() => {
     setMounted(true);
     fetchContent();
+
+    const updateHeaderHeight = () => {
+      const header = document.querySelector('header');
+      if (header) {
+        setHeaderHeight(header.offsetHeight);
+      }
+    };
+    updateHeaderHeight();
+    window.addEventListener('resize', updateHeaderHeight);
+    return () => window.removeEventListener('resize', updateHeaderHeight);
   }, []);
 
   const fetchContent = async () => {
@@ -256,75 +267,24 @@ export default function ContactPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-[#FBFBF7] text-neutral-900 font-sans selection:bg-[#900606] selection:text-white pb-12 sm:pb-16">
+    <div 
+      className="min-h-screen bg-[#FBFBF7] text-neutral-900 font-sans selection:bg-[#900606] selection:text-white pb-12 sm:pb-16 pt-16 sm:pt-20"
+      style={headerHeight ? { paddingTop: `${headerHeight}px` } : undefined}
+    >
       
-      {/* 1. HERO BANNER SECTION (Responsive Padding & Grid Support Badges) */}
-      <section className="relative w-full pt-18 sm:pt-28 pb-3 sm:pb-8 md:py-16 bg-[#0c0c0c] text-white overflow-hidden">
-        {/* Background Visual */}
-        <div className="absolute inset-0 z-0 overflow-hidden bg-[#0c0c0c] pointer-events-none">
-          <div className="absolute right-0 top-0 bottom-0 w-full lg:w-[58%] h-full">
-            <Image 
-              src={getImageUrl(heroData.image || '/contact1.png')} 
-              alt="CreatorsKit Creator Studio" 
-              fill 
+      {/* 1. HERO BANNER SECTION (Single Banner Image matching Live Sale Banner Size) */}
+      <section className="relative w-full overflow-hidden bg-[#0a0a0a] mb-2 sm:mb-4">
+        <div className="w-full relative z-8 max-w-[3000px] mx-auto">
+          <div className="relative w-full aspect-[1023/370] min-h-[190px] xs:min-h-[240px] sm:min-h-[340px] md:min-h-[420px] lg:min-h-[480px] xl:min-h-[540px] overflow-hidden bg-[#0a0a0a]">
+            <Image
+              src="/img-kit17.png"
+              alt="Creators Kit Contact Us"
+              fill
               priority
               unoptimized
-              sizes="(max-width: 1024px) 100vw, 60vw" 
-              className="object-cover object-right md:object-center opacity-85" 
+              sizes="100vw"
+              className="object-cover object-center"
             />
-            {/* Dark gradient overlay on left for razor-sharp text legibility */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0c0c0c] via-[#0c0c0c]/90 md:via-[#0c0c0c]/80 lg:via-[#0c0c0c]/35 to-transparent"></div>
-            <div className="absolute inset-0 bg-gradient-to-b from-[#0c0c0c]/40 via-transparent to-[#0c0c0c]"></div>
-          </div>
-          {/* Subtle warm ambient glow */}
-          <div className="absolute top-1/3 left-10 w-[450px] h-[450px] bg-[#900606]/15 blur-[130px] rounded-full"></div>
-        </div>
-
-        <div className="max-w-[1750px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 relative z-10">
-          <div className="max-w-2xl text-left">
-            {/* Breadcrumb */}
-            <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-neutral-400 font-medium mb-3 sm:mb-5">
-              <Link href="/" className="hover:text-white transition-colors">Home</Link>
-              <span className="text-neutral-500">›</span>
-              <span className="text-white font-semibold">Contact Us</span>
-            </nav>
-
-            {/* Red Pre-heading Label */}
-            <p className="text-xs font-bold tracking-[0.2em] text-red-500 uppercase mb-2 sm:mb-3">
-              {heroData.badge || "WE'RE HERE TO HELP"}
-            </p>
-
-            {/* Main Headline */}
-            <h1 className="text-3xl sm:text-5xl lg:text-[3.6rem] font-bold sm:font-extrabold text-white tracking-tight leading-[1.14] mb-3 sm:mb-4">
-              {heroData.title}{' '}
-              {heroData.highlight && (
-                <span className="text-red-500 font-extrabold">{heroData.highlight}</span>
-              )}
-            </h1>
-
-            {/* Subtitle */}
-            <p className="text-neutral-300 font-normal text-xs sm:text-sm md:text-base leading-relaxed max-w-xl mb-3 sm:mb-6">
-              {heroData.description}
-            </p>
-
-            {/* Support Feature Badges: Clean Responsive Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 pt-1 sm:pt-2">
-              {heroBadges.map((badge, idx) => (
-                <div 
-                  key={badge._id || idx}
-                  className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl p-2.5 sm:p-3 backdrop-blur-xs"
-                >
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-red-500/30 bg-red-950/40 text-red-500 flex items-center justify-center shrink-0">
-                    {renderDynamicIcon(badge.icon, 'w-4 h-4 sm:w-5 sm:h-5 stroke-[2]')}
-                  </div>
-                  <div>
-                    <p className="text-white font-bold text-xs sm:text-sm tracking-tight leading-tight">{badge.title}</p>
-                    <p className="text-neutral-400 text-[11px] sm:text-xs">{badge.subtitle}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
           </div>
         </div>
       </section>

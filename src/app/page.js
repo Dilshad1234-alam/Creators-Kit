@@ -68,6 +68,7 @@ export default async function Home() {
         { name: 'Pro Tripods', image: '/tripod.jpg', link: '/product', itemCount: 'Heavy Duty Stands', order: 2 },
         { name: 'Gimbal/Rig', image: '/chorma.jpg', link: '/product', itemCount: 'Stabilizers & Backdrops', order: 3 },
         { name: 'Microphones', image: '/wireless-mic.jpg', link: '/product', itemCount: 'Wireless Audio', order: 4 },
+        { name: 'Ring Light', image: '/ring.jpg', link: '/product', itemCount: 'LED Ring Light', order: 5 },
       ];
       await Category.insertMany(seedCategories);
       catsData = await Category.find({}).sort({ order: 1 }).lean();
@@ -141,7 +142,7 @@ export default async function Home() {
         { productType: 'individual' },
         { productType: { $exists: false }, isBundle: false }
       ]
-    }).sort({ createdAt: -1 }).lean();
+    }).sort({ createdAt: -1 }).limit(20).lean();
 
     featuredProducts = rawProducts.map((p) => {
       const priceVal = typeof p.price === 'number' ? p.price : Number(p.price) || 0;
@@ -151,6 +152,10 @@ export default async function Home() {
         id: p.id || p._id.toString(),
         _id: p._id.toString(),
         name: p.name,
+        category: p.category || 'Creator Studio',
+        tag: p.tag || 'BESTSELLER',
+        description: p.description || '',
+        subheading: p.subheading || '',
         price: priceVal,
         mrp: origVal,
         discount: discountVal,

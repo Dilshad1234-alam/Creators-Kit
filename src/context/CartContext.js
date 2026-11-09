@@ -7,13 +7,20 @@ import { getStoredCustomer } from '@/lib/auth-client';
 
 const CartContext = createContext();
 
+const LOCAL_STORAGE_CART_KEY = 'creators-kit-cart';
+
 export function CartProvider({ children }) {
-  const [cart, setCart] = useState(null); // null indicates hydrating
+  const [cart, setCart] = useState(null); // null indicates initial hydrating
   const [isClient, setIsClient] = useState(false);
   const [currentUserEmail, setCurrentUserEmail] = useState(null);
+  const currentUserEmailRef = useRef(currentUserEmail);
+  useEffect(() => {
+    currentUserEmailRef.current = currentUserEmail;
+  }, [currentUserEmail]);
   const { data: session, status: sessionStatus } = useSession();
   const router = useRouter();
   const isFetchingRef = useRef(false);
+  const hasInitializedRef = useRef(false);
 
   // Helper to determine the active logged-in customer's identifier
   const getActiveUserEmail = useCallback(() => {
@@ -37,6 +44,68 @@ export function CartProvider({ children }) {
     return email ? `creators-kit-cart-${email}` : null;
   };
 
+  // Read saved cart from localStorage safely
+  const loadLocalCart = useCallback((email) => {
+    if (typeof window === 'undefined') return [];
+    try {
+      // First try user-specific key if email is available
+      if (email) {
+        const userSaved = localStorage.getItem(`creators-kit-cart-${email}`);
+        if (userSaved) {
+          const parsed = JSON.parse(userSaved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      }
+      // Fallback to primary local cart key
+      const mainSaved = localStorage.getItem(LOCAL_STORAGE_CART_KEY);
+      if (mainSaved) {
+        const parsed = JSON.parse(mainSaved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) {
+      console.warn('[CartContext] Error reading localStorage cart:', e);
+    }
+    return [];
+  }, []);
+
+  // Write cart to localStorage safely
+  const saveLocalCart = useCallback((items, email) => {
+    if (typeof window === 'undefined') return;
+    try {
+      const serialized = JSON.stringify(items || []);
+      localStorage.setItem(LOCAL_STORAGE_CART_KEY, serialized);
+      const targetEmail = email || currentUserEmailRef.current || getActiveUserEmail();
+      const userKey = getStorageKey(targetEmail);
+      if (userKey) {
+        localStorage.setItem(userKey, serialized);
+      }
+    } catch (e) {
+      console.warn('[CartContext] Error saving cart to localStorage:', e);
+    }
+  }, [getActiveUserEmail]);
+
+  // Persist cart changes to MongoDB and user-scoped localStorage
+  const syncCartToBackend = useCallback(async (newItems, action = 'sync', payload = {}) => {
+    const activeEmail = currentUserEmailRef.current || getActiveUserEmail();
+    saveLocalCart(newItems, activeEmail);
+
+    if (!activeEmail) return;
+
+    try {
+      await fetch('/api/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action,
+          items: newItems,
+          ...payload,
+        }),
+      });
+    } catch (err) {
+      console.error('[CartContext] Error syncing cart to MongoDB:', err);
+    }
+  }, [getActiveUserEmail, saveLocalCart]);
+
   // Fetch cart directly from MongoDB for the active authenticated user
   const fetchCartFromDB = useCallback(async (userEmail) => {
     if (!userEmail || isFetchingRef.current) return;
@@ -52,61 +121,57 @@ export function CartProvider({ children }) {
       const data = await res.json();
 
       if (data.authenticated && Array.isArray(data.items)) {
-        setCart(data.items);
-        const storageKey = getStorageKey(userEmail);
-        if (storageKey) {
-          try {
-            localStorage.setItem(storageKey, JSON.stringify(data.items));
-          } catch (e) {}
+        if (data.items.length > 0) {
+          setCart(data.items);
+          saveLocalCart(data.items, userEmail);
+        } else {
+          // If server cart is empty, check if we have local items to push to server
+          const localItems = loadLocalCart(userEmail);
+          if (localItems.length > 0) {
+            setCart(localItems);
+            fetch('/api/cart', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'sync', items: localItems }),
+            }).catch(() => {});
+          } else {
+            setCart([]);
+          }
         }
-      } else {
-        // Not authenticated on server side: reset to empty
-        setCart([]);
       }
+      // If not authenticated or error, NEVER wipe out local items!
     } catch (err) {
       console.error('[CartContext] Error loading user cart from DB:', err);
     } finally {
       isFetchingRef.current = false;
     }
-  }, []);
+  }, [loadLocalCart, saveLocalCart]);
 
-  // Sync authentication state and initialize or reset cart
+  // Sync authentication state and initialize cart from localStorage immediately
   useEffect(() => {
     setIsClient(true);
 
-    // Purge any lingering anonymous guest cart keys from localStorage
-    try {
-      localStorage.removeItem('creators-kit-cart-guest');
-      localStorage.removeItem('creators-kit-cart-null');
-      localStorage.removeItem('creators-kit-cart-undefined');
-    } catch (e) {}
+    const activeEmail = getActiveUserEmail();
+    setCurrentUserEmail((prev) => (prev !== activeEmail ? activeEmail : prev));
+
+    // Initial load: Read local storage immediately on mount so cart never starts empty
+    if (!hasInitializedRef.current) {
+      hasInitializedRef.current = true;
+      const cachedItems = loadLocalCart(activeEmail);
+      setCart(cachedItems);
+    }
+
+    if (activeEmail) {
+      fetchCartFromDB(activeEmail);
+    }
 
     const syncAuthState = () => {
-      const activeEmail = getActiveUserEmail();
-      setCurrentUserEmail(activeEmail);
-
-      if (!activeEmail) {
-        // No authenticated user: cart is strictly empty and guest-restricted
-        setCart([]);
-        return;
+      const email = getActiveUserEmail();
+      setCurrentUserEmail((prev) => (prev !== email ? email : prev));
+      if (email) {
+        fetchCartFromDB(email);
       }
-
-      // Fast optimistic load from user-scoped localStorage
-      const storageKey = getStorageKey(activeEmail);
-      if (storageKey) {
-        try {
-          const cached = localStorage.getItem(storageKey);
-          if (cached) {
-            setCart(JSON.parse(cached));
-          }
-        } catch (e) {}
-      }
-
-      // Sync fresh authoritative cart from MongoDB
-      fetchCartFromDB(activeEmail);
     };
-
-    syncAuthState();
 
     window.addEventListener('storage', syncAuthState);
     window.addEventListener('creatorskit-auth-change', syncAuthState);
@@ -115,50 +180,13 @@ export function CartProvider({ children }) {
       window.removeEventListener('storage', syncAuthState);
       window.removeEventListener('creatorskit-auth-change', syncAuthState);
     };
-  }, [getActiveUserEmail, fetchCartFromDB, sessionStatus]);
-
-  // Persist optimistic cart changes to MongoDB and user-scoped localStorage
-  const syncCartToBackend = async (newItems, action = 'sync', payload = {}) => {
-    const activeEmail = currentUserEmail || getActiveUserEmail();
-    if (!activeEmail) return;
-
-    const storageKey = getStorageKey(activeEmail);
-    if (storageKey) {
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(newItems));
-      } catch (e) {}
-    }
-
-    try {
-      await fetch('/api/cart', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action,
-          items: newItems,
-          ...payload,
-        }),
-      });
-    } catch (err) {
-      console.error('[CartContext] Error syncing cart to MongoDB:', err);
-    }
-  };
+  }, [getActiveUserEmail, fetchCartFromDB, loadLocalCart, sessionStatus]);
 
   // -------------------------------------------------------------
   // Cart Actions
   // -------------------------------------------------------------
-  const addToCart = (product) => {
+  const addToCart = useCallback((product) => {
     if (!product || !product.id) return false;
-
-    const activeEmail = currentUserEmail || getActiveUserEmail();
-    if (!activeEmail) {
-      // User is not logged in: redirect to login page with return URL
-      if (typeof window !== 'undefined') {
-        const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
-        router.push(`/login?redirect=${returnUrl}`);
-      }
-      return false;
-    }
 
     const itemImg = product.img || product.image || '';
     const itemImages = Array.isArray(product.images) && product.images.length > 0 ? product.images : [];
@@ -179,7 +207,7 @@ export function CartProvider({ children }) {
     };
 
     setCart((prevCart) => {
-      const current = prevCart || [];
+      const current = Array.isArray(prevCart) ? prevCart : loadLocalCart();
       const existingIndex = current.findIndex((item) => String(item.id) === String(product.id));
 
       let updated;
@@ -197,24 +225,16 @@ export function CartProvider({ children }) {
         updated = [...current, formattedItem];
       }
 
+      saveLocalCart(updated);
       syncCartToBackend(updated, 'sync');
       return updated;
     });
 
     return true;
-  };
+  }, [loadLocalCart, saveLocalCart, syncCartToBackend]);
 
-  const buyNow = (product) => {
+  const buyNow = useCallback((product, redirectUrl = '/checkout') => {
     if (!product || !product.id) return false;
-
-    const activeEmail = currentUserEmail || getActiveUserEmail();
-    if (!activeEmail) {
-      if (typeof window !== 'undefined') {
-        const returnUrl = encodeURIComponent('/cart');
-        router.push(`/login?redirect=${returnUrl}`);
-      }
-      return false;
-    }
 
     const itemImg = product.img || product.image || '';
     const itemImages = Array.isArray(product.images) && product.images.length > 0 ? product.images : [];
@@ -236,65 +256,74 @@ export function CartProvider({ children }) {
 
     const newCart = [buyNowItem];
     setCart(newCart);
+    saveLocalCart(newCart);
     syncCartToBackend(newCart, 'sync');
-    router.push('/cart');
-    return true;
-  };
 
-  const updateQuantity = (id, quantity) => {
+    // If user is not logged in / registered, open modal on current page with return URL
     const activeEmail = currentUserEmail || getActiveUserEmail();
-    if (!activeEmail) return;
+    if (!activeEmail) {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('creatorskit-open-auth', {
+            detail: { mode: 'register', redirectUrl },
+          })
+        );
+      }
+    } else {
+      router.push(redirectUrl);
+    }
+    return true;
+  }, [currentUserEmail, getActiveUserEmail, router, saveLocalCart, syncCartToBackend]);
 
+  const updateQuantity = useCallback((id, quantity) => {
     setCart((prevCart) => {
-      if (!prevCart) return [];
+      const current = Array.isArray(prevCart) ? prevCart : loadLocalCart();
       const targetQty = Number(quantity);
       let updated;
       if (targetQty <= 0) {
-        updated = prevCart.filter((item) => String(item.id) !== String(id));
+        updated = current.filter((item) => String(item.id) !== String(id));
       } else {
-        updated = prevCart.map((item) =>
+        updated = current.map((item) =>
           String(item.id) === String(id) ? { ...item, quantity: targetQty } : item
         );
       }
 
+      saveLocalCart(updated);
       syncCartToBackend(updated, 'sync');
       return updated;
     });
-  };
+  }, [loadLocalCart, saveLocalCart, syncCartToBackend]);
 
-  const removeFromCart = (id) => {
-    const activeEmail = currentUserEmail || getActiveUserEmail();
-    if (!activeEmail) return;
-
+  const removeFromCart = useCallback((id) => {
     setCart((prevCart) => {
-      const updated = prevCart ? prevCart.filter((item) => String(item.id) !== String(id)) : [];
+      const current = Array.isArray(prevCart) ? prevCart : loadLocalCart();
+      const updated = current.filter((item) => String(item.id) !== String(id));
+      saveLocalCart(updated);
       syncCartToBackend(updated, 'sync');
       return updated;
     });
-  };
+  }, [loadLocalCart, saveLocalCart, syncCartToBackend]);
 
-  const clearCart = () => {
-    const activeEmail = currentUserEmail || getActiveUserEmail();
+  const clearCart = useCallback(() => {
     setCart([]);
-
-    if (activeEmail) {
-      const storageKey = getStorageKey(activeEmail);
-      if (storageKey) {
-        try {
-          localStorage.removeItem(storageKey);
-        } catch (e) {}
+    try {
+      localStorage.removeItem(LOCAL_STORAGE_CART_KEY);
+      const activeEmail = currentUserEmail || getActiveUserEmail();
+      if (activeEmail) {
+        const userKey = getStorageKey(activeEmail);
+        if (userKey) localStorage.removeItem(userKey);
+        fetch('/api/cart', { method: 'DELETE' }).catch(() => {});
       }
-      fetch('/api/cart', { method: 'DELETE' }).catch(() => {});
-    }
-  };
+    } catch (e) {}
+  }, [currentUserEmail, getActiveUserEmail]);
 
   const isAuthenticated = Boolean(currentUserEmail);
-  const cartTotal = cart
+  const cartTotal = Array.isArray(cart)
     ? cart.reduce((total, item) => total + (Number(item.price) || 0) * (Number(item.quantity) || 1), 0)
     : 0;
 
-  // Real-time counter strictly tied to active user items (0 for unauthenticated guests)
-  const cartCount = isAuthenticated && cart
+  // Real-time counter strictly tied to items in cart - never resets on reload
+  const cartCount = Array.isArray(cart)
     ? cart.reduce((count, item) => count + (Number(item.quantity) || 1), 0)
     : 0;
 

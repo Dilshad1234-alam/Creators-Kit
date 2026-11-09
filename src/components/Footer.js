@@ -19,6 +19,7 @@ export default function Footer() {
 
   const quickLinks = [
     { name: 'Home', href: '/' },
+    { name: 'Live Sale', href: '/live-sale' },
     { name: 'Shop', href: '/product' },
     { name: 'Bundles', href: '/product#bundles' },
     { name: 'Courses', href: '/account?tab=courses' },
@@ -84,123 +85,133 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="w-full bg-[#111827] text-white pt-16 pb-12 border-t border-neutral-800 font-sans">
-      <div className="max-w-[1750px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
-        
-        {/* Main 4-Column Footer Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-12 pb-14 border-b border-neutral-800">
+    <footer className="w-full font-sans">
+      {/* Main 4-Column Footer Section - Cream Background (#FBFBF7) with Brand Red Text (#900606) */}
+      <div className="w-full bg-[#FBFBF7] text-[#900606] pt-6 pb-8 sm:pt-8 sm:pb-10 border-t border-neutral-200/90">
+        <div className="max-w-[1750px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
           
-          {/* Column 1: Brand Logo, Description & Social Icons */}
-          <div className="lg:col-span-4 space-y-5">
-            <Link href="/" className="inline-flex items-center gap-2.5 group">
-              <div className="w-8 h-8 rounded-lg bg-[#900606] flex items-center justify-center text-white shadow-md shadow-[#900606]/30 shrink-0 group-hover:scale-105 transition-transform">
-                <svg className="w-4 h-4 fill-current translate-x-0.5" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </div>
-              <div>
-                <span className="text-xl font-extrabold tracking-tight text-white block leading-none">
-                  Creators<span className="text-[#900606]">kit</span>
-                </span>
-                <span className="text-[9px] font-bold tracking-widest text-neutral-400 block uppercase mt-1">
-                  GEAR UP. CREATE MORE.
-                </span>
-              </div>
-            </Link>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-12">
+            
+            {/* Column 1: Brand Logo, Description & Social Icons */}
+            <div className="lg:col-span-4 space-y-5">
+              <Link href="/" className="inline-flex items-center gap-2.5 group">
+                <div className="w-8 h-8 rounded-lg bg-[#900606] flex items-center justify-center text-white shadow-md shadow-[#900606]/30 shrink-0 group-hover:scale-105 transition-transform">
+                  <svg className="w-4 h-4 fill-current translate-x-0.5" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-xl font-extrabold tracking-tight text-[#900606] block leading-none">
+                    Creators<span className="text-[#900606]">kit</span>
+                  </span>
+                  <span className="text-[9px] font-bold tracking-widest text-[#900606]/80 block uppercase mt-1">
+                    GEAR UP. CREATE MORE.
+                  </span>
+                </div>
+              </Link>
 
-            <p className="text-neutral-400 text-xs sm:text-sm font-normal leading-relaxed max-w-sm">
-              Premium creator products and expert courses to help you start, grow and succeed. Our mission is to create more and more creators across India.
-            </p>
+              <p className="text-[#900606]/90 text-xs sm:text-sm font-normal leading-relaxed max-w-sm">
+                Premium creator products and expert courses to help you start, grow and succeed. Our mission is to create more and more creators across India.
+              </p>
 
-            {/* Social Media Rounded Buttons */}
-            <div className="flex items-center gap-2.5 pt-1">
-              {socialLinks.map((item, i) => (
-                <Link
-                  key={i}
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={item.name}
-                  className="w-9 h-9 rounded-full border border-neutral-700/80 bg-neutral-900/60 hover:bg-[#900606] hover:border-[#900606] transition-all duration-300 flex items-center justify-center text-neutral-300 hover:text-white cursor-pointer shadow-sm hover:scale-105"
-                >
-                  {item.icon}
-                </Link>
-              ))}
+              {/* Social Media Rounded Buttons */}
+              <div className="flex items-center gap-2.5 pt-1">
+                {socialLinks.map((item, i) => (
+                  <Link
+                    key={i}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={item.name}
+                    className="w-9 h-9 rounded-full border border-[#900606]/30 bg-white hover:bg-[#900606] hover:border-[#900606] transition-all duration-300 flex items-center justify-center text-[#900606] hover:text-white cursor-pointer shadow-sm hover:scale-105"
+                  >
+                    {item.icon}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Column 2: Quick Links */}
-          <div className="lg:col-span-2 space-y-4">
-            <h4 className="font-bold text-sm sm:text-base text-white tracking-wide">
-              Quick Links
-            </h4>
-            <ul className="space-y-2.5 text-xs sm:text-sm text-neutral-400 font-normal">
-              {quickLinks.map((link, idx) => (
-                <li key={idx}>
-                  <Link href={link.href} className="hover:text-white transition-colors duration-200 inline-block">
-                    {link.name}
-                  </Link>
+            {/* Column 2: Quick Links */}
+            <div className="lg:col-span-2 space-y-4">
+              <h4 className="font-extrabold text-sm sm:text-base text-[#900606] tracking-wide">
+                Quick Links
+              </h4>
+              <ul className="space-y-2.5 text-xs sm:text-sm text-[#900606]/90 font-medium">
+                {quickLinks.map((link, idx) => (
+                  <li key={idx}>
+                    <Link href={link.href} className="hover:underline hover:opacity-100 opacity-90 transition-all duration-200 inline-block">
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Column 3: Customer Support */}
+            <div className="lg:col-span-3 space-y-4">
+              <h4 className="font-extrabold text-sm sm:text-base text-[#900606] tracking-wide">
+                Customer Support
+              </h4>
+              <ul className="space-y-2.5 text-xs sm:text-sm text-[#900606]/90 font-medium">
+                {supportLinks.map((link, idx) => (
+                  <li key={idx}>
+                    <Link href={link.href} className="hover:underline hover:opacity-100 opacity-90 transition-all duration-200 inline-block">
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Column 4: Contact Us */}
+            <div className="lg:col-span-3 space-y-4">
+              <h4 className="font-extrabold text-sm sm:text-base text-[#900606] tracking-wide">
+                Contact Us
+              </h4>
+              <ul className="space-y-3.5 text-xs sm:text-sm text-[#900606]/90 font-medium">
+                <li className="flex items-center gap-3">
+                  <span className="text-[#900606] shrink-0">
+                    <Mail className="w-4 h-4 stroke-[2]" />
+                  </span>
+                  <a href="mailto:support@creatorskit.in" className="hover:underline transition-colors">
+                    support@creatorskit.in
+                  </a>
                 </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Column 3: Customer Support */}
-          <div className="lg:col-span-3 space-y-4">
-            <h4 className="font-bold text-sm sm:text-base text-white tracking-wide">
-              Customer Support
-            </h4>
-            <ul className="space-y-2.5 text-xs sm:text-sm text-neutral-400 font-normal">
-              {supportLinks.map((link, idx) => (
-                <li key={idx}>
-                  <Link href={link.href} className="hover:text-white transition-colors duration-200 inline-block">
-                    {link.name}
-                  </Link>
+                <li className="flex items-center gap-3">
+                  <span className="text-[#900606] shrink-0">
+                    <Phone className="w-4 h-4 stroke-[2]" />
+                  </span>
+                  <a href="tel:+919876543210" className="hover:underline transition-colors">
+                    +91 98765 43210
+                  </a>
                 </li>
-              ))}
-            </ul>
-          </div>
+                <li className="flex items-center gap-3">
+                  <span className="text-[#900606] shrink-0">
+                    <MapPin className="w-4 h-4 stroke-[2]" />
+                  </span>
+                  <span>New Delhi, India</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <span className="text-[#900606] shrink-0">
+                    <Clock className="w-4 h-4 stroke-[2]" />
+                  </span>
+                  <span>Mon - Sat, 10AM - 7PM</span>
+                </li>
+              </ul>
+            </div>
 
-          {/* Column 4: Contact Us */}
-          <div className="lg:col-span-3 space-y-4">
-            <h4 className="font-bold text-sm sm:text-base text-white tracking-wide">
-              Contact Us
-            </h4>
-            <ul className="space-y-3.5 text-xs sm:text-sm text-neutral-400 font-normal">
-              <li className="flex items-center gap-3">
-                <span className="text-[#900606] shrink-0">
-                  <Mail className="w-4 h-4 stroke-[2]" />
-                </span>
-                <span className="hover:text-white transition-colors">support@creatorskit.in</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <span className="text-[#900606] shrink-0">
-                  <Phone className="w-4 h-4 stroke-[2]" />
-                </span>
-                <span className="hover:text-white transition-colors">+91 98765 43210</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <span className="text-[#900606] shrink-0">
-                  <MapPin className="w-4 h-4 stroke-[2]" />
-                </span>
-                <span>New Delhi, India</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <span className="text-[#900606] shrink-0">
-                  <Clock className="w-4 h-4 stroke-[2]" />
-                </span>
-                <span>Mon - Sat, 10AM - 7PM</span>
-              </li>
-            </ul>
           </div>
 
         </div>
+      </div>
 
-        {/* Bottom Clean Divider & Copyright */}
-        <div className="pt-8 text-center text-xs sm:text-sm text-neutral-400 font-medium">
-          © 2026 Creators Kit — All Rights Reserved
+      {/* Bottom Copyright Bar - Red Background (#900606) */}
+      <div className="w-full bg-[#900606] text-white py-4 px-4 text-center text-xs sm:text-sm font-medium">
+        <div className="max-w-[1750px] mx-auto flex items-center justify-center">
+          <p className="text-white/95">
+            © 2026 Creators Kit — All Rights Reserved
+          </p>
         </div>
-
       </div>
     </footer>
   );

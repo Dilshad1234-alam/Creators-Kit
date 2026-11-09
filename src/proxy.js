@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export function middleware(request) {
+export function proxy(request) {
   const { pathname } = request.nextUrl;
   const adminRole = request.cookies.get('admin_role')?.value || request.cookies.get('user_role')?.value;
   const userRole = request.cookies.get('user_role')?.value;
@@ -44,9 +44,10 @@ export function middleware(request) {
       Boolean(request.cookies.get('admin_token')?.value);
 
     if (!hasAuth) {
-      const loginUrl = new URL('/login', request.url);
-      loginUrl.searchParams.set('redirect', pathname);
-      return NextResponse.redirect(loginUrl);
+      const authPath = (pathname === '/checkout' || pathname.startsWith('/checkout/')) ? '/register' : '/login';
+      const redirectUrl = new URL(authPath, request.url);
+      redirectUrl.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(redirectUrl);
     }
     return NextResponse.next();
   }

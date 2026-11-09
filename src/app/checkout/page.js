@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { 
   ShoppingBag, 
@@ -17,6 +18,7 @@ import {
   Award, 
   CheckCircle2 
 } from 'lucide-react';
+import GoKwikCheckout from '@/components/GoKwikCheckout';
 
 const loadScript = (src) => {
   return new Promise((resolve) => {
@@ -35,6 +37,7 @@ const loadScript = (src) => {
 export default function CheckoutPage() {
   const { cart, cartTotal, clearCart } = useCart();
   const router = useRouter();
+  const { data: session } = useSession();
 
   const [loading, setLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
@@ -59,6 +62,7 @@ export default function CheckoutPage() {
     const userInfoStr = typeof window !== 'undefined' ? localStorage.getItem('creatorsKitUserInfo') : null;
     const storedRole = typeof window !== 'undefined' ? (sessionStorage.getItem('userRole') || localStorage.getItem('userRole')) : null;
     const sessionEmail = typeof window !== 'undefined' ? (sessionStorage.getItem('userEmail') || localStorage.getItem('userEmail')) : null;
+    const googleEmail = session?.user?.email || null;
     let user = null;
     if (userInfoStr) {
       try {
@@ -66,15 +70,15 @@ export default function CheckoutPage() {
       } catch (e) {}
     }
 
-    const isLoggedIn = (user?.email || sessionEmail) && storedRole !== 'admin' && user?.role !== 'admin';
+    const isLoggedIn = (user?.email || sessionEmail || googleEmail) && storedRole !== 'admin' && user?.role !== 'admin';
 
     if (!isLoggedIn) {
-      router.replace('/login?redirect=/checkout');
+      router.replace('/register?redirect=/checkout');
       return;
     }
 
-    const email = user?.email || sessionEmail || '';
-    const name = user?.name || (sessionStorage.getItem('userName') || localStorage.getItem('userName')) || '';
+    const email = user?.email || sessionEmail || googleEmail || '';
+    const name = user?.name || (sessionStorage.getItem('userName') || localStorage.getItem('userName')) || session?.user?.name || '';
     const nameParts = name.trim().split(' ');
     const firstName = nameParts[0] || '';
     const lastName = nameParts.slice(1).join(' ') || '';
@@ -85,7 +89,7 @@ export default function CheckoutPage() {
       firstName: prev.firstName || firstName,
       lastName: prev.lastName || lastName,
     }));
-  }, [router]);
+  }, [router, session]);
 
   const finalTotal = Math.max(0, cartTotal - (appliedCoupon?.discountAmount || 0));
   const cartItemCount = cart ? cart.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0) : 0;
@@ -542,6 +546,48 @@ export default function CheckoutPage() {
                   )}
                 </span>
               </button>
+
+              {/* GoKwik Express Checkout Option */}
+              <div className="pt-2">
+                <div className="relative flex py-2 items-center">
+                  <div className="flex-grow border-t border-neutral-200 dark:border-neutral-800"></div>
+                  <span className="flex-shrink mx-3 text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
+                    Or Fast 1-Click Checkout
+                  </span>
+                  <div className="flex-grow border-t border-neutral-200 dark:border-neutral-800"></div>
+                </div>
+
+                <GoKwikCheckout
+                  cartItems={cart}
+                  cartTotal={finalTotal}
+                  appliedCoupon={appliedCoupon}
+                  buttonText={`Fast 1-Click ₹${finalTotal.toLocaleString()} via GoKwik`}
+                  buttonSize="lg"
+                  customerDetails={{
+                    firstName: formData.firstName,
+                    lastName: formData.lastName,
+                    email: formData.email,
+                    address: formData.address,
+                    city: formData.city,
+                    zip: formData.zip,
+                    country: formData.country,
+                  }}
+                  onSuccess={(orderData) => {
+                    clearCart();
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('creatorskit_courses_unlocked', 'true');
+                      try {
+                        const bc = new BroadcastChannel('creatorskit_masterclasses_channel');
+                        bc.postMessage({ type: 'updated' });
+                        bc.close();
+                      } catch (e) {}
+                      window.dispatchEvent(new Event('masterclasses-updated'));
+                    }
+                    const savedOrderId = orderData.orderNumber || orderData.orderId;
+                    router.push(`/order-success?orderId=${savedOrderId}`);
+                  }}
+                />
+              </div>
 
               <div className="flex items-center justify-between text-xs text-neutral-500 pt-1">
                 <Link href="/cart" className="hover:text-[#900606] font-semibold transition-colors flex items-center gap-1">

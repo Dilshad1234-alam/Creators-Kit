@@ -18,7 +18,7 @@ export async function GET(req) {
         { category: { $regex: /bundle/i } },
         { category: 'Creator bundles' },
       ],
-    }).sort({ createdAt: -1 });
+    }).sort({ createdAt: -1 }).limit(20).lean();
 
     if (searchParam) {
       const q = searchParam.toLowerCase();

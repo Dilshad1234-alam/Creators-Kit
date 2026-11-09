@@ -2,6 +2,7 @@ import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
 import { CartProvider } from "@/context/CartContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import AuthProvider from "@/components/AuthProvider";
+import { AuthModalProvider } from "@/context/AuthModalContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import "./globals.css";
@@ -58,11 +59,13 @@ export default function RootLayout({ children }) {
       <body className="font-sans min-h-full flex flex-col bg-[#FBFBF7] text-[#111827] transition-colors duration-300 overflow-x-hidden w-full max-w-[100vw]" suppressHydrationWarning={true}>
         <AuthProvider>
           <ThemeProvider>
-            <CartProvider>
-              <Navbar />
-              {children}
-              <Footer />
-            </CartProvider>
+            <AuthModalProvider>
+              <CartProvider>
+                <Navbar />
+                {children}
+                <Footer />
+              </CartProvider>
+            </AuthModalProvider>
           </ThemeProvider>
         </AuthProvider>
       </body>

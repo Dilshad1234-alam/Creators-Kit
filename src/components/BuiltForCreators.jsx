@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import { getImageUrl } from '@/lib/imagekit';
 import Link from 'next/link';
@@ -138,9 +138,10 @@ export default function PopularBundlesSection() {
     };
   }, [mobileBundleEmbla, onSelectBundle]);
 
-  const mobileBundles = bundles && bundles.length > 0
-    ? (bundles.length <= 4 ? [...bundles, ...bundles, ...bundles] : bundles)
-    : [];
+  const mobileBundles = useMemo(() => {
+    if (!bundles || bundles.length === 0) return [];
+    return bundles.length <= 4 ? [...bundles, ...bundles, ...bundles] : bundles;
+  }, [bundles]);
 
   const scrollToBundle = useCallback(
     (index) => {
@@ -159,12 +160,12 @@ export default function PopularBundlesSection() {
   );
 
   return (
-    <section className="w-full pt-3 pb-1 sm:pt-5 sm:pb-2 bg-[#FBFBF7] overflow-hidden">
-      <div className="w-full max-w-[1750px] mx-auto px-4 md:px-6 lg:px-10">
+    <section className="w-full pt-1 pb-1 sm:pt-2 sm:pb-2 bg-[#FBFBF7] overflow-hidden">
+      <div className="w-full max-w-[1550px] mx-auto px-4 md:px-6 lg:px-10">
         
         {/* Section Header */}
-        <div className="flex flex-col items-center text-center mb-3 sm:mb-6">
-          <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-medium text-[#111827] dark:text-white tracking-tight pb-1 sm:pb-3">
+        <div className="flex flex-col items-center text-center mb-2.5 sm:mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-medium text-[#111827] dark:text-white tracking-tight pb-0.5 sm:pb-1">
             Popular <span className="text-[#900606] whitespace-nowrap">Creators Bundles</span>
           </h2>
           <p className="text-neutral-500 text-xs sm:text-sm md:text-base font-normal max-w-xl">
@@ -247,16 +248,13 @@ export default function PopularBundlesSection() {
                         </div>
                       </div>
 
-                      {/* View Details Button with Slide-Up Hover Effect & rounded-xl */}
+                      {/* View Details Button - Matching Product Page Button Style */}
                       <div className="px-4 pb-4">
                         <Link 
                           href={`/bundle/${targetId}`}
-                          className="relative isolate w-full py-3 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-xs sm:text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer active:scale-95"
+                          className="w-full py-2.5 bg-[#900606] hover:bg-[#780505] text-white rounded-xl font-bold text-xs sm:text-sm transition-all shadow-xs flex items-center justify-center cursor-pointer active:scale-95"
                         >
-                          <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0 pointer-events-none"></span>
-                          <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
-                            View Details
-                          </span>
+                          View Details
                         </Link>
                       </div>
 
@@ -359,16 +357,13 @@ export default function PopularBundlesSection() {
                   </div>
                 </div>
 
-                {/* View Details Button with Slide-Up Hover Effect */}
+                {/* View Details Button - Matching Product Page Button Style */}
                 <div className="px-6 pb-6 pt-1 mt-auto">
                   <Link 
                     href={`/bundle/${targetId}`}
-                    className="relative isolate w-full py-3 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer hover:shadow-md"
+                    className="w-full py-2.5 sm:py-3 bg-[#900606] hover:bg-[#780505] text-white rounded-xl font-bold text-sm transition-all shadow-xs hover:shadow-md flex items-center justify-center cursor-pointer active:scale-[0.98]"
                   >
-                    <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0 pointer-events-none"></span>
-                    <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
-                      View Details
-                    </span>
+                    View Details
                   </Link>
                 </div>
 

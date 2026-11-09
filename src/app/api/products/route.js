@@ -12,45 +12,46 @@ export async function GET(req) {
     const categoryParam = searchParams.get('category');
     const typeParam = searchParams.get('type');
     const searchParam = searchParams.get('search');
+    const limitParam = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '60', 10)));
 
-    const products = await Product.find({}).sort({ createdAt: -1 });
-
-    // Filter by type or category if requested
-    let filtered = products;
+    const query = {};
 
     if (typeParam === 'thumbnail-bundle' || typeParam === 'thumbnail-bundles') {
-      filtered = filtered.filter(
-        (p) =>
-          p.productType === 'thumbnail-bundle' ||
-          (!p.productType && p.images && p.images.length > 1 && p.images.some((v) => v.title && v.title !== p.name))
-      );
+      query.$or = [
+        { productType: 'thumbnail-bundle' },
+        { 'images.1': { $exists: true } }
+      ];
     } else if (typeParam === 'bundle' || typeParam === 'bundles' || categoryParam === 'bundle' || categoryParam === 'Creator bundles') {
-      filtered = filtered.filter(
-        (p) =>
-          p.productType === 'bundle' ||
-          (!p.productType && (p.isBundle || (p.category && p.category.toLowerCase().includes('bundle'))))
-      );
+      query.$or = [
+        { productType: 'bundle' },
+        { isBundle: true },
+        { category: { $regex: /bundle/i } }
+      ];
     } else if (typeParam === 'individual') {
-      filtered = filtered.filter(
-        (p) =>
-          p.productType === 'individual' ||
-          (!p.productType && !p.isBundle && p.productType !== 'thumbnail-bundle')
-      );
-    } else if (categoryParam) {
-      filtered = filtered.filter(
-        (p) => p.category && p.category.toLowerCase() === categoryParam.toLowerCase()
-      );
+      query.$or = [
+        { productType: 'individual' },
+        { productType: { $exists: false }, isBundle: false }
+      ];
+    } else if (categoryParam && categoryParam.toLowerCase() !== 'all') {
+      query.category = { $regex: new RegExp(`^${categoryParam.trim()}$`, 'i') };
     }
 
     if (searchParam) {
-      const q = searchParam.toLowerCase();
-      filtered = filtered.filter(
-        (p) =>
-          p.name?.toLowerCase().includes(q) ||
-          p.category?.toLowerCase().includes(q) ||
-          p.description?.toLowerCase().includes(q)
-      );
+      const q = searchParam.trim();
+      const searchOr = [
+        { name: { $regex: q, $options: 'i' } },
+        { category: { $regex: q, $options: 'i' } },
+        { description: { $regex: q, $options: 'i' } }
+      ];
+      if (query.$or) {
+        query.$and = [{ $or: query.$or }, { $or: searchOr }];
+        delete query.$or;
+      } else {
+        query.$or = searchOr;
+      }
     }
+
+    const filtered = await Product.find(query).sort({ createdAt: -1 }).limit(limitParam).lean();
 
     const normalized = filtered.map((p) => {
       const obj = p.toObject ? p.toObject() : { ...p };

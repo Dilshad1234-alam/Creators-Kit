@@ -61,7 +61,7 @@ export default function BlogListingPage() {
               style={{ animationDelay: `${idx * 100}ms` }}
             >
               <div className="flex flex-col h-full w-full">
-                <div className="relative h-48 md:h-56 w-full overflow-hidden shrink-0 bg-neutral-100">
+                <div className="relative h-58 md:h-64 w-full overflow-hidden shrink-0 bg-neutral-100">
                   <div className="absolute inset-0 bg-[#900606]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img 
