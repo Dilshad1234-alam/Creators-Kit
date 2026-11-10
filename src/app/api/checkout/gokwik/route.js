@@ -4,39 +4,11 @@ import Order from '@/models/Order';
 import User from '@/models/User';
 import { sendEmail } from '@/lib/mailer';
 
-interface GoKwikCheckoutBody {
-  gokwikOrderId?: string;
-  paymentId?: string;
-  paymentMode?: string;
-  paymentStatus?: string;
-  totalAmount: number;
-  customerName: string;
-  customerEmail: string;
-  customerPhone?: string;
-  shippingAddress?: {
-    address1?: string;
-    street?: string;
-    city?: string;
-    state?: string;
-    pincode?: string;
-    zipCode?: string;
-    country?: string;
-  };
-  items: Array<{
-    productId: string | number;
-    name: string;
-    price: number;
-    quantity: number;
-    image?: string;
-    image_url?: string;
-  }>;
-}
-
-export async function POST(req: Request) {
+export async function POST(req) {
   try {
     await dbConnect();
 
-    const body: GoKwikCheckoutBody = await req.json();
+    const body = await req.json();
     const {
       gokwikOrderId,
       paymentId,
@@ -129,6 +101,7 @@ export async function POST(req: Request) {
     });
 
     console.log(`[GOKWIK CHECKOUT] Order ${formattedOrderId} created successfully for ${cleanEmail}`);
+    const orderDoc = newOrder;
 
     // 6. Unlock masterclasses and update customer purchase status in MongoDB Compass User collection
     try {
@@ -155,7 +128,7 @@ export async function POST(req: Request) {
     try {
       const itemsListHtml = newOrder.items
         .map(
-          (item: any) => `
+          (item) => `
           <tr style="border-bottom: 1px solid #f1f5f9;">
             <td style="padding: 12px 8px; font-weight: 600; color: #1e293b;">${item.name}</td>
             <td style="padding: 12px 8px; text-align: center; color: #64748b;">x${item.quantity}</td>
@@ -187,7 +160,7 @@ export async function POST(req: Request) {
                 </tr>
                 <tr>
                   <td style="font-size: 13px; color: #64748b; padding-bottom: 6px;">Payment Method:</td>
-                  <td style="font-size: 13px; font-weight: 600; color: #0f172a; text-align: right; padding-bottom: 6px;">GoKwik Express (${newOrder.paymentMode})</td>
+                  <td style="font-size: 13px; font-weight: 600; color: #0f172a; text-align: right; padding-bottom: 6px;">GoKwik Express (${orderDoc.paymentMode})</td>
                 </tr>
                 <tr>
                   <td style="font-size: 13px; color: #64748b;">Delivery OTP (Keep Secret):</td>
@@ -248,15 +221,15 @@ export async function POST(req: Request) {
       {
         success: true,
         message: 'Order placed successfully via GoKwik Express Checkout.',
-        orderId: newOrder._id,
-        orderNumber: newOrder.orderId,
-        deliveryOtp: newOrder.deliveryOtp,
-        status: newOrder.status,
-        totalAmount: newOrder.totalAmount,
+        orderId: orderDoc._id,
+        orderNumber: orderDoc.orderId,
+        deliveryOtp: orderDoc.deliveryOtp,
+        status: orderDoc.status,
+        totalAmount: orderDoc.totalAmount,
       },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error) {
     console.error('[GOKWIK CHECKOUT API ERROR]:', error);
     return NextResponse.json(
       { error: 'Failed to record GoKwik order', details: error.message },

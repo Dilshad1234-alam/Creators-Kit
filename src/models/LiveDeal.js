@@ -67,8 +67,8 @@ LiveDealSchema.pre('save', function (next) {
   if (typeof next === 'function') next();
 });
 
-if (mongoose.models && mongoose.models.LiveDeal) {
-  delete mongoose.models.LiveDeal;
-}
+const LiveDeal =
+  mongoose.models.LiveDeal || mongoose.model('LiveDeal', LiveDealSchema);
 
-export default mongoose.models.LiveDeal || mongoose.model('LiveDeal', LiveDealSchema);
+export { LiveDeal };
+export default LiveDeal;

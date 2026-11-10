@@ -41,7 +41,7 @@ const DEFAULT_CONFIG = {
   showMysteryOffer: true,
 };
 
-function normalizeConfig(doc: any) {
+function normalizeConfig(doc) {
   if (!doc) return { ...DEFAULT_CONFIG };
 
   const raw = typeof doc.toObject === 'function' ? doc.toObject() : doc;
@@ -98,13 +98,13 @@ export async function GET() {
     const config = await LiveSaleConfig.findOne().sort({ updatedAt: -1 }).lean();
     const normalized = normalizeConfig(config);
     return NextResponse.json(normalized, { status: 200 });
-  } catch (error: any) {
+  } catch (error) {
     console.error('[LIVE SALE GET API ERROR]:', error);
     return NextResponse.json(DEFAULT_CONFIG, { status: 200 });
   }
 }
 
-async function handleSave(request: Request) {
+async function handleSave(request) {
   try {
     await dbConnect();
     const body = await request.json();
@@ -131,7 +131,7 @@ async function handleSave(request: Request) {
       message: 'Live Sale settings created in MongoDB Compass successfully!',
       config: normalizeConfig(created),
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('[LIVE SALE SAVE API ERROR]:', error);
     return NextResponse.json(
       { success: false, error: error.message || 'Failed to save Live Sale configuration' },
@@ -140,11 +140,11 @@ async function handleSave(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request) {
   return handleSave(request);
 }
 
-export async function PUT(request: Request) {
+export async function PUT(request) {
   return handleSave(request);
 }
 

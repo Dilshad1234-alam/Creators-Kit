@@ -5,49 +5,6 @@ import Script from 'next/script';
 import { useRouter } from 'next/navigation';
 import { Zap, ShieldCheck, RefreshCw, AlertCircle } from 'lucide-react';
 
-interface CartItem {
-  id: string | number;
-  name: string;
-  price: number;
-  quantity: number;
-  image?: string;
-  img?: string;
-}
-
-interface CustomerDetails {
-  firstName?: string;
-  lastName?: string;
-  name?: string;
-  email?: string;
-  phone?: string;
-  address?: string;
-  city?: string;
-  zip?: string;
-  country?: string;
-}
-
-interface GoKwikCheckoutProps {
-  cartItems?: CartItem[];
-  cartTotal?: number;
-  appliedCoupon?: {
-    code: string;
-    discountAmount: number;
-  } | null;
-  customerDetails?: CustomerDetails;
-  onSuccess?: (orderData: any) => void;
-  onError?: (error: any) => void;
-  className?: string;
-  buttonText?: string;
-  buttonSize?: 'sm' | 'md' | 'lg';
-}
-
-declare global {
-  interface Window {
-    gokwik?: any;
-    gkCheckout?: any;
-  }
-}
-
 export default function GoKwikCheckout({
   cartItems = [],
   cartTotal = 0,
@@ -58,7 +15,7 @@ export default function GoKwikCheckout({
   className = '',
   buttonText = 'GoKwik Express Checkout',
   buttonSize = 'md',
-}: GoKwikCheckoutProps) {
+}) {
   const router = useRouter();
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -154,11 +111,11 @@ export default function GoKwikCheckout({
       // Configure GoKwik checkout parameters with callbacks
       const checkoutConfig = {
         ...payload,
-        onSuccess: async (response: any) => {
+        onSuccess: async (response) => {
           console.log('[GoKwik Checkout] Payment / Order Successful:', response);
           await handleBackendOrderVerification(response, payload);
         },
-        onFailure: (error: any) => {
+        onFailure: (error) => {
           console.warn('[GoKwik Checkout] Cancelled or Failed:', error);
           setLoading(false);
           const errorMsg = error?.message || 'Checkout was cancelled or interrupted.';
@@ -180,7 +137,7 @@ export default function GoKwikCheckout({
       } else {
         await fallbackSimulatedCheckout(payload);
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error('[GoKwik Checkout Error]:', err);
       setErrorMessage(err.message || 'Unable to open GoKwik Express Checkout.');
       setLoading(false);
@@ -189,7 +146,7 @@ export default function GoKwikCheckout({
   };
 
   // Fallback simulator for sandboxing / local dev when external GoKwik CDN is unreachable
-  const fallbackSimulatedCheckout = async (payload: any) => {
+  const fallbackSimulatedCheckout = async (payload) => {
     try {
       const simulatedResponse = {
         orderId: `GK_ORD_${Date.now()}`,
@@ -200,14 +157,14 @@ export default function GoKwikCheckout({
         customer: payload.customer,
       };
       await handleBackendOrderVerification(simulatedResponse, payload);
-    } catch (e: any) {
+    } catch (e) {
       setErrorMessage(e.message || 'Payment simulation failed.');
       setLoading(false);
     }
   };
 
   // Verify and record order in MongoDB database via API route
-  const handleBackendOrderVerification = async (gkResponse: any, cartPayload: any) => {
+  const handleBackendOrderVerification = async (gkResponse, cartPayload) => {
     try {
       const customerEmail =
         cartPayload.customer.email ||
@@ -234,7 +191,7 @@ export default function GoKwikCheckout({
           customerEmail,
           customerPhone: cartPayload.customer.phone || '',
           shippingAddress: cartPayload.customer.shipping_address,
-          items: cartPayload.cart.items.map((i: any) => ({
+          items: cartPayload.cart.items.map((i) => ({
             productId: i.id,
             name: i.title || i.name,
             price: i.price,
@@ -259,7 +216,7 @@ export default function GoKwikCheckout({
       } else {
         router.push(`/track?orderId=${data.orderId || data.orderNumber}`);
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error('[GoKwik Verification Error]:', err);
       setErrorMessage(err.message || 'Payment verified but order logging encountered an error.');
       if (onError) onError(err);
@@ -328,4 +285,3 @@ export default function GoKwikCheckout({
     </>
   );
 }
-

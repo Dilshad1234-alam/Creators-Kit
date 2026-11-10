@@ -391,9 +391,16 @@ export default function LiveSalePage() {
   const [revealedSecret, setRevealedSecret] = useState(false);
   const [copiedSecret, setCopiedSecret] = useState(false);
 
+  // Dynamic MongoDB Collections State (with fallback defaults)
+  const [liveHeroSlides, setLiveHeroSlides] = useState(HERO_SLIDES);
+  const [liveFlashDeals, setLiveFlashDeals] = useState(FLASH_DEALS);
+  const [liveCreatorDeals, setLiveCreatorDeals] = useState(STANDOUT_PRODUCTS);
+  const [liveCategories, setLiveCategories] = useState(CATEGORIES);
+  const [liveFaqs, setLiveFaqs] = useState(FAQS);
+
   // Deal of the Day States
   const [selectedDealIndex, setSelectedDealIndex] = useState(0);
-  const activeDeal = FLASH_DEALS[selectedDealIndex] || FLASH_DEALS[0];
+  const activeDeal = liveFlashDeals[selectedDealIndex] || liveFlashDeals[0] || FLASH_DEALS[0];
   const [dealTimeLeft, setDealTimeLeft] = useState({
     hours: '08',
     minutes: '12',
@@ -451,13 +458,118 @@ export default function LiveSalePage() {
     fetchSaleConfig();
   }, []);
 
+  // Fetch Live Sale sections dynamically from MongoDB
+  useEffect(() => {
+    async function fetchLiveSections() {
+      try {
+        const res = await fetch('/api/admin/live-sale/sections?section=all&activeOnly=true', { cache: 'no-store' });
+        if (res.ok) {
+          const json = await res.json();
+          const data = json.data || {};
+          if (Array.isArray(data.banners) && data.banners.length > 0) {
+            setLiveHeroSlides(
+              data.banners.map((b) => ({
+                bannerImageUrl: b.bannerImage || b.bannerImageUrl || b.image || '/img-kit8.png',
+                image: b.bannerImage || b.bannerImageUrl || b.image || '/img-kit8.png',
+                alt: 'Live Sale Hero Banner',
+                link: b.link || '',
+              }))
+            );
+          }
+          if (Array.isArray(data.deals) && data.deals.length > 0) {
+            setLiveFlashDeals(
+              data.deals.map((d) => ({
+                id: d._id || d.id || 'deal',
+                tag: d.tag || 'FLASH DEAL',
+                name: d.name || 'Creator Gear',
+                subtitle: d.subtitle || '',
+                price: Number(d.price) || 999,
+                mrp: Number(d.mrp) || 1999,
+                savings: Number(d.savings) || Math.max(0, (Number(d.mrp) || 0) - (Number(d.price) || 0)),
+                discountPercent: Number(d.discountPercent) || 50,
+                stockLeft: Number(d.stockLeft) || 10,
+                stockTotal: Number(d.stockTotal) || 50,
+                image: d.image || '/wireless-mic1.png',
+                rating: Number(d.rating) || 4.8,
+                reviewsCount: Number(d.reviewsCount) || 120,
+                freeBonus: d.freeBonus || '',
+                dealUrl: d.dealUrl || '/live-sale',
+              }))
+            );
+          }
+          if (Array.isArray(data.creatorDeals) && data.creatorDeals.length > 0) {
+            setLiveCreatorDeals(
+              data.creatorDeals.map((cd, idx) => ({
+                id: cd._id || cd.id || `creator-deal-${idx}`,
+                name: cd.title || cd.name || 'Creator Equipment',
+                title: cd.title || cd.name || 'Creator Equipment',
+                subtitle: cd.subtitle || 'Professional creator equipment',
+                category: cd.category || 'CREATOR GEAR',
+                categoryKey: (cd.category || '').toLowerCase().includes('stand') || (cd.category || '').toLowerCase().includes('tripod')
+                  ? 'tripods'
+                  : (cd.category || '').toLowerCase().includes('audio') || (cd.category || '').toLowerCase().includes('mic')
+                  ? 'mics'
+                  : (cd.category || '').toLowerCase().includes('light')
+                  ? 'lighting'
+                  : (cd.category || '').toLowerCase().includes('accessory') || (cd.category || '').toLowerCase().includes('backdrop')
+                  ? 'backdrops'
+                  : (cd.category || '').toLowerCase().includes('bundle')
+                  ? 'bundles'
+                  : 'all',
+                tag: cd.badge || cd.tag || 'BESTSELLER',
+                badge: cd.badge || cd.tag || 'BESTSELLER',
+                price: Number(cd.price) || 999,
+                mrp: Number(cd.mrp) || Math.round((Number(cd.price) || 999) * 1.3),
+                savings: Number(cd.savings) || Math.max(0, (Number(cd.mrp) || 0) - (Number(cd.price) || 0)),
+                discountText: cd.discountText || (cd.discountPercent ? `${cd.discountPercent}% OFF` : ''),
+                discountPercent: Number(cd.discountPercent) || 25,
+                stockLeft: Number(cd.stockLeft) || 7,
+                stockTotal: Number(cd.stockTotal) || 20,
+                rating: Number(cd.rating) || 4.8,
+                reviewsCount: Number(cd.reviewsCount) || 120,
+                image: cd.imageUrl || cd.image || '/tripod1.png',
+                imageUrl: cd.imageUrl || cd.image || '/tripod1.png',
+              }))
+            );
+          }
+          if (Array.isArray(data.categories) && data.categories.length > 0) {
+            setLiveCategories(
+              data.categories.map((c) => ({
+                id: c._id || c.id || (c.name ? c.name.toLowerCase().replace(/\s+/g, '-') : 'cat'),
+                name: c.name || 'Category',
+                itemCount: c.itemCount || 'Studio Gear',
+                image: c.image || '/wireless-mic.jpg',
+                discount: c.discount || 'UP TO 50% OFF',
+                startingPrice: c.startingPrice || '₹999',
+                badge: c.badge || 'HOT DEAL',
+                link: c.link || '/product',
+              }))
+            );
+          }
+          if (Array.isArray(data.faqs) && data.faqs.length > 0) {
+            setLiveFaqs(
+              data.faqs.map((f) => ({
+                q: f.question,
+                a: f.answer,
+                category: f.category || 'General',
+              }))
+            );
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching live sections:', err);
+      }
+    }
+    fetchLiveSections();
+  }, []);
+
   // Hero Banner Carousel State
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [touchStartX, setTouchStartX] = useState(null);
 
-  const totalSlides = HERO_SLIDES.length;
+  const totalSlides = liveHeroSlides.length;
 
   const nextSlide = useCallback(() => {
     setIsTransitioning(true);
@@ -508,32 +620,36 @@ export default function LiveSalePage() {
     }
   }, [currentSlide, totalSlides]);
 
-  const renderSlides = [...HERO_SLIDES, HERO_SLIDES[0]];
+  const renderSlides = [...liveHeroSlides, liveHeroSlides[0]];
 
   // Filter Standout Gear
   const displayedProducts = useMemo(() => {
-    if (activeCategory === 'all') return STANDOUT_PRODUCTS;
-    return STANDOUT_PRODUCTS.filter((item) => item.categoryKey === activeCategory);
-  }, [activeCategory]);
+    if (activeCategory === 'all') return liveCreatorDeals;
+    return liveCreatorDeals.filter(
+      (item) => item.categoryKey === activeCategory || (item.category && item.category.toLowerCase().includes(activeCategory))
+    );
+  }, [activeCategory, liveCreatorDeals]);
 
   // Handle Add to Cart
   const handleAddToCart = useCallback((product) => {
+    const prodName = product.name || product.title || 'Creator Gear';
+    const prodImg = product.image || product.imageUrl || '/tripod1.png';
     const success = addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      mrp: product.mrp,
-      image: product.image,
-      img: product.image,
+      id: product.id || product._id,
+      name: prodName,
+      price: Number(product.price) || 0,
+      mrp: Number(product.mrp) || 0,
+      image: prodImg,
+      img: prodImg,
       quantity: 1,
     });
 
     if (success) {
-      setAddedItems((prev) => ({ ...prev, [product.id]: true }));
-      setToastMessage(`✓ Added "${product.name}" to cart!`);
+      setAddedItems((prev) => ({ ...prev, [product.id || product._id]: true }));
+      setToastMessage(`✓ Added "${prodName}" to cart!`);
 
       setTimeout(() => {
-        setAddedItems((prev) => ({ ...prev, [product.id]: false }));
+        setAddedItems((prev) => ({ ...prev, [product.id || product._id]: false }));
       }, 2000);
 
       setTimeout(() => {
@@ -544,14 +660,16 @@ export default function LiveSalePage() {
 
   // Handle Select Kit (Buy Now direct to checkout)
   const handleSelectKit = useCallback((kit) => {
+    const prodName = kit.name || kit.title || 'Creator Gear';
+    const prodImg = kit.image || kit.imageUrl || '/tripod1.png';
     buyNow(
       {
-        id: kit.id,
-        name: kit.name,
-        price: kit.price,
-        mrp: kit.mrp,
-        image: kit.image,
-        img: kit.image,
+        id: kit.id || kit._id,
+        name: prodName,
+        price: Number(kit.price) || 0,
+        mrp: Number(kit.mrp) || 0,
+        image: prodImg,
+        img: prodImg,
         quantity: 1,
       },
       '/checkout'
@@ -639,12 +757,12 @@ export default function LiveSalePage() {
       {/* ========================================================================= */}
       <main className="w-full pt-[96px] sm:pt-[116px]">
         {/* Dynamic Top Announcement Ticker Bar */}
-        <div className="w-full bg-gradient-to-r from-[#900606] via-[#7d0505] to-[#900606] text-white py-2 px-4 text-center text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-xs border-b border-red-800/40">
+        {/* <div className="w-full bg-gradient-to-r from-[#900606] via-[#7d0505] to-[#900606] text-white py-2 px-4 text-center text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-xs border-b border-red-800/40">
           <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping shrink-0" />
           <span className="tracking-wide">
             {saleConfig?.tickerText || "Diwali Creator Dhamaka Live Now • Extra 10% Off with code CREATE10"}
           </span>
-        </div>
+        </div> */}
         <section className="relative w-full overflow-hidden bg-[#0a0a0a] mb-2 sm:mb-3">
           <div className="w-full relative z-8 max-w-[3000px] mx-auto">
             <div
@@ -659,33 +777,36 @@ export default function LiveSalePage() {
                 className={`flex h-full will-change-transform ${isTransitioning ? 'transition-transform duration-700 ease-in-out' : ''}`}
                 style={{ transform: `translateX(-${currentSlide * 100}%)` }}
               >
-                {renderSlides.map((slide, idx) => (
-                  <div key={idx} className="w-full h-full flex-shrink-0 relative overflow-hidden">
-                    {slide.link ? (
-                      <a href={slide.link} className="absolute inset-0 w-full h-full block">
-                        <Image
-                          src={getImageUrl(slide.image)}
-                          alt={slide.alt || 'Creator Sale Banner'}
-                          fill
-                          sizes="100vw"
-                          priority={idx === 0}
-                          className="object-cover object-center"
-                        />
-                      </a>
-                    ) : (
-                      <div className="absolute inset-0 w-full h-full block">
-                        <Image
-                          src={getImageUrl(slide.image)}
-                          alt={slide.alt || 'Creator Sale Banner'}
-                          fill
-                          sizes="100vw"
-                          priority={idx === 0}
-                          className="object-cover object-center"
-                        />
-                      </div>
-                    )}
-                  </div>
-                ))}
+                {renderSlides.map((slide, idx) => {
+                  const bannerSrc = slide.bannerImageUrl || slide.image || '/img-kit8.png';
+                  return (
+                    <div key={idx} className="w-full h-full flex-shrink-0 relative overflow-hidden">
+                      {slide.link ? (
+                        <a href={slide.link} className="absolute inset-0 w-full h-full block">
+                          <Image
+                            src={getImageUrl(bannerSrc)}
+                            alt={slide.alt || 'Live Sale Hero Banner'}
+                            fill
+                            sizes="100vw"
+                            priority={idx === 0}
+                            className="object-cover object-center"
+                          />
+                        </a>
+                      ) : (
+                        <div className="absolute inset-0 w-full h-full block">
+                          <Image
+                            src={getImageUrl(bannerSrc)}
+                            alt={slide.alt || 'Live Sale Hero Banner'}
+                            fill
+                            sizes="100vw"
+                            priority={idx === 0}
+                            className="object-cover object-center"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Digitek-style Bottom-Right Circular Navigation Arrows */}
@@ -710,7 +831,7 @@ export default function LiveSalePage() {
 
               {/* Pagination Dots at bottom center */}
               <div className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 sm:gap-2 z-20">
-                {HERO_SLIDES.map((_, idx) => (
+                {liveHeroSlides.map((_, idx) => (
                   <button
                     key={idx}
                     type="button"
@@ -799,7 +920,7 @@ export default function LiveSalePage() {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-5 w-full">
-              {CATEGORIES.map((cat) => {
+              {liveCategories.map((cat) => {
                 const isSelected = activeCategory === cat.id;
                 return (
                   <div
@@ -898,9 +1019,9 @@ export default function LiveSalePage() {
                       </span>
                     </span>
 
-                    {FLASH_DEALS.length > 1 && (
+                    {liveFlashDeals.length > 1 && (
                       <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-xs border border-amber-400/30 p-1 rounded-full">
-                        {FLASH_DEALS.map((deal, idx) => (
+                        {liveFlashDeals.map((deal, idx) => (
                           <button
                             key={idx}
                             type="button"
@@ -1160,7 +1281,7 @@ export default function LiveSalePage() {
                     {/* 1. Top Festive Gradient Header Strip */}
                     <div className="w-full py-1 px-2.5 sm:px-3 bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 text-white text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center justify-between">
                       <span className="truncate pr-1">
-                        {tagText} • {savePercent}% OFF
+                        {product.badge || product.tag || tagText} • {product.discountText || `${savePercent}% OFF`}
                       </span>
                       {mrpVal > priceVal && (
                         <span className="bg-white/20 px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-extrabold tracking-normal shrink-0">
@@ -1180,8 +1301,8 @@ export default function LiveSalePage() {
                         </div>
 
                         <Image
-                          src={getImageUrl(product.image)}
-                          alt={product.name}
+                          src={getImageUrl(product.imageUrl || product.image)}
+                          alt={product.title || product.name}
                           fill
                           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                           className="object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
@@ -1191,11 +1312,11 @@ export default function LiveSalePage() {
                       {/* 3. Product Information */}
                       <div className="p-2.5 sm:p-3 pb-1.5 flex flex-col flex-1">
                         <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[#9e310e] leading-none mb-0.5 block">
-                          {categoryLabel}
+                          {product.category || categoryLabel}
                         </span>
 
                         <h3 className="font-bold text-[#111827] text-xs sm:text-sm leading-snug line-clamp-1 group-hover:text-[#9e310e] transition-colors">
-                          {product.name}
+                          {product.title || product.name}
                         </h3>
 
                         <p className="text-[10px] sm:text-[11px] text-neutral-500 line-clamp-1 mt-0.5 font-normal leading-tight">
@@ -1213,7 +1334,7 @@ export default function LiveSalePage() {
                             </span>
                           )}
                           <span className="ml-auto text-[9px] sm:text-[10px] font-black text-emerald-700 bg-emerald-100/90 px-1 py-0.5 rounded">
-                            {savePercent}% OFF
+                            {product.discountText || `${savePercent}% OFF`}
                           </span>
                         </div>
 
@@ -1307,7 +1428,7 @@ export default function LiveSalePage() {
               </div>
 
               <div className="space-y-2.5">
-                {FAQS.map((faq, idx) => (
+                {liveFaqs.map((faq, idx) => (
                   <div key={idx} className="bg-white rounded-2xl border border-neutral-200/90 shadow-2xs overflow-hidden">
                     <button
                       type="button"

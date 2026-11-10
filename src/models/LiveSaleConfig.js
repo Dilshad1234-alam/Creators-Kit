@@ -90,8 +90,8 @@ const LiveSaleConfigSchema = new mongoose.Schema(
   { timestamps: true, collection: 'livesaleconfigs' }
 );
 
-if (mongoose.models && mongoose.models.LiveSaleConfig) {
-  delete mongoose.models.LiveSaleConfig;
-}
+const LiveSaleConfig =
+  mongoose.models.LiveSaleConfig || mongoose.model('LiveSaleConfig', LiveSaleConfigSchema);
 
-export default mongoose.models.LiveSaleConfig || mongoose.model('LiveSaleConfig', LiveSaleConfigSchema);
+export { LiveSaleConfig };
+export default LiveSaleConfig;

@@ -9,21 +9,12 @@ import {
   Sparkles,
 } from 'lucide-react';
 
-export interface FestivalOffersSectionProps {
-  onAddToCart?: (product: any) => void;
-  onBuyNow?: (product: any) => void;
-  promoCode?: string;
-  headline?: string;
-  discountPercent?: number;
-  subtitle?: string;
-}
-
 export default function FestivalOffersSection({
   promoCode = 'CREATE10',
   headline,
   discountPercent = 10,
   subtitle,
-}: FestivalOffersSectionProps) {
+}) {
   const [copied, setCopied] = useState(false);
 
   const handleCopyCode = useCallback(() => {
