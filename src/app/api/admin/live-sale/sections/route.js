@@ -510,7 +510,7 @@ export async function DELETE(req) {
       try {
         const body = await req.json();
         itemId = body.id || body._id;
-      } catch (_) {}
+      } catch (_) { }
     }
 
     if (!itemId) {
