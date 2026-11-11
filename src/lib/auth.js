@@ -9,11 +9,23 @@ const isProduction = process.env.NODE_ENV === 'production';
 const cookiePrefix = isProduction ? '__Secure-' : '';
 const hostPrefix = isProduction ? '__Host-' : '';
 
+const getBaseUrl = () => {
+  if (process.env.NEXTAUTH_URL && !process.env.NEXTAUTH_URL.includes('localhost')) {
+    return process.env.NEXTAUTH_URL.replace(/\/$/, '');
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return isProduction ? 'https://creatorskithub.com' : 'http://localhost:3000';
+};
+
 export const authOptions = {
+  trustHost: true,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      allowDangerousEmailAccountLinking: true,
       authorization: {
         params: {
           prompt: 'select_account',
@@ -219,12 +231,26 @@ export const authOptions = {
     },
 
     async redirect({ url, baseUrl }) {
-      if (url.startsWith('/')) return `${baseUrl}${url}`;
+      const prodBase = getBaseUrl();
+      const effectiveBase = (!baseUrl || baseUrl.includes('localhost')) && isProduction ? prodBase : baseUrl;
+
+      // Allows relative callback URLs
+      if (url.startsWith('/')) return `${effectiveBase}${url}`;
+
+      // Allows callback URLs on the same origin or production domain
       try {
-        const parsed = new URL(url);
-        if (parsed.origin === baseUrl) return url;
+        const parsedUrl = new URL(url);
+        const parsedBase = new URL(effectiveBase);
+        if (
+          parsedUrl.origin === parsedBase.origin ||
+          parsedUrl.hostname === 'creatorskithub.com' ||
+          parsedUrl.hostname.endsWith('.creatorskithub.com')
+        ) {
+          return url;
+        }
       } catch (e) {}
-      return baseUrl;
+
+      return effectiveBase;
     },
   },
 
