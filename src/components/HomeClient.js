@@ -608,7 +608,7 @@ export default function HomeClient({
         <section className="relative w-full overflow-hidden bg-[#FBFBF7] mb-5">
           <div className="w-full relative z-8 max-w-[3000px] mx-auto">
             <div
-              className="relative w-full aspect-[2.35/1] sm:aspect-auto h-[155px] xs:h-[175px] sm:h-[450px] md:h-[550px] lg:h-[700px] overflow-hidden bg-[#070b19] group"
+              className="relative w-full aspect-[2022/778] sm:aspect-auto sm:h-[450px] md:h-[550px] lg:h-[700px] overflow-hidden group"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
               onTouchStart={handleTouchStart}
@@ -651,7 +651,7 @@ export default function HomeClient({
                             fill
                             sizes="100vw"
                             priority={idx === 0}
-                            className="object-contain sm:object-cover object-center"
+                            className="object-cover object-center"
                           />
                         )}
                       </Link>
@@ -683,7 +683,7 @@ export default function HomeClient({
                             fill
                             sizes="100vw"
                             priority={idx === 0}
-                            className="object-contain sm:object-cover object-center"
+                            className="object-cover object-center"
                           />
                         )}
                       </div>

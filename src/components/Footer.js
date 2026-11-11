@@ -189,14 +189,14 @@ export default function Footer() {
                   <span className="text-[#900606] shrink-0">
                     <MapPin className="w-4 h-4 stroke-[2]" />
                   </span>
-                  <span>New Delhi, India</span>
+                  <span>Patna, India</span>
                 </li>
-                <li className="flex items-center gap-3">
+                {/* <li className="flex items-center gap-3">
                   <span className="text-[#900606] shrink-0">
                     <Clock className="w-4 h-4 stroke-[2]" />
                   </span>
                   <span>Mon - Sat, 10AM - 7PM</span>
-                </li>
+                </li> */}
               </ul>
             </div>
 
