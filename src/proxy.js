@@ -72,6 +72,8 @@ export async function proxy(request) {
   return NextResponse.next();
 }
 
+export default proxy;
+
 export const config = {
   matcher: [
     /*
