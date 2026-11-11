@@ -19,7 +19,6 @@ import {
   Award,
   CheckCircle2
 } from 'lucide-react';
-import GoKwikCheckout from '@/components/GoKwikCheckout';
 
 export default function CartPage() {
   const { cart, isAuthenticated, removeFromCart, updateQuantity, clearCart, cartTotal, cartCount } = useCart();
@@ -374,38 +373,6 @@ export default function CartPage() {
                   <ArrowRight className="w-4 h-4 stroke-[2.5]" />
                 </span>
               </button>
-
-              {/* GoKwik Express Checkout Option */}
-              <div className="pt-2">
-                <div className="relative flex py-1.5 items-center">
-                  <div className="flex-grow border-t border-neutral-200"></div>
-                  <span className="flex-shrink mx-2 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
-                    Or Fast 1-Click Checkout
-                  </span>
-                  <div className="flex-grow border-t border-neutral-200"></div>
-                </div>
-
-                <GoKwikCheckout
-                  cartItems={cart}
-                  cartTotal={cartTotal}
-                  buttonText="⚡ GoKwik 1-Click Express Checkout"
-                  buttonSize="md"
-                  onSuccess={(orderData) => {
-                    clearCart();
-                    if (typeof window !== 'undefined') {
-                      localStorage.setItem('creatorskit_courses_unlocked', 'true');
-                      try {
-                        const bc = new BroadcastChannel('creatorskit_masterclasses_channel');
-                        bc.postMessage({ type: 'updated' });
-                        bc.close();
-                      } catch (e) {}
-                      window.dispatchEvent(new Event('masterclasses-updated'));
-                    }
-                    const savedOrderId = orderData.orderNumber || orderData.orderId;
-                    router.push(`/order-success?orderId=${savedOrderId}`);
-                  }}
-                />
-              </div>
 
               {/* Trust Badges Inside Summary */}
               <div className="pt-3.5 sm:pt-4 border-t border-neutral-100 space-y-2 text-xs text-neutral-500 font-medium">

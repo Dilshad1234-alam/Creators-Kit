@@ -18,7 +18,6 @@ import {
   Award, 
   CheckCircle2 
 } from 'lucide-react';
-import GoKwikCheckout from '@/components/GoKwikCheckout';
 
 const loadScript = (src) => {
   return new Promise((resolve) => {
@@ -547,49 +546,7 @@ export default function CheckoutPage() {
                 </span>
               </button>
 
-              {/* GoKwik Express Checkout Option */}
-              <div className="pt-2">
-                <div className="relative flex py-2 items-center">
-                  <div className="flex-grow border-t border-neutral-200 dark:border-neutral-800"></div>
-                  <span className="flex-shrink mx-3 text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
-                    Or Fast 1-Click Checkout
-                  </span>
-                  <div className="flex-grow border-t border-neutral-200 dark:border-neutral-800"></div>
-                </div>
-
-                <GoKwikCheckout
-                  cartItems={cart}
-                  cartTotal={finalTotal}
-                  appliedCoupon={appliedCoupon}
-                  buttonText={`Fast 1-Click ₹${finalTotal.toLocaleString()} via GoKwik`}
-                  buttonSize="lg"
-                  customerDetails={{
-                    firstName: formData.firstName,
-                    lastName: formData.lastName,
-                    email: formData.email,
-                    address: formData.address,
-                    city: formData.city,
-                    zip: formData.zip,
-                    country: formData.country,
-                  }}
-                  onSuccess={(orderData) => {
-                    clearCart();
-                    if (typeof window !== 'undefined') {
-                      localStorage.setItem('creatorskit_courses_unlocked', 'true');
-                      try {
-                        const bc = new BroadcastChannel('creatorskit_masterclasses_channel');
-                        bc.postMessage({ type: 'updated' });
-                        bc.close();
-                      } catch (e) {}
-                      window.dispatchEvent(new Event('masterclasses-updated'));
-                    }
-                    const savedOrderId = orderData.orderNumber || orderData.orderId;
-                    router.push(`/order-success?orderId=${savedOrderId}`);
-                  }}
-                />
-              </div>
-
-              <div className="flex items-center justify-between text-xs text-neutral-500 pt-1">
+              <div className="flex items-center justify-between text-xs text-neutral-500 pt-2">
                 <Link href="/cart" className="hover:text-[#900606] font-semibold transition-colors flex items-center gap-1">
                   <span>←</span> Return to Cart
                 </Link>
