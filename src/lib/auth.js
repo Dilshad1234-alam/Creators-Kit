@@ -7,7 +7,6 @@ import PendingUser from '@/models/PendingUser';
 
 const isProduction = process.env.NODE_ENV === 'production';
 const cookiePrefix = isProduction ? '__Secure-' : '';
-const hostPrefix = isProduction ? '__Host-' : '';
 
 const getBaseUrl = () => {
   if (process.env.NEXTAUTH_URL && !process.env.NEXTAUTH_URL.includes('localhost')) {
@@ -101,7 +100,7 @@ export const authOptions = {
       },
     },
     csrfToken: {
-      name: `${hostPrefix}next-auth.csrf-token`,
+      name: `${cookiePrefix}next-auth.csrf-token`,
       options: {
         httpOnly: true,
         sameSite: 'lax',
