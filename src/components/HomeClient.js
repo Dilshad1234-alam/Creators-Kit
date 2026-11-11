@@ -608,7 +608,7 @@ export default function HomeClient({
         <section className="relative w-full overflow-hidden bg-[#FBFBF7] mb-5">
           <div className="w-full relative z-8 max-w-[3000px] mx-auto">
             <div
-              className="relative w-full aspect-[2022/778] sm:aspect-auto sm:h-[450px] md:h-[550px] lg:h-[700px] overflow-hidden group"
+              className="relative w-full aspect-[2.1/1] sm:aspect-auto sm:h-[450px] md:h-[550px] lg:h-[700px] overflow-hidden group"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
               onTouchStart={handleTouchStart}
@@ -735,7 +735,7 @@ export default function HomeClient({
               </button>
 
               {/* Pagination Dots */}
-              <div className="absolute bottom-1.5 sm:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 sm:gap-2 z-20">
+              <div className="absolute bottom-2.5 sm:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 sm:gap-2 z-20">
                 {heroSlides.map((_, idx) => (
                   <button
                     key={idx}
