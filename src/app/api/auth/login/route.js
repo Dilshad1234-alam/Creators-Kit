@@ -37,7 +37,18 @@ export async function POST(req) {
       }
 
       return NextResponse.json(
-        { error: 'Invalid email or password' },
+        {
+          error: 'No account found with this email. Please click Sign Up below to create an account.',
+          notFound: true,
+        },
+        { status: 401 }
+      );
+    }
+
+    // Check if account was created via Google and has no password
+    if (!user.password && user.authProvider === 'google') {
+      return NextResponse.json(
+        { error: 'This account was registered with Google. Please click "Continue with Google" below.' },
         { status: 401 }
       );
     }
@@ -47,7 +58,7 @@ export async function POST(req) {
 
     if (!isMatch) {
       return NextResponse.json(
-        { error: 'Invalid email or password' },
+        { error: 'Incorrect password. Please try again or use Forgot Password.' },
         { status: 401 }
       );
     }
@@ -93,22 +104,12 @@ export async function POST(req) {
       response.cookies.set('admin_email', user.email, sessionCookieOptions);
       response.cookies.set('admin_name', user.name, sessionCookieOptions);
       response.cookies.set('admin_token', 'admin_active', sessionCookieOptions);
-      response.cookies.set('user_role', 'admin', sessionCookieOptions);
-
-      // Purge any lingering customer cookies to prevent session conflict
-      response.cookies.set('auth_token', '', clearCookieOptions);
     } else {
-      // Dedicated customer session cookies
+      // Dedicated customer session cookies (isolated from admin workspace)
       response.cookies.set('user_role', 'user', sessionCookieOptions);
       response.cookies.set('user_email', user.email, sessionCookieOptions);
       response.cookies.set('user_name', user.name, sessionCookieOptions);
       response.cookies.set('auth_token', 'session_active', sessionCookieOptions);
-
-      // Purge any lingering admin cookies to prevent session conflict
-      response.cookies.set('admin_role', '', clearCookieOptions);
-      response.cookies.set('admin_email', '', clearCookieOptions);
-      response.cookies.set('admin_name', '', clearCookieOptions);
-      response.cookies.set('admin_token', '', clearCookieOptions);
     }
 
     return response;

@@ -1,7 +1,13 @@
 import GoogleProvider from 'next-auth/providers/google';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import PendingUser from '@/models/PendingUser';
+
+const isProduction = process.env.NODE_ENV === 'production';
+const cookiePrefix = isProduction ? '__Secure-' : '';
+const hostPrefix = isProduction ? '__Host-' : '';
 
 export const authOptions = {
   providers: [
@@ -16,11 +22,83 @@ export const authOptions = {
         },
       },
     }),
+    CredentialsProvider({
+      id: 'credentials',
+      name: 'Credentials',
+      credentials: {
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error('Please provide both email and password.');
+        }
+
+        await dbConnect();
+        const cleanEmail = credentials.email.toLowerCase().trim();
+        const user = await User.findOne({ email: cleanEmail }).select('+password');
+
+        if (!user) {
+          throw new Error('No account found with this email. Please sign up first.');
+        }
+
+        if (!user.password && user.authProvider === 'google') {
+          throw new Error('This account was created with Google. Please use Continue with Google.');
+        }
+
+        const isMatch = await bcrypt.compare(credentials.password, user.password || '');
+        if (!isMatch) {
+          throw new Error('Incorrect password. Please try again.');
+        }
+
+        return {
+          id: user._id.toString(),
+          dbId: user._id.toString(),
+          name: user.name,
+          email: user.email,
+          role: user.role || 'user',
+          isVerified: user.isVerified ?? true,
+          image: user.profileImage || '',
+        };
+      },
+    }),
   ],
+
   session: {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
+
+  useSecureCookies: isProduction,
+  cookies: {
+    sessionToken: {
+      name: `${cookiePrefix}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: isProduction,
+      },
+    },
+    callbackUrl: {
+      name: `${cookiePrefix}next-auth.callback-url`,
+      options: {
+        sameSite: 'lax',
+        path: '/',
+        secure: isProduction,
+      },
+    },
+    csrfToken: {
+      name: `${hostPrefix}next-auth.csrf-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: isProduction,
+      },
+    },
+  },
+
   callbacks: {
     async signIn({ user, account, profile }) {
       if (account?.provider === 'google') {
@@ -62,8 +140,6 @@ export const authOptions = {
             }
           );
 
-          // Attach synchronized DB user details directly onto the user object in-memory
-          // so the following jwt callback receives it without querying MongoDB again
           if (dbUser) {
             user.dbId = dbUser._id.toString();
             user.role = dbUser.role || 'user';
@@ -72,9 +148,7 @@ export const authOptions = {
             user.isVerified = dbUser.isVerified ?? true;
           }
 
-          // Clean up pending registration in background without blocking sign-in flow
           PendingUser.deleteOne({ email: cleanEmail }).catch(() => {});
-
           return true;
         } catch (err) {
           console.error('[AUTH] NextAuth Google signIn error:', err);
@@ -84,19 +158,28 @@ export const authOptions = {
       return true;
     },
 
-    async jwt({ token, user, account }) {
-      // 1. Initial sign-in: user is passed from signIn callback with in-memory dbId and role
-      if (account && user) {
-        token.id = user.dbId || user.id;
+    async jwt({ token, user, account, trigger, session }) {
+      // 1. Initial sign-in: Capture role & id from authorize() or signIn()
+      if (user) {
+        token.id = user.dbId || user.id || user._id?.toString();
         token.role = user.role || 'user';
         token.name = user.name || token.name;
-        token.email = user.email || token.email;
-        token.picture = user.image || token.picture;
+        token.email = (user.email || token.email || '').toLowerCase().trim();
         token.isVerified = user.isVerified ?? true;
+        if (user.image) {
+          token.picture = user.image;
+        }
         return token;
       }
 
-      // 2. Check if user still exists in MongoDB Compass (in case of logout / deletion)
+      // Handle client session updates
+      if (trigger === 'update' && session) {
+        if (session.name) token.name = session.name;
+        if (session.role) token.role = session.role;
+        return token;
+      }
+
+      // 2. Subsequent requests: Verify against MongoDB if email exists
       if (token?.email) {
         try {
           await dbConnect();
@@ -105,22 +188,16 @@ export const authOptions = {
             .select('_id name email role profileImage isVerified')
             .lean();
 
-          if (!dbUser) {
-            // User deleted from MongoDB Compass on logout -> Revoke session and clean cookies
-            throw new Error('SessionRevoked');
-          }
-
-          token.id = dbUser._id.toString();
-          token.role = dbUser.role || 'user';
-          token.name = dbUser.name || token.name;
-          token.isVerified = dbUser.isVerified;
-          if (dbUser.profileImage) {
-            token.picture = dbUser.profileImage;
+          if (dbUser) {
+            token.id = dbUser._id.toString();
+            token.role = dbUser.role || 'user';
+            token.name = dbUser.name || token.name;
+            token.isVerified = dbUser.isVerified ?? true;
+            if (dbUser.profileImage) {
+              token.picture = dbUser.profileImage;
+            }
           }
         } catch (err) {
-          if (err.message === 'SessionRevoked') {
-            throw err;
-          }
           console.error('[AUTH] NextAuth jwt verification error:', err);
         }
       }
@@ -128,27 +205,14 @@ export const authOptions = {
     },
 
     async session({ session, token }) {
-      if (token?.email) {
-        try {
-          await dbConnect();
-          const cleanEmail = token.email.toLowerCase().trim();
-          const dbUser = await User.findOne({ email: cleanEmail }).select('_id name role profileImage isVerified').lean();
-          if (!dbUser) {
-            // User does not exist in MongoDB Compass (e.g. was deleted on logout)
-            return null;
-          }
-          if (!session.user) session.user = {};
-          session.user.id = dbUser._id.toString();
-          session.user.role = dbUser.role || 'user';
-          session.user.name = dbUser.name || session.user.name;
-          session.user.email = cleanEmail;
-          session.user.isVerified = dbUser.isVerified;
-          if (dbUser.profileImage) {
-            session.user.image = dbUser.profileImage;
-          }
-          return session;
-        } catch (e) {
-          return null;
+      if (session.user) {
+        session.user.id = token.id || token.sub;
+        session.user.role = token.role || 'user';
+        session.user.name = token.name || session.user.name;
+        session.user.email = token.email || session.user.email;
+        session.user.isVerified = token.isVerified ?? true;
+        if (token.picture) {
+          session.user.image = token.picture;
         }
       }
       return session;
@@ -163,6 +227,7 @@ export const authOptions = {
       return baseUrl;
     },
   },
+
   pages: {
     signIn: '/login',
     error: '/login',

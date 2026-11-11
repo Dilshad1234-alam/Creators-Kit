@@ -5,12 +5,9 @@ if (process.env.NODE_ENV === 'development' && !process.env.CI) {
 }
 const nextConfig = {
   /* config options here */
-  reactCompiler: true,
+  reactCompiler: false,
   typescript: {
     ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
   },
   images: {
     formats: ['image/avif', 'image/webp'],
@@ -31,11 +28,6 @@ const nextConfig = {
         hostname: 'images.unsplash.com',
       },
     ],
-  },
-  experimental: {
-    // Optimize memory during compilation and prevent spawning excessive worker threads
-    memoryBasedWorkersCount: true,
-    cpus: 2,
   },
   async redirects() {
     return [

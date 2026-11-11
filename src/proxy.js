@@ -1,9 +1,30 @@
 import { NextResponse } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 
-export function proxy(request) {
+export async function proxy(request) {
   const { pathname } = request.nextUrl;
-  const adminRole = request.cookies.get('admin_role')?.value || request.cookies.get('user_role')?.value;
-  const userRole = request.cookies.get('user_role')?.value;
+
+  // 1. Decrypt NextAuth JWT Token securely from cookies
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET,
+    secureCookie: process.env.NODE_ENV === 'production',
+  });
+
+  // 2. Read isolated cookie roles (ensuring multi-tab Admin/User independence)
+  const adminCookieRole = request.cookies.get('admin_role')?.value;
+  const adminToken = request.cookies.get('admin_token')?.value;
+  const userCookieRole = request.cookies.get('user_role')?.value;
+  const authToken = request.cookies.get('auth_token')?.value;
+
+  const isAdminAuthenticated =
+    (token && token.role === 'admin') ||
+    (adminCookieRole === 'admin' && Boolean(adminToken));
+
+  const isUserAuthenticated =
+    Boolean(token) ||
+    Boolean(authToken) ||
+    Boolean(userCookieRole);
 
   const isAdminRoute = pathname === '/admin' || pathname.startsWith('/admin/');
   const isProtectedCustomerRoute =
@@ -14,7 +35,7 @@ export function proxy(request) {
     pathname === '/dashboard' ||
     pathname.startsWith('/dashboard/');
 
-  // 0. Unified Login: Route any /admin/login directly to the single unified /login
+  // 0. Unified Login: Route any /admin/login directly to /login
   if (pathname === '/admin/login' || pathname === '/admin/login/') {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirect', '/admin');
@@ -22,29 +43,24 @@ export function proxy(request) {
   }
 
   // 1. Dedicated Admin Workspace (/admin/*):
-  // The admin panel is strictly restricted. Only users with role: 'admin' can access /admin.
-  // If a non-admin or unauthenticated visitor tries to access /admin, redirect to /login.
+  // Strictly restricted to users with role 'admin'.
+  // Crucially: Redirects without purging or clearing customer cookies,
+  // preventing accidental session destruction in user tabs.
   if (isAdminRoute) {
-    if (adminRole !== 'admin') {
+    if (!isAdminAuthenticated) {
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('redirect', pathname);
+      loginUrl.searchParams.set('error', 'AdminAccessRequired');
       return NextResponse.redirect(loginUrl);
     }
     return NextResponse.next();
   }
 
-  // 2. Protected Checkout & Customer Account Routes:
-  // Authenticated visitors (both users and admins accessing customer profile) are allowed.
-  // Unauthenticated guests are redirected to login.
+  // 2. Protected Customer Checkout & Account Routes:
+  // Requires authenticated user or admin. Redirects unauthenticated visitors without destroying session state.
   if (isProtectedCustomerRoute) {
-    const hasAuth =
-      userRole === 'user' ||
-      adminRole === 'admin' ||
-      Boolean(request.cookies.get('auth_token')?.value) ||
-      Boolean(request.cookies.get('admin_token')?.value);
-
-    if (!hasAuth) {
-      const authPath = (pathname === '/checkout' || pathname.startsWith('/checkout/')) ? '/register' : '/login';
+    if (!isUserAuthenticated && !isAdminAuthenticated) {
+      const authPath = pathname.startsWith('/checkout') ? '/register' : '/login';
       const redirectUrl = new URL(authPath, request.url);
       redirectUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(redirectUrl);
@@ -52,8 +68,7 @@ export function proxy(request) {
     return NextResponse.next();
   }
 
-  // 3. Public Website & Auth Pages (Home '/', '/login', '/register', '/product', '/cart', etc.):
-  // Operates completely independently and always renders cleanly without automatic redirects.
+  // 3. Public Storefront Routes: Always render freely
   return NextResponse.next();
 }
 
@@ -65,7 +80,7 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - public asset extensions (e.g. .svg, .png, .jpg, .jpeg, .gif, .webp)
+     * - public asset extensions (.svg, .png, .jpg, .jpeg, .gif, .webp)
      */
     '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
