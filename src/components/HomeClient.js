@@ -608,7 +608,7 @@ export default function HomeClient({
         <section className="relative w-full overflow-hidden bg-[#FBFBF7] mb-5">
           <div className="w-full relative z-8 max-w-[3000px] mx-auto">
             <div
-              className="relative w-full h-[240px] xs:h-[300px] sm:h-[450px] md:h-[550px] lg:h-[650px] overflow-hidden bg-[#0a0a0a] group"
+              className="relative w-full aspect-[2.35/1] sm:aspect-auto h-[155px] xs:h-[175px] sm:h-[450px] md:h-[550px] lg:h-[700px] overflow-hidden bg-[#070b19] group"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
               onTouchStart={handleTouchStart}
@@ -620,11 +620,11 @@ export default function HomeClient({
                 style={{ transform: `translateX(-${currentIndex * 100}%)` }}
               >
                 {renderSlides.map((slide, idx) => (
-                  <div key={idx} className="w-full h-full flex-shrink-0 relative flex items-center justify-start overflow-hidden bg-[#0a0a0a]">
+                  <div key={idx} className="w-full h-full flex-shrink-0 relative flex items-center justify-start overflow-hidden">
 
                     {/* Full-Card Background Image */}
                     {slide.link ? (
-                      <Link href={slide.link} className="absolute inset-0 w-full h-full block bg-[#0a0a0a]">
+                      <Link href={slide.link} className="absolute inset-0 w-full h-full block">
                         {slide.mobileImage ? (
                           <>
                             <Image
@@ -633,7 +633,7 @@ export default function HomeClient({
                               fill
                               sizes="100vw"
                               priority={idx === 0}
-                              className="object-contain sm:object-cover object-center sm:hidden bg-[#0a0a0a]"
+                              className="object-cover object-center sm:hidden"
                             />
                             <Image
                               src={getImageUrl(slide.image)}
@@ -651,12 +651,12 @@ export default function HomeClient({
                             fill
                             sizes="100vw"
                             priority={idx === 0}
-                            className="object-contain sm:object-cover object-center bg-[#0a0a0a]"
+                            className="object-contain sm:object-cover object-center"
                           />
                         )}
                       </Link>
                     ) : (
-                      <div className="absolute inset-0 w-full h-full block bg-[#0a0a0a]">
+                      <div className="absolute inset-0 w-full h-full block">
                         {slide.mobileImage ? (
                           <>
                             <Image
@@ -665,7 +665,7 @@ export default function HomeClient({
                               fill
                               sizes="100vw"
                               priority={idx === 0}
-                              className="object-contain sm:object-cover object-center sm:hidden bg-[#0a0a0a]"
+                              className="object-cover object-center sm:hidden"
                             />
                             <Image
                               src={getImageUrl(slide.image)}
@@ -683,7 +683,7 @@ export default function HomeClient({
                             fill
                             sizes="100vw"
                             priority={idx === 0}
-                            className="object-contain sm:object-cover object-center bg-[#0a0a0a]"
+                            className="object-contain sm:object-cover object-center"
                           />
                         )}
                       </div>
@@ -691,14 +691,14 @@ export default function HomeClient({
 
                     {/* Dynamic Text & CTA Overlay (Rendered if title, subtitle or ctaText exists) */}
                     {(slide.title || slide.subtitle || slide.ctaText) && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent z-10 flex flex-col justify-center px-4 sm:px-12 md:px-20 lg:px-28 max-w-3xl pointer-events-none">
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10 flex flex-col justify-center px-4 xs:px-6 sm:px-12 md:px-20 lg:px-28 max-w-3xl pointer-events-none">
                         {slide.subtitle && (
-                          <div className="inline-block px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-[#900606] text-white text-[10px] sm:text-xs font-bold w-fit mb-1.5 sm:mb-3 shadow-sm tracking-wide">
+                          <div className="inline-block px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-[#900606] text-white text-[10px] sm:text-xs font-bold w-fit mb-1 xs:mb-1.5 sm:mb-3 shadow-sm tracking-wide">
                             {slide.subtitle}
                           </div>
                         )}
                         {slide.title && (
-                          <h2 className="text-xl xs:text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight mb-2 sm:mb-4 drop-shadow-md">
+                          <h2 className="text-lg xs:text-xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-snug sm:leading-tight mb-1.5 xs:mb-2 sm:mb-4 drop-shadow-md">
                             {slide.title}
                           </h2>
                         )}
@@ -706,7 +706,7 @@ export default function HomeClient({
                           <div className="pointer-events-auto mt-1 sm:mt-2">
                             <Link
                               href={slide.link || '/product'}
-                              className="inline-flex items-center gap-1.5 sm:gap-2 bg-[#900606] hover:bg-[#720404] text-white text-[11px] sm:text-xs md:text-sm font-bold px-4 sm:px-6 py-2 sm:py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95"
+                              className="inline-flex items-center gap-1.5 sm:gap-2 bg-[#900606] hover:bg-[#720404] text-white text-[11px] sm:text-xs md:text-sm font-bold px-3.5 xs:px-4 sm:px-6 py-1.5 sm:py-2.5 md:py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95"
                             >
                               <span>{slide.ctaText}</span>
                               <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -735,14 +735,14 @@ export default function HomeClient({
               </button>
 
               {/* Pagination Dots */}
-              <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+              <div className="absolute bottom-1.5 sm:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 sm:gap-2 z-20">
                 {heroSlides.map((_, idx) => (
                   <button
                     key={idx}
                     onClick={() => scrollTo(idx)}
-                    className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full transition-all duration-300 ${(currentIndex === totalSlides ? 0 : currentIndex) === idx
-                      ? 'bg-[#900606] w-6 md:w-8'
-                      : 'bg-white/50 hover:bg-white'
+                    className={`h-2 sm:h-2.5 md:h-3 rounded-full transition-all duration-300 ${(currentIndex === totalSlides ? 0 : currentIndex) === idx
+                      ? 'bg-[#900606] w-5 sm:w-6 md:w-8'
+                      : 'bg-white/50 hover:bg-white w-2 sm:w-2.5 md:w-3'
                       }`}
                   />
                 ))}
