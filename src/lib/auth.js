@@ -143,7 +143,10 @@ export const authOptions = {
         try {
           await dbConnect();
           const cleanEmail = (user?.email || profile?.email || '').toLowerCase().trim();
-          if (!cleanEmail) return false;
+          if (!cleanEmail) {
+            console.error('[AUTH] Google signIn rejected: No email found');
+            return false;
+          }
 
           const googleName = user?.name || profile?.name || cleanEmail.split('@')[0];
           const googleImage = user?.image || profile?.picture || '';
@@ -163,10 +166,11 @@ export const authOptions = {
             },
           };
 
+          // Removed lean: true to ensure full Mongoose document and proper ID handling
           const dbUser = await User.findOneAndUpdate(
             { email: cleanEmail },
             updateOps,
-            { upsert: true, new: true, lean: true, projection: { _id: 1, name: 1, email: 1, role: 1, profileImage: 1, isVerified: 1 } }
+            { upsert: true, new: true, setDefaultsOnInsert: true }
           );
 
           if (dbUser) {
@@ -180,7 +184,7 @@ export const authOptions = {
           PendingUser.deleteOne({ email: cleanEmail }).catch(() => { });
           return true;
         } catch (err) {
-          console.error('[AUTH] Google signIn error:', err);
+          console.error('[AUTH] NextAuth Google signIn error:', err);
           return false;
         }
       }
