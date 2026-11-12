@@ -16,7 +16,11 @@ const cookiePrefix = isProduction ? '__Secure-' : '';
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
-const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || process.env.JWT_SECRET || '';
+const NEXTAUTH_SECRET =
+  process.env.NEXTAUTH_SECRET ||
+  process.env.AUTH_SECRET ||
+  process.env.JWT_SECRET ||
+  'creators-kit-production-fallback-secret-2026-auth';
 
 const getBaseUrl = () => {
   if (isProduction) {
@@ -134,6 +138,15 @@ export const authOptions = {
         secure: isProduction,
         maxAge: 900,
       },
+    },
+  },
+
+  logger: {
+    error(code, metadata) {
+      console.error(`[NextAuth Error] [${code}]:`, metadata);
+    },
+    warn(code) {
+      console.warn(`[NextAuth Warning] [${code}]`);
     },
   },
 

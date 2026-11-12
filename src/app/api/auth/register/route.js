@@ -19,8 +19,12 @@ export async function POST(req) {
     const validation = registerSchema.safeParse(body);
 
     if (!validation.success) {
+      const errorMsg =
+        validation.error?.issues?.[0]?.message ||
+        validation.error?.errors?.[0]?.message ||
+        'Please enter a valid email address';
       return NextResponse.json(
-        { error: validation.error.errors[0]?.message || 'Invalid input data' },
+        { error: errorMsg },
         { status: 400 }
       );
     }

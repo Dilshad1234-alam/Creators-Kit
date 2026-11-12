@@ -220,8 +220,9 @@ export default function AuthModal({
       return;
     }
 
-    if (!cleanEmail || !cleanEmail.includes('@')) {
-      setRegisterError('Please enter a valid email address.');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!cleanEmail || !emailRegex.test(cleanEmail)) {
+      setRegisterError('Please enter a valid email address (e.g. name@gmail.com).');
       setRegisterLoading(false);
       return;
     }
