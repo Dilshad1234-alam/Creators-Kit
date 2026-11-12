@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import {
   Mail,
@@ -23,14 +23,52 @@ import {
 export default function AuthContainer({ initialMode = 'login', initialEmail = '' }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { data: session, status } = useSession();
 
   const urlEmail = searchParams?.get('email') || initialEmail || '';
   const urlRedirect = searchParams?.get('redirect') || searchParams?.get('callbackUrl') || '';
   const urlVerified = searchParams?.get('verified');
   const urlError = searchParams?.get('error');
 
+  // Extracts and sanitizes clean target redirect URL (e.g., from "/login?redirect=/checkout" -> "/checkout")
+  const getCleanRedirectUrl = (redirectParam) => {
+    if (!redirectParam) return '';
+    try {
+      if (redirectParam.includes('redirect=') || redirectParam.includes('callbackUrl=')) {
+        const dummyBase = 'https://creatorskithub.com';
+        const parsed = new URL(redirectParam.startsWith('/') ? `${dummyBase}${redirectParam}` : redirectParam);
+        const inner = parsed.searchParams.get('redirect') || parsed.searchParams.get('callbackUrl');
+        if (inner && inner !== '/login' && inner !== '/register') {
+          return inner;
+        }
+      }
+      if (redirectParam === '/login' || redirectParam === '/register') {
+        return '';
+      }
+      return redirectParam;
+    } catch (e) {
+      return redirectParam;
+    }
+  };
+
   const [mode, setMode] = useState(initialMode); // 'login' | 'register'
   const [showPassword, setShowPassword] = useState(false);
+
+  // Auto-forward already authenticated users (prevents modal loops)
+  useEffect(() => {
+    if (status === 'loading') return;
+    const activeEmail =
+      session?.user?.email ||
+      (typeof window !== 'undefined'
+        ? sessionStorage.getItem('userEmail') || localStorage.getItem('userEmail')
+        : null);
+
+    if (activeEmail) {
+      const cleanTarget = getCleanRedirectUrl(urlRedirect);
+      const fallbackTarget = session?.user?.role === 'admin' ? '/admin' : '/';
+      window.location.href = cleanTarget || fallbackTarget;
+    }
+  }, [session, status, urlRedirect]);
 
   // Form states
   const [loginData, setLoginData] = useState({ email: urlEmail, password: '' });
@@ -89,14 +127,12 @@ export default function AuthContainer({ initialMode = 'login', initialEmail = ''
       window.dispatchEvent(new CustomEvent('creatorskit-auth-change', { detail: userData }));
     }
 
-    if (urlRedirect && urlRedirect !== '/login' && urlRedirect !== '/register') {
-      if (urlRedirect.startsWith('http')) {
-        window.location.href = urlRedirect;
-      } else {
-        router.push(urlRedirect);
-      }
-    } else if (userData.role === 'admin') {
-      router.push('/admin');
+    const cleanTarget = getCleanRedirectUrl(urlRedirect);
+
+    if (cleanTarget) {
+      window.location.href = cleanTarget;
+    } else if (userData?.role === 'admin') {
+      window.location.href = '/admin';
     } else {
       window.location.href = '/';
     }
@@ -275,8 +311,8 @@ export default function AuthContainer({ initialMode = 'login', initialEmail = ''
         sessionStorage.removeItem('creatorskit_logged_out');
         localStorage.removeItem('creatorskit_logged_out');
       } catch (e) {}
-      const callback = (urlRedirect && urlRedirect !== '/login' && urlRedirect !== '/register') ? urlRedirect : '/';
-      await signIn('google', { callbackUrl: callback });
+      const targetUrl = getCleanRedirectUrl(urlRedirect) || '/';
+      await signIn('google', { callbackUrl: targetUrl });
     } catch (err) {
       setLoginError('Google sign in error. Please try again.');
       setGoogleLoading(false);

@@ -75,6 +75,25 @@ export default function AuthModal({
   const isLogin = mode === 'login';
   const isRegister = mode === 'register';
 
+  // Extracts and sanitizes clean target redirect URL
+  const getCleanRedirectUrl = (url) => {
+    if (!url) return '';
+    try {
+      if (url.includes('redirect=') || url.includes('callbackUrl=')) {
+        const dummyBase = 'https://creatorskithub.com';
+        const parsed = new URL(url.startsWith('/') ? `${dummyBase}${url}` : url);
+        const inner = parsed.searchParams.get('redirect') || parsed.searchParams.get('callbackUrl');
+        if (inner && inner !== '/login' && inner !== '/register') {
+          return inner;
+        }
+      }
+      if (url === '/login' || url === '/register') return '';
+      return url;
+    } catch (e) {
+      return url;
+    }
+  };
+
   const toggleMode = (newMode) => {
     setMode(newMode);
     setLoginError('');
@@ -90,12 +109,12 @@ export default function AuthModal({
 
     onClose();
 
-    if (redirectUrl && redirectUrl !== '/login' && redirectUrl !== '/register') {
-      if (redirectUrl.startsWith('http')) {
-        window.location.href = redirectUrl;
-      } else {
-        router.push(redirectUrl);
-      }
+    const cleanTarget = getCleanRedirectUrl(redirectUrl);
+
+    if (cleanTarget) {
+      window.location.href = cleanTarget;
+    } else if (userData?.role === 'admin') {
+      window.location.href = '/admin';
     } else {
       window.location.href = '/';
     }
@@ -279,8 +298,8 @@ export default function AuthModal({
         sessionStorage.removeItem('creatorskit_logged_out');
         localStorage.removeItem('creatorskit_logged_out');
       } catch (e) {}
-      const callback = (redirectUrl && redirectUrl !== '/login' && redirectUrl !== '/register') ? redirectUrl : '/';
-      await signIn('google', { callbackUrl: callback });
+      const targetUrl = getCleanRedirectUrl(redirectUrl) || '/';
+      await signIn('google', { callbackUrl: targetUrl });
     } catch (err) {
       setLoginError('Google sign in error. Please try again.');
       setGoogleLoading(false);

@@ -36,7 +36,7 @@ const loadScript = (src) => {
 export default function CheckoutPage() {
   const { cart, cartTotal, clearCart } = useCart();
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   const [loading, setLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
@@ -58,6 +58,9 @@ export default function CheckoutPage() {
 
   // Verify that customer is logged in before allowing checkout
   useEffect(() => {
+    // Wait for NextAuth session check to complete before deciding
+    if (status === 'loading') return;
+
     const userInfoStr = typeof window !== 'undefined' ? localStorage.getItem('creatorsKitUserInfo') : null;
     const storedRole = typeof window !== 'undefined' ? (sessionStorage.getItem('userRole') || localStorage.getItem('userRole')) : null;
     const sessionEmail = typeof window !== 'undefined' ? (sessionStorage.getItem('userEmail') || localStorage.getItem('userEmail')) : null;
@@ -76,6 +79,28 @@ export default function CheckoutPage() {
       return;
     }
 
+    // Auto-populate local customer session if authenticated via Google
+    if (googleEmail && !sessionEmail) {
+      const gUser = {
+        name: session?.user?.name || googleEmail.split('@')[0],
+        email: googleEmail,
+        role: session?.user?.role || 'user',
+        image: session?.user?.image || '',
+      };
+      try {
+        sessionStorage.setItem('userName', gUser.name);
+        sessionStorage.setItem('userEmail', gUser.email);
+        sessionStorage.setItem('userRole', 'user');
+        sessionStorage.setItem('token', 'session_active');
+        sessionStorage.setItem('creatorsKitUserInfo', JSON.stringify(gUser));
+
+        localStorage.setItem('userName', gUser.name);
+        localStorage.setItem('userEmail', gUser.email);
+        localStorage.setItem('userRole', 'user');
+        localStorage.setItem('creatorsKitUserInfo', JSON.stringify(gUser));
+      } catch (e) {}
+    }
+
     const email = user?.email || sessionEmail || googleEmail || '';
     const name = user?.name || (sessionStorage.getItem('userName') || localStorage.getItem('userName')) || session?.user?.name || '';
     const nameParts = name.trim().split(' ');
@@ -88,7 +113,7 @@ export default function CheckoutPage() {
       firstName: prev.firstName || firstName,
       lastName: prev.lastName || lastName,
     }));
-  }, [router, session]);
+  }, [router, session, status]);
 
   const finalTotal = Math.max(0, cartTotal - (appliedCoupon?.discountAmount || 0));
   const cartItemCount = cart ? cart.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0) : 0;

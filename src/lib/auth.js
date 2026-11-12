@@ -191,7 +191,7 @@ export const authOptions = {
             user.isVerified = dbUser.isVerified ?? true;
           }
 
-          PendingUser.deleteOne({ email: cleanEmail }).catch(() => {});
+          PendingUser.deleteOne({ email: cleanEmail }).catch(() => { });
           return true;
         } catch (err) {
           console.error('[AUTH] NextAuth Google signIn error:', err);
@@ -263,26 +263,59 @@ export const authOptions = {
 
     async redirect({ url, baseUrl }) {
       const prodBase = getBaseUrl();
-      const effectiveBase = (!baseUrl || baseUrl.includes('localhost')) && isProduction ? prodBase : (baseUrl || 'http://localhost:3000');
+      const effectiveBase = (!baseUrl || baseUrl.includes('localhost')) && isProduction
+        ? prodBase
+        : (baseUrl || 'http://localhost:3000');
 
-      // Allows relative callback URLs
-      if (url.startsWith('/')) return `${effectiveBase}${url}`;
+      const baseClean = effectiveBase.replace(/\/$/, '');
+      let targetUrl = url;
 
-      // Allows callback URLs on the same origin or production domain
-      try {
-        const parsedUrl = new URL(url);
-        const parsedBase = new URL(effectiveBase);
-        if (
-          parsedUrl.origin === parsedBase.origin ||
-          parsedUrl.hostname === 'localhost' ||
-          parsedUrl.hostname === 'creatorskithub.com' ||
-          parsedUrl.hostname.endsWith('.creatorskithub.com')
-        ) {
-          return url;
+      // Handle relative URLs safely and prevent protocol-relative bypass
+      if (targetUrl.startsWith('/')) {
+        if (targetUrl.startsWith('//')) {
+          targetUrl = '/' + targetUrl.replace(/^\/+/, '');
         }
-      } catch (e) {}
+        targetUrl = baseClean + targetUrl;
+      }
 
-      return effectiveBase;
+      try {
+        const parsed = new URL(targetUrl, baseClean);
+
+        // Security check: Only allow same origin, localhost, or production domain
+        const isAllowed =
+          parsed.hostname === 'localhost' ||
+          parsed.hostname === '127.0.0.1' ||
+          parsed.hostname === 'creatorskithub.com' ||
+          parsed.hostname.endsWith('.creatorskithub.com') ||
+          parsed.origin === new URL(baseClean).origin;
+
+        if (!isAllowed) return baseClean;
+
+        // Prevent infinite loops if target is /login or /register by unpacking nested redirect
+        if (parsed.pathname === '/login' || parsed.pathname === '/register') {
+          const nested = parsed.searchParams.get('redirect') || parsed.searchParams.get('callbackUrl');
+          if (nested && nested !== '/login' && nested !== '/register') {
+            if (nested.startsWith('/')) {
+              return baseClean + nested;
+            }
+            try {
+              const parsedNested = new URL(nested, baseClean);
+              if (
+                parsedNested.hostname === 'localhost' ||
+                parsedNested.hostname === 'creatorskithub.com' ||
+                parsedNested.hostname.endsWith('.creatorskithub.com')
+              ) {
+                return parsedNested.toString();
+              }
+            } catch (e) {}
+          }
+          return baseClean;
+        }
+
+        return parsed.toString();
+      } catch (err) {
+        return baseClean;
+      }
     },
   },
 
