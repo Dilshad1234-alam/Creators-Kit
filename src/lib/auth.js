@@ -8,6 +8,10 @@ import PendingUser from '@/models/PendingUser';
 const isProduction = process.env.NODE_ENV === 'production';
 const cookiePrefix = isProduction ? '__Secure-' : '';
 
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
+const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || process.env.JWT_SECRET || '';
+
 const getBaseUrl = () => {
   if (process.env.NEXTAUTH_URL && !process.env.NEXTAUTH_URL.includes('localhost')) {
     return process.env.NEXTAUTH_URL.replace(/\/$/, '');
@@ -22,16 +26,24 @@ export const authOptions = {
   trustHost: true,
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-      allowDangerousEmailAccountLinking: true,
+      clientId: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+      wellKnown: null,
+      issuer: 'https://accounts.google.com',
       authorization: {
+        url: 'https://accounts.google.com/o/oauth2/v2/auth',
         params: {
           prompt: 'select_account',
           access_type: 'offline',
           response_type: 'code',
+          scope: 'openid email profile',
         },
       },
+      token: 'https://oauth2.googleapis.com/token',
+      userinfo: 'https://openidconnect.googleapis.com/v1/userinfo',
+      jwks_endpoint: 'https://www.googleapis.com/oauth2/v3/certs',
+      checks: ['state'],
+      allowDangerousEmailAccountLinking: true,
     }),
     CredentialsProvider({
       id: 'credentials',
@@ -107,6 +119,26 @@ export const authOptions = {
         path: '/',
         secure: isProduction,
       },
+    },
+    state: {
+      name: `${cookiePrefix}next-auth.state`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: isProduction,
+        maxAge: 900,
+      },
+    },
+  },
+
+  debug: process.env.NODE_ENV === 'development',
+  logger: {
+    error(code, metadata) {
+      console.error(`[NextAuth Error] [${code}]:`, metadata);
+    },
+    warn(code) {
+      console.warn(`[NextAuth Warning] [${code}]`);
     },
   },
 
@@ -231,7 +263,7 @@ export const authOptions = {
 
     async redirect({ url, baseUrl }) {
       const prodBase = getBaseUrl();
-      const effectiveBase = (!baseUrl || baseUrl.includes('localhost')) && isProduction ? prodBase : baseUrl;
+      const effectiveBase = (!baseUrl || baseUrl.includes('localhost')) && isProduction ? prodBase : (baseUrl || 'http://localhost:3000');
 
       // Allows relative callback URLs
       if (url.startsWith('/')) return `${effectiveBase}${url}`;
@@ -242,6 +274,7 @@ export const authOptions = {
         const parsedBase = new URL(effectiveBase);
         if (
           parsedUrl.origin === parsedBase.origin ||
+          parsedUrl.hostname === 'localhost' ||
           parsedUrl.hostname === 'creatorskithub.com' ||
           parsedUrl.hostname.endsWith('.creatorskithub.com')
         ) {
@@ -257,5 +290,5 @@ export const authOptions = {
     signIn: '/login',
     error: '/login',
   },
-  secret: process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET,
+  secret: NEXTAUTH_SECRET,
 };
