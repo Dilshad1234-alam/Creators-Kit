@@ -6,6 +6,12 @@ import User from '@/models/User';
 import PendingUser from '@/models/PendingUser';
 
 const isProduction = process.env.NODE_ENV === 'production';
+
+// PERMANENT FIX: Force NextAuth URL in production to prevent localhost fallback
+if (isProduction) {
+  process.env.NEXTAUTH_URL = 'https://creatorskithub.com';
+}
+
 const cookiePrefix = isProduction ? '__Secure-' : '';
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
@@ -13,13 +19,13 @@ const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
 const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || process.env.JWT_SECRET || '';
 
 const getBaseUrl = () => {
+  if (isProduction) {
+    return 'https://creatorskithub.com';
+  }
   if (process.env.NEXTAUTH_URL && !process.env.NEXTAUTH_URL.includes('localhost')) {
     return process.env.NEXTAUTH_URL.replace(/\/$/, '');
   }
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
-  }
-  return isProduction ? 'https://creatorskithub.com' : 'http://localhost:3000';
+  return 'http://localhost:3000';
 };
 
 export const authOptions = {
@@ -89,7 +95,6 @@ export const authOptions = {
 
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
 
   useSecureCookies: isProduction,
@@ -132,32 +137,18 @@ export const authOptions = {
     },
   },
 
-  debug: process.env.NODE_ENV === 'development',
-  logger: {
-    error(code, metadata) {
-      console.error(`[NextAuth Error] [${code}]:`, metadata);
-    },
-    warn(code) {
-      console.warn(`[NextAuth Warning] [${code}]`);
-    },
-  },
-
   callbacks: {
     async signIn({ user, account, profile }) {
       if (account?.provider === 'google') {
         try {
           await dbConnect();
           const cleanEmail = (user?.email || profile?.email || '').toLowerCase().trim();
-          if (!cleanEmail) {
-            console.error('[AUTH] Google signIn rejected: No email found in Google profile');
-            return false;
-          }
+          if (!cleanEmail) return false;
 
           const googleName = user?.name || profile?.name || cleanEmail.split('@')[0];
           const googleImage = user?.image || profile?.picture || '';
           const googleId = account?.providerAccountId || user?.id || '';
 
-          // Streamlined atomic upsert using lean projection for minimal round-trip latency
           const updateOps = {
             $setOnInsert: {
               name: googleName,
@@ -175,12 +166,7 @@ export const authOptions = {
           const dbUser = await User.findOneAndUpdate(
             { email: cleanEmail },
             updateOps,
-            {
-              upsert: true,
-              new: true,
-              lean: true,
-              projection: { _id: 1, name: 1, email: 1, role: 1, profileImage: 1, isVerified: 1 },
-            }
+            { upsert: true, new: true, lean: true, projection: { _id: 1, name: 1, email: 1, role: 1, profileImage: 1, isVerified: 1 } }
           );
 
           if (dbUser) {
@@ -194,55 +180,27 @@ export const authOptions = {
           PendingUser.deleteOne({ email: cleanEmail }).catch(() => { });
           return true;
         } catch (err) {
-          console.error('[AUTH] NextAuth Google signIn error:', err);
+          console.error('[AUTH] Google signIn error:', err);
           return false;
         }
       }
       return true;
     },
 
-    async jwt({ token, user, account, trigger, session }) {
-      // 1. Initial sign-in: Capture role & id from authorize() or signIn()
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.dbId || user.id || user._id?.toString();
         token.role = user.role || 'user';
         token.name = user.name || token.name;
         token.email = (user.email || token.email || '').toLowerCase().trim();
         token.isVerified = user.isVerified ?? true;
-        if (user.image) {
-          token.picture = user.image;
-        }
+        if (user.image) token.picture = user.image;
         return token;
       }
-
-      // Handle client session updates
       if (trigger === 'update' && session) {
         if (session.name) token.name = session.name;
         if (session.role) token.role = session.role;
         return token;
-      }
-
-      // 2. Subsequent requests: Verify against MongoDB if email exists
-      if (token?.email) {
-        try {
-          await dbConnect();
-          const cleanEmail = token.email.toLowerCase().trim();
-          const dbUser = await User.findOne({ email: cleanEmail })
-            .select('_id name email role profileImage isVerified')
-            .lean();
-
-          if (dbUser) {
-            token.id = dbUser._id.toString();
-            token.role = dbUser.role || 'user';
-            token.name = dbUser.name || token.name;
-            token.isVerified = dbUser.isVerified ?? true;
-            if (dbUser.profileImage) {
-              token.picture = dbUser.profileImage;
-            }
-          }
-        } catch (err) {
-          console.error('[AUTH] NextAuth jwt verification error:', err);
-        }
       }
       return token;
     },
@@ -254,23 +212,15 @@ export const authOptions = {
         session.user.name = token.name || session.user.name;
         session.user.email = token.email || session.user.email;
         session.user.isVerified = token.isVerified ?? true;
-        if (token.picture) {
-          session.user.image = token.picture;
-        }
+        if (token.picture) session.user.image = token.picture;
       }
       return session;
     },
 
     async redirect({ url, baseUrl }) {
-      const prodBase = getBaseUrl();
-      const effectiveBase = (!baseUrl || baseUrl.includes('localhost')) && isProduction
-        ? prodBase
-        : (baseUrl || 'http://localhost:3000');
-
-      const baseClean = effectiveBase.replace(/\/$/, '');
+      const baseClean = getBaseUrl();
       let targetUrl = url;
 
-      // Handle relative URLs safely and prevent protocol-relative bypass
       if (targetUrl.startsWith('/')) {
         if (targetUrl.startsWith('//')) {
           targetUrl = '/' + targetUrl.replace(/^\/+/, '');
@@ -280,34 +230,20 @@ export const authOptions = {
 
       try {
         const parsed = new URL(targetUrl, baseClean);
-
-        // Security check: Only allow same origin, localhost, or production domain
         const isAllowed =
           parsed.hostname === 'localhost' ||
           parsed.hostname === '127.0.0.1' ||
           parsed.hostname === 'creatorskithub.com' ||
-          parsed.hostname.endsWith('.creatorskithub.com') ||
-          parsed.origin === new URL(baseClean).origin;
+          parsed.hostname.endsWith('.creatorskithub.com');
 
         if (!isAllowed) return baseClean;
 
-        // Prevent infinite loops if target is /login or /register by unpacking nested redirect
         if (parsed.pathname === '/login' || parsed.pathname === '/register') {
           const nested = parsed.searchParams.get('redirect') || parsed.searchParams.get('callbackUrl');
           if (nested && nested !== '/login' && nested !== '/register') {
             if (nested.startsWith('/')) {
               return baseClean + nested;
             }
-            try {
-              const parsedNested = new URL(nested, baseClean);
-              if (
-                parsedNested.hostname === 'localhost' ||
-                parsedNested.hostname === 'creatorskithub.com' ||
-                parsedNested.hostname.endsWith('.creatorskithub.com')
-              ) {
-                return parsedNested.toString();
-              }
-            } catch (e) {}
           }
           return baseClean;
         }
