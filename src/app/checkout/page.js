@@ -15,7 +15,6 @@ import {
   RotateCcw, 
   Sparkles, 
   Lock, 
-  Award, 
   CheckCircle2 
 } from 'lucide-react';
 
@@ -356,19 +355,11 @@ export default function CheckoutPage() {
         </nav>
 
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-3 sm:mb-5 pb-5 border-b border-neutral-200/80 dark:border-neutral-800">
+        <div className="flex items-center justify-between gap-4 mb-4 sm:mb-6 pb-4 sm:pb-5 border-b border-neutral-200/80 dark:border-neutral-800">
           <div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-[#111827] dark:text-white tracking-tight">
               Complete Your <span className="text-[#900606] whitespace-nowrap">Order</span>
             </h1>
-            <p className="text-neutral-600 dark:text-neutral-400 text-xs sm:text-sm font-medium mt-1.5 leading-relaxed">
-              Provide your delivery details and complete your payment safely with Razorpay 256-bit encryption.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 self-start sm:self-auto bg-white dark:bg-[#131C2E] border border-neutral-200/90 dark:border-neutral-800 rounded-full px-4 py-1.5 shadow-2xs text-xs font-bold text-neutral-700 dark:text-neutral-300">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span>256-bit Encrypted Checkout</span>
           </div>
         </div>
 
@@ -510,26 +501,65 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="space-y-3">
-                  <label className={`block p-4 sm:p-5 rounded-2xl border cursor-pointer transition-all duration-300 ${paymentMethod === 'online' ? 'bg-[#900606]/5 border-[#900606] ring-1 ring-[#900606]/30 shadow-[0_2px_12px_rgba(144,6,6,0.06)]' : 'bg-[#FDFBF7] dark:bg-[#0B0F19] border-neutral-200/90 dark:border-neutral-800 hover:border-neutral-300'}`}>
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3.5">
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${paymentMethod === 'online' ? 'border-[#900606]' : 'border-neutral-400 dark:border-neutral-600'}`}>
+                  <label className={`block p-4 sm:p-5 rounded-2xl border cursor-pointer transition-all duration-200 ${paymentMethod === 'online' ? 'bg-[#900606]/5 border-[#900606] ring-1 ring-[#900606]/30 shadow-[0_2px_12px_rgba(144,6,6,0.06)]' : 'bg-[#FDFBF7] dark:bg-[#0B0F19] border-neutral-200/90 dark:border-neutral-800 hover:border-neutral-300'}`}>
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                      <div className="flex items-start gap-3.5">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-colors ${paymentMethod === 'online' ? 'border-[#900606]' : 'border-neutral-400 dark:border-neutral-600'}`}>
                           {paymentMethod === 'online' && <div className="w-2.5 h-2.5 rounded-full bg-[#900606]" />}
                         </div>
-                        <div className="w-10 h-10 bg-white dark:bg-neutral-800 rounded-xl flex items-center justify-center p-1.5 shrink-0 border border-neutral-200/80 dark:border-neutral-700 shadow-2xs">
-                          <svg viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full text-[#3395FF]">
-                            <path d="M250 500c138.071 0 250-111.929 250-250S388.071 0 250 0 0 111.929 0 250s111.929 250 250 250z" fill="currentColor"/>
-                            <path d="M150.313 189.688L297.813 135c10.312-3.75 20 4.688 15 14.688L270 235c-2.188 4.688-2.188 10 0 14.688l42.813 85.312c5 10-4.688 18.438-15 14.688L150.313 295c-10.313-3.75-10.313-18.438 0-22.188l55.937-20c4.375-1.562 7.188-5.937 6.875-10.625l-6-63.75c-.625-5.312-5.312-9.062-10.625-8.437l-46.187 6c-11.25 1.562-17.5-12.813-9.375-20.312l49.062-42.5c4-3.438 4.375-9.688.938-13.75-2.813-3.125-7.5-4.062-11.25-2.188l-29.375 14.062c-9.688 4.688-19.376-3.437-14.063-12.5z" fill="#fff"/>
-                          </svg>
-                        </div>
                         <div>
-                          <h3 className={`font-bold text-sm ${paymentMethod === 'online' ? 'text-[#900606] dark:text-red-400' : 'text-neutral-800 dark:text-neutral-200'}`}>Pay Online (Razorpay)</h3>
-                          <p className="text-neutral-500 text-xs mt-0.5 font-medium">Credit/Debit Cards, UPI, Netbanking & Wallets</p>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className={`font-bold text-sm ${paymentMethod === 'online' ? 'text-[#900606] dark:text-red-400' : 'text-neutral-800 dark:text-neutral-200'}`}>
+                              Pay Online (Razorpay)
+                            </h3>
+                            <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-100 dark:border-emerald-900/40">
+                              Instant Confirmation
+                            </span>
+                          </div>
+                          <p className="text-neutral-500 text-xs mt-1 font-medium">
+                            UPI, Google Pay, PhonePe, Cards, Netbanking & Wallets
+                          </p>
+
+                          {/* Brand Icons: Razorpay, PhonePe, Google Pay, UPI */}
+                          <div className="flex flex-wrap items-center gap-2 mt-3 pt-2.5 border-t border-neutral-200/60 dark:border-neutral-800">
+                            {/* Razorpay Badge */}
+                            <span className="inline-flex items-center gap-1.5 bg-[#0C2340] text-white px-2.5 py-1 rounded-md text-[11px] font-bold shadow-2xs">
+                              <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-[#3395FF] shrink-0" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M14.5 2H6L2.5 22h4.5l2-11.5h4c4.1 0 7-2.5 7-6.2C20 2.2 17.5 2 14.5 2zm-1.8 6.5h-3.3l1-5.5h2.5c1.8 0 3.1.2 3.1 2.3 0 2.4-1.5 3.2-3.3 3.2z" />
+                              </svg>
+                              <span>Razorpay</span>
+                            </span>
+
+                            {/* PhonePe Badge */}
+                            <span className="inline-flex items-center gap-1.5 bg-[#5f259f] text-white px-2.5 py-1 rounded-md text-[11px] font-bold shadow-2xs">
+                              <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-white shrink-0" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M15.5 3.5h-4.8c-1.1 0-2 .9-2 2v1.5H7.3c-.4 0-.7.3-.7.7s.3.7.7.7h1.4v1.8H7.3c-.4 0-.7.3-.7.7s.3.7.7.7h1.4v5c0 .4.3.7.7.7s.7-.3.7-.7v-5h3c2.3 0 4.2-1.8 4.2-4.2s-1.9-3.6-4.2-3.6zm-.2 5.8h-2.8V4.8h2.8c1.4 0 2.5 1 2.5 2.2s-1.1 2.3-2.5 2.3z" />
+                                <path d="M15.2 14l3.1 5.3c.2.4.1.9-.3 1.1-.4.2-.9.1-1.1-.3l-3.4-5.8c.6-.1 1.3-.2 1.7-.3z" />
+                              </svg>
+                              <span>PhonePe</span>
+                            </span>
+
+                            {/* Google Pay Badge */}
+                            <span className="inline-flex items-center gap-1.5 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200 px-2.5 py-1 rounded-md text-[11px] font-bold shadow-2xs">
+                              <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+                              </svg>
+                              <span>Google Pay</span>
+                            </span>
+
+                            {/* UPI Badge */}
+                            <span className="inline-flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 px-2 py-1 rounded-md text-[11px] font-bold">
+                              <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current shrink-0" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2L2 22h20L12 2zm0 4.5l6.5 13H5.5L12 6.5z"/>
+                              </svg>
+                              <span>UPI</span>
+                            </span>
+                          </div>
                         </div>
                       </div>
-                      <span className="hidden sm:inline-block text-[11px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-100 dark:border-emerald-900/40">
-                        Instant Confirmation
-                      </span>
                     </div>
                     <input type="radio" name="paymentMethod" value="online" checked={paymentMethod === 'online'} onChange={() => setPaymentMethod('online')} className="hidden" />
                   </label>
@@ -546,39 +576,32 @@ export default function CheckoutPage() {
                 </div>
               )}
 
-              {/* Submit CTA Button */}
+              {/* Submit CTA Button (Solid, No Sliding Hover Animation) */}
               <button
                 type="submit"
                 disabled={loading}
-                className="relative w-full py-4 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-base overflow-hidden group/btn transition-all duration-300 shadow-sm flex justify-center items-center gap-2.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-4 bg-[#900606] hover:bg-[#7a0505] text-white rounded-xl font-bold text-base shadow-[0_4px_16px_rgba(144,6,6,0.25)] flex justify-center items-center gap-2.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
               >
-                <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
-                <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2.5">
-                  {loading ? (
-                    <div className="flex items-center gap-2">
-                      <svg className="animate-spin h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      <span>Processing Secure Payment...</span>
-                    </div>
-                  ) : (
-                    <>
-                      <span>Pay ₹{finalTotal.toLocaleString()} with Razorpay</span>
-                      <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-                    </>
-                  )}
-                </span>
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <svg className="animate-spin h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Processing Secure Payment...</span>
+                  </div>
+                ) : (
+                  <>
+                    <span>Pay ₹{finalTotal.toLocaleString()} with Razorpay</span>
+                    <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                  </>
+                )}
               </button>
 
-              <div className="flex items-center justify-between text-xs text-neutral-500 pt-2">
-                <Link href="/cart" className="hover:text-[#900606] font-semibold transition-colors flex items-center gap-1">
+              <div className="pt-2">
+                <Link href="/cart" className="text-xs text-neutral-500 hover:text-[#900606] font-semibold transition-colors inline-flex items-center gap-1">
                   <span>←</span> Return to Cart
                 </Link>
-                <div className="flex items-center gap-1.5 text-neutral-400">
-                  <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>256-Bit SSL Protected</span>
-                </div>
               </div>
 
             </form>
@@ -772,24 +795,7 @@ export default function CheckoutPage() {
                 </p>
               </div>
 
-              {/* Trust Badges Inside Summary */}
-              <div className="pt-4 border-t border-neutral-100 dark:border-neutral-800 space-y-2.5 text-xs text-neutral-500 font-medium">
-                <div className="flex items-center gap-2.5 text-emerald-700 dark:text-emerald-400 bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-100/80 dark:border-emerald-900/40 rounded-xl px-3 py-2">
-                  <Lock className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span className="text-[11px] font-semibold">256-bit SSL Encrypted Checkout</span>
-                </div>
 
-                <div className="grid grid-cols-2 gap-2 text-[11px] text-neutral-600 dark:text-neutral-400 pt-1">
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span>7-Day Replacement</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Award className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                    <span>Official Warranty</span>
-                  </div>
-                </div>
-              </div>
 
             </div>
           </div>
