@@ -1,3 +1,4 @@
+import '@/lib/loadEnv';
 import mongoose from 'mongoose';
 import dns from 'dns';
 
