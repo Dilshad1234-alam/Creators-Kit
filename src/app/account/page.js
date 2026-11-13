@@ -1140,11 +1140,6 @@ function AccountUserTab({ formData, setFormData, handleSave, handleImageUpload, 
         <p className="text-neutral-500 dark:text-neutral-400 font-normal text-sm mt-1">
           {formData.email || ''}
         </p>
-
-        <span className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 dark:bg-red-950/40 text-[#900606] dark:text-red-400 text-xs font-bold border border-red-200/60 dark:border-red-900/40">
-          <Sparkles className="w-3.5 h-3.5 text-[#900606] dark:text-red-400" />
-          <span>Verified Creator Member</span>
-        </span>
       </div>
 
       <div className="border-t border-neutral-200/80 dark:border-neutral-800 mb-8"></div>
@@ -1852,16 +1847,12 @@ function AccountContent() {
 
   return (
     <div className={`min-h-[100svh] bg-[#FBFBF7] dark:bg-[#0B0F19] text-[#111827] dark:text-neutral-100 font-sans transition-colors duration-300 w-full overflow-hidden ${isMobileVideoFocused ? 'pt-20 sm:pt-24 pb-8 sm:pb-12' : 'pt-28 sm:pt-32 md:pt-36 pb-12 md:pb-20'}`}>
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12">
         
         <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 lg:gap-10 items-start">
           
           <div className={`w-full lg:w-72 xl:w-80 shrink-0 ${isMobileVideoFocused ? 'hidden lg:block' : 'block'}`}>
             <div className="mb-6">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-red-50 dark:bg-red-950/40 text-[#900606] dark:text-red-400 border border-red-200/60 dark:border-red-900/40 mb-3 shadow-2xs">
-                <User className="w-3 h-3 text-[#900606] dark:text-red-400" />
-                <span>Creator Dashboard</span>
-              </span>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#111827] dark:text-white tracking-tight">
                 Account <span className="text-[#900606] whitespace-nowrap">Details</span>
               </h1>
