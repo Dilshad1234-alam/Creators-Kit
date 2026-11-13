@@ -8,14 +8,14 @@ import { sendEmail } from '@/lib/mailer';
 const registerSchema = z.object({
   name: z.string().trim().min(2, 'Name must be at least 2 characters'),
   email: z.string().trim().toLowerCase().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters')
+  password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
 export async function POST(req) {
   try {
     await dbConnect();
 
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
     const validation = registerSchema.safeParse(body);
 
     if (!validation.success) {
@@ -40,8 +40,7 @@ export async function POST(req) {
       );
     }
 
-    // Create and save new User directly into the MongoDB Compass 'users' collection
-    // The User model pre-save hook automatically hashes the password with bcrypt
+    // Create and save new User directly into the MongoDB 'users' collection
     const newUser = new User({
       name,
       email,
@@ -52,13 +51,13 @@ export async function POST(req) {
     });
 
     await newUser.save();
-    console.log(`[AUTH] User successfully registered and saved in MongoDB 'users' collection: ${newUser.email} (ID: ${newUser._id})`);
+    console.log(`[AUTH] User registered successfully: ${newUser.email} (ID: ${newUser._id})`);
 
     // Clean up any stale unverified/pending entries for this email
     try {
       await PendingUser.deleteMany({ email });
     } catch (cleanErr) {
-      console.warn('[AUTH] Cleaned pending user warning:', cleanErr.message);
+      console.warn('[AUTH_WARN] Cleaned pending user warning:', cleanErr.message);
     }
 
     // Send welcome confirmation email in background without blocking response
@@ -92,7 +91,7 @@ export async function POST(req) {
         subject: `Welcome to Creators Kit, ${name}!`,
         html: welcomeHtml,
       }).catch((emailErr) => {
-        console.warn('[AUTH] Welcome email dispatch note:', emailErr.message);
+        console.warn('[AUTH_WARN] Welcome email dispatch note:', emailErr.message);
       });
     } catch (e) {
       // Non-fatal
@@ -111,7 +110,7 @@ export async function POST(req) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('Registration Error:', error);
+    console.error('[AUTH_ERROR] Registration Error:', error);
     return NextResponse.json(
       { error: 'Failed to create account', details: error.message },
       { status: 500 }

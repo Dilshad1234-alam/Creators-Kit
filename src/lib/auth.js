@@ -8,20 +8,35 @@ import PendingUser from '@/models/PendingUser';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-// PERMANENT FIX: Force NextAuth URL in production to prevent localhost fallback
+// PERMANENT ENFORCEMENT: Force NextAuth URL and reverse-proxy trust in production
 if (isProduction) {
   process.env.NEXTAUTH_URL = 'https://creatorskithub.com';
+  process.env.NEXTAUTH_URL_INTERNAL = 'https://creatorskithub.com';
 }
+process.env.AUTH_TRUST_HOST = 'true';
 
 const cookiePrefix = isProduction ? '__Secure-' : '';
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
+const GOOGLE_CLIENT_ID =
+  process.env.GOOGLE_CLIENT_ID ||
+  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+  '';
+
+const GOOGLE_CLIENT_SECRET =
+  process.env.GOOGLE_CLIENT_SECRET ||
+  '';
+
 const NEXTAUTH_SECRET =
   process.env.NEXTAUTH_SECRET ||
   process.env.AUTH_SECRET ||
   process.env.JWT_SECRET ||
-  'creators-kit-production-fallback-secret-2026-auth';
+  '9569bbd37859d9e4d925e16947b6f9a794afe5d929f473be9d21195f690a94ee';
+
+if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+  console.warn(
+    `[AUTH_WARN] Google OAuth credentials are ${!GOOGLE_CLIENT_ID ? 'missing CLIENT_ID' : ''} ${!GOOGLE_CLIENT_SECRET ? 'missing CLIENT_SECRET' : ''}. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in Hostinger environment variables.`
+  );
+}
 
 const getBaseUrl = () => {
   if (isProduction) {
@@ -39,7 +54,7 @@ export const authOptions = {
     GoogleProvider({
       clientId: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
-      wellKnown: null,
+      wellKnown: 'https://accounts.google.com/.well-known/openid-configuration',
       issuer: 'https://accounts.google.com',
       authorization: {
         url: 'https://accounts.google.com/o/oauth2/v2/auth',
@@ -50,8 +65,12 @@ export const authOptions = {
           scope: 'openid email profile',
         },
       },
-      token: 'https://oauth2.googleapis.com/token',
-      userinfo: 'https://openidconnect.googleapis.com/v1/userinfo',
+      token: {
+        url: 'https://oauth2.googleapis.com/token',
+      },
+      userinfo: {
+        url: 'https://openidconnect.googleapis.com/v1/userinfo',
+      },
       jwks_endpoint: 'https://www.googleapis.com/oauth2/v3/certs',
       checks: ['state'],
       allowDangerousEmailAccountLinking: true,
@@ -64,36 +83,41 @@ export const authOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error('Please provide both email and password.');
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            throw new Error('Please provide both email and password.');
+          }
+
+          await dbConnect();
+          const cleanEmail = credentials.email.toLowerCase().trim();
+          const user = await User.findOne({ email: cleanEmail }).select('+password');
+
+          if (!user) {
+            throw new Error('No account found with this email. Please sign up first.');
+          }
+
+          if (!user.password && user.authProvider === 'google') {
+            throw new Error('This account was created with Google. Please use Continue with Google.');
+          }
+
+          const isMatch = await bcrypt.compare(credentials.password, user.password || '');
+          if (!isMatch) {
+            throw new Error('Incorrect password. Please try again.');
+          }
+
+          return {
+            id: user._id.toString(),
+            dbId: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            role: user.role || 'user',
+            isVerified: user.isVerified ?? true,
+            image: user.profileImage || '',
+          };
+        } catch (authErr) {
+          console.error('[AUTH_ERROR] Credentials authorize error:', authErr.message);
+          throw authErr;
         }
-
-        await dbConnect();
-        const cleanEmail = credentials.email.toLowerCase().trim();
-        const user = await User.findOne({ email: cleanEmail }).select('+password');
-
-        if (!user) {
-          throw new Error('No account found with this email. Please sign up first.');
-        }
-
-        if (!user.password && user.authProvider === 'google') {
-          throw new Error('This account was created with Google. Please use Continue with Google.');
-        }
-
-        const isMatch = await bcrypt.compare(credentials.password, user.password || '');
-        if (!isMatch) {
-          throw new Error('Incorrect password. Please try again.');
-        }
-
-        return {
-          id: user._id.toString(),
-          dbId: user._id.toString(),
-          name: user.name,
-          email: user.email,
-          role: user.role || 'user',
-          isVerified: user.isVerified ?? true,
-          image: user.profileImage || '',
-        };
       },
     }),
   ],
@@ -130,6 +154,16 @@ export const authOptions = {
         secure: isProduction,
       },
     },
+    pkceCodeVerifier: {
+      name: `${cookiePrefix}next-auth.pkce.code_verifier`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: isProduction,
+        maxAge: 900,
+      },
+    },
     state: {
       name: `${cookiePrefix}next-auth.state`,
       options: {
@@ -144,10 +178,10 @@ export const authOptions = {
 
   logger: {
     error(code, metadata) {
-      console.error(`[NextAuth Error] [${code}]:`, metadata);
+      console.error(`[AUTH_ERROR] [NextAuth Error] [${code}]:`, metadata);
     },
     warn(code) {
-      console.warn(`[NextAuth Warning] [${code}]`);
+      console.warn(`[AUTH_WARN] [NextAuth Warning] [${code}]`);
     },
   },
 
@@ -158,7 +192,7 @@ export const authOptions = {
           await dbConnect();
           const cleanEmail = (user?.email || profile?.email || '').toLowerCase().trim();
           if (!cleanEmail) {
-            console.error('[AUTH] Google signIn rejected: No email found');
+            console.error('[AUTH_ERROR] Google signIn rejected: No email found');
             return false;
           }
 
@@ -180,7 +214,6 @@ export const authOptions = {
             },
           };
 
-          // Removed lean: true to ensure full Mongoose document and proper ID handling
           const dbUser = await User.findOneAndUpdate(
             { email: cleanEmail },
             updateOps,
@@ -195,10 +228,10 @@ export const authOptions = {
             user.isVerified = dbUser.isVerified ?? true;
           }
 
-          PendingUser.deleteOne({ email: cleanEmail }).catch(() => { });
+          PendingUser.deleteOne({ email: cleanEmail }).catch(() => {});
           return true;
         } catch (err) {
-          console.error('[AUTH] NextAuth Google signIn error:', err);
+          console.error('[AUTH_ERROR] NextAuth Google signIn error:', err);
           return false;
         }
       }
@@ -206,69 +239,89 @@ export const authOptions = {
     },
 
     async jwt({ token, user, trigger, session }) {
-      if (user) {
-        token.id = user.dbId || user.id || user._id?.toString();
-        token.role = user.role || 'user';
-        token.name = user.name || token.name;
-        token.email = (user.email || token.email || '').toLowerCase().trim();
-        token.isVerified = user.isVerified ?? true;
-        if (user.image) token.picture = user.image;
+      try {
+        if (user) {
+          token.id = user.dbId || user.id || user._id?.toString();
+          token.role = user.role || 'user';
+          token.name = user.name || token.name;
+          token.email = (user.email || token.email || '').toLowerCase().trim();
+          token.isVerified = user.isVerified ?? true;
+          if (user.image) token.picture = user.image;
+          return token;
+        }
+        if (trigger === 'update' && session) {
+          if (session.name) token.name = session.name;
+          if (session.role) token.role = session.role;
+          return token;
+        }
+        return token;
+      } catch (jwtErr) {
+        console.error('[AUTH_ERROR] NextAuth JWT callback error:', jwtErr);
         return token;
       }
-      if (trigger === 'update' && session) {
-        if (session.name) token.name = session.name;
-        if (session.role) token.role = session.role;
-        return token;
-      }
-      return token;
     },
 
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id || token.sub;
-        session.user.role = token.role || 'user';
-        session.user.name = token.name || session.user.name;
-        session.user.email = token.email || session.user.email;
-        session.user.isVerified = token.isVerified ?? true;
-        if (token.picture) session.user.image = token.picture;
+      try {
+        if (session.user) {
+          session.user.id = token.id || token.sub;
+          session.user.role = token.role || 'user';
+          session.user.name = token.name || session.user.name;
+          session.user.email = token.email || session.user.email;
+          session.user.isVerified = token.isVerified ?? true;
+          if (token.picture) session.user.image = token.picture;
+        }
+        return session;
+      } catch (sessErr) {
+        console.error('[AUTH_ERROR] NextAuth Session callback error:', sessErr);
+        return session;
       }
-      return session;
     },
 
     async redirect({ url, baseUrl }) {
-      const baseClean = getBaseUrl();
-      let targetUrl = url;
+      const productionBase = 'https://creatorskithub.com';
+      const effectiveBase = isProduction ? productionBase : (baseUrl || 'http://localhost:3000');
 
+      let targetUrl = url || effectiveBase;
+
+      // Handle relative paths
       if (targetUrl.startsWith('/')) {
-        if (targetUrl.startsWith('//')) {
-          targetUrl = '/' + targetUrl.replace(/^\/+/, '');
-        }
-        targetUrl = baseClean + targetUrl;
+        const cleanPath = targetUrl.replace(/^\/+/, '/');
+        return `${effectiveBase}${cleanPath}`;
       }
 
       try {
-        const parsed = new URL(targetUrl, baseClean);
+        const parsed = new URL(targetUrl, effectiveBase);
+
+        // Security check: Only allow our trusted domains
         const isAllowed =
-          parsed.hostname === 'localhost' ||
-          parsed.hostname === '127.0.0.1' ||
           parsed.hostname === 'creatorskithub.com' ||
-          parsed.hostname.endsWith('.creatorskithub.com');
+          parsed.hostname.endsWith('.creatorskithub.com') ||
+          parsed.hostname === 'localhost' ||
+          parsed.hostname === '127.0.0.1';
 
-        if (!isAllowed) return baseClean;
+        if (!isAllowed) {
+          return effectiveBase;
+        }
 
+        // Prevent leaking localhost in production
+        if (isProduction && (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1')) {
+          return `${productionBase}${parsed.pathname}${parsed.search}`;
+        }
+
+        // Prevent redirect loops on auth pages
         if (parsed.pathname === '/login' || parsed.pathname === '/register') {
           const nested = parsed.searchParams.get('redirect') || parsed.searchParams.get('callbackUrl');
-          if (nested && nested !== '/login' && nested !== '/register') {
-            if (nested.startsWith('/')) {
-              return baseClean + nested;
-            }
+          if (nested && !nested.startsWith('/login') && !nested.startsWith('/register')) {
+            return nested.startsWith('/') ? `${effectiveBase}${nested}` : nested;
           }
-          return baseClean;
+          return effectiveBase;
         }
 
         return parsed.toString();
-      } catch (err) {
-        return baseClean;
+      } catch (redirectErr) {
+        console.error('[AUTH_ERROR] NextAuth Redirect callback error:', redirectErr);
+        return effectiveBase;
       }
     },
   },

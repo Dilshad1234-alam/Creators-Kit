@@ -8,7 +8,7 @@ import PendingUser from '@/models/PendingUser';
 // POST: Direct Google synchronization endpoint (accepts { email, name, image, googleId })
 export async function POST(req) {
   try {
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
     const { email, name, image, googleId } = body;
 
     if (!email) {
@@ -47,7 +47,10 @@ export async function POST(req) {
     // Clean up any pending unverified registration in background
     PendingUser.deleteOne({ email: cleanEmail }).catch(() => {});
 
-    const isNew = syncedUser.createdAt && syncedUser.updatedAt && syncedUser.createdAt.getTime() === syncedUser.updatedAt.getTime();
+    const isNew =
+      syncedUser?.createdAt &&
+      syncedUser?.updatedAt &&
+      syncedUser.createdAt.getTime() === syncedUser.updatedAt.getTime();
 
     return NextResponse.json(
       {
@@ -65,7 +68,7 @@ export async function POST(req) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('Google user sync error:', error);
+    console.error('[AUTH_ERROR] Google user sync error:', error);
     return NextResponse.json(
       { error: 'Failed to synchronize Google user', details: error.message },
       { status: 500 }
@@ -126,7 +129,7 @@ export async function GET(req) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('Google session sync error:', error);
+    console.error('[AUTH_ERROR] Google session sync error:', error);
     return NextResponse.json({ error: 'Session fetch failed', details: error.message }, { status: 500 });
   }
 }

@@ -7,7 +7,7 @@ export async function POST(req) {
   try {
     await dbConnect();
 
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
     const { email, password } = body;
 
     if (!email || !password) {
@@ -84,18 +84,12 @@ export async function POST(req) {
       { status: 200 }
     );
 
-    // Session-only cookies: omitting maxAge and expires ensures the browser
-    // terminates the session when the browser tab/window is closed.
+    // Session cookie options
+    const isProd = process.env.NODE_ENV === 'production';
     const sessionCookieOptions = {
       path: '/',
       sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-    };
-
-    const clearCookieOptions = {
-      path: '/',
-      maxAge: 0,
-      expires: new Date(0),
+      secure: isProd,
     };
 
     if (isAdmin) {
@@ -114,7 +108,7 @@ export async function POST(req) {
 
     return response;
   } catch (error) {
-    console.error('Login Error:', error);
+    console.error('[AUTH_ERROR] Login Error:', error);
     return NextResponse.json(
       { error: 'Failed to login user', details: error.message },
       { status: 500 }

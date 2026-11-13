@@ -1,20 +1,36 @@
 import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
+const NEXTAUTH_SECRET =
+  process.env.NEXTAUTH_SECRET ||
+  process.env.JWT_SECRET ||
+  '9569bbd37859d9e4d925e16947b6f9a794afe5d929f473be9d21195f690a94ee';
+
 export async function proxy(request) {
   const { pathname } = request.nextUrl;
 
-  // 1. Decrypt NextAuth JWT Token securely from cookies
-  const token = await getToken({
+  // 1. Dynamic secure flag detection for Hostinger reverse proxy
+  const isSecure =
+    process.env.NODE_ENV === 'production' ||
+    request.url.startsWith('https://') ||
+    request.headers.get('x-forwarded-proto') === 'https';
+
+  // 2. Resilient token decoding (tries isSecure, falls back to inverted if reverse proxy stripped HTTPS header)
+  let token = await getToken({
     req: request,
-    secret:
-      process.env.NEXTAUTH_SECRET ||
-      process.env.JWT_SECRET ||
-      Buffer.from('OTU2OWJiZDM3ODU5ZDllNGQ5MjVlMTY5NDdiNmY5YTc5NGFmZTVkOTI5ZjQ3M2JlOWQyMTE5NWY2OTBhOTRlZQ==', 'base64').toString('utf8'),
-    secureCookie: process.env.NODE_ENV === 'production',
+    secret: NEXTAUTH_SECRET,
+    secureCookie: isSecure,
   });
 
-  // 2. Read isolated cookie roles (ensuring multi-tab Admin/User independence)
+  if (!token) {
+    token = await getToken({
+      req: request,
+      secret: NEXTAUTH_SECRET,
+      secureCookie: !isSecure,
+    });
+  }
+
+  // 3. Read isolated cookie roles (ensuring multi-tab Admin/User independence)
   const adminCookieRole = request.cookies.get('admin_role')?.value;
   const adminToken = request.cookies.get('admin_token')?.value;
   const userCookieRole = request.cookies.get('user_role')?.value;
@@ -47,8 +63,7 @@ export async function proxy(request) {
 
   // 1. Dedicated Admin Workspace (/admin/*):
   // Strictly restricted to users with role 'admin'.
-  // Crucially: Redirects without purging or clearing customer cookies,
-  // preventing accidental session destruction in user tabs.
+  // Preserves existing sessions without destructive session wipes.
   if (isAdminRoute) {
     if (!isAdminAuthenticated) {
       const loginUrl = new URL('/login', request.url);
@@ -60,7 +75,7 @@ export async function proxy(request) {
   }
 
   // 2. Protected Customer Checkout & Account Routes:
-  // Requires authenticated user or admin. Redirects unauthenticated visitors without destroying session state.
+  // Requires authenticated user or admin.
   if (isProtectedCustomerRoute) {
     if (!isUserAuthenticated && !isAdminAuthenticated) {
       const authPath = pathname.startsWith('/checkout') ? '/register' : '/login';

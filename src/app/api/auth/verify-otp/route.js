@@ -118,7 +118,7 @@ export async function POST(req) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('Verify OTP error:', error);
+    console.error('[AUTH_ERROR] Verify OTP error:', error);
     return NextResponse.json(
       { error: 'Failed to verify code', details: error.message },
       { status: 500 }

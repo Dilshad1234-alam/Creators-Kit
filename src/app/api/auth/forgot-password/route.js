@@ -57,10 +57,10 @@ export async function POST(req) {
  return NextResponse.json({ error: 'Email could not be sent'}, { status: 500});
 }
 } catch (error) {
- console.error('Forgot password error:', error);
- return NextResponse.json(
- { error: 'Internal server error'},
- { status: 500}
- );
-}
+    console.error('[AUTH_ERROR] Forgot password error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
 }

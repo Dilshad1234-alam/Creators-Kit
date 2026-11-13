@@ -3,6 +3,13 @@
 if (process.env.NODE_ENV === 'development' && !process.env.CI) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
+
+if (process.env.NODE_ENV === 'production') {
+  if (!process.env.NEXTAUTH_URL) {
+    process.env.NEXTAUTH_URL = 'https://creatorskithub.com';
+  }
+}
+process.env.AUTH_TRUST_HOST = 'true';
 const nextConfig = {
   /* config options here */
   reactCompiler: false,
