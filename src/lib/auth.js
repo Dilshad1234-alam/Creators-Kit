@@ -1,10 +1,8 @@
 import '@/lib/loadEnv';
-import GoogleProvider from 'next-auth/providers/google';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
-import PendingUser from '@/models/PendingUser';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -17,26 +15,11 @@ process.env.AUTH_TRUST_HOST = 'true';
 
 const cookiePrefix = isProduction ? '__Secure-' : '';
 
-const GOOGLE_CLIENT_ID =
-  process.env.GOOGLE_CLIENT_ID ||
-  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
-  '';
-
-const GOOGLE_CLIENT_SECRET =
-  process.env.GOOGLE_CLIENT_SECRET ||
-  '';
-
 const NEXTAUTH_SECRET =
   process.env.NEXTAUTH_SECRET ||
   process.env.AUTH_SECRET ||
   process.env.JWT_SECRET ||
   '9569bbd37859d9e4d925e16947b6f9a794afe5d929f473be9d21195f690a94ee';
-
-if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
-  console.warn(
-    `[AUTH_WARN] Google OAuth credentials are ${!GOOGLE_CLIENT_ID ? 'missing CLIENT_ID' : ''} ${!GOOGLE_CLIENT_SECRET ? 'missing CLIENT_SECRET' : ''}. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in Hostinger environment variables.`
-  );
-}
 
 const getBaseUrl = () => {
   if (isProduction) {
@@ -51,30 +34,6 @@ const getBaseUrl = () => {
 export const authOptions = {
   trustHost: true,
   providers: [
-    GoogleProvider({
-      clientId: GOOGLE_CLIENT_ID,
-      clientSecret: GOOGLE_CLIENT_SECRET,
-      wellKnown: 'https://accounts.google.com/.well-known/openid-configuration',
-      issuer: 'https://accounts.google.com',
-      authorization: {
-        url: 'https://accounts.google.com/o/oauth2/v2/auth',
-        params: {
-          prompt: 'select_account',
-          access_type: 'offline',
-          response_type: 'code',
-          scope: 'openid email profile',
-        },
-      },
-      token: {
-        url: 'https://oauth2.googleapis.com/token',
-      },
-      userinfo: {
-        url: 'https://openidconnect.googleapis.com/v1/userinfo',
-      },
-      jwks_endpoint: 'https://www.googleapis.com/oauth2/v3/certs',
-      checks: ['state'],
-      allowDangerousEmailAccountLinking: true,
-    }),
     CredentialsProvider({
       id: 'credentials',
       name: 'Credentials',
@@ -93,14 +52,14 @@ export const authOptions = {
           const user = await User.findOne({ email: cleanEmail }).select('+password');
 
           if (!user) {
-            throw new Error('No account found with this email. Please sign up first.');
+            throw new Error('No account found with this email. Please check your credentials.');
           }
 
-          if (!user.password && user.authProvider === 'google') {
-            throw new Error('This account was created with Google. Please use Continue with Google.');
+          if (!user.password) {
+            throw new Error('No password set on this account. Please use Forgot Password to set one.');
           }
 
-          const isMatch = await bcrypt.compare(credentials.password, user.password || '');
+          const isMatch = await bcrypt.compare(credentials.password, user.password);
           if (!isMatch) {
             throw new Error('Incorrect password. Please try again.');
           }
@@ -154,26 +113,6 @@ export const authOptions = {
         secure: isProduction,
       },
     },
-    pkceCodeVerifier: {
-      name: `${cookiePrefix}next-auth.pkce.code_verifier`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: isProduction,
-        maxAge: 900,
-      },
-    },
-    state: {
-      name: `${cookiePrefix}next-auth.state`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: isProduction,
-        maxAge: 900,
-      },
-    },
   },
 
   logger: {
@@ -186,55 +125,7 @@ export const authOptions = {
   },
 
   callbacks: {
-    async signIn({ user, account, profile }) {
-      if (account?.provider === 'google') {
-        try {
-          await dbConnect();
-          const cleanEmail = (user?.email || profile?.email || '').toLowerCase().trim();
-          if (!cleanEmail) {
-            console.error('[AUTH_ERROR] Google signIn rejected: No email found');
-            return false;
-          }
-
-          const googleName = user?.name || profile?.name || cleanEmail.split('@')[0];
-          const googleImage = user?.image || profile?.picture || '';
-          const googleId = account?.providerAccountId || user?.id || '';
-
-          const updateOps = {
-            $setOnInsert: {
-              name: googleName,
-              email: cleanEmail,
-              role: 'user',
-              authProvider: 'google',
-            },
-            $set: {
-              isVerified: true,
-              ...(googleId ? { googleId } : {}),
-              ...(googleImage ? { profileImage: googleImage } : {}),
-            },
-          };
-
-          const dbUser = await User.findOneAndUpdate(
-            { email: cleanEmail },
-            updateOps,
-            { upsert: true, new: true, setDefaultsOnInsert: true }
-          );
-
-          if (dbUser) {
-            user.dbId = dbUser._id.toString();
-            user.role = dbUser.role || 'user';
-            user.name = dbUser.name || user.name;
-            user.image = dbUser.profileImage || user.image;
-            user.isVerified = dbUser.isVerified ?? true;
-          }
-
-          PendingUser.deleteOne({ email: cleanEmail }).catch(() => {});
-          return true;
-        } catch (err) {
-          console.error('[AUTH_ERROR] NextAuth Google signIn error:', err);
-          return false;
-        }
-      }
+    async signIn() {
       return true;
     },
 
@@ -284,7 +175,6 @@ export const authOptions = {
 
       let targetUrl = url || effectiveBase;
 
-      // Handle relative paths
       if (targetUrl.startsWith('/')) {
         const cleanPath = targetUrl.replace(/^\/+/, '/');
         return `${effectiveBase}${cleanPath}`;
@@ -293,7 +183,6 @@ export const authOptions = {
       try {
         const parsed = new URL(targetUrl, effectiveBase);
 
-        // Security check: Only allow our trusted domains
         const isAllowed =
           parsed.hostname === 'creatorskithub.com' ||
           parsed.hostname.endsWith('.creatorskithub.com') ||
@@ -304,12 +193,10 @@ export const authOptions = {
           return effectiveBase;
         }
 
-        // Prevent leaking localhost in production
         if (isProduction && (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1')) {
           return `${productionBase}${parsed.pathname}${parsed.search}`;
         }
 
-        // Prevent redirect loops on auth pages
         if (parsed.pathname === '/login' || parsed.pathname === '/register') {
           const nested = parsed.searchParams.get('redirect') || parsed.searchParams.get('callbackUrl');
           if (nested && !nested.startsWith('/login') && !nested.startsWith('/register')) {

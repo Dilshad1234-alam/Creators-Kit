@@ -54,10 +54,18 @@ export async function proxy(request) {
     pathname === '/dashboard' ||
     pathname.startsWith('/dashboard/');
 
-  // 0. Unified Login: Route any /admin/login directly to /login
+  // 0. Unified Login: Route any /admin/login or /register directly to /login
   if (pathname === '/admin/login' || pathname === '/admin/login/') {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirect', '/admin');
+    return NextResponse.redirect(loginUrl);
+  }
+
+  if (pathname === '/register' || pathname === '/register/') {
+    const loginUrl = new URL('/login', request.url);
+    if (request.nextUrl.search) {
+      loginUrl.search = request.nextUrl.search;
+    }
     return NextResponse.redirect(loginUrl);
   }
 
@@ -78,7 +86,7 @@ export async function proxy(request) {
   // Requires authenticated user or admin.
   if (isProtectedCustomerRoute) {
     if (!isUserAuthenticated && !isAdminAuthenticated) {
-      const authPath = pathname.startsWith('/checkout') ? '/register' : '/login';
+      const authPath = '/login';
       const redirectUrl = new URL(authPath, request.url);
       redirectUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(redirectUrl);

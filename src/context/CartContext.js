@@ -259,13 +259,13 @@ export function CartProvider({ children }) {
     saveLocalCart(newCart);
     syncCartToBackend(newCart, 'sync');
 
-    // If user is not logged in / registered, open modal on current page with return URL
+    // If user is not logged in, open login modal on current page with return URL
     const activeEmail = currentUserEmail || getActiveUserEmail();
     if (!activeEmail) {
       if (typeof window !== 'undefined') {
         window.dispatchEvent(
           new CustomEvent('creatorskit-open-auth', {
-            detail: { mode: 'register', redirectUrl },
+            detail: { mode: 'login', redirectUrl },
           })
         );
       }

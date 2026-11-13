@@ -38,17 +38,17 @@ export async function POST(req) {
 
       return NextResponse.json(
         {
-          error: 'No account found with this email. Please click Sign Up below to create an account.',
+          error: 'No account found with this email. Please check your credentials.',
           notFound: true,
         },
         { status: 401 }
       );
     }
 
-    // Check if account was created via Google and has no password
-    if (!user.password && user.authProvider === 'google') {
+    // Check if account has no password set
+    if (!user.password) {
       return NextResponse.json(
-        { error: 'This account was registered with Google. Please click "Continue with Google" below.' },
+        { error: 'No password set on this account. Please use Forgot Password to set one.' },
         { status: 401 }
       );
     }

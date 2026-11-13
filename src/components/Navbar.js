@@ -787,10 +787,10 @@ export default function Navbar() {
               /* Person Icon with Lightning Bolt for Guest / Non-logged in -> Opens Auth Modal */
               <button
                 type="button"
-                onClick={() => openAuthModal({ mode: 'register' })}
+                onClick={() => openAuthModal()}
                 className="p-1.5 text-neutral-700 dark:text-neutral-300 hover:text-[#900606] dark:hover:text-[#900606] hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full transition-all duration-200 flex items-center justify-center cursor-pointer group"
-                title="Create Account / Register"
-                aria-label="Register"
+                title="Sign In"
+                aria-label="Sign In"
               >
                 <GuestUserLightningIcon className="w-5 h-5 xl:w-6 xl:h-6 group-hover:scale-105 transition-transform" />
               </button>
@@ -843,9 +843,10 @@ export default function Navbar() {
               ) : (
                 <button
                   type="button"
-                  onClick={() => openAuthModal({ mode: 'register' })}
+                  onClick={() => openAuthModal()}
                   className="p-1.5 text-neutral-700 dark:text-neutral-300 hover:text-[#900606] rounded-full hover:bg-neutral-100 transition-colors cursor-pointer"
-                  aria-label="Register"
+                  title="Sign In"
+                  aria-label="Sign In"
                 >
                   <GuestUserLightningIcon className="w-5 h-5" />
                 </button>
@@ -1036,22 +1037,12 @@ export default function Navbar() {
                       type="button"
                       onClick={() => {
                         setIsMobileMenuOpen(false);
-                        openAuthModal({ mode: 'login' });
-                      }}
-                      className="block w-full py-2.5 px-4 text-center rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-200 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 cursor-pointer"
-                    >
-                      Log in
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        openAuthModal({ mode: 'register' });
+                        openAuthModal();
                       }}
                       className="flex items-center justify-center gap-2 w-full py-2.5 px-4 text-center rounded-xl text-sm font-bold bg-[#900606] text-white hover:bg-[#7a0505] shadow-sm cursor-pointer"
                     >
                       <GuestUserLightningIcon className="w-4 h-4 text-white" />
-                      Register / Sign Up
+                      Sign In
                     </button>
                   </div>
                 )}
