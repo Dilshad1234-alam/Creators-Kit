@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
-import PendingUser from '@/models/PendingUser';
 
 export async function POST(req) {
   try {
@@ -50,9 +49,6 @@ export async function POST(req) {
 
       await user.save();
       console.log(`[AUTH] Auto-created new user in 'users' collection: ${user.email} (ID: ${user._id})`);
-
-      // Clean up any stale pending registration records
-      PendingUser.deleteMany({ email: cleanEmail }).catch(() => {});
     } else {
       // 3. Existing User: Securely validate password with bcrypt
       if (!user.password) {

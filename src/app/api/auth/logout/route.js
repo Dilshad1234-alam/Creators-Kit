@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
-import PendingUser from '@/models/PendingUser';
 
 export async function POST(req) {
   try {
@@ -15,13 +14,6 @@ export async function POST(req) {
       if (user && user.role !== 'admin' && email !== 'dmd68699@gmail.com') {
         await User.deleteOne({ _id: user._id });
         console.log(`[AUTH] User deleted from database on logout: ${email}`);
-      }
-
-      // Also clean up any pending records for this email
-      try {
-        await PendingUser.deleteMany({ email });
-      } catch (cleanErr) {
-        // ignore
       }
     }
 

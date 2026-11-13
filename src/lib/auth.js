@@ -3,7 +3,6 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
-import PendingUser from '@/models/PendingUser';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -76,7 +75,6 @@ export const authOptions = {
 
             await user.save();
             console.log(`[AUTH] Auto-created new user via NextAuth: ${user.email} (ID: ${user._id})`);
-            PendingUser.deleteMany({ email: cleanEmail }).catch(() => {});
           } else {
             // Existing user: Verify password
             if (!user.password) {

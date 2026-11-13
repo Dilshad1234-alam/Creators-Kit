@@ -54,14 +54,22 @@ export async function proxy(request) {
     pathname === '/dashboard' ||
     pathname.startsWith('/dashboard/');
 
-  // 0. Unified Login: Route any /admin/login or /register directly to /login
+  // 0. Unified Login: Route any /admin/login, /register, or legacy auth routes directly to /login
   if (pathname === '/admin/login' || pathname === '/admin/login/') {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirect', '/admin');
     return NextResponse.redirect(loginUrl);
   }
 
-  if (pathname === '/register' || pathname === '/register/') {
+  if (
+    pathname === '/register' ||
+    pathname.startsWith('/register/') ||
+    pathname === '/verify-otp' ||
+    pathname.startsWith('/verify-otp/') ||
+    pathname === '/reset-password' ||
+    pathname.startsWith('/reset-password/') ||
+    pathname.startsWith('/auth/callback')
+  ) {
     const loginUrl = new URL('/login', request.url);
     if (request.nextUrl.search) {
       loginUrl.search = request.nextUrl.search;
