@@ -1114,12 +1114,12 @@ function AccountMasterclassTab({
    ========================================================================= */
 function AccountUserTab({ formData, setFormData, handleSave, handleImageUpload, saveSuccess }) {
   return (
-    <div className="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-6 md:p-10 shadow-sm border border-neutral-100 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full overflow-hidden">
+    <div className="bg-white dark:bg-[#131C2E] rounded-2xl md:rounded-3xl p-6 sm:p-8 md:p-10 shadow-xs border border-neutral-200/90 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full overflow-hidden">
       
       {/* Profile Header section */}
       <div className="flex flex-col items-center mb-8">
         <div className="relative mb-4">
-          <div className="w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-[6px] border-white dark:border-neutral-800 shadow-xl bg-neutral-200">
+          <div className="w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white dark:border-neutral-800 shadow-md bg-neutral-200">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img 
               src={formData.profileImage ? getImageUrl(formData.profileImage) : "/profile.svg"} 
@@ -1128,40 +1128,40 @@ function AccountUserTab({ formData, setFormData, handleSave, handleImageUpload, 
             />
           </div>
           {/* Edit camera badge */}
-          <label className="absolute bottom-1 right-1 bg-[#900606] text-white p-2.5 rounded-full shadow-lg hover:bg-[#700505] transition-all hover:scale-110 border-2 border-white cursor-pointer">
+          <label className="absolute bottom-1 right-1 bg-[#900606] text-white p-2.5 rounded-full shadow-md hover:bg-[#700505] transition-all hover:scale-105 border-2 border-white dark:border-neutral-800 cursor-pointer">
             <Camera className="w-4 h-4" />
             <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
           </label>
         </div>
 
-        <h2 className="font-black text-2xl sm:text-3xl text-neutral-800 dark:text-neutral-100 tracking-tight">
-          {formData.name || 'Rajat'}
+        <h2 className="font-bold text-2xl sm:text-3xl text-[#111827] dark:text-white tracking-tight">
+          {formData.name || 'Creator'}
         </h2>
-        <p className="text-neutral-500 font-medium text-sm mt-1">
-          {formData.email || 'rjsrivastava1999@gmail.com'}
+        <p className="text-neutral-500 dark:text-neutral-400 font-normal text-sm mt-1">
+          {formData.email || ''}
         </p>
 
-        <span className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#900606]/10 text-[#900606] text-xs font-bold border border-[#900606]/20">
-          <Sparkles className="w-3.5 h-3.5" />
+        <span className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 dark:bg-red-950/40 text-[#900606] dark:text-red-400 text-xs font-bold border border-red-200/60 dark:border-red-900/40">
+          <Sparkles className="w-3.5 h-3.5 text-[#900606] dark:text-red-400" />
           <span>Verified Creator Member</span>
         </span>
       </div>
 
-      <div className="border-t border-neutral-100 dark:border-neutral-800 mb-8"></div>
+      <div className="border-t border-neutral-200/80 dark:border-neutral-800 mb-8"></div>
 
       {saveSuccess && (
-        <div className="mb-6 p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 flex items-center gap-3 text-sm font-bold animate-in fade-in">
-          <CheckCircle2 className="w-5 h-5 shrink-0" />
+        <div className="mb-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 flex items-center gap-3 text-sm font-bold animate-in fade-in">
+          <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-600" />
           <span>Profile changes saved successfully!</span>
         </div>
       )}
 
       {/* Form Grid */}
-      <form className="space-y-8" onSubmit={handleSave}>
+      <form className="space-y-6 sm:space-y-8" onSubmit={handleSave}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
           
           <div className="space-y-2">
-            <label className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-300">
+            <label className="text-xs sm:text-sm font-bold text-[#111827] dark:text-neutral-200">
               Full Name
             </label>
             <input 
@@ -1169,12 +1169,12 @@ function AccountUserTab({ formData, setFormData, handleSave, handleImageUpload, 
               value={formData.name}
               onChange={(e) => setFormData({...formData, name: e.target.value})}
               placeholder="Your Name"
-              className="w-full px-5 py-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-[#900606]/40 focus:border-[#900606] bg-neutral-50/50 hover:bg-neutral-50 dark:bg-neutral-800/50 transition-colors font-medium text-neutral-800 dark:text-white text-sm sm:text-base" 
+              className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-[#900606]/30 focus:border-[#900606] bg-neutral-50/60 hover:bg-neutral-50 dark:bg-neutral-800/50 transition-colors font-medium text-neutral-800 dark:text-white text-sm sm:text-base shadow-2xs" 
             />
           </div>
           
           <div className="space-y-2">
-            <label className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-300">
+            <label className="text-xs sm:text-sm font-bold text-[#111827] dark:text-neutral-200">
               Email Address
             </label>
             <input 
@@ -1182,12 +1182,12 @@ function AccountUserTab({ formData, setFormData, handleSave, handleImageUpload, 
               value={formData.email}
               onChange={(e) => setFormData({...formData, email: e.target.value})}
               placeholder="name@example.com"
-              className="w-full px-5 py-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-[#900606]/40 focus:border-[#900606] bg-neutral-50/50 hover:bg-neutral-50 dark:bg-neutral-800/50 transition-colors font-medium text-neutral-800 dark:text-white text-sm sm:text-base" 
+              className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-[#900606]/30 focus:border-[#900606] bg-neutral-50/60 hover:bg-neutral-50 dark:bg-neutral-800/50 transition-colors font-medium text-neutral-800 dark:text-white text-sm sm:text-base shadow-2xs" 
             />
           </div>
           
           <div className="space-y-2">
-            <label className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-300">
+            <label className="text-xs sm:text-sm font-bold text-[#111827] dark:text-neutral-200">
               Phone Number
             </label>
             <input 
@@ -1195,12 +1195,12 @@ function AccountUserTab({ formData, setFormData, handleSave, handleImageUpload, 
               value={formData.phone}
               onChange={(e) => setFormData({...formData, phone: e.target.value})}
               placeholder="+91 98765 43210" 
-              className="w-full px-5 py-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-[#900606]/40 focus:border-[#900606] bg-neutral-50/50 hover:bg-neutral-50 dark:bg-neutral-800/50 transition-colors font-medium text-neutral-800 dark:text-white text-sm sm:text-base" 
+              className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-[#900606]/30 focus:border-[#900606] bg-neutral-50/60 hover:bg-neutral-50 dark:bg-neutral-800/50 transition-colors font-medium text-neutral-800 dark:text-white text-sm sm:text-base shadow-2xs" 
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-300">
+            <label className="text-xs sm:text-sm font-bold text-[#111827] dark:text-neutral-200">
               Location / City
             </label>
             <input 
@@ -1208,12 +1208,12 @@ function AccountUserTab({ formData, setFormData, handleSave, handleImageUpload, 
               value={formData.location}
               onChange={(e) => setFormData({...formData, location: e.target.value})}
               placeholder="e.g. New Delhi, India" 
-              className="w-full px-5 py-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-[#900606]/40 focus:border-[#900606] bg-neutral-50/50 hover:bg-neutral-50 dark:bg-neutral-800/50 transition-colors font-medium text-neutral-800 dark:text-white text-sm sm:text-base" 
+              className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-[#900606]/30 focus:border-[#900606] bg-neutral-50/60 hover:bg-neutral-50 dark:bg-neutral-800/50 transition-colors font-medium text-neutral-800 dark:text-white text-sm sm:text-base shadow-2xs" 
             />
           </div>
           
           <div className="space-y-2">
-            <label className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-300">
+            <label className="text-xs sm:text-sm font-bold text-[#111827] dark:text-neutral-200">
               Postal Code
             </label>
             <input 
@@ -1221,7 +1221,7 @@ function AccountUserTab({ formData, setFormData, handleSave, handleImageUpload, 
               value={formData.postalCode}
               onChange={(e) => setFormData({...formData, postalCode: e.target.value})}
               placeholder="e.g. 110001" 
-              className="w-full px-5 py-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-[#900606]/40 focus:border-[#900606] bg-neutral-50/50 hover:bg-neutral-50 dark:bg-neutral-800/50 transition-colors font-medium text-neutral-800 dark:text-white text-sm sm:text-base" 
+              className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-[#900606]/30 focus:border-[#900606] bg-neutral-50/60 hover:bg-neutral-50 dark:bg-neutral-800/50 transition-colors font-medium text-neutral-800 dark:text-white text-sm sm:text-base shadow-2xs" 
             />
           </div>
           
@@ -1230,12 +1230,9 @@ function AccountUserTab({ formData, setFormData, handleSave, handleImageUpload, 
         <div className="pt-4 flex justify-end md:justify-start">
           <button 
             type="submit" 
-            className="relative w-full md:w-auto px-10 py-3.5 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm sm:text-base overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer"
+            className="w-full md:w-auto px-8 py-3 bg-[#900606] hover:bg-[#780505] text-white rounded-xl font-bold text-sm sm:text-base transition-all shadow-xs flex items-center justify-center cursor-pointer active:scale-95"
           >
-            <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
-            <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
-              Save Changes
-            </span>
+            Save Changes
           </button>
         </div>
       </form>
@@ -1276,7 +1273,7 @@ function AccountOrdersTab({ email }) {
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-neutral-100 dark:border-neutral-800 flex justify-center items-center min-h-[400px]">
+      <div className="bg-white dark:bg-[#131C2E] rounded-2xl md:rounded-3xl p-8 md:p-12 shadow-xs border border-neutral-200/90 dark:border-neutral-800 flex justify-center items-center min-h-[400px]">
         <div className="w-10 h-10 rounded-full border-4 border-neutral-200 border-t-[#900606] animate-spin"></div>
       </div>
     );
@@ -1284,15 +1281,17 @@ function AccountOrdersTab({ email }) {
 
   if (error || orders.length === 0) {
     return (
-      <div className="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-12 sm:p-16 text-center shadow-sm border border-neutral-100 dark:border-neutral-800 flex flex-col items-center">
+      <div className="bg-white dark:bg-[#131C2E] rounded-2xl md:rounded-3xl p-10 sm:p-14 text-center shadow-xs border border-neutral-200/90 dark:border-neutral-800 flex flex-col items-center">
         <span className="text-6xl mb-6">🛍️</span>
-        <h2 className="text-2xl font-bold mb-3 text-[#900606]">No orders placed yet</h2>
-        <p className="text-neutral-500 mb-8 max-w-md mx-auto text-sm sm:text-base leading-relaxed">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-3 text-[#111827] dark:text-white tracking-tight">
+          No orders <span className="text-[#900606]">placed yet</span>
+        </h2>
+        <p className="text-neutral-600 dark:text-neutral-400 mb-8 max-w-md mx-auto text-sm sm:text-base leading-relaxed">
           Looks like you haven&apos;t bought anything from us yet. Explore our gear bundles and unlock the free masterclasses!
         </p>
         <Link 
           href="/product" 
-          className="px-8 py-3.5 bg-[#900606] hover:bg-[#7a0505] text-white rounded-xl font-bold text-sm shadow-[0_4px_16px_rgba(144,6,6,0.35)] transition-all"
+          className="px-8 py-3 bg-[#900606] hover:bg-[#780505] text-white rounded-xl font-bold text-sm shadow-xs transition-all active:scale-95 cursor-pointer"
         >
           Explore Bundles
         </Link>
@@ -1301,8 +1300,17 @@ function AccountOrdersTab({ email }) {
   }
 
   return (
-    <div className="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-5 sm:p-8 md:p-12 shadow-sm border border-neutral-100 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full overflow-hidden">
-      <h2 className="text-2xl font-bold mb-8 text-neutral-800 dark:text-white">My Orders</h2>
+    <div className="bg-white dark:bg-[#131C2E] rounded-2xl md:rounded-3xl p-6 sm:p-8 md:p-10 shadow-xs border border-neutral-200/90 dark:border-neutral-800 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full overflow-hidden">
+      <div className="flex items-center justify-between mb-8 pb-4 border-b border-neutral-200/80 dark:border-neutral-800">
+        <h2 className="text-2xl sm:text-3xl font-bold text-[#111827] dark:text-white tracking-tight flex items-center gap-2.5">
+          <span className="w-2 h-6 rounded-full bg-[#900606]"></span>
+          <span>My <span className="text-[#900606]">Orders</span></span>
+        </h2>
+        <span className="text-xs sm:text-sm font-semibold text-neutral-500 dark:text-neutral-400">
+          {orders.length} {orders.length === 1 ? 'Order' : 'Orders'} Placed
+        </span>
+      </div>
+
       <div className="space-y-6">
         {orders.map((order) => {
           const statusStyles = {
@@ -1316,21 +1324,21 @@ function AccountOrdersTab({ email }) {
           const statusClass = statusStyles[order.status] || 'bg-neutral-50 text-neutral-600 border-neutral-200';
 
           return (
-            <div key={order._id} className="border border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden hover:shadow-md transition-shadow">
-              <div className="bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-800 px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div key={order._id} className="border border-neutral-200/90 dark:border-neutral-800 rounded-xl sm:rounded-2xl overflow-hidden hover:shadow-xs transition-shadow">
+              <div className="bg-neutral-50 dark:bg-neutral-800/60 border-b border-neutral-200/80 dark:border-neutral-800 px-5 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
                   <div>
-                    <p className="text-neutral-500 dark:text-neutral-400 mb-0.5">Order Placed</p>
+                    <p className="text-neutral-500 dark:text-neutral-400 text-xs mb-0.5">Order Placed</p>
                     <p className="font-semibold text-neutral-800 dark:text-white">
                       {new Date(order.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </p>
                   </div>
                   <div>
-                    <p className="text-neutral-500 dark:text-neutral-400 mb-0.5">Total</p>
+                    <p className="text-neutral-500 dark:text-neutral-400 text-xs mb-0.5">Total</p>
                     <p className="font-semibold text-neutral-800 dark:text-white">₹{order.totalAmount?.toLocaleString('en-IN')}</p>
                   </div>
                   <div>
-                    <p className="text-neutral-500 dark:text-neutral-400 mb-0.5">Order #</p>
+                    <p className="text-neutral-500 dark:text-neutral-400 text-xs mb-0.5">Order #</p>
                     <p className="font-mono font-bold text-[#900606]">{order._id}</p>
                   </div>
                 </div>
@@ -1340,21 +1348,18 @@ function AccountOrdersTab({ email }) {
                   </span>
                   <Link 
                     href={`/order-success?orderId=${order._id}`}
-                    className="relative px-4 py-1.5 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl text-xs sm:text-sm font-bold overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center flex-1 sm:flex-none text-center"
+                    className="px-4 py-2 bg-[#900606] hover:bg-[#780505] text-white rounded-xl font-bold text-xs sm:text-sm transition-all shadow-xs flex items-center justify-center flex-1 sm:flex-none text-center cursor-pointer active:scale-95"
                   >
-                    <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
-                    <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300">
-                      View Details
-                    </span>
+                    View Details
                   </Link>
                 </div>
               </div>
               
-              <div className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="p-5 sm:p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                   {order.items?.map((item, idx) => (
                     <div key={idx} className="flex gap-4 items-center">
-                      <div className="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
+                      <div className="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center shrink-0 overflow-hidden border border-neutral-200/60 dark:border-neutral-700/60">
                         {item.image ? (
                           <img src={getImageUrl(item.image)} alt={item.name} className="w-full h-full object-cover" />
                         ) : (
@@ -1593,13 +1598,14 @@ function AccountContent() {
   const rawTab = searchParams.get('tab') || 'user';
   const tabAliases = {
     'user-info': 'user',
-    'settings': 'setting',
+    'user': 'user',
     'my-orders': 'orders',
+    'orders': 'orders',
     'masterclass': 'courses',
     'course': 'courses',
     'courses': 'courses',
   };
-  const activeTab = tabAliases[rawTab] || rawTab;
+  const activeTab = tabAliases[rawTab] || (rawTab === 'orders' || rawTab === 'courses' ? rawTab : 'user');
 
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [formData, setFormData] = useState({
@@ -1786,7 +1792,7 @@ function AccountContent() {
     window.location.href = '/';
   };
 
-  // Exact tabs as specified
+  // Exact 3 tabs as specified: User, My Orders, Courses
   const navItems = [
     { 
       id: 'user', 
@@ -1804,30 +1810,10 @@ function AccountContent() {
       icon: <GraduationCap className="w-5 h-5" />,
       isLocked: hasBundleAccess === false,
     },
-    { 
-      id: 'setting', 
-      label: 'Setting', 
-      icon: <Settings className="w-5 h-5" /> 
-    },
-    { 
-      id: 'notifications', 
-      label: 'Notifications', 
-      icon: <Bell className="w-5 h-5" /> 
-    },
   ];
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'user':
-        return (
-          <AccountUserTab
-            formData={formData}
-            setFormData={setFormData}
-            handleSave={handleSave}
-            handleImageUpload={handleImageUpload}
-            saveSuccess={saveSuccess}
-          />
-        );
       case 'orders':
         return <AccountOrdersTab email={formData.email} />;
       case 'courses':
@@ -1838,7 +1824,7 @@ function AccountContent() {
         }
         if (hasBundleAccess === null) {
           return (
-            <div className="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-12 flex justify-center items-center min-h-[400px]">
+            <div className="bg-white dark:bg-[#131C2E] rounded-2xl md:rounded-3xl p-12 flex justify-center items-center min-h-[400px] border border-neutral-200/90 dark:border-neutral-800 shadow-xs">
               <div className="w-10 h-10 rounded-full border-4 border-neutral-200 border-t-[#900606] animate-spin"></div>
             </div>
           );
@@ -1850,10 +1836,7 @@ function AccountContent() {
             setIsMobileVideoFocused={setIsMobileVideoFocused}
           />
         );
-      case 'setting':
-        return <AccountSettingsTab email={formData.email} theme={theme} toggleTheme={toggleTheme} />;
-      case 'notifications':
-        return <AccountNotificationsTab email={formData.email} />;
+      case 'user':
       default:
         return (
           <AccountUserTab
@@ -1868,70 +1851,73 @@ function AccountContent() {
   };
 
   return (
-    <div className={`bg-[#FDFBF7] dark:bg-background ${isMobileVideoFocused ? 'pt-16 sm:pt-20 pb-6 sm:pb-12' : 'pt-20 md:pt-28 pb-8 md:pb-12'}`}>
-      <div className="w-full px-4 md:px-8 lg:px-12">
+    <div className={`min-h-[100svh] bg-[#FBFBF7] dark:bg-[#0B0F19] text-[#111827] dark:text-neutral-100 font-sans transition-colors duration-300 w-full overflow-hidden ${isMobileVideoFocused ? 'pt-20 sm:pt-24 pb-8 sm:pb-12' : 'pt-28 sm:pt-32 md:pt-36 pb-12 md:pb-20'}`}>
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 items-start">
+        <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 lg:gap-10 items-start">
           
-          
-
           <div className={`w-full lg:w-72 xl:w-80 shrink-0 ${isMobileVideoFocused ? 'hidden lg:block' : 'block'}`}>
-  <div className="mb-6">
-    <h1 className="text-3xl font-black text-[#900606] dark:text-white tracking-tight">
-      Account Details
-    </h1>
-    <p className="text-xs text-neutral-500 font-medium mt-1">Manage profile, orders & courses</p>
-  </div>
+            <div className="mb-6">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-red-50 dark:bg-red-950/40 text-[#900606] dark:text-red-400 border border-red-200/60 dark:border-red-900/40 mb-3 shadow-2xs">
+                <User className="w-3 h-3 text-[#900606] dark:text-red-400" />
+                <span>Creator Dashboard</span>
+              </span>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#111827] dark:text-white tracking-tight">
+                Account <span className="text-[#900606] whitespace-nowrap">Details</span>
+              </h1>
+              <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-normal mt-1 leading-relaxed">
+                Manage profile, track orders & view masterclasses
+              </p>
+            </div>
 
-  <div className="flex flex-col gap-1.5 bg-white/60 dark:bg-neutral-900/60 p-2 sm:p-2.5 rounded-2xl sm:rounded-3xl border border-neutral-200/80 dark:border-neutral-800 shadow-sm backdrop-blur-sm">
-    {navItems.map((item) => {
-      const isActive = activeTab === item.id;
+            <div className="flex flex-col gap-1.5 bg-white dark:bg-[#131C2E] p-2.5 sm:p-3 rounded-2xl md:rounded-3xl border border-neutral-200/90 dark:border-neutral-800 shadow-xs">
+              {navItems.map((item) => {
+                const isActive = activeTab === item.id;
 
-      return (
-        <button
-          key={item.id}
-          onClick={() => handleTabChange(item.id)}
-          className={`relative flex items-center justify-between px-5 py-3.5 rounded-2xl font-bold text-sm transition-all text-left duration-200 cursor-pointer ${
-            isActive 
-              ? 'bg-[#900606] text-white shadow-[0_4px_14px_rgba(144,6,6,0.35)] translate-x-1' 
-              : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100/80 dark:hover:bg-neutral-800 hover:text-neutral-900'
-          }`}
-        >
-          <div className="flex items-center gap-3.5">
-            <span className={`${isActive ? 'text-white' : 'text-neutral-500 dark:text-neutral-400'}`}>
-              {item.icon}
-            </span>
-            <span>{item.label}</span>
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleTabChange(item.id)}
+                    className={`relative flex items-center justify-between px-4 sm:px-5 py-3.5 rounded-xl sm:rounded-2xl font-bold text-sm transition-all text-left duration-200 cursor-pointer ${
+                      isActive 
+                        ? 'bg-[#900606] text-white shadow-xs' 
+                        : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100/80 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className={`${isActive ? 'text-white' : 'text-neutral-500 dark:text-neutral-400'}`}>
+                        {item.icon}
+                      </span>
+                      <span>{item.label}</span>
+                    </div>
+
+                    {item.isLocked ? (
+                      <span className={`inline-flex items-center gap-1 text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                        isActive 
+                          ? 'bg-white/20 text-white' 
+                          : 'bg-red-50 dark:bg-red-950/40 text-[#900606] dark:text-red-400 border border-red-200 dark:border-red-900/60'
+                      }`}>
+                        <Lock className="w-2.5 h-2.5" />
+                        <span>Locked</span>
+                      </span>
+                    ) : (
+                      isActive && <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                    )}
+                  </button>
+                );
+              })}
+              
+              <div className="my-2 border-t border-neutral-200/80 dark:border-neutral-800 mx-2"></div>
+              
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-3 px-4 sm:px-5 py-3.5 rounded-xl sm:rounded-2xl font-bold text-sm transition-all text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 cursor-pointer group"
+              >
+                <LogOut className="w-5 h-5 text-red-500 group-hover:scale-110 transition-transform" />
+                <span>Log out</span>
+              </button>
+            </div>
           </div>
-
-          {/* Locked Badge or Active indicator dot */}
-          {item.isLocked ? (
-            <span className={`inline-flex items-center gap-1 text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
-              isActive 
-                ? 'bg-white/20 text-white' 
-                : 'bg-red-50 dark:bg-red-950/40 text-[#900606] dark:text-red-400 border border-red-200 dark:border-red-900/60'
-            }`}>
-              <Lock className="w-2.5 h-2.5" />
-              <span>Locked</span>
-            </span>
-          ) : (
-            isActive && <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
-          )}
-        </button>
-      );
-    })}
-    
-    <div className="my-2 border-t border-neutral-200/80 dark:border-neutral-800 mx-2"></div>
-    
-    <button
-      onClick={handleLogout}
-      className="flex items-center gap-3.5 px-5 py-3.5 rounded-2xl font-bold text-sm transition-all text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 cursor-pointer group"
-    >
-      <LogOut className="w-5 h-5 text-red-500 group-hover:scale-110 transition-transform" />
-      <span>Log out</span>
-    </button>
-  </div>
-</div>
 
           {/* Main Content Workspace */}
           <div id="account-tab-content" className="w-full lg:flex-1 min-w-0">
