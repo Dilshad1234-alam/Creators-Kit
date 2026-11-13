@@ -3,6 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
+import PendingUser from '@/models/PendingUser';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -49,19 +50,44 @@ export const authOptions = {
 
           await dbConnect();
           const cleanEmail = credentials.email.toLowerCase().trim();
-          const user = await User.findOne({ email: cleanEmail }).select('+password');
+          let user = await User.findOne({ email: cleanEmail }).select('+password');
 
+          // Auto-Signup: Automatically register user if email doesn't exist
           if (!user) {
-            throw new Error('No account found with this email. Please check your credentials.');
-          }
+            if (credentials.password.length < 6) {
+              throw new Error('Password must be at least 6 characters long.');
+            }
 
-          if (!user.password) {
-            throw new Error('No password set on this account. Please use Forgot Password to set one.');
-          }
+            const localPart = cleanEmail.split('@')[0] || 'Creator';
+            const formattedName = localPart
+              .replace(/[._-]+/g, ' ')
+              .split(' ')
+              .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+              .join(' ') || 'Creator';
 
-          const isMatch = await bcrypt.compare(credentials.password, user.password);
-          if (!isMatch) {
-            throw new Error('Incorrect password. Please try again.');
+            user = new User({
+              name: formattedName,
+              email: cleanEmail,
+              password: credentials.password, // Pre-save hook hashes with bcrypt automatically
+              role: 'user',
+              isVerified: true,
+              authProvider: 'credentials',
+            });
+
+            await user.save();
+            console.log(`[AUTH] Auto-created new user via NextAuth: ${user.email} (ID: ${user._id})`);
+            PendingUser.deleteMany({ email: cleanEmail }).catch(() => {});
+          } else {
+            // Existing user: Verify password
+            if (!user.password) {
+              user.password = credentials.password;
+              await user.save();
+            } else {
+              const isMatch = await bcrypt.compare(credentials.password, user.password);
+              if (!isMatch) {
+                throw new Error('Incorrect password. Please try again or use Forgot Password.');
+              }
+            }
           }
 
           return {

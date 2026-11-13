@@ -12,58 +12,65 @@ export async function POST(req) {
 
     if (!email || !password) {
       return NextResponse.json(
-        { error: 'Please provide email and password' },
+        { error: 'Please provide both email and password' },
         { status: 400 }
       );
     }
 
     const cleanEmail = email.trim().toLowerCase();
 
-    // Check for user
-    const user = await User.findOne({ email: cleanEmail }).select('+password');
+    // 1. Check if user already exists in MongoDB 'users' collection
+    let user = await User.findOne({ email: cleanEmail }).select('+password');
 
     if (!user) {
-      // Check if they are in the pending collection (unverified registration)
-      const pendingUser = await PendingUser.findOne({ email: cleanEmail });
-      if (pendingUser) {
+      // 2. Auto-Signup: Automatically register/create user if email does not exist
+      if (password.length < 6) {
         return NextResponse.json(
-          {
-            error: 'Please verify your email address before logging in.',
-            email: pendingUser.email,
-            isPending: true,
-          },
-          { status: 403 }
+          { error: 'Password must be at least 6 characters long' },
+          { status: 400 }
         );
       }
 
-      return NextResponse.json(
-        {
-          error: 'No account found with this email. Please check your credentials.',
-          notFound: true,
-        },
-        { status: 401 }
-      );
+      // Generate a user-friendly default name from the email (e.g. "alex.morgan" -> "Alex Morgan")
+      const localPart = cleanEmail.split('@')[0] || 'Creator';
+      const formattedName = localPart
+        .replace(/[._-]+/g, ' ')
+        .split(' ')
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ') || 'Creator';
+
+      user = new User({
+        name: formattedName,
+        email: cleanEmail,
+        password: password, // Pre-save hook hashes with bcrypt automatically
+        role: 'user',
+        isVerified: true,
+        authProvider: 'credentials',
+      });
+
+      await user.save();
+      console.log(`[AUTH] Auto-created new user in 'users' collection: ${user.email} (ID: ${user._id})`);
+
+      // Clean up any stale pending registration records
+      PendingUser.deleteMany({ email: cleanEmail }).catch(() => {});
+    } else {
+      // 3. Existing User: Securely validate password with bcrypt
+      if (!user.password) {
+        // If an existing legacy record had no password, set this as their password
+        user.password = password;
+        await user.save();
+      } else {
+        const isMatch = await user.matchPassword(password);
+        if (!isMatch) {
+          return NextResponse.json(
+            { error: 'Incorrect password. Please try again or use Forgot Password.' },
+            { status: 401 }
+          );
+        }
+      }
     }
 
-    // Check if account has no password set
-    if (!user.password) {
-      return NextResponse.json(
-        { error: 'No password set on this account. Please use Forgot Password to set one.' },
-        { status: 401 }
-      );
-    }
-
-    // Check if password matches
-    const isMatch = await user.matchPassword(password);
-
-    if (!isMatch) {
-      return NextResponse.json(
-        { error: 'Incorrect password. Please try again or use Forgot Password.' },
-        { status: 401 }
-      );
-    }
-
-    // Auto-verify user upon successful credentials match if not already verified
+    // Auto-verify user upon successful login if needed
     if (!user.isVerified) {
       user.isVerified = true;
       await user.save().catch(() => {});
@@ -110,7 +117,7 @@ export async function POST(req) {
   } catch (error) {
     console.error('[AUTH_ERROR] Login Error:', error);
     return NextResponse.json(
-      { error: 'Failed to login user', details: error.message },
+      { error: 'Failed to process login', details: error.message },
       { status: 500 }
     );
   }

@@ -91,7 +91,7 @@ export default function AuthModal({
   };
 
   // -------------------------------------------------------------
-  // CREDENTIALS LOGIN HANDLER
+  // SEAMLESS AUTO-SIGNUP / LOGIN HANDLER
   // -------------------------------------------------------------
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -196,10 +196,10 @@ export default function AuthModal({
         {/* Title & Subtitle */}
         <div className="mb-6 pr-8">
           <h2 className="text-2xl sm:text-[1.75rem] font-black text-neutral-900 tracking-tight leading-tight">
-            Welcome Back, <span className="text-[#900606]">Creator</span>
+            Welcome, <span className="text-[#900606]">Creator</span>
           </h2>
           <p className="text-neutral-500 text-xs sm:text-sm mt-1 leading-relaxed">
-            Access your creator gear, orders, and dashboard.
+            Enter your email and password to sign in or get started.
           </p>
         </div>
 
@@ -260,7 +260,7 @@ export default function AuthModal({
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
-                placeholder="Enter your password"
+                placeholder="At least 6 characters"
                 value={loginData.password}
                 onChange={(e) => setLoginData((prev) => ({ ...prev, password: e.target.value }))}
                 className="w-full pl-10 pr-10 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-[#900606] focus:bg-white transition-all shadow-2xs"
