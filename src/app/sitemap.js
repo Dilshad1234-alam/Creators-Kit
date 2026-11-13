@@ -11,6 +11,8 @@ export default function sitemap() {
     '/faq',
     '/terms',
     '/privacy',
+    '/shipping',
+    '/refund',
     '/return-policy'
   ];
 

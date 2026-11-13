@@ -228,7 +228,13 @@ const getTickerContent = (pathname, customTicker) => {
   }
 
   // 12. Policies & Legal
-  if (pathname === '/return-policy' || pathname === '/terms' || pathname === '/privacy') {
+  if (
+    pathname === '/return-policy' ||
+    pathname === '/refund' ||
+    pathname === '/shipping' ||
+    pathname === '/terms' ||
+    pathname === '/privacy'
+  ) {
     return {
       icon: (
         <svg className="w-3.5 h-3.5 fill-[#900606]" viewBox="0 0 24 24">
@@ -237,7 +243,7 @@ const getTickerContent = (pathname, customTicker) => {
       ),
       badge: 'Buyer Protection',
       text: '100% Authentic gear guarantee • Hassle-free 7-day replacement',
-      href: '/return-policy',
+      href: '/refund',
     };
   }
 

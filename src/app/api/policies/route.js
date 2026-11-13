@@ -34,6 +34,17 @@ const initialPolicies = [
 
 3. Process & Support: Doorstep pickup is scheduled by our logistics partners. Once inspected, an immediate replacement or full refund is issued to your original payment method.`,
   },
+  {
+    key: 'shipping',
+    title: 'Shipping Policy',
+    content: `1. Order Processing & Dispatch: All creator gear orders are inspected and dispatched within 24 to 48 business hours of payment confirmation.
+
+2. Pan-India Delivery Timelines: Metro deliveries take 2 to 4 working days; Tier 2 & 3 cities take 4 to 6 working days; remote areas take 6 to 9 working days via our verified courier partners (Bluedart, Delhivery, DTDC, Xpressbees).
+
+3. Shipping Charges & Free Delivery: Free insured standard delivery is provided on eligible prepaid orders. Minimal nominal shipping applies to promotional or COD orders.
+
+4. Live Tracking: You will receive real-time SMS, email, and WhatsApp tracking updates with your courier AWB number immediately upon dispatch.`,
+  },
 ];
 
 export async function GET() {
