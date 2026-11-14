@@ -3,7 +3,7 @@ import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import { sendEmail } from '@/lib/mailer';
 
-function generateOtpHtml({ name, otp }) {
+function generateOtpHtml({ name, otp, isNewUser = false }) {
   return `
 <!DOCTYPE html>
 <html>
@@ -33,11 +33,15 @@ function generateOtpHtml({ name, otp }) {
           <tr>
             <td style="padding:10px 32px 32px 32px;">
               <h2 style="margin:0 0 10px 0;color:#18181b;font-size:20px;font-weight:800;text-align:center;">
-                Login Verification Code
+                ${isNewUser ? 'Welcome to Creators Kit!' : 'Login Verification Code'}
               </h2>
               <p style="margin:0 0 24px 0;color:#52525b;font-size:14px;line-height:1.6;text-align:center;">
                 Hi <strong>${name || 'Creator'}</strong>,<br/>
-                Enter this 6-digit code to securely sign in to your Creators Kit account:
+                ${
+                  isNewUser
+                    ? 'Thank you for getting started with Creators Kit. Enter this 6-digit verification code to activate your account and complete your sign in:'
+                    : 'Enter this 6-digit code to securely sign in to your Creators Kit account:'
+                }
               </p>
 
               <!-- OTP Code Display Card -->
@@ -54,7 +58,7 @@ function generateOtpHtml({ name, otp }) {
               <hr style="border:none;border-top:1px solid #f4f4f5;margin:24px 0 20px 0;" />
 
               <p style="margin:0;color:#a1a1aa;font-size:12px;line-height:1.5;text-align:center;">
-                If you did not request this login verification code, someone may have entered your email by mistake. You can safely ignore this email.
+                If you did not request this verification code, someone may have entered your email by mistake. You can safely ignore this email.
               </p>
             </td>
           </tr>
@@ -100,7 +104,7 @@ export async function POST(req) {
       if (!user) {
         return NextResponse.json(
           { error: 'No account found with this email address.' },
-          { status: 404 }
+          { status: 400 }
         );
       }
 
@@ -109,13 +113,17 @@ export async function POST(req) {
       user.otpExpire = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
       await user.save();
 
-      console.log(`[AUTH] Resent fresh OTP to: ${cleanEmail}`);
+      console.log(`[AUTH] Resent fresh OTP ${freshOtp} to: ${cleanEmail}`);
 
       try {
         await sendEmail({
           to: cleanEmail,
           subject: `${freshOtp} is your Creators Kit verification code`,
-          html: generateOtpHtml({ name: user.name || 'Creator', otp: freshOtp }),
+          html: generateOtpHtml({
+            name: user.name || 'Creator',
+            otp: freshOtp,
+            isNewUser: !user.isVerified,
+          }),
         });
       } catch (mailErr) {
         console.error('[AUTH] Failed to send resend email:', mailErr);
@@ -137,7 +145,7 @@ export async function POST(req) {
     }
 
     // -------------------------------------------------------------
-    // STEP 2: VERIFY OTP CODE & LOG IN
+    // STEP 2: VERIFY OTP CODE & COMPLETE SIGN IN
     // -------------------------------------------------------------
     if (otp !== undefined && otp !== null && String(otp).trim() !== '') {
       const user = await User.findOne({ email: cleanEmail });
@@ -145,13 +153,13 @@ export async function POST(req) {
       if (!user) {
         return NextResponse.json(
           { error: 'No account found with this email address.' },
-          { status: 404 }
+          { status: 400 }
         );
       }
 
       if (!user.otpCode || !user.otpExpire) {
         return NextResponse.json(
-          { error: 'No verification code requested or it has already expired. Please sign in again.' },
+          { error: 'No verification code requested or it has already expired. Please enter your credentials again.' },
           { status: 400 }
         );
       }
@@ -173,12 +181,10 @@ export async function POST(req) {
         );
       }
 
-      // Success: Clear OTP fields
+      // Success: Clear OTP fields and ensure verified
       user.otpCode = undefined;
       user.otpExpire = undefined;
-      if (!user.isVerified) {
-        user.isVerified = true;
-      }
+      user.isVerified = true;
       await user.save();
 
       const userRole = user.role || 'user';
@@ -222,7 +228,7 @@ export async function POST(req) {
     }
 
     // -------------------------------------------------------------
-    // STEP 1: VALIDATE EMAIL & PASSWORD, SEND OTP (NO AUTO-SIGNUP)
+    // STEP 1: VALIDATE CREDENTIALS & SEND OTP (SEAMLESS AUTO-REGISTER / LOGIN)
     // -------------------------------------------------------------
     if (!password) {
       return NextResponse.json(
@@ -231,48 +237,76 @@ export async function POST(req) {
       );
     }
 
-    // 1. Check user exists in MongoDB 'users' collection
-    const user = await User.findOne({ email: cleanEmail }).select('+password');
+    // 1. Check if user already exists in MongoDB 'users' collection
+    let user = await User.findOne({ email: cleanEmail }).select('+password');
+    let isNewUser = false;
 
-    // Rule: Do NOT auto-create users!
-    if (!user) {
-      return NextResponse.json(
-        { error: 'No account found with this email. Please check your email or contact support.' },
-        { status: 404 }
-      );
-    }
-
-    // Check if user has password set
-    if (!user.password) {
-      return NextResponse.json(
-        { error: 'No password set for this account. Please use Forgot Password or contact support.' },
-        { status: 400 }
-      );
-    }
-
-    // Verify password securely using bcrypt
-    const isMatch = await user.matchPassword(password);
-    if (!isMatch) {
-      return NextResponse.json(
-        { error: 'Incorrect password. Please try again or use Forgot Password.' },
-        { status: 401 }
-      );
-    }
-
-    // 2. Generate 6-digit OTP and set 10 minute expiration
+    // Generate 6-digit numeric OTP code
     const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    user.otpCode = generatedOtp;
-    user.otpExpire = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-    await user.save();
+    const otpExpiration = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-    console.log(`[AUTH] Step 1 passed for ${cleanEmail}. Generated OTP: ${generatedOtp}`);
+    if (!user) {
+      // 2. New User: Seamlessly register user with OTP verification
+      if (password.length < 6) {
+        return NextResponse.json(
+          { error: 'Password must be at least 6 characters long.' },
+          { status: 400 }
+        );
+      }
 
-    // 3. Send OTP to user's real email via Hostinger SMTP
+      const localPart = cleanEmail.split('@')[0] || 'Creator';
+      const formattedName = localPart
+        .replace(/[._-]+/g, ' ')
+        .split(' ')
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ') || 'Creator';
+
+      user = new User({
+        name: formattedName,
+        email: cleanEmail,
+        password: password, // Pre-save hook hashes with bcrypt automatically
+        role: 'user',
+        isVerified: false, // Activated when OTP is verified
+        authProvider: 'credentials',
+        otpCode: generatedOtp,
+        otpExpire: otpExpiration,
+      });
+
+      await user.save();
+      isNewUser = true;
+      console.log(`[AUTH] Auto-created new user for OTP verification: ${cleanEmail}`);
+    } else {
+      // 3. Existing User: Verify password
+      if (!user.password) {
+        user.password = password;
+      } else {
+        const isMatch = await user.matchPassword(password);
+        if (!isMatch) {
+          return NextResponse.json(
+            { error: 'Incorrect password. Please try again or use Forgot Password.' },
+            { status: 401 }
+          );
+        }
+      }
+
+      user.otpCode = generatedOtp;
+      user.otpExpire = otpExpiration;
+      await user.save();
+      console.log(`[AUTH] Step 1 passed for existing user: ${cleanEmail}`);
+    }
+
+    console.log(`[AUTH] Step 1 generated OTP ${generatedOtp} for ${cleanEmail} (isNewUser: ${isNewUser})`);
+
+    // 4. Send OTP code to user's real email via Hostinger SMTP
     try {
       await sendEmail({
         to: cleanEmail,
         subject: `${generatedOtp} is your Creators Kit verification code`,
-        html: generateOtpHtml({ name: user.name || 'Creator', otp: generatedOtp }),
+        html: generateOtpHtml({
+          name: user.name || 'Creator',
+          otp: generatedOtp,
+          isNewUser,
+        }),
       });
     } catch (mailErr) {
       console.error('[AUTH] Failed to send OTP email:', mailErr);
@@ -282,13 +316,15 @@ export async function POST(req) {
       );
     }
 
-    // Return requiresOtp signal for Step 2
     return NextResponse.json(
       {
         success: true,
         requiresOtp: true,
+        isNewUser,
         email: cleanEmail,
-        message: 'A 6-digit verification code has been sent to your email.',
+        message: isNewUser
+          ? 'Account created! A 6-digit verification code has been sent to your email.'
+          : 'A 6-digit verification code has been sent to your email.',
       },
       { status: 200 }
     );
