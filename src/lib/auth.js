@@ -51,41 +51,18 @@ export const authOptions = {
           const cleanEmail = credentials.email.toLowerCase().trim();
           let user = await User.findOne({ email: cleanEmail }).select('+password');
 
-          // Auto-Signup: Automatically register user if email doesn't exist
           if (!user) {
-            if (credentials.password.length < 6) {
-              throw new Error('Password must be at least 6 characters long.');
-            }
+            throw new Error('No account found with this email. Please check your credentials.');
+          }
 
-            const localPart = cleanEmail.split('@')[0] || 'Creator';
-            const formattedName = localPart
-              .replace(/[._-]+/g, ' ')
-              .split(' ')
-              .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-              .join(' ') || 'Creator';
+          // Existing user: Verify password
+          if (!user.password) {
+            throw new Error('No password set for this account. Please use Forgot Password.');
+          }
 
-            user = new User({
-              name: formattedName,
-              email: cleanEmail,
-              password: credentials.password, // Pre-save hook hashes with bcrypt automatically
-              role: 'user',
-              isVerified: true,
-              authProvider: 'credentials',
-            });
-
-            await user.save();
-            console.log(`[AUTH] Auto-created new user via NextAuth: ${user.email} (ID: ${user._id})`);
-          } else {
-            // Existing user: Verify password
-            if (!user.password) {
-              user.password = credentials.password;
-              await user.save();
-            } else {
-              const isMatch = await bcrypt.compare(credentials.password, user.password);
-              if (!isMatch) {
-                throw new Error('Incorrect password. Please try again or use Forgot Password.');
-              }
-            }
+          const isMatch = await bcrypt.compare(credentials.password, user.password);
+          if (!isMatch) {
+            throw new Error('Incorrect password. Please try again or use Forgot Password.');
           }
 
           return {

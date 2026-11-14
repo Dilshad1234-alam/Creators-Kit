@@ -1,24 +1,9 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/mongodb';
-import User from '@/models/User';
 
 export async function POST(req) {
   try {
-    await dbConnect();
-    const body = await req.json().catch(() => ({}));
-    const email = body?.email ? body.email.toLowerCase().trim() : '';
-
-    if (email) {
-      // Safety rule: Never delete administrator account!
-      const user = await User.findOne({ email });
-      if (user && user.role !== 'admin' && email !== 'dmd68699@gmail.com') {
-        await User.deleteOne({ _id: user._id });
-        console.log(`[AUTH] User deleted from database on logout: ${email}`);
-      }
-    }
-
     const response = NextResponse.json(
-      { success: true, message: 'User logged out and removed from database.' },
+      { success: true, message: 'Logged out successfully.' },
       { status: 200 }
     );
 

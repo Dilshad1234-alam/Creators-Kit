@@ -6,57 +6,64 @@ import nodemailer from 'nodemailer';
  * Falls back to creating a dynamic Ethereal test account if credentials are not set.
  * Returns a success boolean or throws an error.
  */
-export const sendEmail = async ({ to, subject, html}) => {
- try {
+export const sendEmail = async ({ to, subject, html }) => {
+  try {
     let transporter;
 
+    const host = process.env.SMTP_HOST;
+    const port = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 465;
+    const user = (process.env.SMTP_USER || process.env.SMTP_EMAIL || '').replace(/^["']|["']$/g, '').trim();
+    const pass = (process.env.SMTP_PASS || '').replace(/^["']|["']$/g, '').trim();
+    const fromEmail = process.env.FROM_EMAIL || `"Creators Kit" <${user || 'support@creatorskithub.com'}>`;
+
     // Use actual SMTP if configured
-    if (process.env.SMTP_HOST && process.env.SMTP_PORT) {
-        transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: parseInt(process.env.SMTP_PORT, 10),
-        secure: parseInt(process.env.SMTP_PORT, 10) === 465, // true for 465, false for other ports
+    if (host && port && user && pass) {
+      transporter = nodemailer.createTransport({
+        host,
+        port,
+        secure: port === 465, // true for 465, false for 587 or others
         auth: {
-        user: process.env.SMTP_USER || process.env.SMTP_EMAIL,
-        pass: process.env.SMTP_PASS,
-    },
-    });
+          user,
+          pass,
+        },
+        // Timeout configuration to avoid hanging on slow network
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 15000,
+      });
     } else {
-    // Fallback to Ethereal for testing
-    let testAccount = await nodemailer.createTestAccount();
-        transporter = nodemailer.createTransport({
+      // Fallback to Ethereal for testing
+      const testAccount = await nodemailer.createTestAccount();
+      transporter = nodemailer.createTransport({
         host: 'smtp.ethereal.email',
         port: 587,
         secure: false,
         auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
-    },
-    });
+          user: testAccount.user,
+          pass: testAccount.pass,
+        },
+      });
     }
 
     const info = await transporter.sendMail({
-        from: process.env.FROM_EMAIL || '"Creators Kit" <support@creatorskithub.com>',
-        to,
-        subject,
-        html,
+      from: fromEmail,
+      to,
+      subject,
+      html,
     });
 
-    console.log(`Email sent to ${to}: ${info.messageId}`);
- 
-    // Log preview URL for ethereal emails
-    if (!process.env.SMTP_HOST) {
-        console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+    console.log(`[MAILER] Email successfully sent to ${to}: ${info.messageId}`);
+
+    if (!host) {
+      console.log('[MAILER] Ethereal Preview URL: %s', nodemailer.getTestMessageUrl(info));
     }
 
-    return { success: true, messageId: info.messageId};
-    } catch (error) {
-        console.error('Email sending failed:', error.message);
-        if (error.responseCode === 535) {
-            console.error("  -> [SMTP Auth Error]: Check if your SMTP_USER or SMTP_PASS is correct.");
-            console.error("  -> If your password has special characters, enclose it in quotes in .env.local.");
-        }
-    // Instead of completely crashing, we throw a controlled error that can be caught
-        throw new Error('Failed to send email. Please try again later.');
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error('[MAILER_ERROR] Email sending failed:', error.message);
+    if (error.responseCode === 535) {
+      console.error('  -> [SMTP Auth Error]: Check if your SMTP_USER or SMTP_PASS is correct.');
     }
+    throw new Error('Failed to send verification email. Please try again later.');
+  }
 };
