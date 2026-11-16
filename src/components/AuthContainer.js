@@ -336,16 +336,16 @@ export default function AuthContainer({ initialEmail = '' }) {
       </div>
 
       {/* Centered Auth Card Overlay */}
-      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto animate-in fade-in duration-200">
+      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 overflow-y-auto animate-in fade-in duration-200">
         <div
-          className="w-[calc(100%-2rem)] max-w-[450px] max-h-[90vh] overflow-y-auto mx-4 bg-white rounded-2xl p-5 sm:p-7 shadow-2xl border border-neutral-200/90 relative text-neutral-900 my-auto transform transition-all animate-in zoom-in-95 duration-200 select-none"
+          className="w-full max-w-[440px] max-h-[85vh] overflow-y-auto mx-4 my-auto bg-white rounded-2xl p-5 sm:p-7 shadow-2xl border border-neutral-200/90 relative text-neutral-900 transform transition-all animate-in zoom-in-95 duration-200 select-none overscroll-contain"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Top Close Cut Button */}
           <button
             type="button"
             onClick={handleClose}
-            className="absolute top-4 right-4 sm:top-5 sm:right-5 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-600 hover:text-neutral-900 flex items-center justify-center transition-all cursor-pointer z-20 shadow-xs"
+            className="absolute top-4 right-4 sm:top-5 sm:right-5 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-600 hover:text-neutral-900 flex items-center justify-center transition-all cursor-pointer z-20 shadow-xs active:scale-95"
             title="Close"
             aria-label="Close"
           >
@@ -357,27 +357,27 @@ export default function AuthContainer({ initialEmail = '' }) {
           {/* ========================================================= */}
           {step === 'credentials' && (
             <div>
-              {/* Title & Subtitle */}
-              <div className="mb-6 pr-8">
-                <h2 className="text-2xl sm:text-[1.75rem] font-black text-neutral-900 tracking-tight leading-tight">
+              {/* Title & Subtitle with safe right padding */}
+              <div className="mb-5 pr-10">
+                <h2 className="text-2xl sm:text-[1.7rem] font-black text-neutral-900 tracking-tight leading-tight break-words">
                   Welcome, <span className="text-[#900606]">Creator</span>
                 </h2>
-                <p className="text-neutral-500 text-xs sm:text-sm mt-1 leading-relaxed">
-                  Enter your email and password to securely sign in.
+                <p className="text-neutral-500 text-xs sm:text-sm mt-1 leading-relaxed break-words">
+                  Enter your email and password to sign in or get started.
                 </p>
               </div>
 
               {loginError && (
                 <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-                  <div className="leading-snug">{loginError}</div>
+                  <div className="leading-snug break-words">{loginError}</div>
                 </div>
               )}
 
               {loginSuccessNotice && (
                 <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <div className="leading-snug">{loginSuccessNotice}</div>
+                  <div className="leading-snug break-words">{loginSuccessNotice}</div>
                 </div>
               )}
 
@@ -396,7 +396,7 @@ export default function AuthContainer({ initialEmail = '' }) {
                       placeholder="Enter your email"
                       value={loginData.email}
                       onChange={(e) => setLoginData((prev) => ({ ...prev, email: e.target.value }))}
-                      className="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-[#900606] focus:bg-white transition-all shadow-2xs"
+                      className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-sm sm:text-base text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-[#900606] focus:bg-white transition-all shadow-2xs"
                     />
                   </div>
                 </div>
@@ -423,12 +423,12 @@ export default function AuthContainer({ initialEmail = '' }) {
                       placeholder="Enter your password"
                       value={loginData.password}
                       onChange={(e) => setLoginData((prev) => ({ ...prev, password: e.target.value }))}
-                      className="w-full pl-10 pr-10 py-2.5 sm:py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-[#900606] focus:bg-white transition-all shadow-2xs"
+                      className="w-full pl-10 pr-10 py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-sm sm:text-base text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-[#900606] focus:bg-white transition-all shadow-2xs"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer p-1"
                       title={showPassword ? 'Hide password' : 'Show password'}
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -439,7 +439,7 @@ export default function AuthContainer({ initialEmail = '' }) {
                 <button
                   type="submit"
                   disabled={loginLoading}
-                  className="w-full mt-2 py-3 sm:py-3.5 bg-[#900606] hover:bg-[#7a0505] text-white font-extrabold text-sm sm:text-base rounded-xl shadow-md transition-all active:scale-98 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                  className="w-full mt-2 py-3 sm:py-3.5 bg-[#900606] hover:bg-[#7a0505] text-white font-extrabold text-sm sm:text-base rounded-xl shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                 >
                   {loginLoading ? (
                     <>
@@ -462,16 +462,16 @@ export default function AuthContainer({ initialEmail = '' }) {
           {/* ========================================================= */}
           {step === 'otp' && (
             <div>
-              {/* Title & Subtitle */}
-              <div className="mb-6 pr-8">
+              {/* Title & Subtitle with safe right padding */}
+              <div className="mb-5 pr-10">
                 <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 text-[#900606] text-[11px] font-bold uppercase tracking-wider mb-2">
                   <KeyRound className="w-3.5 h-3.5" />
                   <span>2-Step Verification</span>
                 </div>
-                <h2 className="text-2xl sm:text-[1.75rem] font-black text-neutral-900 tracking-tight leading-tight">
+                <h2 className="text-2xl sm:text-[1.7rem] font-black text-neutral-900 tracking-tight leading-tight break-words">
                   Enter <span className="text-[#900606]">OTP</span>
                 </h2>
-                <p className="text-neutral-500 text-xs sm:text-sm mt-1 leading-relaxed">
+                <p className="text-neutral-500 text-xs sm:text-sm mt-1 leading-relaxed break-words">
                   We sent a 6-digit code to{' '}
                   <span className="font-semibold text-neutral-800 break-all">{loginData.email}</span>
                 </p>
@@ -480,14 +480,14 @@ export default function AuthContainer({ initialEmail = '' }) {
               {loginError && (
                 <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-                  <div className="leading-snug">{loginError}</div>
+                  <div className="leading-snug break-words">{loginError}</div>
                 </div>
               )}
 
               {loginSuccessNotice && (
                 <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <div className="leading-snug">{loginSuccessNotice}</div>
+                  <div className="leading-snug break-words">{loginSuccessNotice}</div>
                 </div>
               )}
 
@@ -522,7 +522,7 @@ export default function AuthContainer({ initialEmail = '' }) {
                 <button
                   type="submit"
                   disabled={loginLoading || loginData.otp.length !== 6}
-                  className="w-full py-3 sm:py-3.5 bg-[#900606] hover:bg-[#7a0505] text-white font-extrabold text-sm sm:text-base rounded-xl shadow-md transition-all active:scale-98 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-3 sm:py-3.5 bg-[#900606] hover:bg-[#7a0505] text-white font-extrabold text-sm sm:text-base rounded-xl shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loginLoading ? (
                     <>
@@ -541,7 +541,7 @@ export default function AuthContainer({ initialEmail = '' }) {
                   <button
                     type="button"
                     onClick={handleBackToCredentials}
-                    className="text-neutral-500 hover:text-neutral-900 font-semibold flex items-center gap-1 transition-colors cursor-pointer py-1"
+                    className="text-neutral-500 hover:text-neutral-900 font-semibold flex items-center gap-1 transition-colors cursor-pointer py-2 px-1"
                   >
                     <ArrowLeft className="w-3.5 h-3.5" />
                     <span>Back</span>
@@ -551,7 +551,7 @@ export default function AuthContainer({ initialEmail = '' }) {
                     type="button"
                     onClick={handleResendOtp}
                     disabled={resendCooldown > 0 || resendLoading}
-                    className="text-[#900606] hover:text-[#7a0505] font-bold disabled:text-neutral-400 disabled:cursor-not-allowed transition-colors cursor-pointer py-1 flex items-center gap-1"
+                    className="text-[#900606] hover:text-[#7a0505] font-bold disabled:text-neutral-400 disabled:cursor-not-allowed transition-colors cursor-pointer py-2 px-1 flex items-center gap-1"
                   >
                     {resendLoading ? (
                       <>

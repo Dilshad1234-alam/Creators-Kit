@@ -1,38 +1,39 @@
 import nodemailer from 'nodemailer';
 
 /**
- * Robust Email Utility
- * Sends an email using SMTP credentials from environment variables.
- * Falls back to creating a dynamic Ethereal test account if credentials are not set.
- * Returns a success boolean or throws an error.
+ * Hostinger SMTP Email Utility
+ * Sends emails using Hostinger SMTP credentials from environment variables.
+ * Fallback to Ethereal if credentials are not configured.
  */
-export const sendEmail = async ({ to, subject, html }) => {
+export const sendEmail = async ({ to, subject, html, text }) => {
   try {
-    let transporter;
-
-    const host = process.env.SMTP_HOST;
-    const port = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 465;
+    const host = process.env.SMTP_HOST || 'smtp.hostinger.com';
+    const port = Number(process.env.SMTP_PORT) || 465;
+    const secure = Number(process.env.SMTP_PORT || 465) === 465; // true for 465, false for 587
     const user = (process.env.SMTP_USER || process.env.SMTP_EMAIL || '').replace(/^["']|["']$/g, '').trim();
     const pass = (process.env.SMTP_PASS || '').replace(/^["']|["']$/g, '').trim();
     const fromEmail = process.env.FROM_EMAIL || `"Creators Kit" <${user || 'support@creatorskithub.com'}>`;
 
-    // Use actual SMTP if configured
-    if (host && port && user && pass) {
+    let transporter;
+
+    if (user && pass) {
       transporter = nodemailer.createTransport({
-        host,
+        host: 'smtp.hostinger.com',
         port,
-        secure: port === 465, // true for 465, false for 587 or others
+        secure, // true for 465, false for 587
         auth: {
           user,
           pass,
         },
-        // Timeout configuration to avoid hanging on slow network
-        connectionTimeout: 10000,
-        greetingTimeout: 10000,
-        socketTimeout: 15000,
+        tls: {
+          rejectUnauthorized: false,
+        },
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 20000,
       });
     } else {
-      // Fallback to Ethereal for testing
+      // Fallback for local testing without credentials
       const testAccount = await nodemailer.createTestAccount();
       transporter = nodemailer.createTransport({
         host: 'smtp.ethereal.email',
@@ -45,25 +46,26 @@ export const sendEmail = async ({ to, subject, html }) => {
       });
     }
 
-    const info = await transporter.sendMail({
+    const mailOptions = {
       from: fromEmail,
       to,
       subject,
+      text: text || 'Your Creators Kit verification code is provided in the HTML version of this email.',
       html,
-    });
+      headers: {
+        'X-Entity-Ref-ID': `${Date.now()}-${Math.random().toString(36).substring(7)}`,
+      },
+    };
 
-    console.log(`[MAILER] Email successfully sent to ${to}: ${info.messageId}`);
+    const info = await transporter.sendMail(mailOptions);
 
-    if (!host) {
-      console.log('[MAILER] Ethereal Preview URL: %s', nodemailer.getTestMessageUrl(info));
-    }
-
+    console.log(`[MAILER] OTP email sent successfully to ${to}: ${info.messageId}`);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error('[MAILER_ERROR] Email sending failed:', error.message);
+    console.error('[MAILER_ERROR] Email dispatch error:', error.message);
     if (error.responseCode === 535) {
-      console.error('  -> [SMTP Auth Error]: Check if your SMTP_USER or SMTP_PASS is correct.');
+      console.error('  -> [SMTP Auth Error]: Incorrect SMTP user or password.');
     }
-    throw new Error('Failed to send verification email. Please try again later.');
+    throw new Error('Failed to send verification email. Please check your credentials and try again.');
   }
 };

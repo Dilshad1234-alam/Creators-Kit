@@ -6,68 +6,72 @@ import { sendEmail } from '@/lib/mailer';
 function generateOtpHtml({ name, otp, isNewUser = false }) {
   return `
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Creators Kit Verification Code</title>
+  <title>Your Verification Code - Creators Kit</title>
 </head>
-<body style="margin:0;padding:0;background-color:#f7f7f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#18181b;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f7f7f8;padding:32px 12px;">
+<body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #18181b;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f4f4f5; padding: 32px 12px;">
     <tr>
       <td align="center">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:500px;background-color:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.06);border:1px solid #e4e4e7;">
-          <!-- Top Accent Bar -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 500px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e4e4e7;">
+          <!-- Top Accent Line -->
           <tr>
-            <td style="background-color:#900606;height:6px;"></td>
+            <td style="background-color: #900606; height: 5px;"></td>
           </tr>
           <!-- Header -->
           <tr>
-            <td style="padding:28px 32px 20px 32px;text-align:center;">
-              <h1 style="margin:0;font-size:26px;font-weight:900;letter-spacing:-0.5px;color:#18181b;">
-                Creators <span style="background-color:#900606;color:#ffffff;padding:2px 8px;border-radius:8px;font-size:20px;font-weight:900;">kit</span>
-              </h1>
+            <td style="padding: 28px 32px 20px 32px; text-align: center;">
+              <span style="font-size: 24px; font-weight: 900; letter-spacing: -0.5px; color: #18181b;">
+                Creators <span style="background-color: #900606; color: #ffffff; padding: 2px 8px; border-radius: 6px; font-size: 18px; font-weight: 900;">kit</span>
+              </span>
             </td>
           </tr>
-          <!-- Content Body -->
+          <!-- Main Content -->
           <tr>
-            <td style="padding:10px 32px 32px 32px;">
-              <h2 style="margin:0 0 10px 0;color:#18181b;font-size:20px;font-weight:800;text-align:center;">
-                ${isNewUser ? 'Welcome to Creators Kit!' : 'Login Verification Code'}
+            <td style="padding: 10px 32px 28px 32px;">
+              <h2 style="margin: 0 0 10px 0; color: #18181b; font-size: 20px; font-weight: 800; text-align: center;">
+                ${isNewUser ? 'Welcome to Creators Kit!' : 'Your Verification Code'}
               </h2>
-              <p style="margin:0 0 24px 0;color:#52525b;font-size:14px;line-height:1.6;text-align:center;">
+              <p style="margin: 0 0 20px 0; color: #52525b; font-size: 14px; line-height: 1.6; text-align: center;">
                 Hi <strong>${name || 'Creator'}</strong>,<br/>
                 ${
                   isNewUser
-                    ? 'Thank you for getting started with Creators Kit. Enter this 6-digit verification code to activate your account and complete your sign in:'
-                    : 'Enter this 6-digit code to securely sign in to your Creators Kit account:'
+                    ? 'Enter the 6-digit verification code below to activate your account and complete your sign in:'
+                    : 'Use the following 6-digit verification code to securely access your account:'
                 }
               </p>
 
-              <!-- OTP Code Display Card -->
-              <div style="background-color:#fbf4f4;border:2px dashed #900606;border-radius:14px;padding:20px 16px;text-align:center;margin:20px 0;">
-                <span style="font-family:'Courier New',Courier,monospace;font-size:36px;font-weight:900;color:#900606;letter-spacing:10px;display:inline-block;padding-left:10px;">
-                  ${otp}
-                </span>
-              </div>
+              <!-- OTP Code Display Box -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 20px 0;">
+                <tr>
+                  <td align="center" style="background-color: #faf5f5; border: 2px dashed #900606; border-radius: 12px; padding: 18px 24px;">
+                    <span style="font-family: 'Courier New', Courier, monospace; font-size: 34px; font-weight: 900; color: #900606; letter-spacing: 8px; display: inline-block; padding-left: 8px;">
+                      ${otp}
+                    </span>
+                  </td>
+                </tr>
+              </table>
 
-              <p style="margin:0 0 20px 0;color:#71717a;font-size:13px;line-height:1.5;text-align:center;">
-                ⏰ This code will expire in <strong>10 minutes</strong>.
+              <p style="margin: 0 0 16px 0; color: #71717a; font-size: 13px; line-height: 1.5; text-align: center;">
+                ⏱️ This code is valid for <strong>10 minutes</strong>.
               </p>
 
-              <hr style="border:none;border-top:1px solid #f4f4f5;margin:24px 0 20px 0;" />
+              <hr style="border: none; border-top: 1px solid #f4f4f5; margin: 24px 0 16px 0;" />
 
-              <p style="margin:0;color:#a1a1aa;font-size:12px;line-height:1.5;text-align:center;">
-                If you did not request this verification code, someone may have entered your email by mistake. You can safely ignore this email.
+              <p style="margin: 0; color: #a1a1aa; font-size: 12px; line-height: 1.5; text-align: center;">
+                If you did not request this login code, you can safely ignore this email.
               </p>
             </td>
           </tr>
           <!-- Footer -->
           <tr>
-            <td style="background-color:#fafafa;padding:18px 32px;text-align:center;border-top:1px solid #f4f4f5;">
-              <p style="margin:0;color:#a1a1aa;font-size:11px;">
+            <td style="background-color: #fafafa; padding: 16px 32px; text-align: center; border-top: 1px solid #f4f4f5;">
+              <p style="margin: 0; color: #a1a1aa; font-size: 11px;">
                 &copy; ${new Date().getFullYear()} Creators Kit Hub &bull; All Rights Reserved.<br/>
-                <a href="https://creatorskithub.com" style="color:#900606;text-decoration:none;font-weight:600;">creatorskithub.com</a>
+                <a href="https://creatorskithub.com" style="color: #900606; text-decoration: none; font-weight: 600;">creatorskithub.com</a>
               </p>
             </td>
           </tr>
@@ -115,10 +119,13 @@ export async function POST(req) {
 
       console.log(`[AUTH] Resent fresh OTP ${freshOtp} to: ${cleanEmail}`);
 
+      const plainText = `Hi ${user.name || 'Creator'},\n\nYour fresh Creators Kit verification code is: ${freshOtp}\n\nThis code will expire in 10 minutes.\n\nCreators Kit Hub\nhttps://creatorskithub.com`;
+
       try {
         await sendEmail({
           to: cleanEmail,
           subject: `${freshOtp} is your Creators Kit verification code`,
+          text: plainText,
           html: generateOtpHtml({
             name: user.name || 'Creator',
             otp: freshOtp,
@@ -297,11 +304,14 @@ export async function POST(req) {
 
     console.log(`[AUTH] Step 1 generated OTP ${generatedOtp} for ${cleanEmail} (isNewUser: ${isNewUser})`);
 
+    const plainText = `Hi ${user.name || 'Creator'},\n\nYour 6-digit Creators Kit verification code is: ${generatedOtp}\n\nThis code will expire in 10 minutes.\nIf you did not request this code, please ignore this email.\n\nCreators Kit Hub\nhttps://creatorskithub.com`;
+
     // 4. Send OTP code to user's real email via Hostinger SMTP
     try {
       await sendEmail({
         to: cleanEmail,
         subject: `${generatedOtp} is your Creators Kit verification code`,
+        text: plainText,
         html: generateOtpHtml({
           name: user.name || 'Creator',
           otp: generatedOtp,
