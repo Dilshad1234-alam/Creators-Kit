@@ -2,42 +2,87 @@ import { NextResponse } from 'next/server';
 import '@/lib/loadEnv';
 import dbConnect from '@/lib/mongodb';
 import fs from 'fs';
-import path from 'path';
+import dns from 'dns';
+import net from 'net';
+import nodemailer from 'nodemailer';
 
 export async function GET() {
+  const diagnostic = {};
+
   try {
     await dbConnect();
-    const cwd = process.cwd();
-    const checked = [
-      path.join(cwd, '.env'),
-      path.join(cwd, '.env.production'),
-      path.join(cwd, '.env.local'),
-      path.join(cwd, '..', '.env'),
-      path.join(cwd, '..', '.env.production'),
-      path.join(cwd, '..', '.env.local'),
-      '/home/u633803084/domains/creatorskithub.com/.env',
-      '/home/u633803084/domains/creatorskithub.com/public_html/.env',
-    ];
-    const found = checked.filter(p => {
-      try { return fs.existsSync(p); } catch { return false; }
-    });
-
-    return NextResponse.json({
-      message: 'Database connected successfully',
-      cwd,
-      found_env_files: found,
-      node_env: process.env.NODE_ENV || 'undefined',
-      nextauth_url: process.env.NEXTAUTH_URL || 'undefined',
-      auth_trust_host: process.env.AUTH_TRUST_HOST || 'undefined',
-      has_google_id: !!(process.env.GOOGLE_CLIENT_ID || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID),
-      has_google_secret: !!process.env.GOOGLE_CLIENT_SECRET,
-      has_nextauth_secret: !!process.env.NEXTAUTH_SECRET,
-      has_mongodb_uri: !!process.env.MONGODB_URI,
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed', details: error.message },
-      { status: 500 }
-    );
+    diagnostic.db = 'connected';
+  } catch (err) {
+    diagnostic.db = err.message;
   }
+
+  // 1. Environment variables check
+  diagnostic.env = {
+    SMTP_HOST: process.env.SMTP_HOST || 'not set (using fallback: smtp.hostinger.com)',
+    SMTP_PORT: process.env.SMTP_PORT || 'not set',
+    SMTP_USER: process.env.SMTP_USER || 'not set',
+    has_SMTP_PASS: !!process.env.SMTP_PASS,
+    NODE_ENV: process.env.NODE_ENV,
+  };
+
+  // 2. DNS check for smtp.hostinger.com
+  try {
+    diagnostic.dns_ipv4 = await dns.promises.resolve4('smtp.hostinger.com').catch(e => `ERR: ${e.message}`);
+  } catch (e) {
+    diagnostic.dns_ipv4 = `ERR: ${e.message}`;
+  }
+
+  // 3. TCP socket checks
+  const testTcp = (host, port, timeout = 4000) => {
+    return new Promise((resolve) => {
+      const s = net.createConnection({ host, port, timeout });
+      s.on('connect', () => { s.destroy(); resolve('CONNECTED'); });
+      s.on('timeout', () => { s.destroy(); resolve('TIMEOUT'); });
+      s.on('error', (err) => resolve(`ERR: ${err.message}`));
+    });
+  };
+
+  diagnostic.tcp_465 = await testTcp('smtp.hostinger.com', 465);
+  diagnostic.tcp_587 = await testTcp('smtp.hostinger.com', 587);
+
+  // 4. Sendmail binary check
+  diagnostic.has_sendmail = fs.existsSync('/usr/sbin/sendmail');
+
+  // 5. Test nodemailer verify on port 465
+  try {
+    const t465 = nodemailer.createTransport({
+      host: 'smtp.hostinger.com',
+      port: 465,
+      secure: true,
+      auth: {
+        user: (process.env.SMTP_USER || 'support@creatorskithub.com').trim(),
+        pass: (process.env.SMTP_PASS || 'CreatorsKitHub@2026').trim(),
+      },
+      tls: { rejectUnauthorized: false },
+      connectionTimeout: 10000,
+    });
+    diagnostic.verify_465 = await t465.verify().then(() => 'SUCCESS').catch(e => `ERR: ${e.message} (code: ${e.code})`);
+  } catch (e) {
+    diagnostic.verify_465 = `ERR: ${e.message}`;
+  }
+
+  // 6. Test nodemailer verify on port 587
+  try {
+    const t587 = nodemailer.createTransport({
+      host: 'smtp.hostinger.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: (process.env.SMTP_USER || 'support@creatorskithub.com').trim(),
+        pass: (process.env.SMTP_PASS || 'CreatorsKitHub@2026').trim(),
+      },
+      tls: { rejectUnauthorized: false },
+      connectionTimeout: 10000,
+    });
+    diagnostic.verify_587 = await t587.verify().then(() => 'SUCCESS').catch(e => `ERR: ${e.message} (code: ${e.code})`);
+  } catch (e) {
+    diagnostic.verify_587 = `ERR: ${e.message}`;
+  }
+
+  return NextResponse.json(diagnostic);
 }

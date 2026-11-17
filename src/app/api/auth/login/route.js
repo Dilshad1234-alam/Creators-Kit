@@ -10,8 +10,8 @@ try {
 } catch (e) {}
 
 /**
- * Creates a Nodemailer Transporter strictly bound to IPv4
- * Prioritizes Port 465 (SSL direct) with fast 4s timeouts, with Port 587 (STARTTLS) fallback.
+ * Creates a Nodemailer Transporter
+ * Handles Hostinger port 465 (SSL direct) and port 587 (STARTTLS)
  */
 function createHostingerTransporter(targetPort) {
   const host = process.env.SMTP_HOST || 'smtp.hostinger.com';
@@ -30,12 +30,10 @@ function createHostingerTransporter(targetPort) {
     },
     tls: {
       rejectUnauthorized: false,
-      minVersion: 'TLSv1.2',
     },
-    family: 4, // CRITICAL: Always use IPv4 to bypass container unrouted IPv6 issues
-    connectionTimeout: 4000,
-    greetingTimeout: 4000,
-    socketTimeout: 6000,
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
   });
 }
 
@@ -125,14 +123,12 @@ function generateOtpHtml({ name, otp, isNewUser = false }) {
 }
 
 /**
- * Dispatches the 6-Digit OTP Email with Smart Dual-Port Failover (465 SSL <-> 587 STARTTLS)
- * Guarantees real email delivery across local environments and live Hostinger cloud hosting.
+ * Dispatches the 6-Digit OTP Email with Resilient Multi-Channel Failover
+ * Attempts Hostinger Port 465 (SSL), Port 587 (TLS), Sendmail binary, and direct IP fallback.
  */
 async function dispatchOtpEmail({ to, name, otp, isNewUser = false }) {
-  // Prioritize Port 465 (Hostinger SSL direct), fall back to 587 (STARTTLS)
-  const primaryPort = 465;
-  const secondaryPort = 587;
   const smtpUser = (process.env.SMTP_USER || process.env.SMTP_EMAIL || 'support@creatorskithub.com').replace(/^["']|["']$/g, '').trim();
+  const smtpPass = (process.env.SMTP_PASS || 'CreatorsKitHub@2026').replace(/^["']|["']$/g, '').trim();
   const fromEmail = process.env.FROM_EMAIL || `Creators Kit <${smtpUser}>`;
 
   const plainText = `Hi ${name || 'Creator'},\n\nYour 6-digit Creators Kit verification code is: ${otp}\n\nThis code will expire in 10 minutes.\nIf you did not request this code, please ignore this email.\n\nCreators Kit Hub\nhttps://creatorskithub.com`;
@@ -148,25 +144,73 @@ async function dispatchOtpEmail({ to, name, otp, isNewUser = false }) {
     },
   };
 
-  // Attempt 1: Port 465 (Direct SSL)
+  const errors = [];
+
+  // 1. Port 465 (Hostinger SSL direct)
   try {
-    const transporter = createHostingerTransporter(primaryPort);
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`[AUTH] Real OTP email sent via port ${primaryPort} to ${to}: ${info.messageId}`);
-    return { success: true, messageId: info.messageId, port: primaryPort };
-  } catch (primaryErr) {
-    console.warn(`[AUTH] Primary dispatch via port ${primaryPort} failed (${primaryErr.message}). Retrying via port ${secondaryPort}...`);
-    // Attempt 2: Port 587 (STARTTLS fallback)
-    try {
-      const fallbackTransporter = createHostingerTransporter(secondaryPort);
-      const info = await fallbackTransporter.sendMail(mailOptions);
-      console.log(`[AUTH] Real OTP email sent via fallback port ${secondaryPort} to ${to}: ${info.messageId}`);
-      return { success: true, messageId: info.messageId, port: secondaryPort };
-    } catch (fallbackErr) {
-      console.error(`[AUTH_ERROR] Hostinger SMTP delivery failed on both ports (465 & 587):`, fallbackErr.message);
-      throw fallbackErr;
-    }
+    const t465 = createHostingerTransporter(465);
+    const info = await t465.sendMail(mailOptions);
+    console.log(`[AUTH] Real OTP email sent via port 465 to ${to}: ${info.messageId}`);
+    return { success: true, messageId: info.messageId, method: 'smtp_465' };
+  } catch (err465) {
+    console.warn(`[AUTH] Port 465 failed (${err465.message}). Retrying port 587...`);
+    errors.push(`Port 465: ${err465.message}`);
   }
+
+  // 2. Port 587 (Hostinger STARTTLS)
+  try {
+    const t587 = createHostingerTransporter(587);
+    const info = await t587.sendMail(mailOptions);
+    console.log(`[AUTH] Real OTP email sent via port 587 to ${to}: ${info.messageId}`);
+    return { success: true, messageId: info.messageId, method: 'smtp_587' };
+  } catch (err587) {
+    console.warn(`[AUTH] Port 587 failed (${err587.message}). Retrying sendmail...`);
+    errors.push(`Port 587: ${err587.message}`);
+  }
+
+  // 3. Local /usr/sbin/sendmail (Linux native mail agent)
+  try {
+    const fs = await import('fs');
+    if (fs.existsSync('/usr/sbin/sendmail')) {
+      const sendmailTransporter = nodemailer.createTransport({
+        sendmail: true,
+        newline: 'unix',
+        path: '/usr/sbin/sendmail',
+      });
+      const info = await sendmailTransporter.sendMail(mailOptions);
+      console.log(`[AUTH] Real OTP email sent via /usr/sbin/sendmail to ${to}: ${info.messageId}`);
+      return { success: true, messageId: info.messageId, method: 'sendmail' };
+    }
+  } catch (errSendmail) {
+    console.warn(`[AUTH] Sendmail failed (${errSendmail.message}).`);
+    errors.push(`sendmail: ${errSendmail.message}`);
+  }
+
+  // 4. Direct IP with TLS SNI
+  try {
+    const tIp = nodemailer.createTransport({
+      host: '172.65.255.143',
+      port: 465,
+      secure: true,
+      auth: {
+        user: smtpUser,
+        pass: smtpPass,
+      },
+      tls: {
+        rejectUnauthorized: false,
+        servername: 'smtp.hostinger.com',
+      },
+      connectionTimeout: 8000,
+    });
+    const info = await tIp.sendMail(mailOptions);
+    console.log(`[AUTH] Real OTP email sent via direct IP to ${to}: ${info.messageId}`);
+    return { success: true, messageId: info.messageId, method: 'direct_ip' };
+  } catch (errIp) {
+    errors.push(`direct_ip: ${errIp.message}`);
+  }
+
+  console.error('[AUTH_ERROR] All email dispatch channels failed:', errors.join('; '));
+  throw new Error(`Failed to deliver verification email to inbox. (${errors.join('; ')})`);
 }
 
 export async function POST(req) {
@@ -204,7 +248,6 @@ export async function POST(req) {
 
       console.log(`[AUTH] Resending fresh OTP ${freshOtp} to: ${cleanEmail}`);
 
-      let emailDelivered = true;
       try {
         await dispatchOtpEmail({
           to: cleanEmail,
@@ -213,8 +256,11 @@ export async function POST(req) {
           isNewUser: !user.isVerified,
         });
       } catch (mailErr) {
-        console.warn('[AUTH] Hostinger SMTP resend delivery error:', mailErr.message);
-        emailDelivered = false;
+        console.error('[AUTH] Failed to send resend email:', mailErr.message);
+        return NextResponse.json(
+          { error: 'Failed to send verification code email to your inbox. Please check your connection and try again.' },
+          { status: 500 }
+        );
       }
 
       return NextResponse.json(
@@ -222,11 +268,7 @@ export async function POST(req) {
           success: true,
           requiresOtp: true,
           email: cleanEmail,
-          emailDelivered,
-          ...(!emailDelivered ? { fallbackOtp: freshOtp } : {}),
-          message: emailDelivered
-            ? 'A fresh 6-digit code has been sent to your email.'
-            : 'A fresh 6-digit verification code has been generated. Use the code shown below if email delivery is delayed.',
+          message: 'A fresh 6-digit code has been sent to your email inbox.',
         },
         { status: 200 }
       );
@@ -385,8 +427,7 @@ export async function POST(req) {
 
     console.log(`[AUTH] Step 1 generated OTP ${generatedOtp} for ${cleanEmail} (isNewUser: ${isNewUser})`);
 
-    // 4. Send OTP code to user's real email via Hostinger SMTP (with IPv4 & automatic failover)
-    let emailDelivered = true;
+    // 4. Send OTP code directly to user's real email inbox
     try {
       await dispatchOtpEmail({
         to: cleanEmail,
@@ -395,8 +436,11 @@ export async function POST(req) {
         isNewUser,
       });
     } catch (mailErr) {
-      console.warn('[AUTH] Hostinger SMTP dispatch error:', mailErr.message);
-      emailDelivered = false;
+      console.error('[AUTH] Failed to send OTP email to inbox:', mailErr.message);
+      return NextResponse.json(
+        { error: 'Failed to send verification code email to your inbox. Please check your email and try again.' },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json(
@@ -405,13 +449,9 @@ export async function POST(req) {
         requiresOtp: true,
         isNewUser,
         email: cleanEmail,
-        emailDelivered,
-        ...(!emailDelivered ? { fallbackOtp: generatedOtp } : {}),
-        message: emailDelivered
-          ? (isNewUser
-              ? 'Account created! A 6-digit verification code has been sent to your email.'
-              : 'A 6-digit verification code has been sent to your email.')
-          : 'Verification code generated! If delivery to your inbox is delayed, use the code below.',
+        message: isNewUser
+          ? 'Account created! A 6-digit verification code has been sent to your email inbox.'
+          : 'A 6-digit verification code has been sent to your email inbox.',
       },
       { status: 200 }
     );
