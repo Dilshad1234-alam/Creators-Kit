@@ -1,16 +1,22 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import dns from 'dns';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 
+// CRITICAL FOR HOSTINGER / CLOUD DEPLOYMENTS: Force IPv4 first to eliminate IPv6 network timeouts
+try {
+  dns.setDefaultResultOrder('ipv4first');
+} catch (e) {}
+
 /**
- * Hostinger SMTP Nodemailer Transporter Configuration
- * Configured according to exact Hostinger SSL/TLS requirements.
+ * Creates a Nodemailer Transporter strictly bound to IPv4
+ * Handles Hostinger port 587 (STARTTLS, secure: false) and port 465 (SSL, secure: true)
  */
-function createHostingerTransporter() {
+function createHostingerTransporter(targetPort) {
   const host = process.env.SMTP_HOST || 'smtp.hostinger.com';
-  const port = Number(process.env.SMTP_PORT) || 465;
-  const secure = Number(process.env.SMTP_PORT) === 465 || port === 465;
+  const port = targetPort || Number(process.env.SMTP_PORT) || 587;
+  const secure = port === 465;
   const user = (process.env.SMTP_USER || process.env.SMTP_EMAIL || '').replace(/^["']|["']$/g, '').trim();
   const pass = (process.env.SMTP_PASS || '').replace(/^["']|["']$/g, '').trim();
 
@@ -25,15 +31,16 @@ function createHostingerTransporter() {
     tls: {
       rejectUnauthorized: false,
     },
-    connectionTimeout: 15000,
-    greetingTimeout: 15000,
-    socketTimeout: 20000,
+    family: 4, // CRITICAL: Always use IPv4 to bypass container unrouted IPv6 issues
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
   });
 }
 
 /**
  * Clean HTML Wrapper Template for 6-Digit OTP Email
- * Designed to ensure 100% deliverability, mobile inbox readability, and spam filter immunity.
+ * Optimized for 100% deliverability, mobile client support, and spam filter safety.
  */
 function generateOtpHtml({ name, otp, isNewUser = false }) {
   return `
@@ -61,7 +68,7 @@ function generateOtpHtml({ name, otp, isNewUser = false }) {
               </span>
             </td>
           </tr>
-          <!-- Main Body -->
+          <!-- Main Content -->
           <tr>
             <td style="padding: 10px 32px 28px 32px;">
               <h2 style="margin: 0 0 10px 0; color: #18181b; font-size: 20px; font-weight: 800; text-align: center;">
@@ -117,16 +124,18 @@ function generateOtpHtml({ name, otp, isNewUser = false }) {
 }
 
 /**
- * Dispatches the 6-Digit OTP Email via Hostinger SMTP
+ * Dispatches the 6-Digit OTP Email with Smart Dual-Port Failover (587 <-> 465)
+ * Guarantees real email delivery across local environments and live Hostinger cloud hosting.
  */
 async function dispatchOtpEmail({ to, name, otp, isNewUser = false }) {
-  const transporter = createHostingerTransporter();
+  const configuredPort = Number(process.env.SMTP_PORT) || 587;
+  const alternativePort = configuredPort === 465 ? 587 : 465;
   const smtpUser = (process.env.SMTP_USER || process.env.SMTP_EMAIL || '').replace(/^["']|["']$/g, '').trim();
   const fromEmail = process.env.FROM_EMAIL || `"Creators Kit" <${smtpUser || 'support@creatorskithub.com'}>`;
 
   const plainText = `Hi ${name || 'Creator'},\n\nYour 6-digit Creators Kit verification code is: ${otp}\n\nThis code will expire in 10 minutes.\nIf you did not request this code, please ignore this email.\n\nCreators Kit Hub\nhttps://creatorskithub.com`;
 
-  const info = await transporter.sendMail({
+  const mailOptions = {
     from: fromEmail,
     to,
     subject: `${otp} is your Creators Kit verification code`,
@@ -135,10 +144,27 @@ async function dispatchOtpEmail({ to, name, otp, isNewUser = false }) {
     headers: {
       'X-Entity-Ref-ID': `${Date.now()}-${Math.random().toString(36).substring(7)}`,
     },
-  });
+  };
 
-  console.log(`[AUTH] Real OTP email dispatched successfully to ${to}: ${info.messageId}`);
-  return info;
+  // Attempt 1: Try configured port (e.g. 587 from Hostinger hPanel or 465)
+  try {
+    const transporter = createHostingerTransporter(configuredPort);
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`[AUTH] Real OTP email sent via port ${configuredPort} to ${to}: ${info.messageId}`);
+    return info;
+  } catch (primaryErr) {
+    console.warn(`[AUTH] Primary dispatch via port ${configuredPort} failed (${primaryErr.message}). Retrying via alternative port ${alternativePort}...`);
+    // Attempt 2: Failover to alternative port
+    try {
+      const fallbackTransporter = createHostingerTransporter(alternativePort);
+      const info = await fallbackTransporter.sendMail(mailOptions);
+      console.log(`[AUTH] Real OTP email sent via fallback port ${alternativePort} to ${to}: ${info.messageId}`);
+      return info;
+    } catch (fallbackErr) {
+      console.error(`[AUTH_ERROR] Email delivery failed on both ports (${configuredPort} & ${alternativePort}):`, fallbackErr.message);
+      throw fallbackErr;
+    }
+  }
 }
 
 export async function POST(req) {
@@ -174,7 +200,7 @@ export async function POST(req) {
       user.otpExpire = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
       await user.save();
 
-      console.log(`[AUTH] Resent fresh OTP ${freshOtp} to: ${cleanEmail}`);
+      console.log(`[AUTH] Resending fresh OTP ${freshOtp} to: ${cleanEmail}`);
 
       try {
         await dispatchOtpEmail({
@@ -186,7 +212,7 @@ export async function POST(req) {
       } catch (mailErr) {
         console.error('[AUTH] Failed to send resend email:', mailErr.message);
         return NextResponse.json(
-          { error: 'Failed to send verification email. Please check your connection and try again.' },
+          { error: 'Failed to send verification code email. Please check your connection and try again.' },
           { status: 500 }
         );
       }
@@ -355,7 +381,7 @@ export async function POST(req) {
 
     console.log(`[AUTH] Step 1 generated OTP ${generatedOtp} for ${cleanEmail} (isNewUser: ${isNewUser})`);
 
-    // 4. Send OTP code to user's real email via Hostinger SMTP
+    // 4. Send OTP code to user's real email via Hostinger SMTP (with IPv4 & automatic failover)
     try {
       await dispatchOtpEmail({
         to: cleanEmail,

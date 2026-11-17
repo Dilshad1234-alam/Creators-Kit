@@ -336,9 +336,9 @@ export default function AuthContainer({ initialEmail = '' }) {
       </div>
 
       {/* Centered Auth Card Overlay */}
-      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200">
+      <div className="fixed inset-0 z-[99999] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
         <div
-          className="w-full max-w-[440px] max-h-[90vh] overflow-y-auto my-auto bg-white rounded-2xl p-5 sm:p-7 shadow-2xl border border-neutral-200/90 relative text-neutral-900 transform transition-all animate-in zoom-in-95 duration-200 select-none overscroll-contain"
+          className="w-full max-w-[440px] max-h-[92vh] sm:max-h-[90vh] overflow-y-auto bg-white rounded-t-3xl sm:rounded-2xl p-6 sm:p-7 shadow-2xl border border-neutral-200/90 relative text-neutral-900 transform transition-all animate-in zoom-in-95 duration-200 select-none overscroll-contain mt-auto sm:my-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Top Close Cut Button */}
