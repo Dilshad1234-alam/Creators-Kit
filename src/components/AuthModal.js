@@ -25,6 +25,7 @@ export default function AuthModal({
 }) {
   const router = useRouter();
   const otpInputRef = useRef(null);
+  const openTimeRef = useRef(0);
 
   // 2-Step Authentication State ('credentials' vs 'otp')
   const [step, setStep] = useState('credentials');
@@ -46,6 +47,7 @@ export default function AuthModal({
   // Synchronize state when modal opens
   useEffect(() => {
     if (isOpen) {
+      openTimeRef.current = Date.now();
       setStep('credentials');
       setLoginError('');
       setLoginSuccessNotice('');
@@ -85,6 +87,19 @@ export default function AuthModal({
       document.body.style.overflow = originalOverflow;
     };
   }, [isOpen]);
+
+  // Handle ESC key to dismiss modal cleanly
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (Date.now() - openTimeRef.current < 500) return;
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -295,21 +310,39 @@ export default function AuthModal({
     setLoginSuccessNotice('');
   };
 
+  const handleBackdropClick = (e) => {
+    // Strictly close only when the user taps outside the card on the backdrop
+    if (e.target !== e.currentTarget) return;
+    // Prevent accidental tap bleed-through immediately after opening on mobile
+    if (Date.now() - openTimeRef.current < 500) return;
+    onClose();
+  };
+
+  const handleCloseButtonClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (Date.now() - openTimeRef.current < 500) return;
+    onClose();
+  };
+
   return (
     <div
-      className="fixed inset-0 z-[99999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200"
-      onClick={onClose}
+      className="fixed inset-0 z-[99999] bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
+      onClick={handleBackdropClick}
     >
       {/* Fully Responsive, Centered & Scrollable Auth Modal Card */}
       <div
-        className="w-full max-w-[440px] max-h-[90vh] overflow-y-auto my-auto bg-white rounded-2xl p-5 sm:p-7 shadow-2xl border border-neutral-200/90 relative text-neutral-900 transform transition-all animate-in zoom-in-95 duration-200 select-none overscroll-contain"
+        className="w-full max-w-[440px] max-h-[92dvh] overflow-y-auto my-auto bg-white rounded-2xl p-5 sm:p-7 shadow-2xl border border-neutral-200/90 relative text-neutral-900 overscroll-contain animate-in fade-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
       >
         {/* Top Close Button with Touch-Friendly Hit Target */}
         <button
           type="button"
-          onClick={onClose}
-          className="absolute top-4 right-4 sm:top-5 sm:right-5 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-neutral-100 hover:bg-neutral-200 active:bg-neutral-300 text-neutral-600 hover:text-neutral-900 flex items-center justify-center transition-all cursor-pointer z-20 shadow-xs active:scale-95 touch-manipulation"
+          onClick={handleCloseButtonClick}
+          onTouchEnd={handleCloseButtonClick}
+          className="absolute top-3.5 right-3.5 sm:top-5 sm:right-5 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-neutral-100 hover:bg-neutral-200 active:bg-neutral-300 text-neutral-600 hover:text-neutral-900 flex items-center justify-center transition-all cursor-pointer z-20 shadow-xs active:scale-95 touch-manipulation"
           title="Close"
           aria-label="Close modal"
         >

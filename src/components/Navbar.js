@@ -776,12 +776,6 @@ export default function Navbar() {
                     <Link href="/account?tab=courses" className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:text-[#900606] font-semibold transition-colors">
                       Courses
                     </Link>
-                    <Link href="/account?tab=setting" className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:text-[#900606] font-semibold transition-colors">
-                      Setting
-                    </Link>
-                    <Link href="/account?tab=notifications" className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:text-[#900606] font-semibold transition-colors">
-                      Notifications
-                    </Link>
                     <div className="my-1 border-t border-neutral-200 dark:border-neutral-800" />
                     <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 font-bold transition-colors w-full text-left cursor-pointer">
                       Log out
@@ -793,8 +787,12 @@ export default function Navbar() {
               /* Person Icon with Lightning Bolt for Guest / Non-logged in -> Opens Auth Modal */
               <button
                 type="button"
-                onClick={() => openAuthModal()}
-                className="p-1.5 text-neutral-700 dark:text-neutral-300 hover:text-[#900606] dark:hover:text-[#900606] hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full transition-all duration-200 flex items-center justify-center cursor-pointer group"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  openAuthModal();
+                }}
+                className="p-1.5 text-neutral-700 dark:text-neutral-300 hover:text-[#900606] dark:hover:text-[#900606] hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full transition-all duration-200 flex items-center justify-center cursor-pointer group touch-manipulation"
                 title="Sign In"
                 aria-label="Sign In"
               >
@@ -849,8 +847,19 @@ export default function Navbar() {
               ) : (
                 <button
                   type="button"
-                  onClick={() => openAuthModal()}
-                  className="p-1.5 text-neutral-700 dark:text-neutral-300 hover:text-[#900606] rounded-full hover:bg-neutral-100 transition-colors cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsMobileMenuOpen(false);
+                    openAuthModal();
+                  }}
+                  onTouchEnd={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsMobileMenuOpen(false);
+                    openAuthModal();
+                  }}
+                  className="p-1.5 text-neutral-700 dark:text-neutral-300 hover:text-[#900606] rounded-full hover:bg-neutral-100 transition-colors cursor-pointer touch-manipulation"
                   title="Sign In"
                   aria-label="Sign In"
                 >
@@ -1013,20 +1022,6 @@ export default function Navbar() {
                     >
                       Courses
                     </Link>
-                    <Link
-                      href="/account?tab=setting"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="block px-3 py-2 rounded-lg text-sm font-semibold text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                    >
-                      Setting
-                    </Link>
-                    <Link
-                      href="/account?tab=notifications"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="block px-3 py-2 rounded-lg text-sm font-semibold text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                    >
-                      Notifications
-                    </Link>
                     <button
                       onClick={() => {
                         setIsMobileMenuOpen(false);
@@ -1041,11 +1036,19 @@ export default function Navbar() {
                   <div className="flex flex-col gap-2 pt-1">
                     <button
                       type="button"
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         setIsMobileMenuOpen(false);
                         openAuthModal();
                       }}
-                      className="flex items-center justify-center gap-2 w-full py-2.5 px-4 text-center rounded-xl text-sm font-bold bg-[#900606] text-white hover:bg-[#7a0505] shadow-sm cursor-pointer"
+                      onTouchEnd={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsMobileMenuOpen(false);
+                        openAuthModal();
+                      }}
+                      className="flex items-center justify-center gap-2 w-full py-2.5 px-4 text-center rounded-xl text-sm font-bold bg-[#900606] text-white hover:bg-[#7a0505] shadow-sm cursor-pointer touch-manipulation"
                     >
                       <GuestUserLightningIcon className="w-4 h-4 text-white" />
                       Sign In
