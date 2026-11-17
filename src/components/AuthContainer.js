@@ -336,20 +336,20 @@ export default function AuthContainer({ initialEmail = '' }) {
       </div>
 
       {/* Centered Auth Card Overlay */}
-      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 overflow-y-auto animate-in fade-in duration-200">
+      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200">
         <div
-          className="w-full max-w-[440px] max-h-[85vh] overflow-y-auto mx-4 my-auto bg-white rounded-2xl p-5 sm:p-7 shadow-2xl border border-neutral-200/90 relative text-neutral-900 transform transition-all animate-in zoom-in-95 duration-200 select-none overscroll-contain"
+          className="w-full max-w-[440px] max-h-[90vh] overflow-y-auto my-auto bg-white rounded-2xl p-5 sm:p-7 shadow-2xl border border-neutral-200/90 relative text-neutral-900 transform transition-all animate-in zoom-in-95 duration-200 select-none overscroll-contain"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Top Close Cut Button */}
           <button
             type="button"
             onClick={handleClose}
-            className="absolute top-4 right-4 sm:top-5 sm:right-5 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-600 hover:text-neutral-900 flex items-center justify-center transition-all cursor-pointer z-20 shadow-xs active:scale-95"
+            className="absolute top-4 right-4 sm:top-5 sm:right-5 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-neutral-100 hover:bg-neutral-200 active:bg-neutral-300 text-neutral-600 hover:text-neutral-900 flex items-center justify-center transition-all cursor-pointer z-20 shadow-xs active:scale-95 touch-manipulation"
             title="Close"
             aria-label="Close"
           >
-            <X className="w-4 h-4 stroke-[2.5]" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />
           </button>
 
           {/* ========================================================= */}
@@ -428,7 +428,7 @@ export default function AuthContainer({ initialEmail = '' }) {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer p-1"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer p-1.5 touch-manipulation"
                       title={showPassword ? 'Hide password' : 'Show password'}
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -439,7 +439,7 @@ export default function AuthContainer({ initialEmail = '' }) {
                 <button
                   type="submit"
                   disabled={loginLoading}
-                  className="w-full mt-2 py-3 sm:py-3.5 bg-[#900606] hover:bg-[#7a0505] text-white font-extrabold text-sm sm:text-base rounded-xl shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                  className="w-full mt-2 py-3 sm:py-3.5 bg-[#900606] hover:bg-[#7a0505] text-white font-extrabold text-sm sm:text-base rounded-xl shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 touch-manipulation"
                 >
                   {loginLoading ? (
                     <>
@@ -522,7 +522,7 @@ export default function AuthContainer({ initialEmail = '' }) {
                 <button
                   type="submit"
                   disabled={loginLoading || loginData.otp.length !== 6}
-                  className="w-full py-3 sm:py-3.5 bg-[#900606] hover:bg-[#7a0505] text-white font-extrabold text-sm sm:text-base rounded-xl shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-3 sm:py-3.5 bg-[#900606] hover:bg-[#7a0505] text-white font-extrabold text-sm sm:text-base rounded-xl shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                 >
                   {loginLoading ? (
                     <>
@@ -541,7 +541,7 @@ export default function AuthContainer({ initialEmail = '' }) {
                   <button
                     type="button"
                     onClick={handleBackToCredentials}
-                    className="text-neutral-500 hover:text-neutral-900 font-semibold flex items-center gap-1 transition-colors cursor-pointer py-2 px-1"
+                    className="text-neutral-500 hover:text-neutral-900 font-semibold flex items-center gap-1 transition-colors cursor-pointer py-2.5 px-2 touch-manipulation"
                   >
                     <ArrowLeft className="w-3.5 h-3.5" />
                     <span>Back</span>
@@ -551,7 +551,7 @@ export default function AuthContainer({ initialEmail = '' }) {
                     type="button"
                     onClick={handleResendOtp}
                     disabled={resendCooldown > 0 || resendLoading}
-                    className="text-[#900606] hover:text-[#7a0505] font-bold disabled:text-neutral-400 disabled:cursor-not-allowed transition-colors cursor-pointer py-2 px-1 flex items-center gap-1"
+                    className="text-[#900606] hover:text-[#7a0505] font-bold disabled:text-neutral-400 disabled:cursor-not-allowed transition-colors cursor-pointer py-2.5 px-2 flex items-center gap-1 touch-manipulation"
                   >
                     {resendLoading ? (
                       <>
