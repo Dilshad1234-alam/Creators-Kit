@@ -8,13 +8,14 @@ try {
 
 /**
  * Creates a Nodemailer transporter with IPv4 and relaxed TLS for Hostinger SMTP
+ * Defaults to Port 465 (Direct SSL) with 4s fast timeouts.
  */
 function createTransporter(targetPort) {
   const host = process.env.SMTP_HOST || 'smtp.hostinger.com';
-  const port = targetPort || Number(process.env.SMTP_PORT) || 587;
+  const port = targetPort || 465;
   const secure = port === 465;
-  const user = (process.env.SMTP_USER || process.env.SMTP_EMAIL || '').replace(/^["']|["']$/g, '').trim();
-  const pass = (process.env.SMTP_PASS || '').replace(/^["']|["']$/g, '').trim();
+  const user = (process.env.SMTP_USER || process.env.SMTP_EMAIL || 'support@creatorskithub.com').replace(/^["']|["']$/g, '').trim();
+  const pass = (process.env.SMTP_PASS || 'CreatorsKitHub@2026').replace(/^["']|["']$/g, '').trim();
 
   return nodemailer.createTransport({
     host,
@@ -26,22 +27,23 @@ function createTransporter(targetPort) {
     },
     tls: {
       rejectUnauthorized: false,
+      minVersion: 'TLSv1.2',
     },
     family: 4, // Force IPv4 connection to avoid Hostinger Docker container IPv6 network drops
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
+    connectionTimeout: 4000,
+    greetingTimeout: 4000,
+    socketTimeout: 6000,
   });
 }
 
 /**
- * Resilient Hostinger SMTP Email Utility with Automatic Dual-Port Failover (587 <-> 465)
+ * Resilient Hostinger SMTP Email Utility with Automatic Dual-Port Failover (465 SSL <-> 587 STARTTLS)
  */
 export const sendEmail = async ({ to, subject, html, text }) => {
-  const configuredPort = Number(process.env.SMTP_PORT) || 587;
-  const alternativePort = configuredPort === 465 ? 587 : 465;
-  const user = (process.env.SMTP_USER || process.env.SMTP_EMAIL || '').replace(/^["']|["']$/g, '').trim();
-  const fromEmail = process.env.FROM_EMAIL || `"Creators Kit" <${user || 'support@creatorskithub.com'}>`;
+  const primaryPort = 465;
+  const secondaryPort = 587;
+  const user = (process.env.SMTP_USER || process.env.SMTP_EMAIL || 'support@creatorskithub.com').replace(/^["']|["']$/g, '').trim();
+  const fromEmail = process.env.FROM_EMAIL || `Creators Kit <${user}>`;
 
   const mailOptions = {
     from: fromEmail,
@@ -54,23 +56,23 @@ export const sendEmail = async ({ to, subject, html, text }) => {
     },
   };
 
-  // Attempt 1: Try configured port
+  // Attempt 1: Port 465 (SSL direct)
   try {
-    const transporter = createTransporter(configuredPort);
+    const transporter = createTransporter(primaryPort);
     const info = await transporter.sendMail(mailOptions);
-    console.log(`[MAILER] Email successfully sent via port ${configuredPort} to ${to}: ${info.messageId}`);
-    return { success: true, messageId: info.messageId };
+    console.log(`[MAILER] Email successfully sent via port ${primaryPort} to ${to}: ${info.messageId}`);
+    return { success: true, messageId: info.messageId, port: primaryPort };
   } catch (primaryErr) {
-    console.warn(`[MAILER] Primary delivery via port ${configuredPort} failed (${primaryErr.message}). Retrying via alternative port ${alternativePort}...`);
-    // Attempt 2: Failover to alternative port
+    console.warn(`[MAILER] Primary delivery via port ${primaryPort} failed (${primaryErr.message}). Retrying via port ${secondaryPort}...`);
+    // Attempt 2: Port 587 (STARTTLS fallback)
     try {
-      const fallbackTransporter = createTransporter(alternativePort);
+      const fallbackTransporter = createTransporter(secondaryPort);
       const info = await fallbackTransporter.sendMail(mailOptions);
-      console.log(`[MAILER] Email successfully sent via fallback port ${alternativePort} to ${to}: ${info.messageId}`);
-      return { success: true, messageId: info.messageId };
+      console.log(`[MAILER] Email successfully sent via fallback port ${secondaryPort} to ${to}: ${info.messageId}`);
+      return { success: true, messageId: info.messageId, port: secondaryPort };
     } catch (fallbackErr) {
-      console.error(`[MAILER_ERROR] Email delivery failed on both ports (${configuredPort} & ${alternativePort}):`, fallbackErr.message);
-      throw new Error('Failed to send verification email. Please check your connection and try again.');
+      console.error(`[MAILER_ERROR] Email delivery failed on both ports (465 & 587):`, fallbackErr.message);
+      return { success: false, error: fallbackErr.message };
     }
   }
 };

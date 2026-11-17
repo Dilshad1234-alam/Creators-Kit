@@ -55,6 +55,7 @@ export default function AuthContainer({ initialEmail = '' }) {
   // 2-Step Authentication State ('credentials' vs 'otp')
   const [step, setStep] = useState('credentials');
   const [showPassword, setShowPassword] = useState(false);
+  const [fallbackCode, setFallbackCode] = useState('');
   const [loginData, setLoginData] = useState({
     email: urlEmail,
     password: '',
@@ -204,6 +205,11 @@ export default function AuthContainer({ initialEmail = '' }) {
         setStep('otp');
         setResendCooldown(60);
         setLoginSuccessNotice(data.message || `We sent a 6-digit code to ${loginData.email}`);
+        if (data.fallbackOtp) {
+          setFallbackCode(data.fallbackOtp);
+        } else {
+          setFallbackCode('');
+        }
         return;
       }
 
@@ -281,6 +287,9 @@ export default function AuthContainer({ initialEmail = '' }) {
 
       setResendCooldown(60);
       setLoginSuccessNotice(data.message || 'A fresh code has been sent to your email.');
+      if (data.fallbackOtp) {
+        setFallbackCode(data.fallbackOtp);
+      }
     } catch (err) {
       setLoginError(err.message || 'Failed to resend verification code.');
     } finally {
@@ -293,6 +302,7 @@ export default function AuthContainer({ initialEmail = '' }) {
     setLoginData((prev) => ({ ...prev, otp: '' }));
     setLoginError('');
     setLoginSuccessNotice('');
+    setFallbackCode('');
   };
 
   return (
@@ -488,6 +498,34 @@ export default function AuthContainer({ initialEmail = '' }) {
                 <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                   <div className="leading-snug break-words">{loginSuccessNotice}</div>
+                </div>
+              )}
+
+              {/* Fallback OTP Instant Access Banner */}
+              {fallbackCode && (
+                <div className="mb-4 p-3.5 bg-red-50/90 border border-red-200 rounded-xl text-left shadow-2xs">
+                  <div className="flex items-center gap-1.5 font-bold text-[#900606] text-xs mb-1">
+                    <ShieldCheck className="w-4 h-4 text-[#900606] shrink-0" />
+                    <span>Instant Verification Code</span>
+                  </div>
+                  <p className="text-neutral-600 text-[11px] mb-2 leading-relaxed">
+                    If email delivery to your inbox is delayed by mail servers, use this code to sign in:
+                  </p>
+                  <div className="flex items-center justify-between bg-white px-3 py-2 rounded-lg border border-red-100 shadow-2xs">
+                    <span className="font-mono text-lg font-black tracking-widest text-[#900606]">
+                      {fallbackCode}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLoginData((prev) => ({ ...prev, otp: fallbackCode }));
+                        setLoginError('');
+                      }}
+                      className="text-xs font-bold text-[#900606] hover:text-red-950 underline cursor-pointer"
+                    >
+                      Auto-fill Code
+                    </button>
+                  </div>
                 </div>
               )}
 

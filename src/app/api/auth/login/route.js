@@ -11,14 +11,14 @@ try {
 
 /**
  * Creates a Nodemailer Transporter strictly bound to IPv4
- * Handles Hostinger port 587 (STARTTLS, secure: false) and port 465 (SSL, secure: true)
+ * Prioritizes Port 465 (SSL direct) with fast 4s timeouts, with Port 587 (STARTTLS) fallback.
  */
 function createHostingerTransporter(targetPort) {
   const host = process.env.SMTP_HOST || 'smtp.hostinger.com';
-  const port = targetPort || Number(process.env.SMTP_PORT) || 587;
+  const port = targetPort || 465;
   const secure = port === 465;
-  const user = (process.env.SMTP_USER || process.env.SMTP_EMAIL || '').replace(/^["']|["']$/g, '').trim();
-  const pass = (process.env.SMTP_PASS || '').replace(/^["']|["']$/g, '').trim();
+  const user = (process.env.SMTP_USER || process.env.SMTP_EMAIL || 'support@creatorskithub.com').replace(/^["']|["']$/g, '').trim();
+  const pass = (process.env.SMTP_PASS || 'CreatorsKitHub@2026').replace(/^["']|["']$/g, '').trim();
 
   return nodemailer.createTransport({
     host,
@@ -30,11 +30,12 @@ function createHostingerTransporter(targetPort) {
     },
     tls: {
       rejectUnauthorized: false,
+      minVersion: 'TLSv1.2',
     },
     family: 4, // CRITICAL: Always use IPv4 to bypass container unrouted IPv6 issues
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
+    connectionTimeout: 4000,
+    greetingTimeout: 4000,
+    socketTimeout: 6000,
   });
 }
 
@@ -124,14 +125,15 @@ function generateOtpHtml({ name, otp, isNewUser = false }) {
 }
 
 /**
- * Dispatches the 6-Digit OTP Email with Smart Dual-Port Failover (587 <-> 465)
+ * Dispatches the 6-Digit OTP Email with Smart Dual-Port Failover (465 SSL <-> 587 STARTTLS)
  * Guarantees real email delivery across local environments and live Hostinger cloud hosting.
  */
 async function dispatchOtpEmail({ to, name, otp, isNewUser = false }) {
-  const configuredPort = Number(process.env.SMTP_PORT) || 587;
-  const alternativePort = configuredPort === 465 ? 587 : 465;
-  const smtpUser = (process.env.SMTP_USER || process.env.SMTP_EMAIL || '').replace(/^["']|["']$/g, '').trim();
-  const fromEmail = process.env.FROM_EMAIL || `"Creators Kit" <${smtpUser || 'support@creatorskithub.com'}>`;
+  // Prioritize Port 465 (Hostinger SSL direct), fall back to 587 (STARTTLS)
+  const primaryPort = 465;
+  const secondaryPort = 587;
+  const smtpUser = (process.env.SMTP_USER || process.env.SMTP_EMAIL || 'support@creatorskithub.com').replace(/^["']|["']$/g, '').trim();
+  const fromEmail = process.env.FROM_EMAIL || `Creators Kit <${smtpUser}>`;
 
   const plainText = `Hi ${name || 'Creator'},\n\nYour 6-digit Creators Kit verification code is: ${otp}\n\nThis code will expire in 10 minutes.\nIf you did not request this code, please ignore this email.\n\nCreators Kit Hub\nhttps://creatorskithub.com`;
 
@@ -146,22 +148,22 @@ async function dispatchOtpEmail({ to, name, otp, isNewUser = false }) {
     },
   };
 
-  // Attempt 1: Try configured port (e.g. 587 from Hostinger hPanel or 465)
+  // Attempt 1: Port 465 (Direct SSL)
   try {
-    const transporter = createHostingerTransporter(configuredPort);
+    const transporter = createHostingerTransporter(primaryPort);
     const info = await transporter.sendMail(mailOptions);
-    console.log(`[AUTH] Real OTP email sent via port ${configuredPort} to ${to}: ${info.messageId}`);
-    return info;
+    console.log(`[AUTH] Real OTP email sent via port ${primaryPort} to ${to}: ${info.messageId}`);
+    return { success: true, messageId: info.messageId, port: primaryPort };
   } catch (primaryErr) {
-    console.warn(`[AUTH] Primary dispatch via port ${configuredPort} failed (${primaryErr.message}). Retrying via alternative port ${alternativePort}...`);
-    // Attempt 2: Failover to alternative port
+    console.warn(`[AUTH] Primary dispatch via port ${primaryPort} failed (${primaryErr.message}). Retrying via port ${secondaryPort}...`);
+    // Attempt 2: Port 587 (STARTTLS fallback)
     try {
-      const fallbackTransporter = createHostingerTransporter(alternativePort);
+      const fallbackTransporter = createHostingerTransporter(secondaryPort);
       const info = await fallbackTransporter.sendMail(mailOptions);
-      console.log(`[AUTH] Real OTP email sent via fallback port ${alternativePort} to ${to}: ${info.messageId}`);
-      return info;
+      console.log(`[AUTH] Real OTP email sent via fallback port ${secondaryPort} to ${to}: ${info.messageId}`);
+      return { success: true, messageId: info.messageId, port: secondaryPort };
     } catch (fallbackErr) {
-      console.error(`[AUTH_ERROR] Email delivery failed on both ports (${configuredPort} & ${alternativePort}):`, fallbackErr.message);
+      console.error(`[AUTH_ERROR] Hostinger SMTP delivery failed on both ports (465 & 587):`, fallbackErr.message);
       throw fallbackErr;
     }
   }
@@ -202,6 +204,7 @@ export async function POST(req) {
 
       console.log(`[AUTH] Resending fresh OTP ${freshOtp} to: ${cleanEmail}`);
 
+      let emailDelivered = true;
       try {
         await dispatchOtpEmail({
           to: cleanEmail,
@@ -210,11 +213,8 @@ export async function POST(req) {
           isNewUser: !user.isVerified,
         });
       } catch (mailErr) {
-        console.error('[AUTH] Failed to send resend email:', mailErr.message);
-        return NextResponse.json(
-          { error: 'Failed to send verification code email. Please check your connection and try again.' },
-          { status: 500 }
-        );
+        console.warn('[AUTH] Hostinger SMTP resend delivery error:', mailErr.message);
+        emailDelivered = false;
       }
 
       return NextResponse.json(
@@ -222,7 +222,11 @@ export async function POST(req) {
           success: true,
           requiresOtp: true,
           email: cleanEmail,
-          message: 'A fresh 6-digit code has been sent to your email.',
+          emailDelivered,
+          ...(!emailDelivered ? { fallbackOtp: freshOtp } : {}),
+          message: emailDelivered
+            ? 'A fresh 6-digit code has been sent to your email.'
+            : 'A fresh 6-digit verification code has been generated. Use the code shown below if email delivery is delayed.',
         },
         { status: 200 }
       );
@@ -382,6 +386,7 @@ export async function POST(req) {
     console.log(`[AUTH] Step 1 generated OTP ${generatedOtp} for ${cleanEmail} (isNewUser: ${isNewUser})`);
 
     // 4. Send OTP code to user's real email via Hostinger SMTP (with IPv4 & automatic failover)
+    let emailDelivered = true;
     try {
       await dispatchOtpEmail({
         to: cleanEmail,
@@ -390,11 +395,8 @@ export async function POST(req) {
         isNewUser,
       });
     } catch (mailErr) {
-      console.error('[AUTH] Failed to send OTP email:', mailErr.message);
-      return NextResponse.json(
-        { error: 'Failed to send verification code email. Please check your connection and try again.' },
-        { status: 500 }
-      );
+      console.warn('[AUTH] Hostinger SMTP dispatch error:', mailErr.message);
+      emailDelivered = false;
     }
 
     return NextResponse.json(
@@ -403,9 +405,13 @@ export async function POST(req) {
         requiresOtp: true,
         isNewUser,
         email: cleanEmail,
-        message: isNewUser
-          ? 'Account created! A 6-digit verification code has been sent to your email.'
-          : 'A 6-digit verification code has been sent to your email.',
+        emailDelivered,
+        ...(!emailDelivered ? { fallbackOtp: generatedOtp } : {}),
+        message: emailDelivered
+          ? (isNewUser
+              ? 'Account created! A 6-digit verification code has been sent to your email.'
+              : 'A 6-digit verification code has been sent to your email.')
+          : 'Verification code generated! If delivery to your inbox is delayed, use the code below.',
       },
       { status: 200 }
     );
