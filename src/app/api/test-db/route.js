@@ -6,8 +6,10 @@ import dns from 'dns';
 import net from 'net';
 import nodemailer from 'nodemailer';
 
-export async function GET() {
+export async function GET(request) {
   const diagnostic = {};
+  const { searchParams } = new URL(request.url);
+  const testEmailTarget = searchParams.get('test_email');
 
   try {
     await dbConnect();
@@ -82,6 +84,44 @@ export async function GET() {
     diagnostic.verify_587 = await t587.verify().then(() => 'SUCCESS').catch(e => `ERR: ${e.message} (code: ${e.code})`);
   } catch (e) {
     diagnostic.verify_587 = `ERR: ${e.message}`;
+  }
+
+  // 7. Optional live email test dispatch
+  if (testEmailTarget) {
+    try {
+      const liveTransporter = nodemailer.createTransport({
+        host: 'smtp.hostinger.com',
+        port: 465,
+        secure: true,
+        auth: {
+          user: (process.env.SMTP_USER || 'support@creatorskithub.com').trim(),
+          pass: (process.env.SMTP_PASS || 'CreatorsKitHub@2026').trim(),
+        },
+        tls: { rejectUnauthorized: false, servername: 'smtp.hostinger.com' },
+        connectionTimeout: 10000,
+      });
+
+      const info = await liveTransporter.sendMail({
+        from: '"Creators Kit" <support@creatorskithub.com>',
+        replyTo: 'support@creatorskithub.com',
+        to: testEmailTarget,
+        subject: 'Creators Kit Live SMTP Test',
+        text: `Live test email dispatched successfully to ${testEmailTarget}.`,
+        html: `<b>Live test email dispatched successfully to ${testEmailTarget}.</b>`,
+      });
+
+      diagnostic.test_send = {
+        status: 'SUCCESS',
+        messageId: info.messageId,
+        response: info.response,
+        accepted: info.accepted,
+      };
+    } catch (err) {
+      diagnostic.test_send = {
+        status: 'ERROR',
+        error: err.message,
+      };
+    }
   }
 
   return NextResponse.json(diagnostic);

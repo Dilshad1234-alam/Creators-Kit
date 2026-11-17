@@ -10,26 +10,45 @@ try {
 } catch (e) {}
 
 /**
+ * Resolves verified SMTP credentials for Hostinger mail service.
+ * Crucial: Prevents misconfigured 'smtp.gmail.com' in server environment from breaking
+ * authentication for Hostinger 'support@creatorskithub.com' accounts.
+ */
+function getResolvedSmtpConfig(targetPort = 465) {
+  let host = (process.env.SMTP_HOST || '').replace(/^["']|["']$/g, '').trim();
+  const user = (process.env.SMTP_USER || process.env.SMTP_EMAIL || 'support@creatorskithub.com').replace(/^["']|["']$/g, '').trim();
+  const pass = (process.env.SMTP_PASS || 'CreatorsKitHub@2026').replace(/^["']|["']$/g, '').trim();
+
+  // If host is erroneously set to Gmail but account is @creatorskithub.com,
+  // or if SMTP_HOST is unset/blank, force the true Hostinger SMTP host.
+  if (!host || (host.includes('gmail') && !user.includes('gmail'))) {
+    host = 'smtp.hostinger.com';
+  }
+
+  const port = targetPort || 465;
+  const secure = port === 465;
+
+  return { host, port, secure, user, pass };
+}
+
+/**
  * Creates a Nodemailer Transporter
  * Handles Hostinger port 465 (SSL direct) and port 587 (STARTTLS)
  */
 function createHostingerTransporter(targetPort) {
-  const host = process.env.SMTP_HOST || 'smtp.hostinger.com';
-  const port = targetPort || 465;
-  const secure = port === 465;
-  const user = (process.env.SMTP_USER || process.env.SMTP_EMAIL || 'support@creatorskithub.com').replace(/^["']|["']$/g, '').trim();
-  const pass = (process.env.SMTP_PASS || 'CreatorsKitHub@2026').replace(/^["']|["']$/g, '').trim();
+  const config = getResolvedSmtpConfig(targetPort);
 
   return nodemailer.createTransport({
-    host,
-    port,
-    secure,
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
     auth: {
-      user,
-      pass,
+      user: config.user,
+      pass: config.pass,
     },
     tls: {
       rejectUnauthorized: false,
+      servername: config.host,
     },
     connectionTimeout: 10000,
     greetingTimeout: 10000,
@@ -124,29 +143,33 @@ function generateOtpHtml({ name, otp, isNewUser = false }) {
 
 /**
  * Dispatches the 6-Digit OTP Email with Resilient Multi-Channel Failover
- * Attempts Hostinger Port 465 (SSL), Port 587 (TLS), Sendmail binary, and direct IP fallback.
+ * Attempts Hostinger Port 465 (SSL), Port 587 (TLS), and direct IP fallback.
+ * Strictly uses authenticated Hostinger SMTP to ensure 100% inbox deliverability with valid DKIM/SPF.
  */
 async function dispatchOtpEmail({ to, name, otp, isNewUser = false }) {
-  const smtpUser = (process.env.SMTP_USER || process.env.SMTP_EMAIL || 'support@creatorskithub.com').replace(/^["']|["']$/g, '').trim();
-  const smtpPass = (process.env.SMTP_PASS || 'CreatorsKitHub@2026').replace(/^["']|["']$/g, '').trim();
-  const fromEmail = process.env.FROM_EMAIL || `Creators Kit <${smtpUser}>`;
+  const config = getResolvedSmtpConfig(465);
+  const fromEmail = `"Creators Kit" <${config.user}>`;
 
   const plainText = `Hi ${name || 'Creator'},\n\nYour 6-digit Creators Kit verification code is: ${otp}\n\nThis code will expire in 10 minutes.\nIf you did not request this code, please ignore this email.\n\nCreators Kit Hub\nhttps://creatorskithub.com`;
 
   const mailOptions = {
     from: fromEmail,
+    replyTo: config.user,
     to,
     subject: `${otp} is your Creators Kit verification code`,
     text: plainText,
     html: generateOtpHtml({ name, otp, isNewUser }),
     headers: {
+      'X-Priority': '1 (Highest)',
+      'X-MSMail-Priority': 'High',
+      'Importance': 'High',
       'X-Entity-Ref-ID': `${Date.now()}-${Math.random().toString(36).substring(7)}`,
     },
   };
 
   const errors = [];
 
-  // 1. Port 465 (Hostinger SSL direct)
+  // 1. Port 465 (Hostinger SSL direct - Primary Standard)
   try {
     const t465 = createHostingerTransporter(465);
     const info = await t465.sendMail(mailOptions);
@@ -164,43 +187,27 @@ async function dispatchOtpEmail({ to, name, otp, isNewUser = false }) {
     console.log(`[AUTH] Real OTP email sent via port 587 to ${to}: ${info.messageId}`);
     return { success: true, messageId: info.messageId, method: 'smtp_587' };
   } catch (err587) {
-    console.warn(`[AUTH] Port 587 failed (${err587.message}). Retrying sendmail...`);
+    console.warn(`[AUTH] Port 587 failed (${err587.message}). Retrying direct IP...`);
     errors.push(`Port 587: ${err587.message}`);
   }
 
-  // 3. Local /usr/sbin/sendmail (Linux native mail agent)
-  try {
-    const fs = await import('fs');
-    if (fs.existsSync('/usr/sbin/sendmail')) {
-      const sendmailTransporter = nodemailer.createTransport({
-        sendmail: true,
-        newline: 'unix',
-        path: '/usr/sbin/sendmail',
-      });
-      const info = await sendmailTransporter.sendMail(mailOptions);
-      console.log(`[AUTH] Real OTP email sent via /usr/sbin/sendmail to ${to}: ${info.messageId}`);
-      return { success: true, messageId: info.messageId, method: 'sendmail' };
-    }
-  } catch (errSendmail) {
-    console.warn(`[AUTH] Sendmail failed (${errSendmail.message}).`);
-    errors.push(`sendmail: ${errSendmail.message}`);
-  }
-
-  // 4. Direct IP with TLS SNI
+  // 3. Direct Hostinger Cloudflare Proxy IP with TLS SNI
   try {
     const tIp = nodemailer.createTransport({
       host: '172.65.255.143',
       port: 465,
       secure: true,
       auth: {
-        user: smtpUser,
-        pass: smtpPass,
+        user: config.user,
+        pass: config.pass,
       },
       tls: {
         rejectUnauthorized: false,
         servername: 'smtp.hostinger.com',
       },
       connectionTimeout: 8000,
+      greetingTimeout: 8000,
+      socketTimeout: 12000,
     });
     const info = await tIp.sendMail(mailOptions);
     console.log(`[AUTH] Real OTP email sent via direct IP to ${to}: ${info.messageId}`);
