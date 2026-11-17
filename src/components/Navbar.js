@@ -852,12 +852,6 @@ export default function Navbar() {
                     setIsMobileMenuOpen(false);
                     openAuthModal();
                   }}
-                  onTouchEnd={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setIsMobileMenuOpen(false);
-                    openAuthModal();
-                  }}
                   className="p-1.5 text-neutral-700 dark:text-neutral-300 hover:text-[#900606] rounded-full hover:bg-neutral-100 transition-colors cursor-pointer touch-manipulation"
                   title="Sign In"
                   aria-label="Sign In"
@@ -1034,12 +1028,6 @@ export default function Navbar() {
                     <button
                       type="button"
                       onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setIsMobileMenuOpen(false);
-                        openAuthModal();
-                      }}
-                      onTouchEnd={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         setIsMobileMenuOpen(false);
