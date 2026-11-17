@@ -33,7 +33,7 @@ export default function ForgotPasswordPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || 'Something went wrong');
 
       setMessage(data.message || 'OTP sent to your email.');
@@ -57,7 +57,7 @@ export default function ForgotPasswordPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || 'Invalid OTP');
 
       setMessage('OTP verified! Please enter your new password.');
@@ -86,7 +86,7 @@ export default function ForgotPasswordPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp, password: newPassword }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || 'Something went wrong');
 
       setMessage('Password reset successfully! Redirecting to login...');
