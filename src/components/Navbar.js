@@ -306,7 +306,7 @@ export default function Navbar() {
             setLiveSaleTicker(data.tickerText);
           }
         }
-      } catch (e) {}
+      } catch (e) { }
     }
     fetchLiveTicker();
   }, []);
@@ -396,7 +396,7 @@ export default function Navbar() {
             customerName = parsed.name;
             if (parsed.role) role = parsed.role;
           }
-        } catch (e) {}
+        } catch (e) { }
       }
 
       // Fallback to storage/session
@@ -452,7 +452,7 @@ export default function Navbar() {
             window.dispatchEvent(new Event('storage'));
             window.dispatchEvent(new CustomEvent('creatorskit-auth-change', { detail: googleUserInfo }));
           }
-        } catch (e) {}
+        } catch (e) { }
       }
 
       if (customerName) {
@@ -487,14 +487,14 @@ export default function Navbar() {
       try {
         const u = JSON.parse(sessionStorage.getItem('creatorsKitUserInfo') || localStorage.getItem('creatorsKitUserInfo') || '{}');
         if (u.email) activeEmail = u.email;
-      } catch (e) {}
+      } catch (e) { }
     }
 
     // 1. Immediately mark logged-out flag to prevent state resurrection across tabs & reload
     try {
       sessionStorage.setItem('creatorskit_logged_out', '1');
       localStorage.setItem('creatorskit_logged_out', '1');
-    } catch (e) {}
+    } catch (e) { }
 
     // 2. Immediately wipe UI state
     setUserName(null);
@@ -506,7 +506,7 @@ export default function Navbar() {
         sessionStorage.removeItem(k);
         localStorage.removeItem(k);
       });
-    } catch (e) {}
+    } catch (e) { }
 
     // 4. Clear all cookies
     try {
@@ -519,18 +519,18 @@ export default function Navbar() {
       cookieNames.forEach((c) => {
         document.cookie = `${c}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
       });
-    } catch (e) {}
+    } catch (e) { }
 
     // 5. Clear cart
     if (typeof clearCart === 'function') {
-      try { clearCart(); } catch (e) {}
+      try { clearCart(); } catch (e) { }
     }
 
     // 6. Notify all listeners
     try {
       window.dispatchEvent(new Event('storage'));
       window.dispatchEvent(new CustomEvent('creatorskit-auth-change', { detail: null }));
-    } catch (e) {}
+    } catch (e) { }
 
     // 7. Delete user from MongoDB Compass 'users' collection & clear server cookies
     if (activeEmail) {
@@ -548,7 +548,7 @@ export default function Navbar() {
     // 8. Complete NextAuth sign out
     try {
       await signOut({ redirect: false });
-    } catch (e) {}
+    } catch (e) { }
 
     // 9. Hard navigation/reload to home page so UI state is guaranteed clean on first click
     window.location.href = '/';
@@ -598,7 +598,7 @@ export default function Navbar() {
       )}
       <div className="w-full bg-white/90 backdrop-blur-md border-b border-neutral-200">
         <div className="w-full h-16 sm:h-20 px-4 md:px-6 flex items-center justify-between transition-colors duration-300">
-          
+
           {/* Brand Logo */}
           <div className="flex-1 flex items-center justify-start h-full min-w-0">
             <Link href="/" className="relative flex items-center">
@@ -623,11 +623,10 @@ export default function Navbar() {
                   key={link.name}
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
-                  className={`relative px-3 xl:px-5 py-2 text-xs xl:text-sm font-bold transition-all duration-300 rounded-full whitespace-nowrap flex items-center gap-1.5 ${
-                    pathname === link.href 
-                      ? 'bg-[#900606] text-white shadow-md' 
-                      : 'text-neutral-700 dark:text-neutral-300 hover:text-[#900606] dark:hover:text-[#900606] hover:bg-neutral-100 dark:hover:bg-neutral-800/50'
-                  }`}
+                  className={`relative px-3 xl:px-5 py-2 text-xs xl:text-sm font-bold transition-all duration-300 rounded-full whitespace-nowrap flex items-center gap-1.5 ${pathname === link.href
+                    ? 'bg-[#900606] text-white shadow-md'
+                    : 'text-neutral-700 dark:text-neutral-300 hover:text-[#900606] dark:hover:text-[#900606] hover:bg-neutral-100 dark:hover:bg-neutral-800/50'
+                    }`}
                 >
                   <span>{link.name}</span>
                   {link.isLive && (
@@ -643,7 +642,7 @@ export default function Navbar() {
 
           {/* Desktop Actions */}
           <div className="flex-1 hidden lg:flex items-center justify-end gap-2.5 xl:gap-4 h-full pr-2 xl:pr-6">
-            
+
             {/* Search Bar & Live Dropdown */}
             {!pathname.startsWith('/admin') && (
               <div className="relative mr-1" ref={searchRef}>
@@ -970,10 +969,9 @@ export default function Navbar() {
         )}
 
         {/* Mobile Navigation Menu */}
-        <div 
-          className={`lg:hidden absolute top-full left-0 right-0 w-full bg-white/95 dark:bg-[#0B0F19]/95 backdrop-blur-md shadow-2xl transition-all duration-300 ease-in-out overflow-hidden ${
-            isMobileMenuOpen ? 'max-h-[600px] opacity-100 border-t border-neutral-200 dark:border-neutral-800' : 'max-h-0 opacity-0 border-t-0'
-          }`}
+        <div
+          className={`lg:hidden absolute top-full left-0 right-0 w-full bg-white/95 dark:bg-[#0B0F19]/95 backdrop-blur-md shadow-2xl transition-all duration-300 ease-in-out overflow-hidden ${isMobileMenuOpen ? 'max-h-[600px] opacity-100 border-t border-neutral-200 dark:border-neutral-800' : 'max-h-0 opacity-0 border-t-0'
+            }`}
         >
           {!pathname.startsWith('/admin') && (
             <div className="px-4 pt-4 pb-6 space-y-2 sm:px-6">
@@ -985,9 +983,8 @@ export default function Navbar() {
                     setIsMobileMenuOpen(false);
                     handleNavClick(e, link.href);
                   }}
-                  className={`flex items-center justify-between px-3 py-2 rounded-md text-base font-medium ${
-                    pathname === link.href ? 'text-[#900606] bg-neutral-100 dark:bg-neutral-800' : 'text-neutral-700 dark:text-neutral-300 hover:text-[#900606] hover:bg-neutral-50 dark:hover:bg-neutral-800'
-                  }`}
+                  className={`flex items-center justify-between px-3 py-2 rounded-md text-base font-medium ${pathname === link.href ? 'text-[#900606] bg-neutral-100 dark:bg-neutral-800' : 'text-neutral-700 dark:text-neutral-300 hover:text-[#900606] hover:bg-neutral-50 dark:hover:bg-neutral-800'
+                    }`}
                 >
                   <span>{link.name}</span>
                   {link.isLive && (

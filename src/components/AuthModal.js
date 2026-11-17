@@ -19,7 +19,7 @@ import {
 
 export default function AuthModal({
   isOpen = false,
-  onClose = () => {},
+  onClose = () => { },
   redirectUrl = null,
   initialEmail = '',
 }) {
@@ -128,7 +128,7 @@ export default function AuthModal({
 
     // Clear old cached keys
     ['creatorsKitUserInfo', 'userName', 'userEmail', 'userRole', 'token', 'adminName', 'adminEmail', 'adminRole', 'adminToken'].forEach((k) => {
-      try { localStorage.removeItem(k); } catch (err) {}
+      try { localStorage.removeItem(k); } catch (err) { }
     });
 
     if (isAdmin) {
@@ -156,7 +156,7 @@ export default function AuthModal({
     try {
       sessionStorage.removeItem('creatorskit_logged_out');
       localStorage.removeItem('creatorskit_logged_out');
-    } catch (e) {}
+    } catch (e) { }
 
     sessionStorage.setItem('userName', userData.name);
     sessionStorage.setItem('userEmail', userData.email);
