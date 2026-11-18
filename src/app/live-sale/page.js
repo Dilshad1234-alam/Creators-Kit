@@ -911,8 +911,8 @@ export default function LiveSalePage() {
           {/* ========================================================================= */}
           <section className="pt-1 sm:pt-1 pb-1 sm:pb-2">
             <div className="flex flex-col items-center text-center mb-6 sm:mb-8">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-[#111827] tracking-tight pb-1">
-                Shop Exclusive Deals By <span className="text-[#900606] whitespace-nowrap">Category</span>
+              <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-medium text-[#111827] tracking-tight pb-1">
+                Shop Exclusive Deals By  <span className="text-[#900606] whitespace-nowrap">Category</span>
               </h2>
               <p className="text-neutral-500 text-xs sm:text-sm md:text-base font-normal max-w-xl mx-auto mt-1">
                 Select your gear setup to jump directly to live slashed prices & exclusive festive drops.
@@ -996,13 +996,13 @@ export default function LiveSalePage() {
           {/* ========================================================================= */}
           {/* DEAL OF THE DAY (HIGH-IMPACT FLASH SALE WITH LIVE TIMER & ZERO EXCESS GAPS)*/}
           {/* ========================================================================= */}
-          <section className="mt-2 sm:mt-3 mb-4 sm:mb-6 w-full">
+          <section className="mt-2 sm:mt-3 mb-1 sm:mb-3 w-full">
             <div className="w-full bg-gradient-to-br from-[#451206] via-[#731c0a] to-[#9e310e] rounded-2xl sm:rounded-3xl border border-amber-500/40 p-5 sm:p-7 lg:p-8 shadow-[0_20px_60px_rgba(69,18,6,0.35)] relative overflow-hidden text-white">
               {/* Ambient luminous glow flares */}
               <div className="absolute -top-24 -right-24 w-96 h-96 bg-amber-400/20 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-red-600/30 rounded-full blur-3xl pointer-events-none" />
 
-              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
 
                 {/* LEFT SIDE: Heading, Glowing Badge, Live Urgency & Button */}
                 <div className="lg:col-span-5 flex flex-col justify-center">
@@ -1013,7 +1013,7 @@ export default function LiveSalePage() {
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
                         <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-400" />
                       </span>
-                      <Flame className="w-4 h-4 text-amber-300 fill-amber-300 animate-pulse" />
+                      {/* <Flame className="w-4 h-4 text-amber-300 fill-amber-300 animate-pulse" /> */}
                       <span className="text-[11px] sm:text-xs font-black tracking-wider uppercase text-amber-200">
                         {activeDeal.tag}
                       </span>
@@ -1039,7 +1039,7 @@ export default function LiveSalePage() {
                   </div>
 
                   {/* Main Heading with Gold Accent */}
-                  <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.6rem] font-black text-white tracking-tight leading-tight mb-2.5 sm:whitespace-nowrap">
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.2rem] font-black text-white tracking-tight leading-tight mb-2.5 sm:whitespace-nowrap">
                     {saleConfig?.heroHeading || 'MEGA CREATOR FEST:'}{' '}
                     <span className="text-amber-300">
                       {saleConfig?.heroHighlight || 'UP TO 50% OFF'}
@@ -1055,7 +1055,7 @@ export default function LiveSalePage() {
 
                   {/* Live Urgency Social Proof Badge */}
                   <div className="flex items-center gap-2 text-xs font-bold text-amber-200 mb-3 bg-black/30 backdrop-blur-xs border border-amber-400/30 px-3 py-1.5 rounded-xl w-fit">
-                    <Zap className="w-4 h-4 text-amber-400 fill-amber-400" />
+                    {/* <Zap className="w-4 h-4 text-amber-400 fill-amber-400" /> */}
                     <span>
                       {saleConfig?.viewerCount ?? saleConfig?.liveViewerCount ?? 184} creators viewing this deal right now
                     </span>
@@ -1063,7 +1063,7 @@ export default function LiveSalePage() {
 
                   {/* Free Masterclass Bonus Tag */}
                   <div className="mb-6 flex items-center gap-2.5 bg-amber-400/10 border border-amber-400/30 px-3.5 py-2 rounded-xl text-amber-200 w-fit">
-                    <Sparkles className="w-4 h-4 text-amber-300 shrink-0" />
+                    {/* <Sparkles className="w-4 h-4 text-amber-300 shrink-0" /> */}
                     <span className="text-xs font-bold text-amber-100">
                       {activeDeal.freeBonus}
                     </span>
@@ -1084,7 +1084,7 @@ export default function LiveSalePage() {
 
                 {/* RIGHT SIDE: Offer Card with Product Image, Details, Stock Bar & Timer */}
                 <div className="lg:col-span-7">
-                  <div className="bg-white rounded-2xl sm:rounded-3xl border border-amber-200 shadow-2xl p-5 sm:p-6 md:p-7 flex flex-col md:flex-row md:items-stretch gap-5 sm:gap-6 text-neutral-900">
+                  <div className="bg-white rounded-xl sm:rounded-1xl border border-amber-200 shadow-2xl p-3 sm:p-4 md:p-5 flex flex-col md:flex-row md:items-stretch gap-5 sm:gap-8 text-neutral-900">
 
                     {/* Product Image Container */}
                     <div
@@ -1095,7 +1095,7 @@ export default function LiveSalePage() {
                         -{activeDeal.discountPercent}% OFF
                       </span>
                       <span className="absolute bottom-2.5 right-2.5 z-10 bg-black/80 backdrop-blur-md text-amber-300 border border-amber-400/40 font-bold text-[10px] px-2.5 py-1 rounded-md shadow-md flex items-center gap-1">
-                        <Zap className="w-2.5 h-2.5 fill-amber-300 text-amber-300" />
+                        {/* <Zap className="w-2.5 h-2.5 fill-amber-300 text-amber-300" /> */}
                         Flash Deal
                       </span>
                       <Image
@@ -1412,7 +1412,7 @@ export default function LiveSalePage() {
 
         {/* Re-open content container for bundles and lower sections */}
         <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-14">
-
+        
           {/* ========================================================================= */}
           {/* 10. FREQUENTLY ASKED QUESTIONS                                            */}
           {/* ========================================================================= */}
@@ -1422,7 +1422,7 @@ export default function LiveSalePage() {
                 <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-medium text-[#111827] dark:text-white tracking-tight">
                   Frequently Asked <span className="text-[#900606] whitespace-nowrap">Questions</span>
                 </h2>
-                <p className="text-neutral-500 text-xs sm:text-sm md:text-base font-normal max-w-xl mx-auto mt-0.5">
+                <p className="text-neutral-500 text-xs sm:text-sm md:text-base font-normal max-w-xl mx-auto mt-5">
                   Everything you need to know about compatibility, shipping, and warranty.
                 </p>
               </div>
@@ -1451,64 +1451,6 @@ export default function LiveSalePage() {
             </div>
           </section>
 
-          {/* ========================================================================= */}
-          {/* 11. SECRET FESTIVAL LUCKY OFFER (INTERACTIVE CONVERSION BOOSTER)          */}
-          {/* ========================================================================= */}
-          {(saleConfig?.secretOfferEnabled ?? saleConfig?.showMysteryOffer ?? true) && (
-            <div className="my-4 sm:my-6 rounded-3xl bg-gradient-to-r from-amber-500/10 via-red-500/10 to-amber-500/10 border-2 border-amber-400/40 p-5 sm:p-7 backdrop-blur-md shadow-md">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-3.5 text-center md:text-left">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-amber-500 shrink-0">
-                    <Gift className="w-6 h-6 stroke-[2.2]" />
-                  </div>
-                  <div>
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-800 text-[10px] font-black uppercase tracking-wider mb-1">
-                      <Sparkles className="w-3 h-3 text-amber-600" />
-                      SECRET FESTIVAL OFFER
-                    </span>
-                    <h3 className="text-base sm:text-lg font-black text-neutral-900 tracking-tight">
-                      {saleConfig?.secretOfferTitle || saleConfig?.mysteryOfferTitle || "Today's Secret Festival Deal!"}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-neutral-600 font-medium">
-                      {saleConfig?.secretBenefit || saleConfig?.mysteryOfferDesc || "Flat ₹500 OFF on all Creator Bundles"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {!revealedSecret ? (
-                    <button
-                      type="button"
-                      onClick={() => setRevealedSecret(true)}
-                      className="px-5 py-2.5 bg-gradient-to-r from-[#900606] to-[#b31919] hover:from-[#780505] hover:to-[#900606] text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-2 cursor-pointer"
-                    >
-                      <Sparkles className="w-4 h-4 text-amber-300" />
-                      <span>Tap to Reveal Secret Coupon</span>
-                    </button>
-                  ) : (
-                    <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-amber-400 shadow-xs">
-                      <span className="font-mono font-black text-sm sm:text-base text-[#900606] tracking-wider">
-                        {saleConfig?.secretCoupon || saleConfig?.mysteryOfferCode || "FEST500"}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (typeof navigator !== 'undefined' && navigator.clipboard) {
-                            navigator.clipboard.writeText(saleConfig?.secretCoupon || saleConfig?.mysteryOfferCode || 'FEST500');
-                            setCopiedSecret(true);
-                            setTimeout(() => setCopiedSecret(false), 2500);
-                          }
-                        }}
-                        className="px-3 py-1 bg-amber-400 hover:bg-amber-500 text-neutral-950 font-black text-xs rounded-lg transition-colors cursor-pointer"
-                      >
-                        {copiedSecret ? '✓ COPIED' : 'COPY'}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* ========================================================================= */}
           {/* 12. FESTIVAL COUPON BONUS SECTION                                         */}

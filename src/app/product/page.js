@@ -473,14 +473,14 @@ export default function ProductPage() {
         {/* ========================================================================= */}
         {/* 1. HERO SECTION (PRO CREATOR BUNDLE - MATCHING REFERENCE SCREENSHOT 2)    */}
         {/* ========================================================================= */}
-        <section className="w-full pt-1 sm:pt-2 pb-1.5 sm:pb-2 bg-[#FBFBF7]">
+        <section className="w-full pt-3 sm:pt-4 pb-4.5 sm:pb-6 bg-[#FBFBF7]">
           <div className="w-full px-3.5 sm:px-6 md:px-8 lg:px-10">
 
             {/* Grid Layout: Left Gallery + Right Details */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-5 xl:gap-6 lg:items-stretch w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 lg:gap-7 xl:gap-8 lg:items-stretch w-full">
 
               {/* LEFT: VERTICAL THUMBNAILS + MAIN SHOWCASE CARD */}
-              <div className="lg:col-span-7 flex flex-col md:flex-row gap-2.5 sm:gap-3 items-stretch w-full h-full">
+              <div className="lg:col-span-6 flex flex-col md:flex-row gap-2.5 sm:gap-3 items-stretch w-full h-full">
 
                 {/* Vertical Thumbnails */}
                 <div className="flex md:flex-col gap-2 sm:gap-2.5 order-2 md:order-1 overflow-x-auto md:overflow-visible no-scrollbar pb-1 md:pb-0 shrink-0 w-full md:w-20 lg:w-22 xl:w-24">
@@ -506,7 +506,7 @@ export default function ProductPage() {
                 </div>
 
                 {/* Main Showcase Image Card - Stretches full height to align bottom with right column */}
-                <div className="relative flex-1 min-w-0 w-full h-full min-h-[460px] sm:min-h-[500px] lg:min-h-0 rounded-3xl bg-white border border-neutral-200 shadow-sm overflow-hidden order-1 md:order-2 flex items-center justify-center">
+                <div className="relative flex-1 min-w-0 w-full  min-h-[360px] sm:min-h-[400px]  lg:min-h-0 rounded-xl bg-white border border-neutral-200 shadow-sm overflow-hidden order-1 md:order-2 flex items-center justify-center">
 
                   {/* BEST VALUE Badge */}
                   <span className="absolute top-4 left-4 z-20 bg-[#900606] text-white text-[10px] sm:text-xs font-black px-3.5 py-1.5 rounded-lg uppercase tracking-wider shadow-sm">
@@ -537,7 +537,7 @@ export default function ProductPage() {
                       src={getImageUrl(proCreatorBundleHero.images[heroImageIdx].src)}
                       alt={proCreatorBundleHero.images[heroImageIdx].alt}
                       fill
-                      sizes="(max-width: 1024px) 100vw, 55vw"
+                      sizes="(max-width: 824px) 80vw, 35vw"
                       className={`${heroImageIdx === 0 ? 'object-cover object-center' : 'object-contain object-center p-4 sm:p-6'} select-none transition-all duration-300`}
                       priority
                     />
@@ -562,7 +562,7 @@ export default function ProductPage() {
               </div>
 
               {/* RIGHT: DETAILS, BUNDLE BREAKDOWN, MASTERCLASSES, BUY ACTIONS */}
-              <div className="lg:col-span-5 flex flex-col justify-start">
+              <div className="lg:col-span-6 flex flex-col justify-start">
 
                 {/* LIMITED-TIME BUNDLE OFFER Badge */}
                 <div>

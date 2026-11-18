@@ -404,8 +404,8 @@ export default function ContactPage() {
                     disabled={isSubmitting}
                     className="relative w-full py-3.5 sm:py-4 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-xs sm:text-sm tracking-wide overflow-hidden group/btn transition-all duration-300 shadow-sm disabled:opacity-60 cursor-pointer flex items-center justify-center gap-2"
                   >
-                    <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
-                    <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                    <span className="absolute inset-0 bg-[#900606] "></span>
+                    <span className="relative z-10 text-[#ffffff] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
                       <span>{isSubmitting ? 'Sending...' : 'Send Message ➔'}</span>
                     </span>
                   </button>

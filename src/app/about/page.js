@@ -277,89 +277,25 @@ export default function AboutPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-[#FBFBF7] text-neutral-900 font-sans selection:bg-[#900606] selection:text-white pb-0">
+    <div className="min-h-screen bg-[#FBFBF7] text-neutral-900 font-sans selection:bg-[#900606] selection:text-white pb-0 pt-16 sm:pt-20">
       <main className="w-full flex flex-col">
 
-        {/* 1. HERO SECTION (Dark Full-Width Banner with dynamic data) */}
-        <section className="relative w-full text-white pt-30 sm:pt-34 pb-2.5 sm:pb-6 md:py-20 overflow-hidden flex flex-col justify-between">
-          <div className="absolute inset-0 w-full h-full z-0">
-            <Image 
-              src={getImageUrl(heroData.image || '/about5.png')} 
-              alt={heroData.title || 'Empowering Creators Across India'} 
-              fill 
-              unoptimized
-              priority
-              sizes="100vw" 
-              className="object-cover object-center" 
-            />
-            {/* Dark gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/80 to-black/35"></div>
-          </div>
-
-          <div className="max-w-[1750px] w-full pt-10 mx-auto px-4 sm:px-6 md:px-8 lg:px-12 relative z-10">
-            {/* Breadcrumb */}
-            <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-neutral-300 font-medium mb-3 sm:mb-5">
-              <Link href="/" className="hover:text-white transition-colors">Home</Link>
-              <span className="text-neutral-400">›</span>
-              <span className="text-white font-semibold">About Us</span>
-            </nav>
-
-            <div className="max-w-xl text-left py-1 sm:py-3">
-              <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                <span className="w-5 h-[2px] bg-red-500"></span>
-                <span className="text-xs font-bold tracking-widest text-red-500 uppercase">
-                  {heroData.badge || 'OUR STORY'}
-                </span>
-              </div>
-
-              <h1 className="text-2xl sm:text-4xl lg:text-[3.2rem] font-bold text-white tracking-tight leading-[1.15] mb-3">
-                {heroData.title}{' '}
-                {heroData.highlight && (
-                  <span className="text-red-500 font-extrabold">{heroData.highlight}</span>
-                )}
-              </h1>
-
-              <p className="text-neutral-200 font-normal text-xs sm:text-sm leading-relaxed mb-5 max-w-lg">
-                {heroData.description}
-              </p>
-
-              <div>
-                <Link 
-                  href={heroData.ctaLink || '/product'} 
-                  className="relative inline-flex items-center justify-center gap-2.5 bg-white text-[#111827] border-2 border-neutral-200 font-bold text-xs sm:text-sm px-6 sm:px-8 py-3 rounded-xl overflow-hidden group/btn transition-all duration-300 shadow-sm"
-                >
-                  <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
-                  <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
-                    <span>{heroData.ctaText || 'Shop Our Kits'}</span>
-                    <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-                  </span>
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Badges Row at the bottom with comfortable padding */}
-          <div className="max-w-[1750px] w-full mx-auto px-4 sm:px-6 md:px-8 lg:px-12 relative z-10 pt-3 sm:pt-6 mt-2.5 sm:mt-4 border-t border-white/20 pb-1">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm text-neutral-200 font-medium">
-              <div className="flex items-center gap-2 sm:gap-2.5">
-                <Diamond className="w-4 h-4 text-white stroke-[1.8] shrink-0" />
-                <span className="leading-tight">Premium Quality Products</span>
-              </div>
-              <div className="flex items-center gap-2 sm:gap-2.5">
-                <GraduationCap className="w-4 h-4 text-white stroke-[1.8] shrink-0" />
-                <span className="leading-tight">Free Expert Courses</span>
-              </div>
-              <div className="flex items-center gap-2 sm:gap-2.5">
-                <Users className="w-4 h-4 text-white stroke-[1.8] shrink-0" />
-                <span className="leading-tight">Creator Community</span>
-              </div>
-              <div className="flex items-center gap-2 sm:gap-2.5">
-                <Headphones className="w-4 h-4 text-white stroke-[1.8] shrink-0" />
-                <span className="leading-tight">Dedicated Support</span>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* 1. HERO BANNER SECTION (Single Banner Image matching Live Sale Banner Size) */}
+              <section className="relative w-full overflow-hidden bg-[#0a0a0a] mb-2 sm:mb-4">
+                <div className="w-full relative z-8 max-w-[3000px] mx-auto">
+                  <div className="relative w-full aspect-[1023/370] min-h-[190px] xs:min-h-[240px] sm:min-h-[340px] md:min-h-[420px] lg:min-h-[480px] xl:min-h-[540px] overflow-hidden bg-[#0a0a0a]">
+                    <Image
+                      src="/about6.png"
+                      alt="Creators Kit Contact Us"
+                      fill
+                      priority
+                      unoptimized
+                      sizes="100vw"
+                      className="object-cover object-center"
+                    />
+                  </div>
+                </div>
+              </section>
 
         {/* 2. OUR MISSION SECTION */}
         <section className="w-full pt-2 pb-3 sm:py-4 md:py-6">
@@ -791,10 +727,10 @@ export default function AboutPage() {
             <div className="flex items-center gap-4 sm:gap-6 shrink-0">
               <Link
                 href={ctaBannerData.ctaLink || '/contact'}
-                className="relative inline-flex items-center justify-center gap-2.5 bg-white text-[#111827] border-2 border-neutral-200 font-bold text-xs sm:text-sm px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl overflow-hidden group/btn transition-all duration-300 shadow-sm"
+                className="relative inline-flex items-center justify-center gap-2.5 border-2 font-bold text-xs sm:text-sm px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl overflow-hidden group/btn transition-all duration-300 shadow-sm"
               >
-                <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
-                <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                <span className="absolute inset-0 bg-[#900606] "></span>
+                <span className="relative z-10 text-[#fcfcfc] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
                   <span>{ctaBannerData.ctaText || 'Join Now'}</span>
                   <ArrowRight className="w-4 h-4 stroke-[2.5]" />
                 </span>

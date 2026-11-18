@@ -37,7 +37,7 @@ export default function FestivalOffersSection({
           {/* Left Text */}
           <div className="text-center lg:text-left max-w-xl">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-200 text-xs font-black uppercase tracking-wider mb-2.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+              {/* <Sparkles className="w-3.5 h-3.5 text-amber-300" /> */}
               <span>INSTANT FESTIVAL CHECKOUT BONUS</span>
             </div>
 
@@ -59,44 +59,13 @@ export default function FestivalOffersSection({
 
           {/* Right Coupon Voucher Box */}
           <div className="flex flex-col sm:flex-row items-center gap-3.5 w-full lg:w-auto shrink-0 justify-center">
-            {/* Dashed Voucher Box */}
-            <div className="flex items-center gap-3 bg-black/50 backdrop-blur-md px-5 py-3 rounded-2xl border-2 border-dashed border-amber-400/80 shadow-inner">
-              <Tag className="w-5 h-5 text-amber-400 shrink-0" />
-              <div className="flex flex-col">
-                <span className="text-[10px] font-bold text-amber-200/80 uppercase tracking-widest">
-                  Coupon Code
-                </span>
-                <span className="text-xl sm:text-2xl font-black text-white font-mono tracking-wider">
-                  {promoCode}
-                </span>
-              </div>
-
-              {/* Copy Button */}
-              <button
-                type="button"
-                onClick={handleCopyCode}
-                className="ml-3 px-4 py-2 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-neutral-950 font-black text-xs rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-4 h-4 stroke-[3]" />
-                    <span>COPIED!</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4" />
-                    <span>COPY CODE</span>
-                  </>
-                )}
-              </button>
-            </div>
-
+ 
             {/* Quick Explore Button */}
             <a
               href="#standout-gear"
               className="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-xs sm:text-sm rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
             >
-              <span>Explore All Deals</span>
+              <span className='border-amber-400/40 text-amber-200'>Explore All Deals</span>
               <ArrowRight className="w-4 h-4" />
             </a>
           </div>
