@@ -764,90 +764,108 @@ export default function LiveSalePage() {
             {saleConfig?.tickerText || "Diwali Creator Dhamaka Live Now • Extra 10% Off with code CREATE10"}
           </span>
         </div> */}
-        <section className="relative w-full overflow-hidden bg-[#0a0a0a] mb-2 sm:mb-3">
-          <div className="w-full relative z-8 max-w-[3000px] mx-auto">
-            <div
-              className="relative w-full aspect-[1023/370] min-h-[190px] xs:min-h-[240px] sm:min-h-[340px] md:min-h-[420px] lg:min-h-[480px] xl:min-h-[540px] overflow-hidden bg-[#0a0a0a] group"
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              onTouchStart={handleTouchStart}
-              onTouchEnd={handleTouchEnd}
-            >
-              {/* Carousel Track */}
-              <div
-                className={`flex h-full will-change-transform ${isTransitioning ? 'transition-transform duration-700 ease-in-out' : ''}`}
-                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-              >
-                {renderSlides.map((slide, idx) => {
-                  const bannerSrc = slide.bannerImageUrl || slide.image || '/img-kit8.png';
-                  return (
-                    <div key={idx} className="w-full h-full flex-shrink-0 relative overflow-hidden">
-                      {slide.link ? (
-                        <a href={slide.link} className="absolute inset-0 w-full h-full block">
-                          <Image
-                            src={getImageUrl(bannerSrc)}
-                            alt={slide.alt || 'Live Sale Hero Banner'}
-                            fill
-                            sizes="100vw"
-                            priority={idx === 0}
-                            className="object-cover object-center"
-                          />
-                        </a>
-                      ) : (
-                        <div className="absolute inset-0 w-full h-full block">
-                          <Image
-                            src={getImageUrl(bannerSrc)}
-                            alt={slide.alt || 'Live Sale Hero Banner'}
-                            fill
-                            sizes="100vw"
-                            priority={idx === 0}
-                            className="object-cover object-center"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+<section className="relative w-full overflow-hidden bg-[#0a0a0a] mb-2 sm:mb-3">
+  <div className="w-full relative z-8 max-w-[3000px] mx-auto">
+    <div
+      className="relative w-full aspect-[2/1] sm:aspect-auto sm:h-[450px] md:h-[550px] lg:h-[700px] overflow-hidden group bg-[#f7941d]"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Carousel Track */}
+      <div
+        className={`flex h-full will-change-transform ${isTransitioning ? 'transition-transform duration-700 ease-in-out' : ''}`}
+        style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+      >
+        {renderSlides.map((slide, idx) => {
+          const bannerSrc = slide.bannerImageUrl || slide.image || '/img-kit8.png';
+          const mobileBannerSrc = slide.mobileImageUrl || slide.mobileImage || bannerSrc;
 
-              {/* Digitek-style Bottom-Right Circular Navigation Arrows */}
-              <div className="absolute bottom-3 right-3 xs:bottom-4 xs:right-4 sm:bottom-6 sm:right-8 z-20 flex items-center gap-2 sm:gap-2.5">
-                <button
-                  type="button"
-                  onClick={prevSlide}
-                  aria-label="Previous Banner"
-                  className="w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-full bg-white/95 hover:bg-white text-neutral-800 shadow-md hover:shadow-lg flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer border border-neutral-200/60"
-                >
-                  <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-800" strokeWidth={2.5} />
-                </button>
-                <button
-                  type="button"
-                  onClick={nextSlide}
-                  aria-label="Next Banner"
-                  className="w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-full bg-white/95 hover:bg-white text-neutral-800 shadow-md hover:shadow-lg flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer border border-neutral-200/60"
-                >
-                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-800" strokeWidth={2.5} />
-                </button>
-              </div>
-
-              {/* Pagination Dots at bottom center */}
-              <div className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 sm:gap-2 z-20">
-                {liveHeroSlides.map((_, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => scrollToSlide(idx)}
-                    aria-label={`Go to slide ${idx + 1}`}
-                    className={`h-2 sm:h-2.5 rounded-full transition-all duration-300 cursor-pointer ${(currentSlide === totalSlides ? 0 : currentSlide) === idx
-                      ? 'bg-[#900606] w-6 sm:w-8'
-                      : 'bg-white/70 hover:bg-white w-2 sm:w-2.5'
-                      }`}
+          return (
+            <div key={idx} className="w-full h-full flex-shrink-0 relative overflow-hidden bg-[#f7941d] flex items-center justify-center">
+              {slide.link ? (
+                <a href={slide.link} className="absolute inset-0 w-full h-full block">
+                  <Image
+                    src={getImageUrl(mobileBannerSrc)}
+                    alt={slide.alt || 'Live Sale Hero Banner'}
+                    fill
+                    sizes="100vw"
+                    priority={idx === 0}
+                    className="object-fill object-center sm:hidden"
                   />
-                ))}
-              </div>
+                  <Image
+                    src={getImageUrl(bannerSrc)}
+                    alt={slide.alt || 'Live Sale Hero Banner'}
+                    fill
+                    sizes="100vw"
+                    priority={idx === 0}
+                    className="object-cover object-center hidden sm:block"
+                  />
+                </a>
+              ) : (
+                <div className="absolute inset-0 w-full h-full block">
+                  <Image
+                    src={getImageUrl(mobileBannerSrc)}
+                    alt={slide.alt || 'Live Sale Hero Banner'}
+                    fill
+                    sizes="100vw"
+                    priority={idx === 0}
+                    className="object-fill object-center sm:hidden"
+                  />
+                  <Image
+                    src={getImageUrl(bannerSrc)}
+                    alt={slide.alt || 'Live Sale Hero Banner'}
+                    fill
+                    sizes="100vw"
+                    priority={idx === 0}
+                    className="object-cover object-center hidden sm:block"
+                  />
+                </div>
+              )}
             </div>
-          </div>
-        </section>
+          );
+        })}
+      </div>
+
+      {/* Digitek-style Bottom-Right Circular Navigation Arrows */}
+      <div className="absolute bottom-3 right-3 xs:bottom-4 xs:right-4 sm:bottom-6 sm:right-8 z-20 flex items-center gap-2 sm:gap-2.5">
+        <button
+          type="button"
+          onClick={prevSlide}
+          aria-label="Previous Banner"
+          className="w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-full bg-white/95 hover:bg-white text-neutral-800 shadow-md hover:shadow-lg flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer border border-neutral-200/60"
+        >
+          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-800" strokeWidth={2.5} />
+        </button>
+        <button
+          type="button"
+          onClick={nextSlide}
+          aria-label="Next Banner"
+          className="w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-full bg-white/95 hover:bg-white text-neutral-800 shadow-md hover:shadow-lg flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer border border-neutral-200/60"
+        >
+          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-800" strokeWidth={2.5} />
+        </button>
+      </div>
+
+      {/* Pagination Dots at bottom center */}
+      <div className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 sm:gap-2 z-20">
+        {liveHeroSlides.map((_, idx) => (
+          <button
+            key={idx}
+            type="button"
+            onClick={() => scrollToSlide(idx)}
+            aria-label={`Go to slide ${idx + 1}`}
+            className={`h-2 sm:h-2.5 rounded-full transition-all duration-300 cursor-pointer ${(currentSlide === totalSlides ? 0 : currentSlide) === idx
+              ? 'bg-[#900606] w-6 sm:w-8'
+              : 'bg-white/70 hover:bg-white w-2 sm:w-2.5'
+              }`}
+          />
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
 
         {/* Content sections container */}
         <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-14">

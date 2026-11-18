@@ -605,151 +605,151 @@ export default function HomeClient({
       <main className="flex-grow w-full pt-[96px] sm:pt-[116px]">
 
         {/* 1. HERO SECTION (CAROUSEL) */}
-        <section className="relative w-full overflow-hidden bg-[#FBFBF7] mb-5">
-          <div className="w-full relative z-8 max-w-[3000px] mx-auto">
-            <div
-              className="relative w-full aspect-[2.1/1] sm:aspect-auto sm:h-[450px] md:h-[550px] lg:h-[700px] overflow-hidden group"
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              onTouchStart={handleTouchStart}
-              onTouchEnd={handleTouchEnd}
-            >
-              {/* Carousel Track */}
-              <div
-                className={`flex h-full will-change-transform ${isTransitioning ? 'transition-transform duration-700 ease-in-out' : ''}`}
-                style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-              >
-                {renderSlides.map((slide, idx) => (
-                  <div key={idx} className="w-full h-full flex-shrink-0 relative flex items-center justify-start overflow-hidden">
+<section className="relative w-full overflow-hidden bg-[#FBFBF7] mb-5">
+  <div className="w-full relative z-8 max-w-[3000px] mx-auto">
+    <div
+      className="relative w-full aspect-[10/5] sm:aspect-auto sm:h-[450px] md:h-[550px] lg:h-[700px] overflow-hidden group"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Carousel Track */}
+      <div
+        className={`flex h-full will-change-transform ${isTransitioning ? 'transition-transform duration-700 ease-in-out' : ''}`}
+        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+      >
+        {renderSlides.map((slide, idx) => (
+          <div key={idx} className="w-full h-full flex-shrink-0 relative flex items-center justify-center overflow-hidden">
 
-                    {/* Full-Card Background Image */}
-                    {slide.link ? (
-                      <Link href={slide.link} className="absolute inset-0 w-full h-full block">
-                        {slide.mobileImage ? (
-                          <>
-                            <Image
-                              src={getImageUrl(slide.mobileImage)}
-                              alt={slide.title || "Hero Banner"}
-                              fill
-                              sizes="100vw"
-                              priority={idx === 0}
-                              className="object-cover object-center sm:hidden"
-                            />
-                            <Image
-                              src={getImageUrl(slide.image)}
-                              alt={slide.title || "Hero Banner"}
-                              fill
-                              sizes="100vw"
-                              priority={idx === 0}
-                              className="object-cover object-center hidden sm:block"
-                            />
-                          </>
-                        ) : (
-                          <Image
-                            src={getImageUrl(slide.image)}
-                            alt={slide.title || "Hero Banner"}
-                            fill
-                            sizes="100vw"
-                            priority={idx === 0}
-                            className="object-cover object-center"
-                          />
-                        )}
-                      </Link>
-                    ) : (
-                      <div className="absolute inset-0 w-full h-full block">
-                        {slide.mobileImage ? (
-                          <>
-                            <Image
-                              src={getImageUrl(slide.mobileImage)}
-                              alt={slide.title || "Hero Banner"}
-                              fill
-                              sizes="100vw"
-                              priority={idx === 0}
-                              className="object-cover object-center sm:hidden"
-                            />
-                            <Image
-                              src={getImageUrl(slide.image)}
-                              alt={slide.title || "Hero Banner"}
-                              fill
-                              sizes="100vw"
-                              priority={idx === 0}
-                              className="object-cover object-center hidden sm:block"
-                            />
-                          </>
-                        ) : (
-                          <Image
-                            src={getImageUrl(slide.image)}
-                            alt={slide.title || "Hero Banner"}
-                            fill
-                            sizes="100vw"
-                            priority={idx === 0}
-                            className="object-cover object-center"
-                          />
-                        )}
-                      </div>
-                    )}
-
-                    {/* Dynamic Text & CTA Overlay (Rendered if title, subtitle or ctaText exists) */}
-                    {(slide.title || slide.subtitle || slide.ctaText) && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10 flex flex-col justify-center px-4 xs:px-6 sm:px-12 md:px-20 lg:px-28 max-w-3xl pointer-events-none">
-                        {slide.subtitle && (
-                          <div className="inline-block px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-[#900606] text-white text-[10px] sm:text-xs font-bold w-fit mb-1 xs:mb-1.5 sm:mb-3 shadow-sm tracking-wide">
-                            {slide.subtitle}
-                          </div>
-                        )}
-                        {slide.title && (
-                          <h2 className="text-lg xs:text-xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-snug sm:leading-tight mb-1.5 xs:mb-2 sm:mb-4 drop-shadow-md">
-                            {slide.title}
-                          </h2>
-                        )}
-                        {slide.ctaText && (
-                          <div className="pointer-events-auto mt-1 sm:mt-2">
-                            <Link
-                              href={slide.link || '/product'}
-                              className="inline-flex items-center gap-1.5 sm:gap-2 bg-[#900606] hover:bg-[#720404] text-white text-[11px] sm:text-xs md:text-sm font-bold px-3.5 xs:px-4 sm:px-6 py-1.5 sm:py-2.5 md:py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95"
-                            >
-                              <span>{slide.ctaText}</span>
-                              <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                            </Link>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* Navigation Arrows */}
-              <button
-                onClick={prevSlide}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white/30 hover:bg-white/50 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/30 transition-all opacity-0 hover:opacity-100 group-hover:opacity-100 z-10"
-              >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
-              </button>
-
-              <button
-                onClick={nextSlide}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white/30 hover:bg-white/50 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/30 transition-all opacity-0 hover:opacity-100 group-hover:opacity-100 z-10"
-              >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
-              </button>
-
-              {/* Pagination Dots */}
-              <div className="absolute bottom-2.5 sm:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 sm:gap-2 z-20">
-                {heroSlides.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => scrollTo(idx)}
-                    className={`h-2 sm:h-2.5 md:h-3 rounded-full transition-all duration-300 ${(currentIndex === totalSlides ? 0 : currentIndex) === idx
-                      ? 'bg-[#900606] w-5 sm:w-6 md:w-8'
-                      : 'bg-white/50 hover:bg-white w-2 sm:w-2.5 md:w-3'
-                      }`}
+            {/* Full-Card Background Image */}
+            {slide.link ? (
+              <Link href={slide.link} className="absolute inset-0 w-full h-full block">
+                {slide.mobileImage ? (
+                  <>
+                    <Image
+                      src={getImageUrl(slide.mobileImage)}
+                      alt={slide.title || "Hero Banner"}
+                      fill
+                      sizes="100vw"
+                      priority={idx === 0}
+                      className="object-cover object-center sm:hidden"
+                    />
+                    <Image
+                      src={getImageUrl(slide.image)}
+                      alt={slide.title || "Hero Banner"}
+                      fill
+                      sizes="100vw"
+                      priority={idx === 0}
+                      className="object-cover object-center hidden sm:block"
+                    />
+                  </>
+                ) : (
+                  <Image
+                    src={getImageUrl(slide.image)}
+                    alt={slide.title || "Hero Banner"}
+                    fill
+                    sizes="100vw"
+                    priority={idx === 0}
+                    className="object-fill sm:object-cover object-center"
                   />
-                ))}
+                )}
+              </Link>
+            ) : (
+              <div className="absolute inset-0 w-full h-full block">
+                {slide.mobileImage ? (
+                  <>
+                    <Image
+                      src={getImageUrl(slide.mobileImage)}
+                      alt={slide.title || "Hero Banner"}
+                      fill
+                      sizes="100vw"
+                      priority={idx === 0}
+                      className="object-fill object-center sm:hidden"
+                    />
+                    <Image
+                      src={getImageUrl(slide.image)}
+                      alt={slide.title || "Hero Banner"}
+                      fill
+                      sizes="100vw"
+                      priority={idx === 0}
+                      className="object-cover object-center hidden sm:block"
+                    />
+                  </>
+                ) : (
+                  <Image
+                    src={getImageUrl(slide.image)}
+                    alt={slide.title || "Hero Banner"}
+                    fill
+                    sizes="100vw"
+                    priority={idx === 0}
+                    className="object-fill sm:object-cover object-center"
+                  />
+                )}
               </div>
-            </div>
+            )}
+
+            {/* Dynamic Text & CTA Overlay */}
+            {(slide.title || slide.subtitle || slide.ctaText) && (
+              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10 flex flex-col justify-center px-4 xs:px-6 sm:px-12 md:px-20 lg:px-28 max-w-3xl pointer-events-none">
+                {slide.subtitle && (
+                  <div className="inline-block px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-[#900606] text-white text-[10px] sm:text-xs font-bold w-fit mb-1 xs:mb-1.5 sm:mb-3 shadow-sm tracking-wide">
+                    {slide.subtitle}
+                  </div>
+                )}
+                {slide.title && (
+                  <h2 className="text-lg xs:text-xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-snug sm:leading-tight mb-1.5 xs:mb-2 sm:mb-4 drop-shadow-md">
+                    {slide.title}
+                  </h2>
+                )}
+                {slide.ctaText && (
+                  <div className="pointer-events-auto mt-1 sm:mt-2">
+                    <Link
+                      href={slide.link || '/product'}
+                      className="inline-flex items-center gap-1.5 sm:gap-2 bg-[#900606] hover:bg-[#720404] text-white text-[11px] sm:text-xs md:text-sm font-bold px-3.5 xs:px-4 sm:px-6 py-1.5 sm:py-2.5 md:py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95"
+                    >
+                      <span>{slide.ctaText}</span>
+                      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-        </section>
+        ))}
+      </div>
+
+      {/* Navigation Arrows */}
+      <button
+        onClick={prevSlide}
+        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white/30 hover:bg-white/50 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/30 transition-all opacity-0 hover:opacity-100 group-hover:opacity-100 z-10"
+      >
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
+      </button>
+
+      <button
+        onClick={nextSlide}
+        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white/30 hover:bg-white/50 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/30 transition-all opacity-0 hover:opacity-100 group-hover:opacity-100 z-10"
+      >
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
+      </button>
+
+      {/* Pagination Dots */}
+      <div className="absolute bottom-2.5 sm:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 sm:gap-2 z-20">
+        {heroSlides.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => scrollTo(idx)}
+            className={`h-2 sm:h-2.5 md:h-3 rounded-full transition-all duration-300 ${(currentIndex === totalSlides ? 0 : currentIndex) === idx
+              ? 'bg-[#900606] w-5 sm:w-6 md:w-8'
+              : 'bg-white/50 hover:bg-white w-2 sm:w-2.5 md:w-3'
+              }`}
+          />
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
 
         {/* 2. SHOP BY CATEGORY */}
         <section className="w-full pt-0 pb-2 sm:pb-4 lg:pb-6 bg-[#FBFBF7]">
