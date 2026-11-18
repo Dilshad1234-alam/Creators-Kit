@@ -312,8 +312,14 @@ export default function AuthModal({
   };
 
   const handleBackdropPointerDown = (e) => {
-    // Prevent accidental tap bleed-through immediately after opening on mobile
-    if (Date.now() - openTimeRef.current < 450) {
+    // On mobile (< 640px), backdrop taps are disabled to prevent accidental dismissal while scrolling or typing.
+    // Mobile users can close intentionally using the top (X) button.
+    if (typeof window !== 'undefined' && window.innerWidth < 640) {
+      isBackdropPointerDownRef.current = false;
+      return;
+    }
+    // Prevent accidental tap bleed-through immediately after opening
+    if (Date.now() - openTimeRef.current < 600) {
       isBackdropPointerDownRef.current = false;
       return;
     }
@@ -324,8 +330,13 @@ export default function AuthModal({
   };
 
   const handleBackdropClick = (e) => {
-    // Prevent accidental tap bleed-through immediately after opening on mobile
-    if (Date.now() - openTimeRef.current < 450) {
+    // On mobile (< 640px), modal is dismissed via the explicit (X) button.
+    if (typeof window !== 'undefined' && window.innerWidth < 640) {
+      isBackdropPointerDownRef.current = false;
+      return;
+    }
+    // Prevent accidental tap bleed-through immediately after opening
+    if (Date.now() - openTimeRef.current < 600) {
       isBackdropPointerDownRef.current = false;
       return;
     }
@@ -342,7 +353,7 @@ export default function AuthModal({
     e.preventDefault();
     e.stopPropagation();
     // Prevent close button from getting triggered by opening tap on mobile
-    if (Date.now() - openTimeRef.current < 450) return;
+    if (Date.now() - openTimeRef.current < 600) return;
     onClose();
   };
 
