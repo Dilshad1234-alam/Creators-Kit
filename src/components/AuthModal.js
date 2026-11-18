@@ -26,6 +26,7 @@ export default function AuthModal({
   const router = useRouter();
   const otpInputRef = useRef(null);
   const openTimeRef = useRef(0);
+  const isBackdropPointerDownRef = useRef(false);
 
   // 2-Step Authentication State ('credentials' vs 'otp')
   const [step, setStep] = useState('credentials');
@@ -310,9 +311,12 @@ export default function AuthModal({
     setLoginSuccessNotice('');
   };
 
-  const isBackdropPointerDownRef = useRef(false);
-
   const handleBackdropPointerDown = (e) => {
+    // Prevent accidental tap bleed-through immediately after opening on mobile
+    if (Date.now() - openTimeRef.current < 450) {
+      isBackdropPointerDownRef.current = false;
+      return;
+    }
     // Only mark true if the user pressed down directly on the backdrop (NOT on the card)
     if (e.target === e.currentTarget) {
       isBackdropPointerDownRef.current = true;
@@ -320,6 +324,11 @@ export default function AuthModal({
   };
 
   const handleBackdropClick = (e) => {
+    // Prevent accidental tap bleed-through immediately after opening on mobile
+    if (Date.now() - openTimeRef.current < 450) {
+      isBackdropPointerDownRef.current = false;
+      return;
+    }
     // Only close if BOTH pointerdown AND click happened directly on the backdrop
     if (e.target === e.currentTarget && isBackdropPointerDownRef.current) {
       isBackdropPointerDownRef.current = false;
@@ -332,6 +341,8 @@ export default function AuthModal({
   const handleCloseButtonClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    // Prevent close button from getting triggered by opening tap on mobile
+    if (Date.now() - openTimeRef.current < 450) return;
     onClose();
   };
 
@@ -346,6 +357,8 @@ export default function AuthModal({
         className="w-full max-w-[440px] max-h-[92dvh] overflow-y-auto my-auto bg-white rounded-2xl p-5 sm:p-7 shadow-2xl border border-neutral-200/90 relative text-neutral-900 overscroll-contain animate-in fade-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
         onPointerDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
       >
         {/* Top Close Button with Touch-Friendly Hit Target */}
         <button

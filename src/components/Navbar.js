@@ -294,6 +294,19 @@ export default function Navbar() {
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [liveSaleTicker, setLiveSaleTicker] = useState(null);
   const searchRef = useRef(null);
+  const lastAuthOpenRef = useRef(0);
+
+  const handleOpenAuthModal = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const now = Date.now();
+    if (now - lastAuthOpenRef.current < 500) return;
+    lastAuthOpenRef.current = now;
+    setIsMobileMenuOpen(false);
+    openAuthModal();
+  };
 
   // Load live sale dynamic ticker if on live sale page
   useEffect(() => {
@@ -786,11 +799,7 @@ export default function Navbar() {
               /* Person Icon with Lightning Bolt for Guest / Non-logged in -> Opens Auth Modal */
               <button
                 type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  openAuthModal();
-                }}
+                onClick={handleOpenAuthModal}
                 className="p-1.5 text-neutral-700 dark:text-neutral-300 hover:text-[#900606] dark:hover:text-[#900606] hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full transition-all duration-200 flex items-center justify-center cursor-pointer group touch-manipulation"
                 title="Sign In"
                 aria-label="Sign In"
@@ -846,12 +855,7 @@ export default function Navbar() {
               ) : (
                 <button
                   type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setIsMobileMenuOpen(false);
-                    openAuthModal();
-                  }}
+                  onClick={handleOpenAuthModal}
                   className="p-1.5 text-neutral-700 dark:text-neutral-300 hover:text-[#900606] rounded-full hover:bg-neutral-100 transition-colors cursor-pointer touch-manipulation"
                   title="Sign In"
                   aria-label="Sign In"
@@ -1027,12 +1031,7 @@ export default function Navbar() {
                   <div className="flex flex-col gap-2 pt-1">
                     <button
                       type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setIsMobileMenuOpen(false);
-                        openAuthModal();
-                      }}
+                      onClick={handleOpenAuthModal}
                       className="flex items-center justify-center gap-2 w-full py-2.5 px-4 text-center rounded-xl text-sm font-bold bg-[#900606] text-white hover:bg-[#7a0505] shadow-sm cursor-pointer touch-manipulation"
                     >
                       <GuestUserLightningIcon className="w-4 h-4 text-white" />
