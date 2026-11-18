@@ -680,12 +680,13 @@ export default function LiveSalePage() {
   const handleCategoryClick = (catId) => {
     if (catId === 'bundles') {
       const el = document.getElementById('bundles-section');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      if (el) el.scrollIntoView({ behavior: 'smooth' });  
     } else {
       setActiveCategory(catId);
       const el = document.getElementById('standout-gear');
       if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
+    router.push(`/product`);
   };
 
   // Handle Newsletter Subscribe
@@ -911,7 +912,7 @@ export default function LiveSalePage() {
           {/* ========================================================================= */}
           <section className="pt-1 sm:pt-1 pb-1 sm:pb-2">
             <div className="flex flex-col items-center text-center mb-6 sm:mb-8">
-              <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-medium text-[#111827] tracking-tight pb-1">
+              <h2 className="text-1xl sm:text-2xl md:text-4xl lg:text-5xl font-medium text-[#111827] tracking-tight pb-1">
                 Shop Exclusive Deals By  <span className="text-[#900606] whitespace-nowrap">Category</span>
               </h2>
               <p className="text-neutral-500 text-xs sm:text-sm md:text-base font-normal max-w-xl mx-auto mt-1">
@@ -1238,7 +1239,7 @@ export default function LiveSalePage() {
           <section id="standout-gear" className="py-2 sm:py-4">
             <div className="flex flex-col items-center text-center mb-6 sm:mb-8">
               
-              <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-medium text-[#111827] tracking-tight pb-1">
+              <h2 className="text-1xl sm:text-2xl md:text-4xl lg:text-5xl font-medium text-[#111827] tracking-tight pb-1">
                 Festive Creator  <span className="text-[#900606] whitespace-nowrap">Deals.</span>
               </h2>
               <p className="text-neutral-500 text-xs sm:text-sm md:text-base font-normal max-w-xl mx-auto mt-1">
