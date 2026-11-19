@@ -756,7 +756,7 @@ export default function Navbar() {
                 title="Sign In"
                 aria-label="Sign In"
               >
-                <GuestUserLightningIcon className="w-5 h-5 group-hover:scale-105 transition-transform" />
+                <GuestUserLightningIcon className="w-5 h-5 xl:w-6 xl:h-6 group-hover:scale-105 transition-transform" />
               </button>
             )}
 
