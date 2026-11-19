@@ -7,7 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuthModal } from '@/context/AuthModalContext';
 import { useSession, signOut } from 'next-auth/react';
-import { Search, User, Lock } from 'lucide-react';
+import { Search, User } from 'lucide-react';
 
 const Menu = ({ className }) => (
   <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -18,6 +18,47 @@ const Menu = ({ className }) => (
 const X = ({ className }) => (
   <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+  </svg>
+);
+
+const GuestUserLightningIcon = ({ className = "w-5 h-5" }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    aria-hidden="true"
+  >
+    <circle
+      cx="10"
+      cy="6.8"
+      r="3.5"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M3.5 20.5v-1.5a4.8 4.8 0 0 1 4.8-4.8h3"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M18.5 20.5v-1a4.8 4.8 0 0 0-1-2.8"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <polygon
+      points="15.2 4.2 10.8 12.2 14.5 12.2 12.5 19.8 19 10.5 14.8 10.5 16.2 4.2"
+      fill="#F59E0B"
+      stroke="#EA580C"
+      strokeWidth="0.6"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
@@ -331,14 +372,12 @@ export default function Navbar() {
 
       const userInfoStr = sessionStorage.getItem('creatorsKitUserInfo') || localStorage.getItem('creatorsKitUserInfo');
       let customerName = null;
-      let role = 'user';
 
       if (userInfoStr) {
         try {
           const parsed = JSON.parse(userInfoStr);
           if (parsed && parsed.name) {
             customerName = parsed.name;
-            if (parsed.role) role = parsed.role;
           }
         } catch (e) {}
       }
@@ -348,11 +387,6 @@ export default function Navbar() {
           sessionStorage.getItem('userName') ||
           localStorage.getItem('userName') ||
           session?.user?.name;
-        const storedRole =
-          sessionStorage.getItem('userRole') ||
-          localStorage.getItem('userRole') ||
-          session?.user?.role;
-        if (storedRole) role = storedRole;
       }
 
       const isLoggedOut =
@@ -365,7 +399,6 @@ export default function Navbar() {
         const googleName = session.user.name || googleEmail.split('@')[0];
         const googleRole = session.user.role || 'user';
         customerName = googleName;
-        role = googleRole;
 
         try {
           if (!sessionStorage.getItem('userEmail')) {
@@ -540,7 +573,7 @@ export default function Navbar() {
             <Link href="/" className="relative flex items-center">
               <div className="relative h-12 w-[160px] sm:h-[70px] sm:w-[230px] xl:h-[109px] xl:w-[340px] overflow-hidden ml-1 md:ml-0">
                 <Image
-                  src={getImageUrl("/logo-kits.png")}
+                  src={getImageUrl('/logo-kits.png')}
                   alt="Creators Kit Logo"
                   fill
                   priority
@@ -693,7 +726,7 @@ export default function Navbar() {
                 >
                   <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden border border-neutral-200">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={getImageUrl("/profile.svg")} alt="Profile" className="w-full h-full object-cover" />
+                    <img src={getImageUrl('/profile.svg')} alt="Profile" className="w-full h-full object-cover" />
                   </div>
                 </Link>
 
@@ -723,7 +756,7 @@ export default function Navbar() {
                 title="Sign In"
                 aria-label="Sign In"
               >
-                <Lock className="w-5 h-5 stroke-[2] group-hover:scale-105 transition-transform" />
+                <GuestUserLightningIcon className="w-5 h-5 group-hover:scale-105 transition-transform" />
               </button>
             )}
 
@@ -780,7 +813,7 @@ export default function Navbar() {
                   title="Sign In"
                   aria-label="Sign In"
                 >
-                  <Lock className="w-5 h-5 stroke-[2]" />
+                  <GuestUserLightningIcon className="w-5 h-5" />
                 </button>
               )
             )}
@@ -957,7 +990,7 @@ export default function Navbar() {
                       onClick={handleOpenAuthModal}
                       className="flex items-center justify-center gap-2 w-full py-2.5 px-4 text-center rounded-xl text-sm font-bold bg-[#900606] text-white hover:bg-[#7a0505] shadow-sm cursor-pointer touch-manipulation"
                     >
-                      <Lock className="w-4 h-4 stroke-[2]" />
+                      <GuestUserLightningIcon className="w-4 h-4 text-white" />
                       Sign In
                     </button>
                   </div>
