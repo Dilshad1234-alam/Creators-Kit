@@ -828,7 +828,7 @@ export default function CustomVideoPlayer({
             ref={iframeRef}
             key={youtubeId}
             src={`https://www.youtube.com/embed/${youtubeId}?enablejsapi=1&autoplay=${
-              autoPlay && !pausedByUserRef.current ? 1 : 0
+              autoPlay ? 1 : 0
             }&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1${originParam}`}
             title={title}
             className="absolute -top-[14%] -left-[2%] w-[104%] h-[128%] border-0 pointer-events-none select-none"
