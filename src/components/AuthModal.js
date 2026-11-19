@@ -73,7 +73,7 @@ export default function AuthModal({
 
   return (
     <div
-      className="fixed inset-0 z-[99999] bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto"
+      className="fixed inset-0 z-[99999] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto"
       onPointerDown={handleBackdropPointerDown}
       onClick={handleBackdropClick}
     >

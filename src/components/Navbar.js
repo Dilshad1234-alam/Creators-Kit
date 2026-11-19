@@ -29,7 +29,6 @@ const GuestUserLightningIcon = ({ className = "w-5 h-5 xl:w-6 xl:h-6" }) => (
     className={className}
     aria-hidden="true"
   >
-    {/* Person Head */}
     <circle
       cx="10"
       cy="6.8"
@@ -39,7 +38,6 @@ const GuestUserLightningIcon = ({ className = "w-5 h-5 xl:w-6 xl:h-6" }) => (
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-    {/* Person Body Left */}
     <path
       d="M3.5 20.5v-1.5a4.8 4.8 0 0 1 4.8-4.8h3"
       stroke="currentColor"
@@ -47,7 +45,6 @@ const GuestUserLightningIcon = ({ className = "w-5 h-5 xl:w-6 xl:h-6" }) => (
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-    {/* Person Body Right */}
     <path
       d="M18.5 20.5v-1a4.8 4.8 0 0 0-1-2.8"
       stroke="currentColor"
@@ -55,7 +52,6 @@ const GuestUserLightningIcon = ({ className = "w-5 h-5 xl:w-6 xl:h-6" }) => (
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-    {/* Lightning Bolt */}
     <polygon
       points="15.2 4.2 10.8 12.2 14.5 12.2 12.5 19.8 19 10.5 14.8 10.5 16.2 4.2"
       fill="#F59E0B"
@@ -69,7 +65,6 @@ const GuestUserLightningIcon = ({ className = "w-5 h-5 xl:w-6 xl:h-6" }) => (
 const getTickerContent = (pathname, customTicker) => {
   if (!pathname) return null;
 
-  // 1. Live Sale / Flash Offers
   if (pathname === '/live-sale') {
     return {
       icon: (
@@ -83,7 +78,6 @@ const getTickerContent = (pathname, customTicker) => {
     };
   }
 
-  // 2. Contact & Customer Support
   if (pathname === '/contact') {
     return {
       icon: (
@@ -97,7 +91,6 @@ const getTickerContent = (pathname, customTicker) => {
     };
   }
 
-  // 3. Single Product Details
   if (pathname.startsWith('/product/') && pathname !== '/product') {
     return {
       icon: (
@@ -111,7 +104,6 @@ const getTickerContent = (pathname, customTicker) => {
     };
   }
 
-  // 4. Products Catalog / Store
   if (pathname === '/product') {
     return {
       icon: (
@@ -125,7 +117,6 @@ const getTickerContent = (pathname, customTicker) => {
     };
   }
 
-  // 5. Creator Bundles
   if (pathname.startsWith('/bundle')) {
     return {
       icon: (
@@ -139,7 +130,6 @@ const getTickerContent = (pathname, customTicker) => {
     };
   }
 
-  // 6. Cart
   if (pathname === '/cart') {
     return {
       icon: (
@@ -153,7 +143,6 @@ const getTickerContent = (pathname, customTicker) => {
     };
   }
 
-  // 7. Checkout
   if (pathname === '/checkout') {
     return {
       icon: (
@@ -167,7 +156,6 @@ const getTickerContent = (pathname, customTicker) => {
     };
   }
 
-  // 8. Blogs & Creator Academy
   if (pathname.startsWith('/blog')) {
     return {
       icon: (
@@ -181,7 +169,6 @@ const getTickerContent = (pathname, customTicker) => {
     };
   }
 
-  // 9. About Us
   if (pathname === '/about') {
     return {
       icon: (
@@ -195,7 +182,6 @@ const getTickerContent = (pathname, customTicker) => {
     };
   }
 
-  // 10. FAQs
   if (pathname === '/faq') {
     return {
       icon: (
@@ -210,7 +196,6 @@ const getTickerContent = (pathname, customTicker) => {
     };
   }
 
-  // 11. Track Order
   if (pathname === '/track') {
     return {
       icon: (
@@ -227,7 +212,6 @@ const getTickerContent = (pathname, customTicker) => {
     };
   }
 
-  // 12. Policies & Legal
   if (
     pathname === '/return-policy' ||
     pathname === '/refund' ||
@@ -247,7 +231,6 @@ const getTickerContent = (pathname, customTicker) => {
     };
   }
 
-  // 13. Dashboard & Account
   if (pathname === '/account' || pathname === '/dashboard') {
     return {
       icon: (
@@ -262,7 +245,6 @@ const getTickerContent = (pathname, customTicker) => {
     };
   }
 
-  // Default: Homepage ('/') & fallback
   return {
     icon: (
       <svg className="w-3.5 h-3.5 fill-[#900606]" viewBox="0 0 24 24">
@@ -278,7 +260,6 @@ const getTickerContent = (pathname, customTicker) => {
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [userName, setUserName] = useState(null);
-  const [userRole, setUserRole] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
   const { cartCount, clearCart } = useCart();
   const { openAuthModal } = useAuthModal();
@@ -286,7 +267,6 @@ export default function Navbar() {
   const router = useRouter();
   const { data: session } = useSession();
 
-  // Search Bar States
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -308,7 +288,6 @@ export default function Navbar() {
     openAuthModal();
   };
 
-  // Load live sale dynamic ticker if on live sale page
   useEffect(() => {
     async function fetchLiveTicker() {
       try {
@@ -319,12 +298,11 @@ export default function Navbar() {
             setLiveSaleTicker(data.tickerText);
           }
         }
-      } catch (e) { }
+      } catch (e) {}
     }
     fetchLiveTicker();
   }, []);
 
-  // Close search dropdown on click outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (searchRef.current && !searchRef.current.contains(e.target)) {
@@ -335,7 +313,6 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Debounced product search
   useEffect(() => {
     const q = searchQuery.trim();
     if (!q) {
@@ -379,25 +356,20 @@ export default function Navbar() {
   };
 
   useEffect(() => {
-    // Navbar is completely hidden and inactive on /admin routes.
-    // Never run auth redirects when already in /admin to avoid reload loops.
     if (pathname?.startsWith('/admin')) {
       return;
     }
 
     const updateAuth = () => {
-      // If user has explicitly logged out, ensure state remains strictly unauthenticated
       if (
         typeof window !== 'undefined' &&
         (sessionStorage.getItem('creatorskit_logged_out') === '1' ||
           localStorage.getItem('creatorskit_logged_out') === '1')
       ) {
         setUserName(null);
-        setUserRole(null);
         return;
       }
 
-      // Check for user account info in creatorsKitUserInfo
       const userInfoStr = sessionStorage.getItem('creatorsKitUserInfo') || localStorage.getItem('creatorsKitUserInfo');
       let customerName = null;
       let role = 'user';
@@ -409,10 +381,9 @@ export default function Navbar() {
             customerName = parsed.name;
             if (parsed.role) role = parsed.role;
           }
-        } catch (e) { }
+        } catch (e) {}
       }
 
-      // Fallback to storage/session
       if (!customerName) {
         customerName =
           sessionStorage.getItem('userName') ||
@@ -425,7 +396,6 @@ export default function Navbar() {
         if (storedRole) role = storedRole;
       }
 
-      // Synchronize Google OAuth session into client storage and cookies (only if not explicitly logged out)
       const isLoggedOut =
         typeof window !== 'undefined' &&
         (sessionStorage.getItem('creatorskit_logged_out') === '1' ||
@@ -465,16 +435,10 @@ export default function Navbar() {
             window.dispatchEvent(new Event('storage'));
             window.dispatchEvent(new CustomEvent('creatorskit-auth-change', { detail: googleUserInfo }));
           }
-        } catch (e) { }
+        } catch (e) {}
       }
 
-      if (customerName) {
-        setUserName(customerName);
-        setUserRole(role);
-      } else {
-        setUserName(null);
-        setUserRole(null);
-      }
+      setUserName(customerName || null);
     };
 
     updateAuth();
@@ -500,28 +464,23 @@ export default function Navbar() {
       try {
         const u = JSON.parse(sessionStorage.getItem('creatorsKitUserInfo') || localStorage.getItem('creatorsKitUserInfo') || '{}');
         if (u.email) activeEmail = u.email;
-      } catch (e) { }
+      } catch (e) {}
     }
 
-    // 1. Immediately mark logged-out flag to prevent state resurrection across tabs & reload
     try {
       sessionStorage.setItem('creatorskit_logged_out', '1');
       localStorage.setItem('creatorskit_logged_out', '1');
-    } catch (e) { }
+    } catch (e) {}
 
-    // 2. Immediately wipe UI state
     setUserName(null);
-    setUserRole(null);
 
-    // 3. Clear all storage
     try {
       ['creatorsKitUserInfo', 'userName', 'userEmail', 'userRole', 'token', 'adminToken', 'admin_role'].forEach((k) => {
         sessionStorage.removeItem(k);
         localStorage.removeItem(k);
       });
-    } catch (e) { }
+    } catch (e) {}
 
-    // 4. Clear all cookies
     try {
       const cookieNames = [
         'user_role', 'user_email', 'user_name', 'auth_token',
@@ -532,20 +491,17 @@ export default function Navbar() {
       cookieNames.forEach((c) => {
         document.cookie = `${c}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
       });
-    } catch (e) { }
+    } catch (e) {}
 
-    // 5. Clear cart
     if (typeof clearCart === 'function') {
-      try { clearCart(); } catch (e) { }
+      try { clearCart(); } catch (e) {}
     }
 
-    // 6. Notify all listeners
     try {
       window.dispatchEvent(new Event('storage'));
       window.dispatchEvent(new CustomEvent('creatorskit-auth-change', { detail: null }));
-    } catch (e) { }
+    } catch (e) {}
 
-    // 7. Delete user from MongoDB Compass 'users' collection & clear server cookies
     if (activeEmail) {
       try {
         await fetch('/api/auth/logout', {
@@ -558,26 +514,30 @@ export default function Navbar() {
       }
     }
 
-    // 8. Complete NextAuth sign out
     try {
       await signOut({ redirect: false });
-    } catch (e) { }
+    } catch (e) {}
 
-    // 9. Hard navigation/reload to home page so UI state is guaranteed clean on first click
     window.location.href = '/';
     if (window.location.pathname === '/') {
       window.location.reload();
     }
   };
 
-  if (pathname === '/login' || pathname === '/register' || pathname === '/verify-otp' || pathname === '/forgot-password' || pathname.startsWith('/admin')) return null;
+  if (
+    pathname === '/login' ||
+    pathname === '/register' ||
+    pathname === '/verify-otp' ||
+    pathname === '/forgot-password' ||
+    pathname.startsWith('/admin')
+  ) {
+    return null;
+  }
 
-  // Updated navigation links matching homepage content, About, Contact, and Live Sale
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Products', href: '/product' },
     { name: 'Live Sale', href: '/live-sale', isLive: true },
-    // { name: 'About Us', href: '/about' },
     { name: 'Contact', href: '/contact' },
   ];
 
@@ -592,11 +552,10 @@ export default function Navbar() {
 
   return (
     <header className="w-full fixed top-0 left-0 right-0 z-50 transition-colors duration-300 shadow-sm">
-      {/* Top Dynamic Page Ticker */}
       {ticker && (
         <Link
           href={ticker.href || '#'}
-          className="w-full bg-[#FAF9F5] border-b border-neutral-200/90 text-[#111827] text-[11px] sm:text-xs md:text-sm font-medium py-1.5 px-4 text-center tracking-normal flex items-center justify-center gap-2 select-none hover:bg-[#f5f3ec] transition-colors group block"
+          className="w-full bg-[#FAF9F5] border-b border-neutral-200/90 text-[#111827] text-[11px] sm:text-xs md:text-sm font-medium py-1.5 px-4 text-center tracking-normal flex items-center justify-center gap-2 select-none hover:bg-[#f5f3ec] transition-colors group"
         >
           <span className="inline-flex items-center gap-1.5">
             <span className="text-[#900606] font-extrabold flex items-center gap-1 shrink-0 group-hover:scale-105 transition-transform">
@@ -604,14 +563,13 @@ export default function Navbar() {
               <span>{ticker.badge}</span>
             </span>
             <span className="text-neutral-700 font-medium truncate max-w-[280px] xs:max-w-sm sm:max-w-none">
-              • {ticker.text}
+              - {ticker.text}
             </span>
           </span>
         </Link>
       )}
       <div className="w-full bg-white/90 backdrop-blur-md border-b border-neutral-200">
         <div className="w-full h-16 sm:h-20 px-4 md:px-6 flex items-center justify-between transition-colors duration-300">
-
           {/* Brand Logo */}
           <div className="flex-1 flex items-center justify-start h-full min-w-0">
             <Link href="/" className="relative flex items-center">
@@ -636,10 +594,11 @@ export default function Navbar() {
                   key={link.name}
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
-                  className={`relative px-3 xl:px-5 py-2 text-xs xl:text-sm font-bold transition-all duration-300 rounded-full whitespace-nowrap flex items-center gap-1.5 ${pathname === link.href
-                    ? 'bg-[#900606] text-white shadow-md'
-                    : 'text-neutral-700 dark:text-neutral-300 hover:text-[#900606] dark:hover:text-[#900606] hover:bg-neutral-100 dark:hover:bg-neutral-800/50'
-                    }`}
+                  className={`relative px-3 xl:px-5 py-2 text-xs xl:text-sm font-bold transition-all duration-300 rounded-full whitespace-nowrap flex items-center gap-1.5 ${
+                    pathname === link.href
+                      ? 'bg-[#900606] text-white shadow-md'
+                      : 'text-neutral-700 dark:text-neutral-300 hover:text-[#900606] dark:hover:text-[#900606] hover:bg-neutral-100 dark:hover:bg-neutral-800/50'
+                  }`}
                 >
                   <span>{link.name}</span>
                   {link.isLive && (
@@ -655,8 +614,6 @@ export default function Navbar() {
 
           {/* Desktop Actions */}
           <div className="flex-1 hidden lg:flex items-center justify-end gap-2.5 xl:gap-4 h-full pr-2 xl:pr-6">
-
-            {/* Search Bar & Live Dropdown */}
             {!pathname.startsWith('/admin') && (
               <div className="relative mr-1" ref={searchRef}>
                 <form onSubmit={handleSearchSubmit} className="relative">
@@ -691,7 +648,6 @@ export default function Navbar() {
                   </div>
                 </form>
 
-                {/* Live Search Results Dropdown */}
                 {showSearchDropdown && searchQuery.trim() && (
                   <div className="absolute right-0 top-full mt-2 w-72 xl:w-80 bg-white dark:bg-[#131C2E] rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden z-50">
                     {isSearching ? (
@@ -733,7 +689,7 @@ export default function Navbar() {
                                 </span>
                                 {item.category && (
                                   <span className="text-[10px] text-neutral-400 truncate">
-                                    • {item.category}
+                                    - {item.category}
                                   </span>
                                 )}
                               </div>
@@ -758,7 +714,6 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* Person Icon / User Profile Dropdown */}
             {!isMounted ? (
               <div className="w-9 h-9 flex items-center justify-center">
                 <div className="w-5 h-5 rounded-full border-2 border-neutral-200 border-t-[#900606] animate-spin"></div>
@@ -796,7 +751,6 @@ export default function Navbar() {
                 </div>
               </div>
             ) : (
-              /* Person Icon with Lightning Bolt for Guest / Non-logged in -> Opens Auth Modal */
               <button
                 type="button"
                 onClick={handleOpenAuthModal}
@@ -808,7 +762,6 @@ export default function Navbar() {
               </button>
             )}
 
-            {/* Cart Icon */}
             {!pathname.startsWith('/admin') && (
               <Link
                 href="/cart"
@@ -830,7 +783,6 @@ export default function Navbar() {
 
           {/* Mobile Right Actions */}
           <div className="flex justify-end lg:hidden items-center gap-1 sm:gap-2 h-full flex-shrink-0">
-            {/* Mobile Search Toggle */}
             {!pathname.startsWith('/admin') && (
               <button
                 type="button"
@@ -842,9 +794,12 @@ export default function Navbar() {
               </button>
             )}
 
-            {/* Mobile Person Icon */}
             {!pathname.startsWith('/admin') && (
-              userName ? (
+              !isMounted ? (
+                <div className="w-8 h-8 flex items-center justify-center">
+                  <div className="w-4 h-4 rounded-full border-2 border-neutral-200 border-t-[#900606] animate-spin" />
+                </div>
+              ) : userName ? (
                 <Link
                   href="/account"
                   className="p-1.5 text-neutral-700 dark:text-neutral-300 hover:text-[#900606] rounded-full hover:bg-neutral-100 transition-colors cursor-pointer"
@@ -865,7 +820,6 @@ export default function Navbar() {
               )
             )}
 
-            {/* Mobile Cart Icon */}
             {!pathname.startsWith('/admin') && (
               <Link
                 href="/cart"
@@ -883,7 +837,6 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="inline-flex items-center justify-center p-2 rounded-full text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
@@ -930,7 +883,6 @@ export default function Navbar() {
               </div>
             </form>
 
-            {/* Mobile Quick Results */}
             {searchQuery.trim() && searchResults.length > 0 && (
               <div className="mt-2 flex flex-col divide-y divide-neutral-100 dark:divide-neutral-800 max-h-[260px] overflow-y-auto">
                 {searchResults.map((item) => (
@@ -968,8 +920,11 @@ export default function Navbar() {
 
         {/* Mobile Navigation Menu */}
         <div
-          className={`lg:hidden absolute top-full left-0 right-0 w-full bg-white/95 dark:bg-[#0B0F19]/95 backdrop-blur-md shadow-2xl transition-all duration-300 ease-in-out overflow-hidden ${isMobileMenuOpen ? 'max-h-[600px] opacity-100 border-t border-neutral-200 dark:border-neutral-800' : 'max-h-0 opacity-0 border-t-0'
-            }`}
+          className={`lg:hidden absolute top-full left-0 right-0 w-full bg-white/95 dark:bg-[#0B0F19]/95 backdrop-blur-md shadow-2xl transition-all duration-300 ease-in-out overflow-hidden ${
+            isMobileMenuOpen
+              ? 'max-h-[600px] opacity-100 border-t border-neutral-200 dark:border-neutral-800'
+              : 'max-h-0 opacity-0 border-t-0'
+          }`}
         >
           {!pathname.startsWith('/admin') && (
             <div className="px-4 pt-4 pb-6 space-y-2 sm:px-6">
@@ -981,8 +936,11 @@ export default function Navbar() {
                     setIsMobileMenuOpen(false);
                     handleNavClick(e, link.href);
                   }}
-                  className={`flex items-center justify-between px-3 py-2 rounded-md text-base font-medium ${pathname === link.href ? 'text-[#900606] bg-neutral-100 dark:bg-neutral-800' : 'text-neutral-700 dark:text-neutral-300 hover:text-[#900606] hover:bg-neutral-50 dark:hover:bg-neutral-800'
-                    }`}
+                  className={`flex items-center justify-between px-3 py-2 rounded-md text-base font-medium ${
+                    pathname === link.href
+                      ? 'text-[#900606] bg-neutral-100 dark:bg-neutral-800'
+                      : 'text-neutral-700 dark:text-neutral-300 hover:text-[#900606] hover:bg-neutral-50 dark:hover:bg-neutral-800'
+                  }`}
                 >
                   <span>{link.name}</span>
                   {link.isLive && (
