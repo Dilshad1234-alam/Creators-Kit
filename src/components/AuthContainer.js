@@ -339,7 +339,7 @@ export default function AuthContainer({
 
   const authCardContent = (
     <div
-      className="w-full max-w-[440px] max-h-[90dvh] overflow-y-auto bg-white rounded-t-3xl sm:rounded-2xl p-6 sm:p-7 shadow-2xl border border-neutral-200/90 relative text-neutral-900 overscroll-contain mt-auto sm:my-auto"
+      className="w-full max-w-[440px] max-h-[88dvh] overflow-y-auto bg-white rounded-2xl p-6 sm:p-7 shadow-2xl border border-neutral-200/90 relative text-neutral-900 overscroll-contain my-auto"
       onClick={(e) => e.stopPropagation()}
       onPointerDown={(e) => e.stopPropagation()}
     >
