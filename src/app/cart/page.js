@@ -52,8 +52,8 @@ export default function CartPage() {
             href="/product"
             className="relative w-full sm:w-auto px-8 py-3.5 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm overflow-hidden group/btn transition-all duration-300 shadow-sm inline-flex items-center justify-center gap-2.5"
           >
-            <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
-            <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2.5">
+            <span className="absolute inset-0 bg-[#900606] "></span>
+            <span className="relative z-10 text-[#ffffff]  flex items-center justify-center gap-2.5">
               <span>Explore Studio Gear</span>
               <ArrowRight className="w-4 h-4 stroke-[2.5]" />
             </span>
@@ -87,9 +87,6 @@ export default function CartPage() {
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-[#111827] tracking-tight">
               Review Your <span className="text-[#900606] whitespace-nowrap">Cart</span>
             </h1>
-            <p className="text-neutral-600 text-xs sm:text-sm font-medium mt-2.5 leading-relaxed">
-              Verify your equipment selections and bundle upgrades before moving to secure checkout.
-            </p>
           </div>
 
           <div className="flex items-center gap-2 self-start sm:self-auto bg-white border border-neutral-200/90 rounded-full px-4 py-1.5 shadow-2xs text-xs font-bold text-neutral-700">
@@ -367,8 +364,8 @@ export default function CartPage() {
                 }}
                 className="relative w-full min-h-[48px] py-3.5 bg-white text-[#111827] border-2 border-neutral-200 rounded-xl font-bold text-sm sm:text-base overflow-hidden group/btn transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer active:scale-[0.99]"
               >
-                <span className="absolute inset-0 bg-[#900606] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
-                <span className="relative z-10 text-[#111827] group-hover/btn:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                <span className="absolute inset-0 bg-[#900606] "></span>
+                <span className="relative z-10 text-[#fdfdfd]   flex items-center justify-center gap-2">
                   <span>Proceed to Checkout</span>
                   <ArrowRight className="w-4 h-4 stroke-[2.5]" />
                 </span>
